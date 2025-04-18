@@ -90,24 +90,12 @@
   }
 }
 
-/* Police Impact */
-@font-face {
-  font-family: "Impact";
-  src: local("Impact"), url("https://fonts.gstatic.com/s/impact/v11/H4ckBXa4NsF3pIxZVoE.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-body {
-  @apply bg-background text-foreground;
-  font-family: 'Open Sans', Arial, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
 }
-
-.font-impact {
-  font-family: "Impact", "Arial Black", Arial, sans-serif;
-}
-
-/* recommande à l'utilisateur d'ajouter ceci dans index.html :
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" rel="stylesheet">
-*/
