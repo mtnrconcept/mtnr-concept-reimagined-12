@@ -22,6 +22,7 @@ export default {
         impact: ['Impact', 'Arial Black', 'sans-serif'],
         playfair: ['"Playfair Display"', 'serif'],
         inter: ['Inter', 'Arial', 'sans-serif'],
+        'open-sans': ['Open Sans', 'Arial', 'sans-serif'],
       },
       colors: {
 				border: 'hsl(var(--border))',
