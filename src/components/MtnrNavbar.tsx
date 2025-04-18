@@ -10,49 +10,55 @@ const navLinks = [
   { name: "Book ta session", path: "/book" },
   { name: "Écris-nous", path: "/contact" },
   { name: "Boutique", path: "/boutique" },
-  { name: "Réservation en ligne", path: "/reservation" },
 ];
 
 export default function MtnrNavbar() {
   const location = useLocation();
   return (
-    <header className="w-full pb-4 bg-transparent fixed left-0 top-0 z-50">
-      <div className="mx-auto flex flex-col items-center">
-        {/* Logo & user area */}
-        <div className="w-full flex justify-center relative" style={{height: '162px'}}>
-          <div className="bg-black/90 h-36 w-[880px] rounded-b-lg shadow-2xl flex flex-col items-center relative z-20 pt-3">
-            <img
-              src="/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png"
-              alt="MTNR Logo"
-              className="w-40 h-40 object-contain -mt-5 drop-shadow logo-mtnr"
-              style={{ filter: "drop-shadow(0 1px 5px #222)" }}
-            />
-          </div>
-          <div className="absolute right-10 top-6 flex gap-5 items-center z-40">
-            <User className="text-white" size={28} />
-            <span className="text-sm text-white">Se connecter</span>
-            <ShoppingCart className="text-white" size={28} />
-          </div>
+    <header className="w-full flex flex-col items-center pt-6 z-40 relative">
+      {/* LOGO style badge */}
+      <div className="flex flex-col items-center">
+        <div className="bg-gradient-to-br from-[#151c2a] via-[#1e273d] to-[#252840] rounded-full p-4 shadow-2xl mb-2 border-4 border-[#9b87f5]">
+          <img
+            src="/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png"
+            alt="MTNR Logo"
+            className="w-36 h-36 rounded-full object-contain drop-shadow-lg"
+            style={{
+              background: "radial-gradient(circle at 60% 25%, #17192b 70%, #265ebfbb 100%)"
+            }}
+          />
         </div>
-        {/* Nav menu */}
-        <nav className="mx-auto -mt-3 z-20">
-          <ul className="flex gap-1">
-            {navLinks.map(link => (
-              <li
-                key={link.path}
-                className={`font-impact uppercase px-5 py-3 text-lg cursor-pointer border-b-2 transition-all duration-150
+        <span className="block font-impact text-white text-4xl tracking-widest uppercase mt-2 text-shadow-lg">
+          MTNR Concept
+        </span>
+      </div>
+      {/* Navigation liens */}
+      <nav className="mt-7">
+        <ul className="flex gap-4">
+          {navLinks.map(link => (
+            <li key={link.path}>
+              <Link
+                to={link.path}
+                className={`font-impact px-6 py-2 rounded-full text-lg uppercase tracking-widest shadow-lg
+                  transition-all duration-150 border-2
                   ${
                     location.pathname === link.path
-                      ? "bg-black text-white border-black"
-                      : "bg-white/95 text-black border-transparent hover:bg-gray-200"
+                      ? "bg-[#1EAEDB] border-[#9b87f5] text-black shadow-cyan-400/60"
+                      : "bg-[#191c25] border-white/10 text-white hover:bg-[#111728] hover:text-[#1EAEDB] hover:border-[#9b87f5] hover:shadow-lg"
                   }
                 `}
               >
-                <Link to={link.path}>{link.name}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+                {link.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      {/* User & Cart area à droite */}
+      <div className="absolute right-8 top-7 flex gap-6 items-center text-white drop-shadow-lg">
+        <User size={28} />
+        <span className="text-white text-base font-light tracking-widest hover:underline cursor-pointer">Se connecter</span>
+        <ShoppingCart size={28} />
       </div>
     </header>
   );
