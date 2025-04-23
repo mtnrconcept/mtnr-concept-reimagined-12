@@ -7,49 +7,54 @@
   :root {
     --background: 235 18% 10%;
     --foreground: 55 43% 98%;
-
     --primary: 55 100% 54%;
     --primary-foreground: 240 10% 5%;
-
     --card: 238 16% 13%;
     --card-foreground: 50 15% 90%;
-
     --muted: 230 20% 18%;
     --muted-foreground: 60 4% 65%;
-
     --border: 238 9% 18%;
     --input: 50 9% 18%;
-
     --radius: 0.5rem;
   }
 
   body {
-    @apply bg-grunge text-primary-foreground font-marker antialiased;
-    letter-spacing: 0.04em;
-    background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?blend=2f2d36&sat=0&exp=2&blend-mode=multiply"), 
+    @apply font-grunge bg-grunge text-primary-foreground antialiased;
+    letter-spacing: 0.055em;
+    /* Collage grunge */
+    background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?blend=2f2d36&sat=0&exp=2&blend-mode=multiply"),
+                      url("https://www.transparenttextures.com/patterns/concrete-wall-2.png"),
+                      url("https://www.transparenttextures.com/patterns/old-wall.png"),
                       url("https://www.transparenttextures.com/patterns/rocky-wall.png");
-    background-size: cover, auto;
-    background-repeat: no-repeat, repeat;
+    background-size: cover, auto, auto, auto;
+    background-repeat: no-repeat, repeat, repeat, repeat;
     background-attachment: fixed;
   }
 
+  .font-grunge {
+    font-family: 'Special Elite', 'Share Tech Mono', 'Permanent Marker', 'Rock Salt', cursive, monospace;
+    font-smooth: always;
+  }
   .grunge-border {
-    @apply border-2 border-yellow-400 border-dashed rounded-xl shadow-[0_2px_22px_#ffd70033] bg-[#222226bf] backdrop-blur-[2.5px];
+    @apply border-2 border-yellow-400 border-dashed rounded-2xl shadow-[0_3px_32px_#ffd70033] bg-[#19191edc] backdrop-blur-[3px];
+    filter: drop-shadow(0 2px 24px #222) blur(0.4px);
   }
   .glass-morphism {
-    @apply backdrop-blur-2xl bg-black/50 border border-yellow-400/20 shadow-[0_4px_28px_-2px_rgba(255,221,46,0.1)];
+    @apply backdrop-blur-2xl bg-black/65 border border-yellow-400/30 shadow-[0_4px_32px_-2px_rgba(255,221,46,0.19)];
+  }
+  .paper-texture {
+    background-image: url("https://www.transparenttextures.com/patterns/cardboard-flat.png") !important;
+    background-blend-mode: darken;
   }
 }
-
 ::-webkit-scrollbar {
-  width: 8px;
-  background: #0f0f0f;
+  width: 10px;
+  background: #11101a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ffd70060;
-  border-radius: 6px;
+  background: #ffd70080;
+  border-radius: 8px;
 }
-
 .selection\:bg-primary::selection {
   @apply bg-primary text-black;
 }
