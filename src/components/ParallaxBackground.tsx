@@ -16,9 +16,9 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   React.useEffect(() => {
     const handleScroll = () => {
       document.querySelectorAll<HTMLElement>('.parallax-bg').forEach((el, i) => {
-        // Reduced speed for a more subtle effect
-        const speed = 0.05 + i * 0.05;
-        el.style.transform = `translateY(${window.scrollY * speed}px) scale(1.05)`;
+        // Minimal parallax effect
+        const speed = 0.03 + i * 0.02;
+        el.style.transform = `translateY(${window.scrollY * speed}px)`;
       });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -34,16 +34,14 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             key={img}
             className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
             style={{
-              zIndex: idx - 10, // Lower z-index so content appears above
-              transformOrigin: 'center center',
+              zIndex: -20 + idx, // Very low z-index
+              opacity: 0.4 - (idx * 0.1),
             }}
           >
             <img
               src={img}
               alt=""
-              className={`w-full h-full object-cover select-none grayscale contrast-[1.15] ${
-                idx === 0 ? 'opacity-80' : idx === 1 ? 'opacity-65' : 'opacity-50'
-              } ${idx > 0 ? 'blur-[1px]' : ''}`}
+              className={`w-full h-full object-cover select-none grayscale contrast-125 ${idx > 0 ? 'blur-[1px]' : ''}`}
               draggable={false}
               loading="eager"
             />
@@ -51,21 +49,19 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         ))}
       </div>
       
-      {/* Overlay for better readability */}
-      <div className="absolute inset-0 bg-black/60 z-0" />
+      {/* Dark overlay to ensure content visibility */}
+      <div className="absolute inset-0 bg-black/75 -z-5" />
       
       {/* Grain texture */}
       <div 
-        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30 z-0"
+        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30 -z-5"
         style={{
           backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")'
         }}
       />
       
-      {/* Content container with very high z-index */}
-      <div className="relative z-50 w-full h-full">
-        {children}
-      </div>
+      {/* Content container with normal document flow */}
+      {children}
     </div>
   );
 }

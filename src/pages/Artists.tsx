@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
@@ -19,8 +20,8 @@ export default function Artists() {
     <>
       <Navbar />
       <ParallaxBackground>
-        <div className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
-          <div className="w-full max-w-5xl z-10">
+        <main className="relative z-50 min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
+          <div className="w-full max-w-5xl">
             <h1 className="text-yellow-400 text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center font-black drop-shadow-lg" style={{ letterSpacing: "0.16em" }}>
               Le Crew
             </h1>
@@ -48,7 +49,7 @@ export default function Artists() {
               ))}
             </div>
           </div>
-        </div>
+        </main>
       </ParallaxBackground>
     </>
   );

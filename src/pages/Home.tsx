@@ -23,7 +23,7 @@ const artistImages = [
 ];
 
 export default function Home() {
-  // Force scroll to top on page load and fix z-index issues
+  // Force scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -32,8 +32,8 @@ export default function Home() {
     <>
       <Navbar />
       <ParallaxBackground>
-        <div className="min-h-screen w-full flex flex-col items-center font-grunge z-20 selection:bg-primary selection:text-black pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6">
-          <section className="w-full flex flex-col items-center justify-center pb-14 px-1 sm:px-3 section-content z-20">
+        <main className="relative z-50 min-h-screen w-full flex flex-col items-center font-grunge selection:bg-primary selection:text-black pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6">
+          <section className="w-full flex flex-col items-center justify-center pb-14 px-1 sm:px-3">
             <div className="inline-block px-4 sm:px-7 py-9 sm:py-12 grunge-border shadow-2xl bg-black/80 max-w-2xl backdrop-blur-lg mt-5" >
               <h1 className="section-title text-3xl xs:text-4xl sm:text-5xl md:text-6xl text-primary mb-4">Bienvenue</h1>
               <div className="uppercase text-white tracking-widest text-xl sm:text-2xl md:text-3xl mb-5 font-extrabold" style={{ textShadow: "0 2px 10px #ffe,0 6px 30px #444" }}>
@@ -69,7 +69,7 @@ export default function Home() {
               </Link>
             </div>
           </section>
-          <section className="w-full mt-14 xs:mt-16 z-20 section-content">
+          <section className="w-full mt-14 xs:mt-16">
             <h2 className="section-title text-yellow-400 text-2xl md:text-4xl mb-5">Artistes de la cave</h2>
             <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 gap-5 xs:gap-7">
               {artistImages.map((artist) => (
@@ -80,10 +80,10 @@ export default function Home() {
               ))}
             </div>
           </section>
-          <footer className="w-full flex justify-center items-center py-7 mt-16 xs:mt-24 text-xs xs:text-sm text-yellow-300/60 font-grunge uppercase tracking-widest z-20">
+          <footer className="w-full flex justify-center items-center py-7 mt-16 xs:mt-24 text-xs xs:text-sm text-yellow-300/60 font-grunge uppercase tracking-widest">
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
           </footer>
-        </div>
+        </main>
       </ParallaxBackground>
     </>
   );
