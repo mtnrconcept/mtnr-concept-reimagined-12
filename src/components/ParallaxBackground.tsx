@@ -16,7 +16,9 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   React.useEffect(() => {
     const handleScroll = () => {
       document.querySelectorAll<HTMLElement>('.parallax-bg').forEach((el, i) => {
-        el.style.transform = `translateY(${window.scrollY * (0.15 + i * 0.1)}px)`;
+        // Augmentons la vitesse de défilement pour un effet plus prononcé
+        const speed = 0.25 + i * 0.15;
+        el.style.transform = `translateY(${window.scrollY * speed}px) scale(1.1)`;
       });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -33,26 +35,28 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
             style={{
               zIndex: idx + 1,
+              transformOrigin: 'center center',
             }}
           >
             <img
               src={img}
               alt=""
-              className={`w-full h-full object-cover select-none grayscale contrast-125 ${
+              className={`w-full h-full object-cover select-none grayscale contrast-[1.15] ${
                 idx === 0 ? 'opacity-90' : idx === 1 ? 'opacity-75' : 'opacity-60'
-              } ${idx > 0 ? 'blur-sm' : ''}`}
+              } ${idx > 0 ? 'blur-[2px]' : ''}`}
               draggable={false}
+              loading="eager"
             />
           </div>
         ))}
       </div>
       
-      {/* Ajout d'un overlay pour améliorer la lisibilité du contenu */}
-      <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* Overlay pour améliorer la lisibilité */}
+      <div className="absolute inset-0 bg-black/50 z-10" />
       
       {/* Grain texture */}
       <div 
-        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-20 z-20"
+        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30 z-20"
         style={{
           backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")'
         }}
