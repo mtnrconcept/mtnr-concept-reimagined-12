@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
@@ -13,7 +14,7 @@ export default function WhatWeDo() {
       <Navbar />
       <ParallaxBackground>
         <div className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
-          <div className="w-full max-w-4xl z-10">
+          <div className="w-full max-w-4xl">
             <h1 className="text-primary text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 uppercase text-center font-black drop-shadow-lg" style={{ letterSpacing: "0.16em" }}>
               Notre Vibe
             </h1>
