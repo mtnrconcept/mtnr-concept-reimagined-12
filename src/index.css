@@ -15,13 +15,12 @@
     --muted-foreground: 60 4% 65%;
     --border: 238 9% 18%;
     --input: 50 9% 18%;
-    --radius: 0.5rem;
+    --radius: 0.65rem;
   }
 
   body {
     @apply font-grunge bg-grunge text-primary-foreground antialiased;
     letter-spacing: 0.055em;
-    /* Collage grunge */
     background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?blend=2f2d36&sat=0&exp=2&blend-mode=multiply"),
                       url("https://www.transparenttextures.com/patterns/concrete-wall-2.png"),
                       url("https://www.transparenttextures.com/patterns/old-wall.png"),
@@ -29,22 +28,41 @@
     background-size: cover, auto, auto, auto;
     background-repeat: no-repeat, repeat, repeat, repeat;
     background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Font totalement grunge : plus fort que Special Elite et marker */
+  @font-face {
+    font-family: 'TrashHand';
+    src: url('https://fonts.cdnfonts.com/s/61959/TrashHand.woff') format('woff'),
+         url('https://fonts.cdnfonts.com/s/61959/TrashHand.ttf') format('truetype');
+    font-display: swap;
   }
 
   .font-grunge {
-    font-family: 'Special Elite', 'Share Tech Mono', 'Permanent Marker', 'Rock Salt', cursive, monospace;
+    font-family: 'TrashHand', 'Special Elite', 'Share Tech Mono', 'Permanent Marker', 'Rock Salt', cursive, monospace;
     font-smooth: always;
   }
+
   .grunge-border {
     @apply border-2 border-yellow-400 border-dashed rounded-2xl shadow-[0_3px_32px_#ffd70033] bg-[#19191edc] backdrop-blur-[3px];
-    filter: drop-shadow(0 2px 24px #222) blur(0.4px);
+    filter: drop-shadow(0 2px 24px #000a) blur(0.3px);
   }
   .glass-morphism {
-    @apply backdrop-blur-2xl bg-black/65 border border-yellow-400/30 shadow-[0_4px_32px_-2px_rgba(255,221,46,0.19)];
+    @apply backdrop-blur-2xl bg-zinc-900/70 border border-yellow-400/30 shadow-[0_4px_32px_-2px_rgba(255,221,46,0.19)];
   }
   .paper-texture {
     background-image: url("https://www.transparenttextures.com/patterns/cardboard-flat.png") !important;
     background-blend-mode: darken;
+  }
+
+  /* Amélioration du responsive pour ttes sections */
+  .section-content {
+    @apply w-full max-w-5xl px-3 sm:px-5 md:px-8;
+  }
+  .section-title {
+    @apply font-grunge uppercase text-center mb-6 font-black drop-shadow-lg;
+    letter-spacing: 0.16em;
   }
 }
 ::-webkit-scrollbar {
@@ -55,6 +73,19 @@
   background: #ffd70080;
   border-radius: 8px;
 }
+
 .selection\:bg-primary::selection {
   @apply bg-primary text-black;
+}
+
+@media (max-width: 640px) {
+  .grunge-border {
+    border-width: 1.5px;
+    border-radius: 1rem;
+    padding: 0.2em;
+  }
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 1.1em;
+  }
 }
