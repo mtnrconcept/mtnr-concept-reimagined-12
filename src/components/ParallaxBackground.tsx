@@ -16,8 +16,8 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   React.useEffect(() => {
     const handleScroll = () => {
       document.querySelectorAll<HTMLElement>('.parallax-bg').forEach((el, i) => {
-        // Minimal parallax effect
-        const speed = 0.03 + i * 0.02;
+        // Minimal parallax effect with very slow scroll speed
+        const speed = 0.02 + i * 0.01;
         el.style.transform = `translateY(${window.scrollY * speed}px)`;
       });
     };
@@ -26,42 +26,48 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden -z-10 bg-black">
-      {/* Parallax layers */}
-      <div className="absolute inset-0 pointer-events-none">
-        {stairsImages.map((img, idx) => (
-          <div
-            key={img}
-            className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
-            style={{
-              zIndex: -20 + idx, // Very low z-index
-              opacity: 0.4 - (idx * 0.1),
-            }}
-          >
-            <img
-              src={img}
-              alt=""
-              className={`w-full h-full object-cover select-none grayscale contrast-125 ${idx > 0 ? 'blur-[1px]' : ''}`}
-              draggable={false}
-              loading="eager"
-            />
-          </div>
-        ))}
+    <div className="min-h-screen">
+      {/* Fixed background container */}
+      <div className="fixed inset-0 w-full h-full overflow-hidden bg-black" style={{ zIndex: 0 }}>
+        {/* Parallax layers */}
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+          {stairsImages.map((img, idx) => (
+            <div
+              key={img}
+              className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
+              style={{
+                zIndex: idx,
+                opacity: 0.3 - (idx * 0.05),
+              }}
+            >
+              <img
+                src={img}
+                alt=""
+                className={`w-full h-full object-cover select-none grayscale contrast-125 ${idx > 0 ? 'blur-[1px]' : ''}`}
+                draggable={false}
+                loading="eager"
+              />
+            </div>
+          ))}
+        </div>
+        
+        {/* Dark overlay to ensure content visibility */}
+        <div className="absolute inset-0 bg-black/85" style={{ zIndex: 5 }} />
+        
+        {/* Grain texture */}
+        <div 
+          className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30"
+          style={{
+            backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")',
+            zIndex: 6
+          }}
+        />
       </div>
       
-      {/* Dark overlay to ensure content visibility */}
-      <div className="absolute inset-0 bg-black/75 -z-5" />
-      
-      {/* Grain texture */}
-      <div 
-        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-30 -z-5"
-        style={{
-          backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")'
-        }}
-      />
-      
-      {/* Content container with normal document flow */}
-      {children}
+      {/* Content container with normal document flow - HIGH z-index to ensure visibility */}
+      <div className="relative" style={{ zIndex: 10 }}>
+        {children}
+      </div>
     </div>
   );
 }

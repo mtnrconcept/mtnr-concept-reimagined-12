@@ -1,3 +1,4 @@
+
 import ParallaxBackground from "@/components/ParallaxBackground";
 import Navbar from "@/components/Navbar";
 import { Link } from "react-router-dom";
@@ -29,10 +30,10 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <Navbar />
-      <ParallaxBackground>
-        <main className="relative z-50 min-h-screen w-full flex flex-col items-center font-grunge selection:bg-primary selection:text-black pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6">
+    <ParallaxBackground>
+      <div className="relative z-10 min-h-screen">
+        <Navbar />
+        <main className="min-h-screen w-full flex flex-col items-center font-grunge selection:bg-primary selection:text-black pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6">
           <section className="w-full flex flex-col items-center justify-center pb-14 px-1 sm:px-3">
             <div className="inline-block px-4 sm:px-7 py-9 sm:py-12 grunge-border shadow-2xl bg-black/80 max-w-2xl backdrop-blur-lg mt-5" >
               <h1 className="section-title text-3xl xs:text-4xl sm:text-5xl md:text-6xl text-primary mb-4">Bienvenue</h1>
@@ -84,7 +85,7 @@ export default function Home() {
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
           </footer>
         </main>
-      </ParallaxBackground>
-    </>
+      </div>
+    </ParallaxBackground>
   );
 }

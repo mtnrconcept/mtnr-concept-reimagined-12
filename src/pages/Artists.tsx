@@ -17,10 +17,10 @@ export default function Artists() {
   }, []);
 
   return (
-    <>
-      <Navbar />
-      <ParallaxBackground>
-        <main className="relative z-50 min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
+    <ParallaxBackground>
+      <div className="relative z-10 min-h-screen">
+        <Navbar />
+        <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
           <div className="w-full max-w-5xl">
             <h1 className="text-yellow-400 text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center font-black drop-shadow-lg" style={{ letterSpacing: "0.16em" }}>
               Le Crew
@@ -50,7 +50,7 @@ export default function Artists() {
             </div>
           </div>
         </main>
-      </ParallaxBackground>
-    </>
+      </div>
+    </ParallaxBackground>
   );
 }
