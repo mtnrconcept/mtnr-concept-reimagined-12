@@ -23,10 +23,8 @@ export default {
         'urban': ['"Urban Hookupz"', 'cursive'],
         'graffont': ['Graffont', 'cursive'],
         'garage': ['"Garage Shock"', 'cursive'],
-        playfair: ['"Playfair Display"', 'serif'],
-        inter: ['Inter', 'sans-serif'],
-        marker: ['"Permanent Marker"', 'cursive'],
-        rocksalt: ['"Rock Salt"', 'cursive'],
+        'marker': ['"Permanent Marker"', 'cursive'],
+        'rocksalt': ['"Rock Salt"', 'cursive'],
         'nosegrind': ['Nosegrind', 'cursive'],
       },
       colors: {
@@ -64,12 +62,18 @@ export default {
         wiggle: {
           "0%, 100%": { transform: "rotate(-3deg) scale(1)" },
           "50%": { transform: "rotate(3deg) scale(1.02)" }
+        },
+        spray: {
+          '0%': { transform: 'scale(1)', opacity: '0.6' },
+          '50%': { transform: 'scale(1.1)', opacity: '0.8' },
+          '100%': { transform: 'scale(1)', opacity: '0.6' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        wiggle: "wiggle 0.3s ease-in-out infinite"
+        wiggle: "wiggle 0.3s ease-in-out infinite",
+        'spray': 'spray 2s ease-in-out infinite',
       },
     }
   },

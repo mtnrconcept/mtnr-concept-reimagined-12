@@ -30,11 +30,20 @@
     min-height: 100dvh;
   }
 
-  /* Font totalement grunge : plus fort que Special Elite et marker */
+  /* Font totalement grunge : plus fort que Special Elite et marker */
   @font-face {
     font-family: 'TrashHand';
     src: url('https://fonts.cdnfonts.com/s/61959/TrashHand.woff') format('woff'),
          url('https://fonts.cdnfonts.com/s/61959/TrashHand.ttf') format('truetype');
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Nosegrind';
+    src: url('/fonts/Nosegrind.woff2') format('woff2'),
+         url('/fonts/Nosegrind.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
     font-display: swap;
   }
 
@@ -47,9 +56,25 @@
     @apply border-2 border-yellow-400 border-dashed rounded-2xl shadow-[0_3px_32px_#ffd70033] bg-[#19191edc] backdrop-blur-[3px];
     filter: drop-shadow(0 2px 24px #000a) blur(0.3px);
   }
+
   .glass-morphism {
     @apply backdrop-blur-2xl bg-zinc-900/70 border border-yellow-400/30 shadow-[0_4px_32px_-2px_rgba(255,221,46,0.19)];
   }
+
+  .spray-text {
+    text-shadow: 0 0 5px rgba(255,221,68,0.3),
+                 0 0 10px rgba(255,221,68,0.2),
+                 0 0 15px rgba(255,221,68,0.1);
+    @apply animate-spray;
+  }
+
+  .graffiti-outline {
+    text-shadow: -1px -1px 0 #000,
+                  1px -1px 0 #000,
+                 -1px 1px 0 #000,
+                  1px 1px 0 #000;
+  }
+
   .paper-texture {
     background-image: url("https://www.transparenttextures.com/patterns/cardboard-flat.png") !important;
     background-blend-mode: darken;
@@ -64,14 +89,6 @@
     letter-spacing: 0.16em;
   }
   
-  @font-face {
-    font-family: 'Nosegrind';
-    src: url('/fonts/Nosegrind.woff2') format('woff2'),
-         url('/fonts/Nosegrind.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
 }
 ::-webkit-scrollbar {
   width: 10px;

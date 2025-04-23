@@ -20,8 +20,8 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center justify-between h-16 px-3">
         <Link to="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <img src="/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png" alt="Logo MTNR" className="h-12 w-auto object-contain rounded shadow-2xl border-2 border-yellow-400/60 bg-paper" draggable={false} />
-          <span className="font-nosegrind text-2xl xs:text-3xl tracking-tight uppercase text-primary drop-shadow-lg select-none"
-            style={{ letterSpacing: "0.09em", textShadow: "0 3px 18px #000,0 0 10px #fdec2066" }}
+          <span className="font-nosegrind text-2xl xs:text-3xl tracking-tight uppercase text-primary spray-text graffiti-outline"
+            style={{ letterSpacing: "0.09em" }}
           >
             MTNR
           </span>
@@ -35,7 +35,7 @@ export default function Navbar() {
           </svg>
         </button>
         <ul className={cn(
-          "flex-col md:flex-row md:flex gap-5 font-grunge text-lg md:text-xl font-black uppercase fixed md:static top-16 left-0 w-full md:w-auto bg-black/95 md:bg-transparent z-40 transition-all duration-300",
+          "flex-col md:flex-row md:flex gap-5 font-urban text-lg md:text-xl font-black uppercase fixed md:static top-16 left-0 w-full md:w-auto bg-black/95 md:bg-transparent z-40 transition-all duration-300",
           menuOpen ? "flex" : "hidden md:flex"
         )}>
           {navLinks.map((link) => (
@@ -46,7 +46,7 @@ export default function Navbar() {
                 className={cn(
                   "relative py-1 px-4 after:absolute after:w-full after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 after:scale-x-0 hover:after:scale-x-100 hover:after:origin-bottom-left",
                   "transition-colors duration-200 font-black uppercase tracking-tight rounded-md hover:text-yellow-300",
-                  pathname === link.path ? "text-primary after:scale-x-100" : "text-white/90"
+                  pathname === link.path ? "text-primary spray-text" : "text-white/90"
                 )}
                 style={{
                   textShadow: "0 2px 7px #111, 0 0 7px #ffd60039",
