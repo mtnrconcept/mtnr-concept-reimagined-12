@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,6 +19,10 @@ export default {
     },
     extend: {
       fontFamily: {
+        'street': ['"Street Writer"', 'cursive'],
+        'urban': ['"Urban Hookupz"', 'cursive'],
+        'graffont': ['Graffont', 'cursive'],
+        'garage': ['"Garage Shock"', 'cursive'],
         playfair: ['"Playfair Display"', 'serif'],
         inter: ['Inter', 'sans-serif'],
         marker: ['"Permanent Marker"', 'cursive'],

@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,7 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center justify-between h-16 px-3">
         <Link to="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
           <img src="/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png" alt="Logo MTNR" className="h-12 w-auto object-contain rounded shadow-2xl border-2 border-yellow-400/60 bg-paper" draggable={false} />
-          <span className="font-grunge text-2xl xs:text-3xl tracking-tight uppercase text-primary drop-shadow-lg select-none"
+          <span className="font-street text-2xl xs:text-3xl tracking-tight uppercase text-primary drop-shadow-lg select-none"
             style={{ letterSpacing: "0.09em", textShadow: "0 3px 18px #000,0 0 10px #fdec2066" }}
           >
             MTNR
@@ -62,4 +61,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
