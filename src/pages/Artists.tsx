@@ -1,7 +1,7 @@
 
-import ParallaxBg from "@/components/ParallaxBg";
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
+import ParallaxBg from "@/components/ParallaxBg";
 
 const artists = [
   { name: "U.D Sensei", img: "/lovable-uploads/211284ce-8851-4248-8f65-0ea7e3c0c8ff.png", desc: "Producteur maudit, MC, boss du son MTNR. Beat sale, vision claire." },
@@ -17,11 +17,11 @@ export default function Artists() {
   }, []);
 
   return (
-    <ParallaxBg>
+    <>
       <Navbar />
       <div className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
         <div className="w-full max-w-5xl z-10">
-          <h1 className="text-yellow-400 text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center font-black drop-shadow-lg animate-wiggle" style={{ letterSpacing: "0.16em" }}>
+          <h1 className="text-yellow-400 text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center font-black drop-shadow-lg" style={{ letterSpacing: "0.16em" }}>
             Le Crew
           </h1>
           
@@ -49,6 +49,7 @@ export default function Artists() {
           </div>
         </div>
       </div>
-    </ParallaxBg>
+      <ParallaxBg />
+    </>
   );
 }

@@ -64,8 +64,6 @@ export default function ParallaxBg({ children }: { children?: React.ReactNode })
           backgroundImage: 'url("https://www.transparenttextures.com/patterns/dark-mosaic.png")'
         }}
       />
-      {/* Content */}
-      <div className="relative z-10 min-h-screen">{children}</div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 
-import ParallaxBg from "@/components/ParallaxBg";
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
+import ParallaxBg from "@/components/ParallaxBg";
 
 export default function WhatWeDo() {
   // Force scroll to top on page load
@@ -10,7 +10,7 @@ export default function WhatWeDo() {
   }, []);
   
   return (
-    <ParallaxBg>
+    <>
       <Navbar />
       <div className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
         <div className="w-full max-w-4xl z-10">
@@ -33,6 +33,7 @@ export default function WhatWeDo() {
           </div>
         </div>
       </div>
-    </ParallaxBg>
+      <ParallaxBg />
+    </>
   );
 }
