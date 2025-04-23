@@ -1,7 +1,6 @@
 
 import React from "react";
 
-// Escalier images (remplace avec tes propres URLs si besoin)
 const stairsImages = [
   "/lovable-uploads/photo-1433086966358-54859d0ed716",
   "/lovable-uploads/photo-1482938289607-e9573fc25ebb",
@@ -17,8 +16,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   React.useEffect(() => {
     const handleScroll = () => {
       document.querySelectorAll<HTMLElement>('.parallax-bg').forEach((el, i) => {
-        // offset: first = slowest, next = faster
-        el.style.transform = `translateY(${window.scrollY * 0.2 * (i+1)}px)`;
+        el.style.transform = `translateY(${window.scrollY * (0.15 + i * 0.1)}px)`;
       });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -26,29 +24,41 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden bg-black">
+    <div className="fixed inset-0 w-full h-full overflow-hidden -z-10 bg-black">
       {/* Parallax layers */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none">
         {stairsImages.map((img, idx) => (
-          <img
+          <div
             key={img}
-            src={img}
-            alt={`Escalier ${idx + 1}`}
-            className={`parallax-bg absolute w-full object-cover opacity-${60 - idx * 15} blur-sm`}
+            className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
             style={{
-              top: `${idx * 25}%`,
-              left: 0,
-              height: "60vh",
-              pointerEvents: "none",
               zIndex: idx + 1,
-              filter: `blur(${2 + idx}px)`,
-              opacity: 0.55 - idx * 0.18,
             }}
-          />
+          >
+            <img
+              src={img}
+              alt=""
+              className={`w-full h-full object-cover select-none grayscale contrast-125 ${
+                idx === 0 ? 'opacity-90' : idx === 1 ? 'opacity-75' : 'opacity-60'
+              } ${idx > 0 ? 'blur-sm' : ''}`}
+              draggable={false}
+            />
+          </div>
         ))}
       </div>
-      {/* Content above parallax */}
-      <div className="relative z-10">{children}</div>
+      
+      {/* Ajout d'un overlay pour améliorer la lisibilité du contenu */}
+      <div className="absolute inset-0 bg-black/40 z-10" />
+      
+      {/* Grain texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-20 z-20"
+        style={{
+          backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")'
+        }}
+      />
+      
+      {children}
     </div>
   );
 }
