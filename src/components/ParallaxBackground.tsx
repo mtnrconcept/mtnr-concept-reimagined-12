@@ -62,7 +62,10 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         }}
       />
       
-      {children}
+      {/* CRITICAL: Make sure children have a high z-index so they appear above backgrounds */}
+      <div className="relative z-30 w-full h-full">
+        {children}
+      </div>
     </div>
   );
 }
