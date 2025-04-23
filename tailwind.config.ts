@@ -27,6 +27,7 @@ export default {
         inter: ['Inter', 'sans-serif'],
         marker: ['"Permanent Marker"', 'cursive'],
         rocksalt: ['"Rock Salt"', 'cursive'],
+        'nosegrind': ['Nosegrind', 'cursive'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -41,7 +42,6 @@ export default {
         accent: "#8B5CF6",
         muted: "#444", // foncé-vernis
         card: { DEFAULT: "#18181b", foreground: "#f9f9f9" },
-        // ... garder le reste
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
