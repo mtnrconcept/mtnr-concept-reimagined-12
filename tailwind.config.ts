@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,6 +27,7 @@ export default {
         'marker': ['"Permanent Marker"', 'cursive'],
         'rocksalt': ['"Rock Salt"', 'cursive'],
         'nosegrind': ['Nosegrind', 'cursive'],
+        'impact': ['Impact', 'Haettenschweiler', 'Arial Narrow Bold', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -93,6 +95,36 @@ export default {
         'fade-down': {
           '0%': { opacity: '0', transform: 'translateY(-20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        'rotate-3d': {
+          '0%, 100%': { transform: 'perspective(1000px) rotateY(0deg)' },
+          '50%': { transform: 'perspective(1000px) rotateY(15deg)' }
+        },
+        'neon-pulse': {
+          '0%, 100%': { 
+            textShadow: '0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #ffdd2d, 0 0 82px #ffdd2d' 
+          },
+          '50%': { 
+            textShadow: '0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #ffdd2d, 0 0 102px #ffdd2d'
+          }
+        },
+        'grid-flow': {
+          '0%': { 
+            backgroundPosition: '0% 0%' 
+          },
+          '100%': { 
+            backgroundPosition: '100% 100%'
+          }
+        },
+        'slide-in': {
+          '0%': {
+            transform: 'translateX(-100%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1',
+          }
         }
       },
       animation: {
@@ -104,7 +136,11 @@ export default {
         'text-shimmer': 'text-shimmer 2s linear infinite',
         'spotlight': 'spotlight 2s ease .75s forwards',
         'fade-up': 'fade-up 0.5s ease-out forwards',
-        'fade-down': 'fade-down 0.5s ease-out forwards'
+        'fade-down': 'fade-down 0.5s ease-out forwards',
+        'rotate-3d': 'rotate-3d 7s ease-in-out infinite',
+        'neon-pulse': 'neon-pulse 2s ease-in-out infinite',
+        'grid-flow': 'grid-flow 15s linear infinite',
+        'slide-in': 'slide-in 0.6s ease-out',
       }
     }
   },
