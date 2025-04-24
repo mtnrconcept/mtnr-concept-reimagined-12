@@ -55,6 +55,19 @@
   .grunge-border {
     @apply border-2 border-yellow-400 border-dashed rounded-2xl shadow-[0_3px_32px_#ffd70033] bg-[#19191edc] backdrop-blur-[3px];
     filter: drop-shadow(0 2px 24px #000a) blur(0.3px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grunge-border::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-purple-500/5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .grunge-border:hover::before {
+    opacity: 1;
   }
 
   .glass-morphism {

@@ -67,6 +67,32 @@ export default {
           '0%': { transform: 'scale(1)', opacity: '0.6' },
           '50%': { transform: 'scale(1.1)', opacity: '0.8' },
           '100%': { transform: 'scale(1)', opacity: '0.6' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        'text-shimmer': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '100% 50%' }
+        },
+        spotlight: {
+          "0%": {
+            opacity: '0',
+            transform: 'translate(-72%, -62%) scale(0.5)',
+          },
+          "100%": {
+            opacity: '1',
+            transform: 'translate(-50%,-40%) scale(1)',
+          }
+        },
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        'fade-down': {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
         }
       },
       animation: {
@@ -74,7 +100,12 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         wiggle: "wiggle 0.3s ease-in-out infinite",
         'spray': 'spray 2s ease-in-out infinite',
-      },
+        'float': 'float 5s ease-in-out infinite',
+        'text-shimmer': 'text-shimmer 2s linear infinite',
+        'spotlight': 'spotlight 2s ease .75s forwards',
+        'fade-up': 'fade-up 0.5s ease-out forwards',
+        'fade-down': 'fade-down 0.5s ease-out forwards'
+      }
     }
   },
   plugins: [require("tailwindcss-animate")],
