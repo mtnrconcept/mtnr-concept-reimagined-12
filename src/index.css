@@ -19,43 +19,29 @@
   }
 
   body {
-    @apply font-impact bg-grunge text-primary-foreground antialiased;
-    letter-spacing: 0.045em;
+    @apply bg-grunge text-primary-foreground antialiased font-sans;
+    letter-spacing: 0.01em;
     background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?blend=2f2d36&sat=0&exp=2&blend-mode=multiply"),
-                      url("https://www.transparenttextures.com/patterns/concrete-wall-2.png"),
-                      url("https://www.transparenttextures.com/patterns/old-wall.png"),
-                      url("https://www.transparenttextures.com/patterns/rocky-wall.png");
-    background-size: cover, auto, auto, auto;
-    background-repeat: no-repeat, repeat, repeat, repeat;
+                      url("https://www.transparenttextures.com/patterns/concrete-wall-2.png");
+    background-size: cover, auto;
+    background-repeat: no-repeat, repeat;
     background-attachment: fixed;
     min-height: 100dvh;
   }
 
-  /* Font totalement grunge : plus fort que Special Elite et marker */
-  @font-face {
-    font-family: 'TrashHand';
-    src: url('https://fonts.cdnfonts.com/s/61959/TrashHand.woff') format('woff'),
-         url('https://fonts.cdnfonts.com/s/61959/TrashHand.ttf') format('truetype');
-    font-display: swap;
+  /* Typography system */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-primary;
   }
 
-  @font-face {
-    font-family: 'Nosegrind';
-    src: url('/fonts/Nosegrind.woff2') format('woff2'),
-         url('/fonts/Nosegrind.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  .font-grunge {
-    font-family: 'TrashHand', 'Special Elite', 'Share Tech Mono', 'Permanent Marker', 'Rock Salt', cursive, monospace;
+  .font-graffiti {
+    font-family: 'Nosegrind', 'Urban Hookupz', 'Impact', sans-serif;
     font-smooth: always;
   }
 
+  /* Enhanced UI components */
   .grunge-border {
-    @apply border-2 border-yellow-400 border-dashed rounded-2xl shadow-[0_3px_32px_#ffd70033] bg-[#19191edc] backdrop-blur-[3px];
-    filter: drop-shadow(0 2px 24px #000a) blur(0.3px);
+    @apply border border-yellow-400/80 rounded-xl shadow-[0_2px_24px_rgba(255,215,0,0.15)] backdrop-blur-lg bg-black/80;
     position: relative;
     overflow: hidden;
   }
@@ -71,82 +57,65 @@
     opacity: 1;
   }
 
-  .glass-morphism {
-    @apply backdrop-blur-2xl bg-zinc-900/70 border border-yellow-400/30 shadow-[0_4px_32px_-2px_rgba(255,221,46,0.19)];
+  .glass-card {
+    @apply backdrop-blur-md bg-zinc-900/70 border border-yellow-400/20 shadow-lg rounded-xl;
   }
 
+  .content-section {
+    @apply max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 lg:py-12;
+  }
+
+  .section-heading {
+    @apply font-display uppercase text-center mb-8 font-bold;
+    letter-spacing: 0.12em;
+  }
+  
   .spray-text {
     text-shadow: 0 0 5px rgba(255,221,68,0.3),
                  0 0 10px rgba(255,221,68,0.2),
                  0 0 15px rgba(255,221,68,0.1);
-    @apply animate-spray;
   }
 
   .neon-text {
-    text-shadow: 0 0 7px #fff,
-                 0 0 10px #fff,
-                 0 0 21px #fff,
-                 0 0 42px #ffdd2d,
-                 0 0 82px #ffdd2d;
-    @apply animate-neon-pulse;
+    text-shadow: 0 0 5px #fff,
+                 0 0 8px #fff,
+                 0 0 15px #ffdd2d,
+                 0 0 30px #ffdd2d;
   }
 
-  .graffiti-outline {
-    text-shadow: -1px -1px 0 #000,
-                  1px -1px 0 #000,
-                 -1px 1px 0 #000,
-                  1px 1px 0 #000;
-  }
-  
   .text-outline {
-    text-shadow: -2px -2px 0 #000,
-                  2px -2px 0 #000,
-                 -2px 2px 0 #000,
-                  2px 2px 0 #000;
+    text-shadow: -1px -1px 0 rgba(0,0,0,0.8),
+                  1px -1px 0 rgba(0,0,0,0.8),
+                 -1px 1px 0 rgba(0,0,0,0.8),
+                  1px 1px 0 rgba(0,0,0,0.8);
   }
 
-  .paper-texture {
-    background-image: url("https://www.transparenttextures.com/patterns/cardboard-flat.png") !important;
-    background-blend-mode: darken;
-  }
-
-  /* Amélioration du responsive pour ttes sections */
+  /* Responsive layout improvements */
   .section-content {
     @apply w-full max-w-5xl px-3 sm:px-5 md:px-8;
   }
   
-  .section-title {
-    @apply font-impact uppercase text-center mb-6 font-black drop-shadow-lg;
-    letter-spacing: 0.16em;
+  /* Animation enhancements */
+  .float-element {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Hover interactions */
+  .hover-lift {
+    @apply transition-all duration-300;
   }
   
-  .grid-bg {
-    background-size: 50px 50px;
-    background-image:
-      linear-gradient(to right, rgba(255, 215, 0, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
-    @apply animate-grid-flow;
+  .hover-lift:hover {
+    @apply transform -translate-y-1 shadow-xl;
   }
   
-  .perspective-text {
-    transform: perspective(800px) rotateX(10deg);
-    transition: transform 0.5s ease;
-  }
-  
-  .perspective-text:hover {
-    transform: perspective(800px) rotateX(0deg);
-  }
-  
-  .retro-card {
-    @apply bg-black/70 border-2 border-yellow-400 rounded-xl p-5;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2), inset 0 0 10px rgba(255, 215, 0, 0.1);
-    transform-style: preserve-3d;
-    perspective: 1000px;
+  .hover-glow:hover {
+    @apply shadow-[0_0_15px_rgba(255,215,0,0.3)];
   }
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
   background: #11101a;
 }
 ::-webkit-scrollbar-thumb {
@@ -154,18 +123,25 @@
   border-radius: 8px;
 }
 
-.selection\:bg-primary::selection {
-  @apply bg-primary text-black;
+/* Animation keyframes */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)); }
+  50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
 }
 
 @media (max-width: 640px) {
   .grunge-border {
-    border-width: 1.5px;
-    border-radius: 1rem;
-    padding: 0.2em;
+    border-width: 1px;
+    border-radius: 0.75rem;
   }
-  .section-title {
-    font-size: 2rem;
-    margin-bottom: 1.1em;
+  .section-heading {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
   }
 }
