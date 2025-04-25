@@ -17,7 +17,7 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
       <img
         src={src}
         alt=""
-        className="w-auto h-auto max-w-[200px] max-h-[200px]"
+        className="w-auto h-auto max-w-[300px] max-h-[300px] object-contain"
         style={{
           transform: `rotate(${rotation}deg) scale(${scale})`,
           filter: 'contrast(1.2)',

@@ -1,48 +1,68 @@
+
 import { useEffect, useRef } from 'react';
 import { PaintSplash } from './parallax/PaintSplash';
 import { Pipe } from './parallax/Pipe';
 import { Light } from './parallax/Light';
 import { Vent } from './parallax/Vent';
 
+// Les images de splash sont maintenant positionnées à différentes profondeurs
 const parallaxElements = [
-  // Background layers - reduced depth for slower movement
-  { type: 'background', depth: 0.05, className: 'opacity-90' },
+  // Background layer - très éloigné pour un mouvement plus lent
+  { type: 'background', depth: 0.02, className: 'opacity-90' },
   
-  // Paint splashes - Far Back layer
-  { type: 'paint', x: 5, y: 10, depth: 0.1, scale: 0.6, rotation: -15, className: 'opacity-30', 
+  // Paint splashes - Far Back layer (très éloignés)
+  { type: 'paint', x: 5, y: 10, depth: 0.05, scale: 0.9, rotation: -15, className: 'opacity-70', 
     src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
-  { type: 'paint', x: 85, y: 5, depth: 0.12, scale: 0.5, rotation: 25, className: 'opacity-25',
+  { type: 'paint', x: 85, y: 5, depth: 0.06, scale: 0.8, rotation: 25, className: 'opacity-65',
     src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
   // Paint splashes - Back layer
-  { type: 'paint', x: 15, y: 25, depth: 0.2, scale: 0.8, rotation: -20, className: 'opacity-40',
+  { type: 'paint', x: 15, y: 25, depth: 0.1, scale: 1.2, rotation: -20, className: 'opacity-80',
     src: '/lovable-uploads/47a81307-0753-4601-86bb-da53c9a62002.png' },
-  { type: 'paint', x: 75, y: 30, depth: 0.25, scale: 0.7, rotation: 15, className: 'opacity-35',
+  { type: 'paint', x: 75, y: 30, depth: 0.12, scale: 0.9, rotation: 15, className: 'opacity-75',
     src: '/lovable-uploads/6bcb3e5d-4148-4cc3-b30d-fa65979d2f3d.png' },
   
-  // Pipes and industrial elements
+  // Ajout d'autres splashes
+  { type: 'paint', x: 10, y: 50, depth: 0.15, scale: 1.1, rotation: 10, className: 'opacity-80',
+    src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
+  { type: 'paint', x: 90, y: 15, depth: 0.18, scale: 1.0, rotation: -5, className: 'opacity-85',
+    src: '/lovable-uploads/47a81307-0753-4601-86bb-da53c9a62002.png' },
+  
+  // Pipes and industrial elements - entre les deux
   { type: 'pipe', x: 15, y: 20, depth: 0.3, rotation: -25, scale: 1.2, className: 'opacity-80' },
   { type: 'pipe', x: 85, y: 45, depth: 0.4, rotation: 15, scale: 0.8, className: 'opacity-70' },
   
   // Paint splashes - Middle layer
-  { type: 'paint', x: 30, y: 45, depth: 0.45, scale: 1.2, rotation: -10, className: 'opacity-60',
+  { type: 'paint', x: 30, y: 45, depth: 0.45, scale: 1.5, rotation: -10, className: 'opacity-90',
     src: '/lovable-uploads/4bcc54d6-fbe7-4e59-ad3c-85be26c0556a.png' },
-  { type: 'paint', x: 70, y: 50, depth: 0.5, scale: 1.1, rotation: 20, className: 'opacity-70',
+  { type: 'paint', x: 70, y: 50, depth: 0.5, scale: 1.4, rotation: 20, className: 'opacity-95',
     src: '/lovable-uploads/40b430f2-e89d-4f31-972c-42da68f93fc4.png' },
   
-  // Neon lights
-  { type: 'light', x: 25, y: 30, depth: 0.5, size: 40, glow: 'yellow', className: 'opacity-60' },
-  { type: 'light', x: 75, y: 60, depth: 0.6, size: 25, glow: 'blue', className: 'opacity-50' },
+  // Ajout de splashes jaunes
+  { type: 'paint', x: 25, y: 60, depth: 0.55, scale: 1.3, rotation: 25, className: 'opacity-90',
+    src: '/lovable-uploads/40b430f2-e89d-4f31-972c-42da68f93fc4.png' },
+  { type: 'paint', x: 60, y: 30, depth: 0.52, scale: 1.2, rotation: -15, className: 'opacity-85',
+    src: '/lovable-uploads/6bcb3e5d-4148-4cc3-b30d-fa65979d2f3d.png' },
   
-  // Paint splashes - Front layer
-  { type: 'paint', x: 20, y: 70, depth: 0.7, scale: 1.4, rotation: -25, className: 'opacity-80',
+  // Neon lights
+  { type: 'light', x: 25, y: 30, depth: 0.6, size: 80, glow: 'rgba(255, 215, 0, 0.8)', className: 'opacity-60' },
+  { type: 'light', x: 75, y: 60, depth: 0.65, size: 60, glow: 'rgba(255, 215, 0, 0.7)', className: 'opacity-50' },
+  
+  // Paint splashes - Front layer (plus proches)
+  { type: 'paint', x: 20, y: 70, depth: 0.7, scale: 1.8, rotation: -25, className: 'opacity-100',
     src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
-  { type: 'paint', x: 80, y: 80, depth: 0.8, scale: 1.3, rotation: 35, className: 'opacity-90',
+  { type: 'paint', x: 80, y: 80, depth: 0.8, scale: 1.7, rotation: 35, className: 'opacity-100',
     src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
+  // Plus de splashes pour remplir l'espace
+  { type: 'paint', x: 40, y: 85, depth: 0.75, scale: 1.6, rotation: -5, className: 'opacity-90',
+    src: '/lovable-uploads/47a81307-0753-4601-86bb-da53c9a62002.png' },
+  { type: 'paint', x: 65, y: 15, depth: 0.78, scale: 1.5, rotation: 30, className: 'opacity-95',
+    src: '/lovable-uploads/6bcb3e5d-4148-4cc3-b30d-fa65979d2f3d.png' },
+  
   // Ventilation grids
-  { type: 'vent', x: 10, y: 70, depth: 0.7, scale: 1, className: 'opacity-90' },
-  { type: 'vent', x: 90, y: 25, depth: 0.8, scale: 0.8, className: 'opacity-80' },
+  { type: 'vent', x: 10, y: 70, depth: 0.85, scale: 1, className: 'opacity-90' },
+  { type: 'vent', x: 90, y: 25, depth: 0.9, scale: 0.8, className: 'opacity-80' },
 ] as const;
 
 export default function ParallaxScene() {
@@ -75,13 +95,17 @@ export default function ParallaxScene() {
         const x = parseFloat(el.dataset.x || '0');
         const y = parseFloat(el.dataset.y || '0');
         
+        // Ajustement du mouvement parallaxe pour le rendre plus prononcé
         const translateY = scrollY * depth;
+        const translateX = mouseX * (depth * 10); // Plus prononcé sur l'axe X
         const rotateX = mouseY * (depth * 5);
         const rotateY = mouseX * (depth * 5);
-        const translateZ = depth * -100;
+        
+        // Distance z ajustée pour améliorer l'effet 3D
+        const translateZ = depth * -300; // Augmentation de la profondeur
 
         el.style.transform = `
-          translate3d(${x}%, ${y + translateY}px, ${translateZ}px)
+          translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)
           rotateX(${rotateX}deg)
           rotateY(${rotateY}deg)
         `;
@@ -90,6 +114,9 @@ export default function ParallaxScene() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    
+    // Exécution initiale pour positionner les éléments
+    updateParallax();
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -103,14 +130,17 @@ export default function ParallaxScene() {
       className="fixed inset-0 w-full h-full overflow-hidden"
       style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
     >
-      {/* Background image */}
+      {/* Background image with very low depth for slow movement */}
       <div 
         className="absolute inset-0 w-full h-full parallax-element"
-        data-depth="0.05"
+        data-depth="0.02"
+        data-x="0"
+        data-y="0"
         style={{
           backgroundImage: 'url("/lovable-uploads/c0a483ca-deba-4667-a277-1e85c6960e36.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          opacity: 0.9,
         }}
       />
 
