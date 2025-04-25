@@ -29,11 +29,12 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         const x = parseFloat(el.dataset.x || '0');
         const y = parseFloat(el.dataset.y || '0');
         
-        const translateY = scrollY * depth;
+        // Réduire l'effet de profondeur sur le scroll pour le fond
+        const translateY = scrollY * depth * (depth < 0.01 ? 0.2 : 1);
         const translateX = mouseX * (depth * 10);
         const rotateX = mouseY * (depth * 5);
         const rotateY = mouseX * (depth * 5);
-        const translateZ = depth * -300;
+        const translateZ = depth * -500; // Ajuster la profondeur pour tous les éléments
 
         el.style.transform = `
           translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)

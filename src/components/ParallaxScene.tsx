@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { PaintSplash } from './parallax/PaintSplash';
 import { Pipe } from './parallax/Pipe';
@@ -17,7 +16,7 @@ export default function ParallaxScene() {
     <div 
       ref={containerRef}
       className="fixed inset-0 w-full h-full overflow-hidden"
-      style={{ perspective: '1500px', transformStyle: 'preserve-3d' }}
+      style={{ perspective: '2500px', transformStyle: 'preserve-3d' }}
     >
       <Background />
 
@@ -83,21 +82,6 @@ export default function ParallaxScene() {
         return null;
       })}
 
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%)',
-          mixBlendMode: 'multiply',
-        }}
-      />
-
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-20"
-        style={{
-          backgroundImage: 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgE1xQAAAABd0Uk5TABAgMEBQYHCAj5+vv8/f7//////////ro6iZAAAAQ0lEQVQ4y2NgQAX8/PyGDIQB4w5UgKEvWEABhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEEYhEGYQRgAn0EYbO4vO3MAAAAASUVORK5CYII=")',
-          mixBlendMode: 'overlay',
-        }}
-      />
     </div>
   );
 }
