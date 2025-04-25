@@ -2,28 +2,40 @@ import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 const parallaxElements = [
-  // Background layers
-  { type: 'background', depth: 0.1, className: 'opacity-90' },
+  // Background layers - reduced depth for slower movement
+  { type: 'background', depth: 0.05, className: 'opacity-90' },
+  
+  // Paint splashes - Far Back layer
+  { type: 'image', x: 5, y: 10, depth: 0.1, scale: 0.6, rotation: -15, className: 'opacity-30', 
+    src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
+  { type: 'image', x: 85, y: 5, depth: 0.12, scale: 0.5, rotation: 25, className: 'opacity-25',
+    src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
   // Paint splashes - Back layer
-  { type: 'paint', x: 10, y: 15, depth: 0.2, color: 'black', scale: 1.2, rotation: -15, className: 'opacity-40' },
-  { type: 'paint', x: 80, y: 25, depth: 0.25, color: '#eedd44', scale: 0.9, rotation: 25, className: 'opacity-30' },
+  { type: 'image', x: 15, y: 25, depth: 0.2, scale: 0.8, rotation: -20, className: 'opacity-40',
+    src: '/lovable-uploads/47a81307-0753-4601-86bb-da53c9a62002.png' },
+  { type: 'image', x: 75, y: 30, depth: 0.25, scale: 0.7, rotation: 15, className: 'opacity-35',
+    src: '/lovable-uploads/6bcb3e5d-4148-4cc3-b30d-fa65979d2f3d.png' },
   
   // Pipes and industrial elements
   { type: 'pipe', x: 15, y: 20, depth: 0.3, rotation: -25, scale: 1.2, className: 'opacity-80' },
   { type: 'pipe', x: 85, y: 45, depth: 0.4, rotation: 15, scale: 0.8, className: 'opacity-70' },
   
   // Paint splashes - Middle layer
-  { type: 'paint', x: 30, y: 40, depth: 0.5, color: 'black', scale: 1.4, rotation: -35, className: 'opacity-70' },
-  { type: 'paint', x: 70, y: 55, depth: 0.55, color: '#eedd44', scale: 1.1, rotation: 15, className: 'opacity-60' },
+  { type: 'image', x: 30, y: 45, depth: 0.45, scale: 1.2, rotation: -10, className: 'opacity-60',
+    src: '/lovable-uploads/4bcc54d6-fbe7-4e59-ad3c-85be26c0556a.png' },
+  { type: 'image', x: 70, y: 50, depth: 0.5, scale: 1.1, rotation: 20, className: 'opacity-70',
+    src: '/lovable-uploads/40b430f2-e89d-4f31-972c-42da68f93fc4.png' },
   
   // Neon lights
   { type: 'light', x: 25, y: 30, depth: 0.5, size: 40, glow: 'yellow', className: 'opacity-60' },
   { type: 'light', x: 75, y: 60, depth: 0.6, size: 25, glow: 'blue', className: 'opacity-50' },
   
   // Paint splashes - Front layer
-  { type: 'paint', x: 20, y: 75, depth: 0.8, color: '#eedd44', scale: 1.6, rotation: -20, className: 'opacity-80' },
-  { type: 'paint', x: 85, y: 85, depth: 0.85, color: 'black', scale: 1.3, rotation: 40, className: 'opacity-90' },
+  { type: 'image', x: 20, y: 70, depth: 0.7, scale: 1.4, rotation: -25, className: 'opacity-80',
+    src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
+  { type: 'image', x: 80, y: 80, depth: 0.8, scale: 1.3, rotation: 35, className: 'opacity-90',
+    src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
   // Ventilation grids
   { type: 'vent', x: 10, y: 70, depth: 0.7, scale: 1, className: 'opacity-90' },
@@ -88,10 +100,10 @@ export default function ParallaxScene() {
       className="fixed inset-0 w-full h-full overflow-hidden"
       style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
     >
-      {/* Main background image */}
+      {/* Main background image with reduced depth */}
       <div 
         className="absolute inset-0 w-full h-full parallax-element"
-        data-depth="0.1"
+        data-depth="0.05"
         style={{
           backgroundImage: 'url("/lovable-uploads/c0a483ca-deba-4667-a277-1e85c6960e36.png")',
           backgroundSize: 'cover',
@@ -118,29 +130,16 @@ export default function ParallaxScene() {
               top: `${element.y}%`,
             }}
           >
-            {element.type === 'paint' && (
-              <div
-                className="paint-splash"
+            {element.type === 'image' && (
+              <img
+                src={element.src}
+                alt=""
+                className="w-auto h-auto max-w-[200px] max-h-[200px]"
                 style={{
-                  width: '120px',
-                  height: '120px',
-                  backgroundColor: element.color,
-                  borderRadius: '50%',
-                  filter: 'blur(2px)',
                   transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
-                  clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-                  maskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)',
-                  WebkitMaskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)',
+                  filter: 'contrast(1.2)',
                 }}
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `radial-gradient(circle at center, ${element.color} 30%, transparent 70%)`,
-                    mixBlendMode: 'multiply',
-                  }}
-                />
-              </div>
+              />
             )}
 
             {element.type === 'pipe' && (
