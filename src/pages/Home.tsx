@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <>
       <ParallaxScene />
-      <div className="relative z-20 min-h-screen overflow-hidden">
+      <div className="relative z-30 min-h-screen">
         <Navbar />
         
         <main className="min-h-screen w-full selection:bg-primary selection:text-black">
