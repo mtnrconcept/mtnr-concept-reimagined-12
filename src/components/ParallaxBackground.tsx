@@ -12,14 +12,14 @@ interface ParallaxBackgroundProps {
 }
 
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
-  // Optimisé pour un effet d'escalier plus prononcé
+  // Effet d'escalier optimisé
   React.useEffect(() => {
     const handleScroll = () => {
       document.querySelectorAll<HTMLElement>('.parallax-bg').forEach((el, i) => {
         // Vitesse progressive pour chaque couche, donnant l'impression de descendre
-        const speed = 0.15 + (i * 0.1); 
+        const speed = 0.2 + (i * 0.12); 
         const yOffset = window.scrollY * speed;
-        const scale = 1 + (window.scrollY * 0.0005); // Léger zoom pendant le scroll
+        const scale = 1 + (window.scrollY * 0.0008); // Zoom plus prononcé pendant le scroll
         el.style.transform = `translateY(${yOffset}px) scale(${scale})`;
       });
     };
@@ -37,11 +37,10 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
           {stairsImages.map((img, idx) => (
             <div
               key={img}
-              className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-500 ease-out will-change-transform"
+              className="parallax-bg absolute inset-0 w-full h-full transition-transform duration-700 ease-out will-change-transform"
               style={{
                 zIndex: idx,
-                opacity: 0.6 - (idx * 0.1), // Opacité progressive
-                filter: `brightness(${0.7 - (idx * 0.1)}) contrast(1.2)`, // Contraste ajusté
+                opacity: 0.85 - (idx * 0.1), // Augmentation de l'opacité pour plus de visibilité
               }}
             >
               <img
@@ -55,15 +54,15 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
           ))}
         </div>
         
-        {/* Overlay sombre avec gradient */}
+        {/* Overlay sombre léger pour garantir la lisibilité du contenu */}
         <div 
-          className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" 
+          className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" 
           style={{ zIndex: 5 }} 
         />
         
-        {/* Texture grain */}
+        {/* Texture grain légère */}
         <div 
-          className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-20"
+          className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-10"
           style={{
             backgroundImage: 'url("https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png")',
             zIndex: 6
