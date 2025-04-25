@@ -112,6 +112,15 @@
   .hover-glow:hover {
     @apply shadow-[0_0_15px_rgba(255,215,0,0.3)];
   }
+  
+  /* 3D Transform utilities */
+  .perspective {
+    perspective: 1000px;
+  }
+  
+  .transform-3d {
+    transform-style: preserve-3d;
+  }
 }
 
 ::-webkit-scrollbar {
