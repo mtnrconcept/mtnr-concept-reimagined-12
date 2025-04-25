@@ -5,7 +5,7 @@ export const Background = () => {
   return (
     <div 
       className="absolute inset-0 w-full h-full parallax-element"
-      data-depth="0.005"  // Réduit considérablement pour éloigner le fond
+      data-depth="0.001"  // Valeur extrêmement réduite pour un défilement très lent
       data-x="0"
       data-y="0"
       style={{
@@ -13,7 +13,7 @@ export const Background = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         opacity: 0.8,
-        transform: 'translateZ(-5000px)', // Éloigne beaucoup plus le fond
+        transform: 'translateZ(-10000px)', // Éloigne considérablement le fond
       }}
     />
   );

@@ -1,3 +1,4 @@
+
 import { useRef } from 'react';
 import { PaintSplash } from './parallax/PaintSplash';
 import { Pipe } from './parallax/Pipe';
@@ -16,7 +17,7 @@ export default function ParallaxScene() {
     <div 
       ref={containerRef}
       className="fixed inset-0 w-full h-full overflow-hidden"
-      style={{ perspective: '2500px', transformStyle: 'preserve-3d' }}
+      style={{ perspective: '5000px', transformStyle: 'preserve-3d' }}
     >
       <Background />
 
@@ -81,7 +82,6 @@ export default function ParallaxScene() {
 
         return null;
       })}
-
     </div>
   );
 }
