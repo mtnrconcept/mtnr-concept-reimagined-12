@@ -1,20 +1,23 @@
 import { useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
+import { PaintSplash } from './parallax/PaintSplash';
+import { Pipe } from './parallax/Pipe';
+import { Light } from './parallax/Light';
+import { Vent } from './parallax/Vent';
 
 const parallaxElements = [
   // Background layers - reduced depth for slower movement
   { type: 'background', depth: 0.05, className: 'opacity-90' },
   
   // Paint splashes - Far Back layer
-  { type: 'image', x: 5, y: 10, depth: 0.1, scale: 0.6, rotation: -15, className: 'opacity-30', 
+  { type: 'paint', x: 5, y: 10, depth: 0.1, scale: 0.6, rotation: -15, className: 'opacity-30', 
     src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
-  { type: 'image', x: 85, y: 5, depth: 0.12, scale: 0.5, rotation: 25, className: 'opacity-25',
+  { type: 'paint', x: 85, y: 5, depth: 0.12, scale: 0.5, rotation: 25, className: 'opacity-25',
     src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
   // Paint splashes - Back layer
-  { type: 'image', x: 15, y: 25, depth: 0.2, scale: 0.8, rotation: -20, className: 'opacity-40',
+  { type: 'paint', x: 15, y: 25, depth: 0.2, scale: 0.8, rotation: -20, className: 'opacity-40',
     src: '/lovable-uploads/47a81307-0753-4601-86bb-da53c9a62002.png' },
-  { type: 'image', x: 75, y: 30, depth: 0.25, scale: 0.7, rotation: 15, className: 'opacity-35',
+  { type: 'paint', x: 75, y: 30, depth: 0.25, scale: 0.7, rotation: 15, className: 'opacity-35',
     src: '/lovable-uploads/6bcb3e5d-4148-4cc3-b30d-fa65979d2f3d.png' },
   
   // Pipes and industrial elements
@@ -22,9 +25,9 @@ const parallaxElements = [
   { type: 'pipe', x: 85, y: 45, depth: 0.4, rotation: 15, scale: 0.8, className: 'opacity-70' },
   
   // Paint splashes - Middle layer
-  { type: 'image', x: 30, y: 45, depth: 0.45, scale: 1.2, rotation: -10, className: 'opacity-60',
+  { type: 'paint', x: 30, y: 45, depth: 0.45, scale: 1.2, rotation: -10, className: 'opacity-60',
     src: '/lovable-uploads/4bcc54d6-fbe7-4e59-ad3c-85be26c0556a.png' },
-  { type: 'image', x: 70, y: 50, depth: 0.5, scale: 1.1, rotation: 20, className: 'opacity-70',
+  { type: 'paint', x: 70, y: 50, depth: 0.5, scale: 1.1, rotation: 20, className: 'opacity-70',
     src: '/lovable-uploads/40b430f2-e89d-4f31-972c-42da68f93fc4.png' },
   
   // Neon lights
@@ -32,15 +35,15 @@ const parallaxElements = [
   { type: 'light', x: 75, y: 60, depth: 0.6, size: 25, glow: 'blue', className: 'opacity-50' },
   
   // Paint splashes - Front layer
-  { type: 'image', x: 20, y: 70, depth: 0.7, scale: 1.4, rotation: -25, className: 'opacity-80',
+  { type: 'paint', x: 20, y: 70, depth: 0.7, scale: 1.4, rotation: -25, className: 'opacity-80',
     src: '/lovable-uploads/4fdf517b-935e-4848-a014-c02754a79ce5.png' },
-  { type: 'image', x: 80, y: 80, depth: 0.8, scale: 1.3, rotation: 35, className: 'opacity-90',
+  { type: 'paint', x: 80, y: 80, depth: 0.8, scale: 1.3, rotation: 35, className: 'opacity-90',
     src: '/lovable-uploads/361c7d09-c2a5-413f-a973-c89812c3e85f.png' },
   
   // Ventilation grids
   { type: 'vent', x: 10, y: 70, depth: 0.7, scale: 1, className: 'opacity-90' },
   { type: 'vent', x: 90, y: 25, depth: 0.8, scale: 0.8, className: 'opacity-80' },
-];
+] as const;
 
 export default function ParallaxScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -100,7 +103,7 @@ export default function ParallaxScene() {
       className="fixed inset-0 w-full h-full overflow-hidden"
       style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
     >
-      {/* Main background image with reduced depth */}
+      {/* Background image */}
       <div 
         className="absolute inset-0 w-full h-full parallax-element"
         data-depth="0.05"
@@ -115,77 +118,63 @@ export default function ParallaxScene() {
       {parallaxElements.map((element, index) => {
         if (element.type === 'background') return null;
 
-        return (
-          <div
-            key={`${element.type}-${index}`}
-            className={cn(
-              'parallax-element absolute pointer-events-none',
-              element.className
-            )}
-            data-depth={element.depth}
-            data-x={element.x}
-            data-y={element.y}
-            style={{
-              left: `${element.x}%`,
-              top: `${element.y}%`,
-            }}
-          >
-            {element.type === 'image' && (
-              <img
-                src={element.src}
-                alt=""
-                className="w-auto h-auto max-w-[200px] max-h-[200px]"
-                style={{
-                  transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
-                  filter: 'contrast(1.2)',
-                }}
-              />
-            )}
+        if (element.type === 'paint') {
+          return (
+            <PaintSplash
+              key={`paint-${index}`}
+              x={element.x}
+              y={element.y}
+              depth={element.depth}
+              scale={element.scale}
+              rotation={element.rotation}
+              className={element.className}
+              src={element.src}
+            />
+          );
+        }
 
-            {element.type === 'pipe' && (
-              <div 
-                className="bg-zinc-800 rounded-full shadow-2xl"
-                style={{
-                  width: '60px',
-                  height: '12px',
-                  transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
-                  boxShadow: '0 0 15px rgba(0,0,0,0.5)',
-                }}
-              />
-            )}
+        if (element.type === 'pipe') {
+          return (
+            <Pipe
+              key={`pipe-${index}`}
+              x={element.x}
+              y={element.y}
+              depth={element.depth}
+              scale={element.scale}
+              rotation={element.rotation}
+              className={element.className}
+            />
+          );
+        }
 
-            {element.type === 'light' && (
-              <div 
-                className="rounded-full mix-blend-screen animate-pulse"
-                style={{
-                  width: `${element.size}px`,
-                  height: `${element.size}px`,
-                  background: `radial-gradient(circle, ${element.glow}, transparent 70%)`,
-                  filter: 'blur(8px)',
-                }}
-              />
-            )}
+        if (element.type === 'light') {
+          return (
+            <Light
+              key={`light-${index}`}
+              x={element.x}
+              y={element.y}
+              depth={element.depth}
+              size={element.size}
+              glow={element.glow}
+              className={element.className}
+            />
+          );
+        }
 
-            {element.type === 'vent' && (
-              <div 
-                className="bg-zinc-900/80 border border-zinc-800"
-                style={{
-                  width: '40px',
-                  height: '30px',
-                  transform: `scale(${element.scale})`,
-                }}
-              >
-                {[...Array(3)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className="absolute bg-zinc-700 w-full h-[2px]"
-                    style={{ top: `${(i + 1) * 25}%` }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        );
+        if (element.type === 'vent') {
+          return (
+            <Vent
+              key={`vent-${index}`}
+              x={element.x}
+              y={element.y}
+              depth={element.depth}
+              scale={element.scale}
+              className={element.className}
+            />
+          );
+        }
+
+        return null;
       })}
 
       {/* Overlay for depth effect */}
