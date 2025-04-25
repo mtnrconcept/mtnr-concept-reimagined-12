@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -6,13 +5,25 @@ const parallaxElements = [
   // Background layers
   { type: 'background', depth: 0.1, className: 'opacity-90' },
   
+  // Paint splashes - Back layer
+  { type: 'paint', x: 10, y: 15, depth: 0.2, color: 'black', scale: 1.2, rotation: -15, className: 'opacity-40' },
+  { type: 'paint', x: 80, y: 25, depth: 0.25, color: '#eedd44', scale: 0.9, rotation: 25, className: 'opacity-30' },
+  
   // Pipes and industrial elements
   { type: 'pipe', x: 15, y: 20, depth: 0.3, rotation: -25, scale: 1.2, className: 'opacity-80' },
   { type: 'pipe', x: 85, y: 45, depth: 0.4, rotation: 15, scale: 0.8, className: 'opacity-70' },
   
+  // Paint splashes - Middle layer
+  { type: 'paint', x: 30, y: 40, depth: 0.5, color: 'black', scale: 1.4, rotation: -35, className: 'opacity-70' },
+  { type: 'paint', x: 70, y: 55, depth: 0.55, color: '#eedd44', scale: 1.1, rotation: 15, className: 'opacity-60' },
+  
   // Neon lights
   { type: 'light', x: 25, y: 30, depth: 0.5, size: 40, glow: 'yellow', className: 'opacity-60' },
   { type: 'light', x: 75, y: 60, depth: 0.6, size: 25, glow: 'blue', className: 'opacity-50' },
+  
+  // Paint splashes - Front layer
+  { type: 'paint', x: 20, y: 75, depth: 0.8, color: '#eedd44', scale: 1.6, rotation: -20, className: 'opacity-80' },
+  { type: 'paint', x: 85, y: 85, depth: 0.85, color: 'black', scale: 1.3, rotation: 40, className: 'opacity-90' },
   
   // Ventilation grids
   { type: 'vent', x: 10, y: 70, depth: 0.7, scale: 1, className: 'opacity-90' },
@@ -107,6 +118,31 @@ export default function ParallaxScene() {
               top: `${element.y}%`,
             }}
           >
+            {element.type === 'paint' && (
+              <div
+                className="paint-splash"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  backgroundColor: element.color,
+                  borderRadius: '50%',
+                  filter: 'blur(2px)',
+                  transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
+                  clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+                  maskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)',
+                  WebkitMaskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)',
+                }}
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `radial-gradient(circle at center, ${element.color} 30%, transparent 70%)`,
+                    mixBlendMode: 'multiply',
+                  }}
+                />
+              </div>
+            )}
+
             {element.type === 'pipe' && (
               <div 
                 className="bg-zinc-800 rounded-full shadow-2xl"
