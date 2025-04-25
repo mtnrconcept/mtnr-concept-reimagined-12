@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import AnimatedBackground from "@/components/AnimatedBackground";
+import ParallaxScene from "@/components/ParallaxScene";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -35,8 +35,8 @@ export default function Home() {
 
   return (
     <>
-      <AnimatedBackground />
-      <div className="relative z-10 min-h-screen overflow-hidden backdrop-blur-[2px]">
+      <ParallaxScene />
+      <div className="relative z-10 min-h-screen overflow-hidden">
         <Navbar />
         
         <main className="min-h-screen w-full selection:bg-primary selection:text-black">
