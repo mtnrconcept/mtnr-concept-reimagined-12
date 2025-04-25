@@ -29,20 +29,14 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         const x = parseFloat(el.dataset.x || '0');
         const y = parseFloat(el.dataset.y || '0');
         
-        // Réduire l'effet de défilement pour le fond avec une profondeur faible
-        const translateY = depth < 0.01 
-          ? scrollY * depth * 0.05 // Très lent pour le background
-          : scrollY * depth; // Normal pour les autres éléments
+        const translateY = depth * scrollY;
+        const translateX = mouseX * (depth * 50);
+        const rotateX = mouseY * (depth * 10);
+        const rotateY = mouseX * (depth * 10);
         
-        const translateX = mouseX * (depth * 20);
-        const rotateX = mouseY * (depth * 5);
-        const rotateY = mouseX * (depth * 5);
-        
-        // Ajustement de la profondeur Z basée sur la valeur de depth
-        // Plus depth est petit, plus l'élément est éloigné
-        const translateZ = depth < 0.01 
-          ? -10000 // Background très éloigné
-          : depth * -1000; // Les autres éléments plus proches
+        // Ajustement de la profondeur Z en fonction du type d'élément
+        const isBackground = depth <= 0.05;
+        const translateZ = isBackground ? -2000 : -1000 + (depth * 1000);
 
         el.style.transform = `
           translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)
