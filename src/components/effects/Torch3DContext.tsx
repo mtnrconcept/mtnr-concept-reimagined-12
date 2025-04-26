@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Plane, useTexture } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useTorch } from "./TorchContext";
 
@@ -38,23 +38,19 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
     <>
       <pointLight
         ref={lightRef}
-        color={0xffdd44}
+        color="#ffdd44"
         intensity={2}
         distance={300}
         decay={2}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
       />
       {/* Light cone approximated with a transparent mesh */}
       <mesh ref={coneRef} position={[0, 0, 50]} rotation={[Math.PI/2, 0, 0]}>
         <coneGeometry args={[100, 200, 32]} />
         <meshBasicMaterial
-          color={"#ffdd44"}
+          color="#ffdd44"
           transparent
           opacity={0.15}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
         />
       </mesh>
     </>
@@ -62,15 +58,11 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
 };
 
 const IlluminatedPlane = ({ position = [0, 0, 0] }: { position?: [number, number, number] }) => {
-  // Use a placeholder texture or a solid color
   return (
-    <Plane
-      args={[2000, 2000]}
-      position={position}
-      receiveShadow
-    >
-      <meshStandardMaterial color="#111" />
-    </Plane>
+    <mesh position={position} receiveShadow>
+      <planeGeometry args={[2000, 2000]} />
+      <meshStandardMaterial color="#111111" />
+    </mesh>
   );
 };
 
