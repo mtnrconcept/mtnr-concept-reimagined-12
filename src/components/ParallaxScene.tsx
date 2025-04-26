@@ -15,7 +15,7 @@ export default function ParallaxScene() {
   
   return (
     <>
-      {/* Background en position fixed, indépendant du conteneur parallax pour un effet maximal */}
+      {/* Background en position fixed, indépendant du conteneur parallax */}
       <Background imagePath="/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png" />
 
       <div 
@@ -39,7 +39,7 @@ export default function ParallaxScene() {
                 depth={element.depth}
                 scale={element.scale}
                 rotation={element.rotation}
-                className={element.className}
+                className="opacity-100" // Forcer l'opacité à 100%
                 src={element.src!}
               />
             );
@@ -54,7 +54,7 @@ export default function ParallaxScene() {
                 depth={element.depth}
                 scale={element.scale}
                 rotation={element.rotation}
-                className={element.className}
+                className="opacity-100" // Forcer l'opacité
               />
             );
           }
@@ -68,7 +68,7 @@ export default function ParallaxScene() {
                 depth={element.depth}
                 size={element.size!}
                 glow={element.glow!}
-                className={element.className}
+                className="opacity-100" // Forcer l'opacité
               />
             );
           }
@@ -81,7 +81,7 @@ export default function ParallaxScene() {
                 y={element.y!}
                 depth={element.depth}
                 scale={element.scale}
-                className={element.className}
+                className="opacity-100" // Forcer l'opacité
               />
             );
           }

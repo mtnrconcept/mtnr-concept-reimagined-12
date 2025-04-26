@@ -21,8 +21,9 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
         style={{
           transform: `rotate(${rotation}deg) scale(${scale})`,
           filter: 'contrast(1.2) brightness(1.1)',
+          opacity: 1
         }}
       />
     </ParallaxElement>
   );
-};
+}
