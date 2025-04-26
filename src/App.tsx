@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense } from "react";
 import { Flashlight } from "./components/effects/Flashlight";
+import { ParticleEffect } from "./components/effects/ParticleEffect";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -41,6 +43,7 @@ const App = () => (
           <AnimatedRoutes />
         </Suspense>
       </BrowserRouter>
+      <ParticleEffect />
       <Flashlight />
     </TooltipProvider>
   </QueryClientProvider>
