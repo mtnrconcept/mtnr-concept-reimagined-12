@@ -7,7 +7,7 @@ interface ParallaxBackgroundProps {
 
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   return (
-    <ParallaxContainer backgroundImage="/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png">
+    <ParallaxContainer backgroundImage="/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png">
       {children}
     </ParallaxContainer>
   );
