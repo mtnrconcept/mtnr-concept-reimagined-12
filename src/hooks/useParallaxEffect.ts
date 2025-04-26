@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 
 export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>) => {
@@ -59,7 +60,7 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.30; // Multiplié par deux, encore plus rapide
+          const translateY = scrollY * 0.60; // Vitesse augmentée (3x plus rapide)
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
