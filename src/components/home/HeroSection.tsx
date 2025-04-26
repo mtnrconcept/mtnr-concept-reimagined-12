@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   return (
-    <section className="container mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+    <section 
+      id="hero-section"
+      className="container mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
+    >
       <div 
         className="glass-card p-8 sm:p-10 max-w-3xl mx-auto relative overflow-hidden"
         data-animate
