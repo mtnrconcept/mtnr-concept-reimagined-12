@@ -6,6 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
+import { Flashlight } from "@/components/effects/Flashlight";
 
 export default function Home() {
   useEffect(() => {
@@ -38,12 +39,11 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
-      {/* Scene Parallax 3D en arrière-plan */}
       <Parallax3DScene />
       
-      {/* Contenu visible */}
       <div className="relative z-20 min-h-screen">
         <Navbar />
+        <Flashlight />
         
         <main id="main-content" className="min-h-screen w-full pt-16">
           <HeroSection />
