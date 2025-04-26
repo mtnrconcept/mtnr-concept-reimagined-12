@@ -10,7 +10,11 @@ export const Flashlight = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
-      setPosition({ x: e.clientX, y: e.clientY });
+      // Utilisez directement les coordonnées du curseur sans transformation
+      setPosition({
+        x: e.clientX,
+        y: e.clientY
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -40,13 +44,12 @@ export const Flashlight = () => {
       </Toggle>
       
       <div
-        className="pointer-events-none fixed inset-0 z-[9997]"
+        className="pointer-events-none fixed inset-0 z-[9999]"
         style={{
-          maskImage: `radial-gradient(circle 300px at ${position.x}px ${position.y}px, transparent, black)`,
-          WebkitMaskImage: `radial-gradient(circle 300px at ${position.x}px ${position.y}px, transparent, black)`,
+          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
           background: 'rgba(0, 0, 0, 0.92)',
           backdropFilter: 'blur(1px)',
-          transition: 'backdrop-filter 300ms ease-out',
         }}
       >
         <div
@@ -54,8 +57,8 @@ export const Flashlight = () => {
           style={{
             left: position.x,
             top: position.y,
-            width: '600px',
-            height: '600px',
+            width: '1000px',
+            height: '1000px',
             transform: 'translate(-50%, -50%)',
             background: 'radial-gradient(circle, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.05) 30%, transparent 70%)',
             filter: 'blur(30px)',
@@ -66,3 +69,4 @@ export const Flashlight = () => {
     </>
   );
 };
+
