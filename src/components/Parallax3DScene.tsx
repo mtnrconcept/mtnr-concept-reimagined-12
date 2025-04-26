@@ -65,7 +65,7 @@ export default function Parallax3DScene() {
               className={`max-w-[350px] max-h-[350px] object-contain ${splash.className || ''}`}
               style={{
                 transform: `rotate(${splash.rotation || 0}deg) scale(${splash.scale || 1})`,
-                filter: `contrast(2.2) brightness(2.2) saturate(1.8) blur(${splash.blur || 0}px)`, // Contrastes amplifiés
+                filter: `contrast(2.2) brightness(2.2) saturate(1.8) blur(${Math.max(0, splash.blur || 0)}px)`, // Ensure non-negative blur
                 mixBlendMode: 'screen',
                 willChange: 'transform, opacity'
               }}

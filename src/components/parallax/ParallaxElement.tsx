@@ -14,6 +14,9 @@ export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxEl
   // Pour les éléments au premier plan (depth négative), on utilise un z-index très élevé
   const zIndex = depth < 0 ? Math.floor(9000 - depth * 1000) : Math.floor(1000 - depth * 1000);
   
+  // Ensure blur value is never negative
+  const blurAmount = Math.max(0, depth * 8);
+  
   return (
     <div
       className={cn('parallax-element absolute will-change-transform', className)}
@@ -27,7 +30,7 @@ export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxEl
         transform: `translateZ(${-depth * 3500}px) scale(${1 + depth * 1.2})`,
         transition: 'transform 0.02s ease-out',
         opacity: depth < 0 ? 0.4 : depth < 0.3 ? 0.6 : 0.5, // Opacités réduites
-        filter: `blur(${Math.max(0, depth * 8)}px)`,
+        filter: `blur(${blurAmount}px)`,
         pointerEvents: 'none',
         transformOrigin: 'center center',
       }}
