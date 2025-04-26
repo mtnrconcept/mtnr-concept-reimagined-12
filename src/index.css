@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,10 +20,9 @@
   body {
     @apply bg-grunge text-primary-foreground antialiased font-sans;
     letter-spacing: 0.01em;
-    background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?blend=2f2d36&sat=0&exp=2&blend-mode=multiply"),
-                      url("https://www.transparenttextures.com/patterns/concrete-wall-2.png");
-    background-size: cover, auto;
-    background-repeat: no-repeat, repeat;
+    background-image: url("/lovable-uploads/7eefa948-da3a-4bfd-8b4b-e19299caaa22.png");
+    background-size: cover;
+    background-repeat: no-repeat;
     background-attachment: fixed;
     min-height: 100dvh;
   }
