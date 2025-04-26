@@ -36,15 +36,15 @@ export const Background = ({
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           transform: `translateZ(${-depth * 1000}px) scale(${1 + depth * 1.5})`,
-          opacity: 0.5, 
+          opacity: 0.8,
           willChange: 'transform',
-          filter: 'brightness(0.7) contrast(1.2)', 
+          filter: 'brightness(0.85) contrast(1.1)',
           transition: 'transform 0.1s ease-out'
         }}
       />
       
       {/* Overlay pour ajouter de la profondeur */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/30" />
       
       {/* Effet grille pour renforcer la profondeur */}
       <div 
@@ -58,3 +58,4 @@ export const Background = ({
     </div>
   );
 };
+
