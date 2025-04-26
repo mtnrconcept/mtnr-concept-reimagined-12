@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider } from "./components/effects/TorchContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
+import { Torch3DProvider } from "./components/effects/Torch3DContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -38,15 +39,17 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <TorchProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Suspense fallback={null}>
-            <AnimatedRoutes />
-          </Suspense>
-        </BrowserRouter>
-        <ParticleEffect />
-        <TorchToggle />
+        <Torch3DProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Suspense fallback={null}>
+              <AnimatedRoutes />
+            </Suspense>
+          </BrowserRouter>
+          <ParticleEffect />
+          <TorchToggle />
+        </Torch3DProvider>
       </TorchProvider>
     </TooltipProvider>
   </QueryClientProvider>
