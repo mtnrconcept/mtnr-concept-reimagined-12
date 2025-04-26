@@ -13,7 +13,7 @@ export const ParticleEffect = () => {
 
     // Configuration des particules
     const particles: Particle[] = [];
-    const particleCount = 500;
+    const particleCount = 100;
     
     class Particle {
       x: number;
