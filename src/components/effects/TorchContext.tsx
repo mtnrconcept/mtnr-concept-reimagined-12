@@ -83,7 +83,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [mousePosition, elementsToIlluminate, isTorchActive]);
 
-  const radius = 400;
+  const radius = 600;
   
   const contextValue = {
     isTorchActive,
@@ -102,7 +102,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {isTorchActive && (
           <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
             <defs>
-              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="70%">
+              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="black" stopOpacity="1" />
                 <stop offset="70%" stopColor="black" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
