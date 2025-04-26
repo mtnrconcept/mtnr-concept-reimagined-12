@@ -1,261 +1,101 @@
+import { useEffect, useRef } from "react";
+import { useTorchContext } from "./TorchContext";
 
-import { useState, useEffect, useRef } from 'react';
-import { Flashlight as FlashlightIcon, FlashlightOff } from 'lucide-react';
-import { Toggle } from '@/components/ui/toggle';
+export default function ShadowManager() {
+  const {
+    isTorchActive,
+    mousePosition,
+    elementsToIlluminate,
+    containerRef,
+  } = useTorchContext();
 
-export const Flashlight = () => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const shadowsContainerRef = useRef<HTMLDivElement>(null);
-  const shadowElements = useRef<Map<string, HTMLElement>>(new Map());
-  const rafId = useRef<number | null>(null);
+  const shadowElements = useRef<Map<string, HTMLDivElement>>(new Map());
+  let shadowUpdateTimeout: number | null = null;
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isEnabled) return;
-      setPosition({ x: e.pageX, y: e.pageY });
+  const createShadowElement = (element: HTMLElement, index: number) => {
+    const rect = element.getBoundingClientRect();
+    const shadow = document.createElement("div");
+    shadow.className = "shadow-element";
+    shadow.style.position = "absolute";
+    shadow.style.top = `${rect.top + window.scrollY}px`;
+    shadow.style.left = `${rect.left + window.scrollX}px`;
+    shadow.style.width = `${rect.width}px`;
+    shadow.style.height = `${rect.height}px`;
+    shadow.style.zIndex = "9999";
+    shadow.style.background = "black";
+    shadow.style.opacity = "0.5";
+    shadow.style.borderRadius = getComputedStyle(element).borderRadius;
+    shadow.style.pointerEvents = "none";
+    shadow.style.mixBlendMode = "multiply";
+    shadow.setAttribute("data-shadow-id", `shadow-${index}`);
+    return shadow;
+  };
+
+  const updateShadowPositions = () => {
+    const torch = document.getElementById("torch-light");
+    if (!torch || !shadowsContainerRef.current) return;
+
+    const torchRect = torch.getBoundingClientRect();
+    const torchCenter = {
+      x: torchRect.left + torchRect.width / 2,
+      y: torchRect.top + torchRect.height / 2,
     };
-    
-    // Fonction pour créer un élément d'ombre
-    const createShadowElement = (element: Element, index: number): HTMLElement => {
+
+    shadowElements.current.forEach((shadow, key) => {
+      const targetId = key.replace("shadow-", "");
+      const element = elementsToIlluminate[Number(targetId)];
+      if (!element) return;
+
       const rect = element.getBoundingClientRect();
-      const shadow = document.createElement('div');
-      const id = `shadow-${index}`;
-      shadow.id = id;
-      shadow.className = 'shadow-element';
-      
-      // Styles de base pour l'ombre
-      shadow.style.position = 'absolute';
-      shadow.style.left = `${rect.left + window.scrollX}px`;
-      shadow.style.top = `${rect.top + window.scrollY}px`;
-      shadow.style.width = `${rect.width}px`;
-      shadow.style.height = `${rect.height}px`;
-      shadow.style.backgroundColor = 'black';
-      shadow.style.borderRadius = window.getComputedStyle(element).borderRadius;
-      shadow.style.pointerEvents = 'none';
-      shadow.style.opacity = '0';
-      shadow.style.transition = 'opacity 0.2s ease-out';
-      shadow.style.zIndex = '1';
-      shadow.style.filter = 'blur(4px)';
-      
-      // Stocker des informations sur l'élément pour les calculs d'ombre
-      shadow.dataset.elementType = element.tagName.toLowerCase();
-      shadow.dataset.elementId = id;
-      
-      // Si l'élément a un attribut data-depth, l'utiliser pour l'effet d'ombre
-      if (element.getAttribute('data-depth')) {
-        shadow.dataset.depth = element.getAttribute('data-depth') || '';
-      }
-      
-      return shadow;
-    };
+      const elementCenter = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
 
-    const isElementVisible = (element: Element): boolean => {
-      const rect = element.getBoundingClientRect();
-      return (
-        rect.width > 5 && 
-        rect.height > 5 && 
-        rect.top < window.innerHeight && 
-        rect.bottom > 0 &&
-        rect.left < window.innerWidth && 
-        rect.right > 0
-      );
-    };
+      const dx = elementCenter.x - torchCenter.x;
+      const dy = elementCenter.y - torchCenter.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const normX = dx / distance;
+      const normY = dy / distance;
+      const shadowLength = Math.min(100, distance / 5);
 
-    const updateShadows = () => {
-      if (!shadowsContainerRef.current || !isEnabled) return;
-      
-      // Vider le conteneur d'ombres
-      shadowElements.current.clear();
-      
-      // On cible des éléments plus spécifiques et visibles
-      const selectorList = [
-        '.parallax-element', 'section', '.card', 
-        'h1', 'h2', 'h3', 'p', 'img', 'button',
-        'div[data-depth]', 'a', '.shadow-receiver'
-      ];
-      const selector = selectorList.join(', ');
-      const elements = document.querySelectorAll(selector);
-      
-      // Vider le conteneur d'ombres
-      shadowsContainerRef.current.innerHTML = '';
-      
-      // Créer une ombre pour chaque élément visible
-      elements.forEach((element, index) => {
-        if (!isElementVisible(element)) return;
-        
-        // Ignorer les éléments trop petits ou déjà des ombres
-        if (element.classList.contains('shadow-element')) return;
-        
+      shadow.style.transform = `translate(${normX * shadowLength}px, ${
+        normY * shadowLength
+      }px)`;
+    });
+  };
+
+  const updateShadows = () => {
+    if (!shadowsContainerRef.current) return;
+    elementsToIlluminate.forEach((element, index) => {
+      const shadowId = `shadow-${index}`;
+      if (!shadowElements.current.has(shadowId)) {
         const shadow = createShadowElement(element, index);
         shadowsContainerRef.current?.appendChild(shadow);
-        shadowElements.current.set(`shadow-${index}`, shadow);
-      });
-    };
+        shadowElements.current.set(shadowId, shadow);
+      }
+    });
+  };
 
-    const updateShadowPositions = () => {
-      if (!isEnabled || !shadowsContainerRef.current) return;
-      
-      shadowElements.current.forEach((shadow) => {
-        // Récupérer l'ID de l'élément d'ombre
-        const elementId = shadow.dataset.elementId || '';
-        const elementType = shadow.dataset.elementType || 'div';
-        
-        // Position de l'ombre
-        const rect = shadow.getBoundingClientRect();
-        const shadowCenterX = rect.left + rect.width / 2;
-        const shadowCenterY = rect.top + rect.height / 2;
-        
-        // Calculer l'angle et la distance entre la source lumineuse et l'élément
-        const dx = position.x - shadowCenterX;
-        const dy = position.y - shadowCenterY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        // Angle opposé à la source de lumière
-        const angle = Math.atan2(-dy, -dx);
-        
-        // Ajuster l'effet d'ombre en fonction de la profondeur (si disponible)
-        const depth = parseFloat(shadow.dataset.depth || '0.5');
-        
-        // Calculer l'offset de l'ombre basé sur la distance et le type d'élément
-        // Plus l'élément est éloigné de la source lumineuse, plus l'ombre est prononcée
-        let maxOffset = 20; // Valeur de base plus petite pour éviter les grands déplacements
-        if (elementType === 'h1' || elementType === 'h2') maxOffset = 15;
-        if (elementType === 'p') maxOffset = 10;
-        if (elementType === 'button' || elementType === 'a') maxOffset = 8;
-        
-        // Distance minimale pour éviter les effets extrêmes à proximité immédiate
-        const minDistance = 100;
-        const effectiveDistance = Math.max(minDistance, distance);
-        
-        // Calculer le déplacement en fonction de la distance (inversement proportionnel à la distance)
-        const offsetFactor = Math.min(1, 800 / effectiveDistance);
-        const offsetX = Math.cos(angle) * maxOffset * offsetFactor;
-        const offsetY = Math.sin(angle) * maxOffset * offsetFactor;
-        
-        // Scale légèrement pour donner un effet de profondeur
-        const baseScale = 1;
-        const scaleIncrease = Math.min(0.1, distance / 5000 + depth * 0.1);
-        const shadowScale = baseScale + scaleIncrease;
-        
-        // Calculer l'opacité de l'ombre en fonction de la distance
-        // Plus la source lumineuse est proche, plus l'ombre est intense
-        const maxOpacity = 0.5; // Opacité maximum réduite
-        const minOpacity = 0.1; // Opacité minimum
-        
-        // Calculer l'opacité en fonction de la distance (inversement proportionnelle)
-        const opacityFactor = Math.min(1, 1000 / effectiveDistance);
-        const opacity = minOpacity + (maxOpacity - minOpacity) * opacityFactor;
-        
-        // Ajuster le flou en fonction de la distance
-        const blur = 3 + Math.min(8, distance / 200);
-        
-        // Appliquer les transformations à l'ombre
-        shadow.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${shadowScale})`;
-        shadow.style.opacity = opacity.toString();
-        shadow.style.filter = `blur(${blur}px)`;
-      });
-    };
-
-    const animateLoop = () => {
-      if (!isEnabled) return;
-      
-      updateShadowPositions();
-      rafId.current = requestAnimationFrame(animateLoop);
-    };
-
-    if (isEnabled) {
-      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+  const debounceUpdateShadows = () => {
+    if (shadowUpdateTimeout) clearTimeout(shadowUpdateTimeout);
+    shadowUpdateTimeout = window.setTimeout(() => {
       updateShadows();
-      animateLoop();
-      
-      // Mettre à jour les ombres lors du scroll ou du redimensionnement
-      window.addEventListener('scroll', updateShadows, { passive: true });
-      window.addEventListener('resize', updateShadows, { passive: true });
-      
-      // Surveiller les changements dans le DOM pour mettre à jour les ombres
-      const observer = new MutationObserver(() => {
-        // Utiliser un debounce simple pour éviter trop de recalculs
-        if (rafId.current) cancelAnimationFrame(rafId.current);
-        rafId.current = requestAnimationFrame(() => {
-          updateShadows();
-          updateShadowPositions();
-        });
-      });
-      
-      observer.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class'] 
-      });
+      updateShadowPositions();
+    }, 100);
+  };
 
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('scroll', updateShadows);
-        window.removeEventListener('resize', updateShadows);
-        observer.disconnect();
-        if (rafId.current) cancelAnimationFrame(rafId.current);
-      };
-    } else {
-      // Nettoyer les ombres quand la lampe est désactivée
-      if (shadowsContainerRef.current) {
-        shadowsContainerRef.current.innerHTML = '';
-      }
-      if (rafId.current) {
-        cancelAnimationFrame(rafId.current);
-        rafId.current = null;
-      }
-    }
-  }, [isEnabled, position]);
+  useEffect(() => {
+    if (!isTorchActive) return;
+    updateShadows();
+    updateShadowPositions();
 
-  return (
-    <>
-      <Toggle 
-        className="fixed right-4 top-24 z-[9999] bg-black/20 hover:bg-black/40"
-        pressed={isEnabled}
-        onPressedChange={setIsEnabled}
-      >
-        {isEnabled ? (
-          <FlashlightIcon className="h-5 w-5 text-yellow-400" />
-        ) : (
-          <FlashlightOff className="h-5 w-5 text-yellow-400" />
-        )}
-      </Toggle>
+    const handleMouseMove = () => debounceUpdateShadows();
+    window.addEventListener("mousemove", handleMouseMove);
 
-      {/* Conteneur pour les éléments d'ombre */}
-      <div
-        ref={shadowsContainerRef}
-        className="fixed inset-0 z-[5] pointer-events-none"
-      />
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isTorchActive, mousePosition]);
 
-      {/* Effet de lumière */}
-      {isEnabled && (
-        <div
-          className="pointer-events-none fixed inset-0 z-[20]"
-          style={{
-            maskImage: `radial-gradient(circle 600px at ${position.x}px ${position.y}px, transparent, black)`,
-            WebkitMaskImage: `radial-gradient(circle 600px at ${position.x}px ${position.y}px, transparent, black)`,
-            background: 'rgba(0, 0, 0, 0.92)',
-            backdropFilter: 'blur(1px)',
-            transition: 'backdrop-filter 0.3s ease',
-          }}
-        >
-          <div
-            className="pointer-events-none absolute"
-            style={{
-              left: position.x,
-              top: position.y,
-              width: '1200px',
-              height: '1200px',
-              transform: 'translate(-50%, -50%)',
-              background: 'radial-gradient(circle, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.08) 30%, transparent 70%)',
-              filter: 'blur(40px)',
-              mixBlendMode: 'soft-light',
-            }}
-          />
-        </div>
-      )}
-    </>
-  );
-};
-
+  return <div ref={shadowsContainerRef} className="absolute top-0 left-0 w-full h-full pointer-events-none z-[9998]" />;
+}
