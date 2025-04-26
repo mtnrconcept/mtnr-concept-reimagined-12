@@ -19,7 +19,7 @@ export default function ParallaxScene() {
   return (
     <>
       {/* Background avec l'image d'escalier */}
-      <Background imagePath="/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png" />
+      <Background imagePath="/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png" />
 
       <div 
         ref={containerRef}
@@ -27,10 +27,10 @@ export default function ParallaxScene() {
         style={{ 
           perspective: '2000px',
           transformStyle: 'preserve-3d',
-          zIndex: 10,  // Augmenté pour s'assurer que les éléments sont au-dessus du fond
+          zIndex: 10,
         }}
       >
-        {/* Couche colorée pour tester la visibilité */}
+        {/* Debug marker */}
         <div className="fixed top-10 left-10 w-20 h-20 bg-yellow-500 opacity-50 z-[100]" />
 
         {parallaxElements.map((element, index) => {
