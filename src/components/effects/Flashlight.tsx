@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useTorchContext } from "./TorchContext";
 
-export default function ShadowManager() {
+import React, { useEffect, useRef, useState } from "react";
+import { useTorchContext, TorchProvider, TorchToggle } from "./TorchContext";
+
+// Composant pour gérer les ombres
+function ShadowManager() {
   const {
     isTorchActive,
     mousePosition,
@@ -68,12 +70,31 @@ export default function ShadowManager() {
 
   const updateShadows = () => {
     if (!shadowsContainerRef.current) return;
+    
+    // Nettoyer les ombres existantes non utilisées
+    const currentIds = new Set(elementsToIlluminate.map((_, i) => `shadow-${i}`));
+    shadowElements.current.forEach((shadow, key) => {
+      if (!currentIds.has(key)) {
+        shadow.remove();
+        shadowElements.current.delete(key);
+      }
+    });
+    
+    // Créer/mettre à jour les ombres
     elementsToIlluminate.forEach((element, index) => {
       const shadowId = `shadow-${index}`;
       if (!shadowElements.current.has(shadowId)) {
         const shadow = createShadowElement(element, index);
         shadowsContainerRef.current?.appendChild(shadow);
         shadowElements.current.set(shadowId, shadow);
+      } else {
+        // Mettre à jour la position des ombres existantes
+        const shadow = shadowElements.current.get(shadowId)!;
+        const rect = element.getBoundingClientRect();
+        shadow.style.top = `${rect.top + window.scrollY}px`;
+        shadow.style.left = `${rect.left + window.scrollX}px`;
+        shadow.style.width = `${rect.width}px`;
+        shadow.style.height = `${rect.height}px`;
       }
     });
   };
@@ -87,7 +108,13 @@ export default function ShadowManager() {
   };
 
   useEffect(() => {
-    if (!isTorchActive) return;
+    if (!isTorchActive) {
+      // Nettoyer les ombres si la lampe est désactivée
+      shadowElements.current.forEach(shadow => shadow.remove());
+      shadowElements.current.clear();
+      return;
+    }
+    
     updateShadows();
     updateShadowPositions();
 
@@ -95,7 +122,17 @@ export default function ShadowManager() {
     window.addEventListener("mousemove", handleMouseMove);
 
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isTorchActive, mousePosition]);
+  }, [isTorchActive, mousePosition, elementsToIlluminate]);
 
   return <div ref={shadowsContainerRef} className="absolute top-0 left-0 w-full h-full pointer-events-none z-[9998]" />;
 }
+
+// Composant principal qui englobe tout
+export const Flashlight: React.FC = () => {
+  return (
+    <TorchProvider>
+      <ShadowManager />
+      <TorchToggle />
+    </TorchProvider>
+  );
+};
