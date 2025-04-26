@@ -9,7 +9,8 @@ export const Flashlight = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isEnabled) {
-        setPosition({ x: e.pageX, y: e.pageY }); // Utiliser pageX/Y pour inclure le scroll
+        // Suivi direct sans interpolation
+        setPosition({ x: e.pageX, y: e.pageY });
       }
     };
 
@@ -40,7 +41,7 @@ export const Flashlight = () => {
         <div
           className="pointer-events-none absolute top-0 left-0 z-[9999] w-full"
           style={{
-            height: `${document.body.scrollHeight}px`, // couvre toute la page
+            height: `${document.body.scrollHeight}px`,
             maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
             WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
             background: 'rgba(0, 0, 0, 0.92)',
