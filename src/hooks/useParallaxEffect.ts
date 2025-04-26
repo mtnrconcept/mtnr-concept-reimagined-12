@@ -55,11 +55,11 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         `;
       });
       
-      // Traitement spécial pour l'arrière-plan avec effet de parallax encore plus lent
+      // Traitement spécial pour l'arrière-plan avec effet de parallax plus rapide
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.035; // Encore plus lent (0.075 -> 0.035)
+          const translateY = scrollY * 0.15; // Trois fois plus rapide
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
