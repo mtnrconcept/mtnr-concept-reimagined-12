@@ -102,7 +102,7 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
           scale(${scaleEffect})
         `;
         
-        // Amélioration de l'ombre dynamique
+        // Amélioration de l'ombre dynamique - Ensure no negative values
         // 1. Calculer l'intensité de l'ombre basée sur la rotation et la profondeur
         const rotationMagnitude = Math.max(0, Math.abs(rotationX + rotationY) * 0.4);
         
@@ -113,7 +113,7 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
         const shadowOffsetX = -target.current.x * 8 * depthFactor;
         const shadowOffsetY = Math.max(3, rotationMagnitude * depthFactor);
         
-        // 4. Blur de l'ombre dynamique
+        // 4. Blur de l'ombre dynamique - ensure positive values
         const shadowBlur = Math.max(4, rotationMagnitude * 3);
         
         // 5. Opacité de l'ombre basée sur la profondeur

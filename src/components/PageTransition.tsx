@@ -7,11 +7,15 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
     <AnimatePresence mode="wait">
       <motion.div
         key={keyId}
-        initial={{ opacity: 0, rotateY: 60, scale: 0.95, filter: "blur(16px)" }}
-        animate={{ opacity: 1, rotateY: 0, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, rotateY: -50, scale: 0.9, filter: "blur(24px)" }}
+        initial={{ opacity: 0, rotateY: 60, scale: 0.95 }}
+        animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+        exit={{ opacity: 0, rotateY: -50, scale: 0.9 }}
         transition={{ type: "spring", duration: 0.92, bounce: 0.16 }}
-        style={{ perspective: "1400px", willChange: "transform, filter, opacity" }}
+        style={{ 
+          perspective: "1400px", 
+          willChange: "transform, opacity",
+          filter: "blur(0px)" // Set initial filter to prevent negative blur values
+        }}
       >
         {children}
       </motion.div>

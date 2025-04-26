@@ -4,6 +4,7 @@ import { Background } from './parallax/Background';
 import { ParallaxElement } from './parallax/ParallaxElement';
 import { use3DParallax } from '@/hooks/use3DParallax';
 import { parallaxElements } from './parallax/config';
+import { safeBlur } from '@/lib/animation-utils';
 
 export default function Parallax3DScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,27 +52,32 @@ export default function Parallax3DScene() {
       {/* Splash éléments from config */}
       {parallaxElements
         .filter(el => el.type === 'paint')
-        .map((splash, index) => (
-          <ParallaxElement 
-            key={`splash-${index}`}
-            depth={splash.depth}
-            x={splash.x || 0}
-            y={splash.y || 0}
-            className="origin-center"
-          >
-            <img
-              src={splash.src}
-              alt="Paint effect"
-              className={`max-w-[350px] max-h-[350px] object-contain ${splash.className || ''}`}
-              style={{
-                transform: `rotate(${splash.rotation || 0}deg) scale(${splash.scale || 1})`,
-                filter: `contrast(2.2) brightness(2.2) saturate(1.8) blur(${Math.max(0, splash.blur || 0)}px)`, // Ensure non-negative blur
-                mixBlendMode: 'screen',
-                willChange: 'transform, opacity'
-              }}
-            />
-          </ParallaxElement>
-        ))}
+        .map((splash, index) => {
+          // Ensure blur value is non-negative
+          const blurAmount = Math.max(0, splash.blur || 0);
+          
+          return (
+            <ParallaxElement 
+              key={`splash-${index}`}
+              depth={splash.depth}
+              x={splash.x || 0}
+              y={splash.y || 0}
+              className="origin-center"
+            >
+              <img
+                src={splash.src}
+                alt="Paint effect"
+                className={`max-w-[350px] max-h-[350px] object-contain ${splash.className || ''}`}
+                style={{
+                  transform: `rotate(${splash.rotation || 0}deg) scale(${splash.scale || 1})`,
+                  filter: `contrast(2.2) brightness(2.2) saturate(1.8) blur(${blurAmount}px)`,
+                  mixBlendMode: 'screen',
+                  willChange: 'transform, opacity'
+                }}
+              />
+            </ParallaxElement>
+          );
+        })}
       
       {/* Neon grid effect */}
       <div className="absolute inset-0 pointer-events-none z-10">
