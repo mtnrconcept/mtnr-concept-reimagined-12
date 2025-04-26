@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import ParallaxScene from "@/components/ParallaxScene";
@@ -5,11 +6,14 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
+
 export default function Home() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   const observerRef = useRef<IntersectionObserver | null>(null);
+  
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -23,18 +27,25 @@ export default function Home() {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     });
+    
     document.querySelectorAll('[data-animate]').forEach(el => {
       el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
       observerRef.current?.observe(el);
     });
+    
     return () => observerRef.current?.disconnect();
   }, []);
-  return <>
+
+  return (
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+      {/* Scene Parallax en arrière-plan */}
       <ParallaxScene />
-      <div className="relative z-10 min-h-screen overflow-hidden">
+      
+      {/* Contenu visible */}
+      <div className="relative z-10 min-h-screen">
         <Navbar />
         
-        <main className="min-h-screen w-full selection:text-black bg-transparent">
+        <main id="main-content" className="min-h-screen w-full bg-transparent">
           <HeroSection />
           <StudioSection />
           <ServicesSection />
@@ -45,5 +56,6 @@ export default function Home() {
           </footer>
         </main>
       </div>
-    </>;
+    </div>
+  );
 }

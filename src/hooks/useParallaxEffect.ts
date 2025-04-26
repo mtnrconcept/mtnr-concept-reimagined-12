@@ -10,6 +10,7 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     let mouseX = 0;
     let mouseY = 0;
     let ticking = false;
+    let rafId: number;
 
     const handleScroll = () => {
       scrollY = window.scrollY;
@@ -25,44 +26,40 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
 
     const requestAnimationUpdate = () => {
       if (!ticking) {
-        requestAnimationFrame(updateParallax);
+        rafId = requestAnimationFrame(updateParallax);
         ticking = true;
       }
     };
 
     const updateParallax = () => {
-      const elements = container.querySelectorAll('.parallax-element');
-      const bgElements = document.querySelectorAll('.parallax-element[data-depth="0.05"]');
+      const elements = container.querySelectorAll<HTMLElement>('.parallax-element');
       
-      // Traitement spécial pour l'arrière-plan
-      bgElements.forEach((element) => {
-        const el = element as HTMLElement;
-        const translateX = mouseX * 20; // Mouvement très léger pour l'arrière-plan
-        const translateY = scrollY * 0.05; // Défilement très lent
-        
-        el.style.transform = `translate3d(${translateX}px, ${translateY}px, -8000px) scale(1.5)`;
-      });
-      
-      // Autres éléments avec effet 3D prononcé
+      // Traitement des éléments avec effet 3D prononcé
       elements.forEach((element) => {
-        if (element.getAttribute('data-depth') === '0.05') return; // Skip background elements
-        
-        const el = element as HTMLElement;
-        const depth = parseFloat(el.dataset.depth || '0');
-        const x = parseFloat(el.dataset.x || '0');
-        const y = parseFloat(el.dataset.y || '0');
+        const depth = parseFloat(element.dataset.depth || '0');
+        const x = parseFloat(element.dataset.x || '0');
+        const y = parseFloat(element.dataset.y || '0');
         
         const translateY = depth * scrollY;
         const translateX = mouseX * (depth * 100);
-        const rotateX = mouseY * (depth * 20);
-        const rotateY = mouseX * (depth * 20);
-        const translateZ = depth * -2000;
+        const rotateX = -mouseY * (depth * 10); // inversé pour effet naturel
+        const rotateY = mouseX * (depth * 10);
+        const translateZ = depth * -1000;
         
-        el.style.transform = `
-          translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)
+        element.style.transform = `
+          translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
           rotateX(${rotateX}deg)
           rotateY(${rotateY}deg)
         `;
+      });
+      
+      // Traitement spécial pour l'arrière-plan
+      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
+      bgElements.forEach((el) => {
+        if (!el.classList.contains('parallax-element')) {
+          const translateY = scrollY * 0.05;
+          el.style.transform = `translateY(${translateY}px) scale(1.05)`;
+        }
       });
       
       ticking = false;
@@ -77,6 +74,7 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId);
     };
   }, [containerRef]);
 };
