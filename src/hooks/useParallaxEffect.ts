@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 
 export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>) => {

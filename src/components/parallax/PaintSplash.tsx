@@ -9,22 +9,27 @@ interface PaintSplashProps {
   rotation?: number;
   className?: string;
   src: string;
+  blur?: number;
 }
 
-export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src }: PaintSplashProps) => {
+export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0 }: PaintSplashProps) => {
+  // Calcul de l'opacité basé sur la profondeur
+  const opacity = Math.max(0.4, 1 - Math.abs(depth - 0.4) * 1.2);
+  
   return (
     <ParallaxElement depth={depth} x={x} y={y} className={className}>
       <img
         src={src}
         alt=""
-        className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain"
+        className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain transition-transform duration-300"
         style={{
           transform: `rotate(${rotation}deg) scale(${scale})`,
-          filter: 'contrast(1.2) brightness(1.1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.2))',
-          opacity: 0.9,
-          mixBlendMode: 'screen'
+          filter: `contrast(1.2) brightness(1.1) blur(${blur}px) drop-shadow(0 0 10px rgba(255, 215, 0, 0.2))`,
+          opacity,
+          mixBlendMode: 'screen',
+          willChange: 'transform, filter'
         }}
       />
     </ParallaxElement>
   );
-}
+};
