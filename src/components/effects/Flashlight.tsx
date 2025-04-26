@@ -17,9 +17,9 @@ export const Flashlight = () => {
     const updatePosition = () => {
       if (!isEnabled) return;
 
-      // Calcul plus fluide avec légère interpolation pour éviter les sauts brusques
-      currentX += (targetX - currentX) * 0.2;
-      currentY += (targetY - currentY) * 0.2;
+      // Interpolation plus fluide pour le suivi du curseur
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
 
       setPosition({
         x: currentX,
@@ -32,11 +32,11 @@ export const Flashlight = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
       
-      // On utilise directement les coordonnées du curseur dans la fenêtre visible
+      // Utilise directement les coordonnées du curseur
       targetX = e.clientX;
       targetY = e.clientY;
       
-      // Si c'est le premier mouvement, on positionne immédiatement sans animation
+      // Si premier mouvement, positionnement immédiat
       if (!frameRef.current) {
         currentX = targetX;
         currentY = targetY;
@@ -56,18 +56,6 @@ export const Flashlight = () => {
     };
   }, [isEnabled]);
 
-  if (!isEnabled) {
-    return (
-      <Toggle 
-        className="fixed right-4 top-24 z-[9999] bg-black/20 hover:bg-black/40"
-        pressed={isEnabled}
-        onPressedChange={setIsEnabled}
-      >
-        <FlashlightOff className="h-5 w-5 text-yellow-400" />
-      </Toggle>
-    );
-  }
-
   return (
     <>
       <Toggle 
@@ -75,32 +63,41 @@ export const Flashlight = () => {
         pressed={isEnabled}
         onPressedChange={setIsEnabled}
       >
-        <FlashlightIcon className="h-5 w-5 text-yellow-400" />
+        {isEnabled ? (
+          <FlashlightIcon className="h-5 w-5 text-yellow-400" />
+        ) : (
+          <FlashlightOff className="h-5 w-5 text-yellow-400" />
+        )}
       </Toggle>
       
-      <div
-        className="pointer-events-none fixed inset-0 z-[9999]"
-        style={{
-          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
-          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
-          background: 'rgba(0, 0, 0, 0.92)',
-          backdropFilter: 'blur(1px)',
-        }}
-      >
+      {isEnabled && (
         <div
-          className="pointer-events-none absolute"
+          className="flashlight-overlay pointer-events-none fixed inset-0 z-[9999]"
           style={{
-            left: position.x,
-            top: position.y,
-            width: '1000px',
-            height: '1000px',
-            transform: 'translate(-50%, -50%)',
-            background: 'radial-gradient(circle, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.05) 30%, transparent 70%)',
-            filter: 'blur(30px)',
-            mixBlendMode: 'soft-light'
+            // Inversé les valeurs pour que la partie éclairée soit visible (black = visible)
+            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+            background: 'rgba(0, 0, 0, 0.92)',
+            backdropFilter: 'blur(1px)',
+            isolation: 'isolate', // Assure que l'effet reste isolé
           }}
-        />
-      </div>
+        >
+          {/* Effet de lueur jaune */}
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              left: position.x,
+              top: position.y,
+              width: '1000px',
+              height: '1000px',
+              transform: 'translate(-50%, -50%)',
+              background: 'radial-gradient(circle, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.05) 30%, transparent 70%)',
+              filter: 'blur(30px)',
+              mixBlendMode: 'soft-light'
+            }}
+          />
+        </div>
+      )}
     </>
   );
 };

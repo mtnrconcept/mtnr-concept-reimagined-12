@@ -43,7 +43,6 @@ export default function Home() {
       
       <div className="relative z-20 min-h-screen">
         <Navbar />
-        <Flashlight />
         
         <main id="main-content" className="min-h-screen w-full pt-16">
           <HeroSection />
@@ -56,6 +55,9 @@ export default function Home() {
           </footer>
         </main>
       </div>
+      
+      {/* Déplacer le Flashlight en dehors du conteneur Parallax */}
+      <Flashlight />
     </div>
   );
 }
