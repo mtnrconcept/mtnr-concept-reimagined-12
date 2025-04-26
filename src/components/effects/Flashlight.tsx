@@ -10,10 +10,8 @@ export const Flashlight = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isEnabled) {
-        setPosition({ 
-          x: e.clientX, 
-          y: e.clientY + window.scrollY 
-        });
+        // Suivi direct sans interpolation
+        setPosition({ x: e.pageX, y: e.pageY });
       }
     };
 
@@ -29,7 +27,7 @@ export const Flashlight = () => {
   return (
     <>
       <Toggle 
-        className="fixed right-4 top-4 z-[9999] bg-black/20 hover:bg-black/40"
+        className="fixed right-4 top-24 z-[9999] bg-black/20 hover:bg-black/40"
         pressed={isEnabled}
         onPressedChange={setIsEnabled}
       >
@@ -42,10 +40,11 @@ export const Flashlight = () => {
 
       {isEnabled && (
         <div
-          className="pointer-events-none fixed top-0 left-0 z-[9998] w-full h-full"
+          className="pointer-events-none absolute top-0 left-0 z-[9999] w-full"
           style={{
-            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
-            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+            height: `${document.body.scrollHeight}px`,
+            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
             background: 'rgba(0, 0, 0, 0.92)',
             backdropFilter: 'blur(1px)',
             isolation: 'isolate',
@@ -69,3 +68,4 @@ export const Flashlight = () => {
     </>
   );
 };
+
