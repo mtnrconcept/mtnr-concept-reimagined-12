@@ -102,8 +102,8 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
           scale(${scaleEffect})
         `;
         
-        // Ombre dynamique plus prononcée basée sur la rotation
-        const shadowIntensity = Math.abs(rotationX + rotationY) * 0.4;
+        // Ombre dynamique plus prononcée basée sur la rotation - S'assurer que les valeurs de blur sont toujours positives
+        const shadowIntensity = Math.max(0, Math.abs(rotationX + rotationY) * 0.4);
         el.style.filter = `drop-shadow(0 ${shadowIntensity}px ${shadowIntensity * 3}px rgba(0,0,0,0.5))`;
       });
       
