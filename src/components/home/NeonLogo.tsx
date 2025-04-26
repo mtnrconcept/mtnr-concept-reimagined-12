@@ -27,7 +27,7 @@ export const NeonLogo = () => {
         }}
       >
         <img 
-          src="/lovable-uploads/abe06f9b-f700-4a49-a4d8-b4d68c473e70.png"
+          src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
           alt="MTNR Concept"
           className="w-full h-auto"
           draggable={false}
