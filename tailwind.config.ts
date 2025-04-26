@@ -28,11 +28,11 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Impact', 'Haettenschweiler', 'Franklin Gothic Bold', 'sans-serif'],
         mono: ['Space Mono', 'monospace'],
-        grunge: ['"Urban Hookupz"', '"Permanent Marker"', 'cursive'],
-        'street': ['"Street Writer"', 'cursive'],
-        'urban': ['"Urban Hookupz"', 'cursive'],
-        'graffont': ['Graffont', 'cursive'],
-        'nosegrind': ['Nosegrind', 'cursive']
+        grunge: ['"Permanent Marker"', 'cursive'],
+        'street': ['Bebas Neue', 'Impact', 'sans-serif'],
+        'urban': ['Nosifer', 'Rubik Spray Paint', 'cursive'],
+        'graffont': ['Cabin Sketch', 'cursive'],
+        'nosegrind': ['Permanent Marker', 'cursive']
       },
       colors: {
         border: 'hsl(var(--border))',

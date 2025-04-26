@@ -13,18 +13,18 @@ interface ParallaxElementProps {
 export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxElementProps) => {
   return (
     <div
-      className={cn('parallax-element absolute', className)}
+      className={cn('parallax-element absolute will-change-transform', className)}
       data-depth={depth}
       data-x={x}
       data-y={y}
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        zIndex: 5000 - Math.floor(depth * 10), // Z-index très élevé
-        transform: `translateZ(${-depth * 800}px)`,
-        willChange: 'transform',
-        opacity: 1,
-        transition: 'transform 0.1s ease-out',
+        zIndex: Math.floor(1000 - depth * 100), // Ajustement du z-index basé sur la profondeur
+        transform: `translateZ(${-depth * 1500}px) scale(${1 + depth * 0.5})`,
+        transition: 'transform 0.05s ease-out',
+        opacity: depth < 0.5 ? 1 : 0.85, // Éléments plus profonds légèrement plus transparents
+        filter: `blur(${depth * 3}px)`, // Flou proportionnel à la profondeur
         pointerEvents: 'none'
       }}
     >

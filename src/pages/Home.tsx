@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import ParallaxScene from "@/components/ParallaxScene";
+import Parallax3DScene from "@/components/Parallax3DScene";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -37,15 +37,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-transparent">
-      {/* Scene Parallax en arrière-plan */}
-      <ParallaxScene />
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+      {/* Scene Parallax 3D en arrière-plan */}
+      <Parallax3DScene />
       
       {/* Contenu visible */}
       <div className="relative z-20 min-h-screen">
         <Navbar />
         
-        <main id="main-content" className="min-h-screen w-full bg-transparent pt-16">
+        <main id="main-content" className="min-h-screen w-full pt-16">
           <HeroSection />
           <StudioSection />
           <ServicesSection />

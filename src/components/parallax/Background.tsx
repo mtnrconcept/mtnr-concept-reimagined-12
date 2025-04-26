@@ -1,40 +1,54 @@
 
 interface BackgroundProps {
-  imagePath: string;
+  imagePath?: string;
   depth?: number;
 }
 
-export const Background = ({ imagePath, depth = 0.05 }: BackgroundProps) => {
+export const Background = ({ imagePath = "/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png", depth = 0.1 }: BackgroundProps) => {
+  console.log("Rendering background with image:", imagePath);
+  
   return (
     <div 
-      className="fixed inset-0 w-full h-full bg-black"
+      className="fixed inset-0 w-full h-full"
       style={{
-        zIndex: 1,
+        zIndex: 0,
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        perspective: '1000px',
+        transformStyle: 'preserve-3d'
       }}
     >
       <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transform-3d"
         data-depth={depth}
         style={{
-          backgroundImage: `url("/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png")`, // Utilisation de l'image d'escalier
+          backgroundImage: `url("${imagePath}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          transform: `translateZ(${-depth * 500}px) scale(${1 + depth * 2})`,
-          opacity: 0.15, // Augmentation légère de l'opacité
+          transform: `translateZ(${-depth * 1000}px) scale(${1 + depth * 1.5})`,
+          opacity: 0.25, // Augmentation de l'opacité pour mieux voir l'image
           willChange: 'transform',
-          filter: 'brightness(0.4) contrast(1.2)' // Amélioration du contraste
+          filter: 'brightness(0.35) contrast(1.3)', // Amélioration du contraste
+          transition: 'transform 0.1s ease-out'
         }}
       />
+      
+      {/* Overlay pour ajouter de la profondeur */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" />
+      
+      {/* Effet grille pour renforcer la profondeur */}
       <div 
-        className="absolute inset-0 bg-black/70" 
-        style={{ zIndex: 2 }} 
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+          transform: 'translateZ(-50px)'
+        }}
       />
     </div>
   );
