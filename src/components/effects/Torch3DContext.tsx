@@ -1,9 +1,49 @@
 
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { OrbitControls, shaderMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { useTorch } from "./TorchContext";
+
+// Création du matériau de masque pour l'effet lampe torche
+const TorchMaskMaterial = shaderMaterial(
+  // Uniforms
+  {
+    u_mouse: new THREE.Vector2(0.5, 0.5),
+    u_radius: 0.3,
+    u_color: new THREE.Color(0x000000),
+    u_intensity: 0.95,
+    resolution: new THREE.Vector2(1, 1),
+  },
+  // Vertex shader
+  `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  `,
+  // Fragment shader
+  `
+  uniform vec2 u_mouse;
+  uniform float u_radius;
+  uniform vec3 u_color;
+  uniform float u_intensity;
+  uniform vec2 resolution;
+  
+  varying vec2 vUv;
+  
+  void main() {
+    vec2 pos = gl_FragCoord.xy / resolution;
+    float dist = distance(pos, u_mouse);
+    float mask = 1.0 - smoothstep(u_radius, u_radius * 1.3, dist);
+    gl_FragColor = vec4(u_color, u_intensity * (1.0 - mask));
+  }
+  `
+);
+
+// Extension du matériau pour React Three Fiber
+extend({ TorchMaskMaterial });
 
 interface Torch3DContextType {
   is3DModeActive: boolean;
@@ -17,20 +57,46 @@ const Torch3DContext = createContext<Torch3DContextType>({
 
 export const use3DTorch = () => useContext(Torch3DContext);
 
+// Composant pour le masque de la lampe torche (effet overlay)
+const TorchMask = ({ mouse }: { mouse: React.MutableRefObject<[number, number]> }) => {
+  const ref = useRef<any>(null);
+  const { size } = useThree();
+
+  useFrame(() => {
+    if (ref.current) {
+      // Convertir les coordonnées de souris normalisées (-1,1) en coordonnées UV (0,1)
+      ref.current.uniforms.u_mouse.value = new THREE.Vector2(
+        (mouse.current[0] + 1) / 2,
+        1 - (mouse.current[1] + 1) / 2
+      );
+      ref.current.uniforms.resolution.value = new THREE.Vector2(size.width, size.height);
+    }
+  });
+
+  return (
+    <mesh position={[0, 0, 10]} renderOrder={1000}>
+      <planeGeometry args={[2, 2]} />
+      {/* @ts-ignore - nécessaire car le matériel personnalisé n'est pas reconnu par TypeScript */}
+      <torchMaskMaterial ref={ref} transparent depthTest={false} depthWrite={false} />
+    </mesh>
+  );
+};
+
 const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]> }) => {
   const lightRef = useRef<THREE.PointLight>(null);
   const coneRef = useRef<THREE.Mesh>(null);
 
   useFrame(() => {
     if (lightRef.current && coneRef.current) {
-      // Project the light in front of the camera based on mouse position
+      // Projection de la lumière en fonction de la position de la souris
       const x = mouse.current[0] * window.innerWidth / 2;
       const y = mouse.current[1] * window.innerHeight / 2;
 
-      // Adjust light position
+      // Ajustement de la position de la lumière
       lightRef.current.position.set(x, y, 50);
       coneRef.current.position.set(x, y, 25);
-      coneRef.current.lookAt(x, y, -100);
+      // Orientation du cône vers la scène (direction -z)
+      coneRef.current.rotation.x = Math.PI/2;
     }
   });
 
@@ -40,10 +106,15 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
         ref={lightRef}
         color="#ffdd44"
         intensity={2}
-        distance={300}
+        distance={600}
         decay={2}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-near={10}
+        shadow-camera-far={600}
       />
-      {/* Light cone approximated with a transparent mesh */}
+      {/* Cône lumineux pour visualiser le rayon de lumière */}
       <mesh ref={coneRef} position={[0, 0, 50]} rotation={[Math.PI/2, 0, 0]}>
         <coneGeometry args={[100, 200, 32]} />
         <meshBasicMaterial
@@ -69,8 +140,18 @@ const IlluminatedPlane = ({ position = [0, 0, 0] }: { position?: [number, number
 const Scene = () => {
   const mouse = useRef<[number, number]>([0, 0]);
   const { isTorchActive, mousePosition } = useTorch();
+  const { camera } = useThree();
 
-  // Convert mousePosition from { x, y } to normalized [-1, 1] format
+  // Configuration de la caméra pour optimiser l'effet de profondeur
+  useEffect(() => {
+    if (camera) {
+      camera.near = 1;
+      camera.far = 2000;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera]);
+
+  // Conversion des coordonnées de souris de { x, y } en format normalisé [-1, 1]
   useEffect(() => {
     if (isTorchActive) {
       mouse.current = [
@@ -83,7 +164,12 @@ const Scene = () => {
   return (
     <>
       <ambientLight intensity={0.1} />
-      {isTorchActive && <TorchLight mouse={mouse} />}
+      {isTorchActive && (
+        <>
+          <TorchLight mouse={mouse} />
+          <TorchMask mouse={mouse} />
+        </>
+      )}
       <IlluminatedPlane position={[0, 0, 0]} />
       <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
     </>
