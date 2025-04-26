@@ -37,21 +37,21 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-transparent">
       {/* Scene Parallax en arrière-plan */}
       <ParallaxScene />
       
       {/* Contenu visible */}
-      <div className="relative z-10 min-h-screen">
+      <div className="relative z-20 min-h-screen">
         <Navbar />
         
-        <main id="main-content" className="min-h-screen w-full bg-transparent">
+        <main id="main-content" className="min-h-screen w-full bg-transparent pt-16">
           <HeroSection />
           <StudioSection />
           <ServicesSection />
           <ArtistsSection />
 
-          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/60 uppercase tracking-widest">
+          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest">
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
           </footer>
         </main>
