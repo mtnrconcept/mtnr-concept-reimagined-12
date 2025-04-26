@@ -16,7 +16,7 @@ export default function ParallaxScene() {
   return (
     <>
       {/* Background en position fixed, indépendant du conteneur parallax pour un effet maximal */}
-      <Background />
+      <Background imagePath="/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png" />
 
       <div 
         ref={containerRef}
