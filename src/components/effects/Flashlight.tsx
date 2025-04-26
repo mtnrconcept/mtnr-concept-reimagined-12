@@ -81,8 +81,8 @@ export const Flashlight = () => {
       <div
         className="pointer-events-none fixed inset-0 z-[9999]"
         style={{
-          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
-          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
           background: 'rgba(0, 0, 0, 0.92)',
           backdropFilter: 'blur(1px)',
         }}
