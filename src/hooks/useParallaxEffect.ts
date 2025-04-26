@@ -25,7 +25,6 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     };
 
     const handleResize = () => {
-      // Force update on resize
       requestAnimationUpdate();
     };
 
@@ -37,17 +36,16 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     };
 
     const updateParallax = () => {
-      const elements = container.querySelectorAll<HTMLElement>('.parallax-element');
-      
       // Traitement des éléments avec effet 3D prononcé
+      const elements = container.querySelectorAll<HTMLElement>('.parallax-element');
       elements.forEach((element) => {
         const depth = parseFloat(element.dataset.depth || '0');
         const x = parseFloat(element.dataset.x || '0');
         const y = parseFloat(element.dataset.y || '0');
         
-        const translateY = depth * scrollY * 0.5; // Réduction de l'effet de scroll
-        const translateX = mouseX * (depth * 50);  // Réduction de l'effet de souris
-        const rotateX = -mouseY * (depth * 5);    // Réduction de la rotation
+        const translateY = depth * scrollY * 0.5;
+        const translateX = mouseX * (depth * 50);
+        const rotateX = -mouseY * (depth * 5);
         const rotateY = mouseX * (depth * 5);
         const translateZ = depth * -800;
         
@@ -58,11 +56,11 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         `;
       });
       
-      // Traitement spécial pour l'arrière-plan
+      // Traitement spécial pour l'arrière-plan avec effet de parallax plus lent
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.03; // Mouvement plus lent
+          const translateY = scrollY * 0.15; // Mouvement plus lent pour l'arrière-plan
           el.style.transform = `translateY(${translateY}px) scale(1.05)`;
         }
       });
@@ -74,7 +72,6 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('resize', handleResize, { passive: true });
     
-    // Force initial render
     requestAnimationUpdate();
     
     return () => {

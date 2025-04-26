@@ -27,12 +27,15 @@ export const Background = ({ imagePath, depth = 0.05 }: BackgroundProps) => {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           transform: `translateZ(${-depth * 500}px) scale(${1 + depth * 2})`,
-          opacity: 1,
+          opacity: 0.45,
           willChange: 'transform',
-          filter: 'brightness(0.8)'
+          filter: 'brightness(0.8) contrast(1.1)'
         }}
       />
-      <div className="absolute inset-0 bg-black/30" style={{ zIndex: -9 }} />
+      <div 
+        className="absolute inset-0 bg-black/30" 
+        style={{ zIndex: -9 }} 
+      />
     </div>
   );
 };
