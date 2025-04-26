@@ -2,7 +2,7 @@
 import React from "react";
 import { useTorch } from "./TorchContext";
 import { use3DTorch } from "./Torch3DContext";
-import { Flashlight, Cube3d } from "lucide-react";
+import { Flashlight, Cube } from "lucide-react";
 
 export const TorchToggle = () => {
   const { isTorchActive, setIsTorchActive } = useTorch();
@@ -32,7 +32,7 @@ export const TorchToggle = () => {
           }`}
           aria-label="Toggle 3D mode"
         >
-          <Cube3d className="w-6 h-6" />
+          <Cube className="w-6 h-6" />
         </button>
       )}
     </div>
