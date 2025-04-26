@@ -40,24 +40,29 @@ export const Flashlight = () => {
       </Toggle>
       
       <div
-        className="pointer-events-none fixed z-[9998] transform -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none fixed inset-0 z-[9997]"
         style={{
-          left: position.x,
-          top: position.y,
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(255, 221, 0, 0.2) 0%, rgba(255, 221, 0, 0.1) 20%, transparent 70%)',
-          filter: 'blur(10px)',
-          mixBlendMode: 'screen'
+          maskImage: `radial-gradient(circle 300px at ${position.x}px ${position.y}px, transparent, black)`,
+          WebkitMaskImage: `radial-gradient(circle 300px at ${position.x}px ${position.y}px, transparent, black)`,
+          background: 'rgba(0, 0, 0, 0.92)',
+          backdropFilter: 'blur(1px)',
+          transition: 'backdrop-filter 300ms ease-out',
         }}
-      />
-      <div 
-        className="pointer-events-none fixed inset-0 z-[9997] transition-opacity duration-300"
-        style={{
-          background: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(2px)'
-        }}
-      />
+      >
+        <div
+          className="pointer-events-none absolute"
+          style={{
+            left: position.x,
+            top: position.y,
+            width: '600px',
+            height: '600px',
+            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(circle, rgba(255, 221, 0, 0.15) 0%, rgba(255, 221, 0, 0.05) 30%, transparent 70%)',
+            filter: 'blur(30px)',
+            mixBlendMode: 'soft-light'
+          }}
+        />
+      </div>
     </>
   );
 };
