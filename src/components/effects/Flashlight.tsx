@@ -12,14 +12,15 @@ export const Flashlight = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
       
-      // Suivre le curseur avec précision en tenant compte du défilement
+      // Suivre le curseur avec précision
+      // On stocke la position absolue du curseur (clientY + scrollY)
       setPosition({
         x: e.clientX,
         y: e.clientY + window.scrollY
       });
     };
     
-    // Mettre à jour uniquement la position du défilement
+    // Mettre à jour la position du défilement séparément
     const handleScroll = () => {
       if (!isEnabled) return;
       setScrollY(window.scrollY);
@@ -46,7 +47,8 @@ export const Flashlight = () => {
     );
   }
 
-  // Calcul de la position fixe à l'écran (sans effet de parallaxe)
+  // Calcul de la position à l'écran en prenant la position absolue et en soustrayant le défilement
+  // Cela donne la position "fixe" par rapport à la fenêtre de visualisation
   const fixedY = position.y - scrollY;
 
   return (
