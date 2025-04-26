@@ -2,148 +2,110 @@
 import { useState, useEffect, useRef } from 'react';
 import { Flashlight as FlashlightIcon, FlashlightOff } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
-import * as PIXI from 'pixi.js';
 
 export const Flashlight = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const appRef = useRef<PIXI.Application | null>(null);
-  const shadowsRef = useRef<PIXI.Graphics[]>([]);
-  const lightRef = useRef<PIXI.Graphics | null>(null);
-  const rafRef = useRef<number>();
+  const shadowCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !isEnabled) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isEnabled) {
+        setPosition({ x: e.pageX, y: e.pageY });
+      }
+    };
 
-    // Initialize PIXI Application with better quality settings
-    const app = new PIXI.Application({
-      resizeTo: window,
-      backgroundAlpha: 0,
-      antialias: true,
-      resolution: window.devicePixelRatio || 1,
-    });
-    containerRef.current.appendChild(app.view as HTMLCanvasElement);
-    appRef.current = app;
+    const renderShadows = () => {
+      const canvas = shadowCanvasRef.current;
+      if (!canvas || !isEnabled) return;
 
-    // Enhanced light source with gradient
-    const light = new PIXI.Graphics();
-    const gradientTexture = createGradientTexture(app);
-    light.beginTextureFill({ texture: gradientTexture });
-    light.drawCircle(0, 0, 500);
-    light.endFill();
-    light.filters = [new PIXI.BlurFilter(30)];
-    app.stage.addChild(light);
-    lightRef.current = light;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    // Get all elements that should cast shadows - expanded selection
-    const elements = document.querySelectorAll('[data-cast-shadow="true"], .parallax-element, section, h1, h2, p, img, button, .card');
+      // Set canvas size to match document height
+      canvas.width = window.innerWidth;
+      canvas.height = document.documentElement.scrollHeight;
 
-    // Create shadows for each element
-    shadowsRef.current = Array.from(elements).map(() => {
-      const shadow = new PIXI.Graphics();
-      app.stage.addChild(shadow);
-      return shadow;
-    });
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const updateShadows = (x: number, y: number) => {
-      if (!lightRef.current) return;
+      // Create gradient for smooth shadow effect with higher contrast
+      const gradient = ctx.createRadialGradient(
+        position.x, position.y, 0,
+        position.x, position.y, 800
+      );
+      
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(0.2, 'rgba(0, 0, 0, 0.4)'); // Increased opacity
+      gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.7)'); // Increased opacity
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)'); // Increased opacity
 
-      lightRef.current.x = x;
-      lightRef.current.y = y + window.scrollY;
+      // Draw shadow effect
+      ctx.save();
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'destination-out';
 
-      elements.forEach((element, i) => {
-        const shadow = shadowsRef.current[i];
-        if (!shadow) return;
-
+      // Get all visible elements
+      const elements = document.querySelectorAll('[data-cast-shadow="true"]');
+      elements.forEach(element => {
         const rect = element.getBoundingClientRect();
         const scrollTop = window.scrollY;
-
-        // Enhanced shadow parameters
+        
+        // Calculate shadow angle based on light position
         const elementCenterX = rect.left + rect.width / 2;
         const elementCenterY = rect.top + scrollTop + rect.height / 2;
-        const dx = elementCenterX - x;
-        const dy = (elementCenterY - scrollTop) - y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const normX = dx / dist;
-        const normY = dy / dist;
-
-        // Dynamic shadow properties based on distance
-        const shadowLength = Math.min(800, dist * 1.2);
-        const shadowOpacity = Math.max(0.3, Math.min(0.7, 1.2 - (dist / 1200)));
-        const shadowBlur = Math.min(20, dist * 0.05);
-
-        // Draw enhanced shadow with blur filter
-        shadow.clear();
-        shadow.filters = [new PIXI.BlurFilter(shadowBlur)];
-        shadow.beginFill(0x000000, shadowOpacity);
-        shadow.moveTo(rect.left, rect.top + scrollTop);
-        shadow.lineTo(rect.left + rect.width, rect.top + scrollTop);
-        shadow.lineTo(
-          rect.left + rect.width + normX * shadowLength,
-          rect.top + scrollTop + normY * shadowLength
+        const angle = Math.atan2(position.y - elementCenterY, position.x - elementCenterX);
+        
+        // Shadow length based on distance from light with increased length
+        const distance = Math.hypot(position.x - elementCenterX, position.y - elementCenterY);
+        const shadowLength = Math.min(500, distance * 0.8); // Increased shadow length
+        
+        // Draw shadow shape with enhanced blur
+        ctx.shadowBlur = 20; // Added shadow blur
+        ctx.shadowColor = 'black';
+        ctx.beginPath();
+        ctx.moveTo(rect.left, rect.top + scrollTop);
+        ctx.lineTo(rect.left + rect.width, rect.top + scrollTop);
+        ctx.lineTo(
+          rect.left + rect.width + Math.cos(angle) * shadowLength,
+          rect.top + scrollTop + rect.height + Math.sin(angle) * shadowLength
         );
-        shadow.lineTo(
-          rect.left + normX * shadowLength,
-          rect.top + scrollTop + normY * shadowLength
+        ctx.lineTo(
+          rect.left + Math.cos(angle) * shadowLength,
+          rect.top + scrollTop + rect.height + Math.sin(angle) * shadowLength
         );
-        shadow.closePath();
-        shadow.endFill();
+        ctx.closePath();
+        ctx.fill();
       });
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isEnabled) return;
-      const { clientX: x, clientY: y } = e;
-      setPosition({ x, y });
       
-      // Use requestAnimationFrame for smooth updates
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      rafRef.current = requestAnimationFrame(() => updateShadows(x, y));
+      ctx.restore();
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', () => {
-      if (position.x && position.y) {
-        updateShadows(position.x, position.y);
+    const animate = () => {
+      renderShadows();
+      if (isEnabled) {
+        requestAnimationFrame(animate);
       }
-    });
+    };
+
+    if (isEnabled) {
+      // Add shadow-casting attribute to more elements
+      document.querySelectorAll('section, .card, .btn, h1, h2, p, img, button').forEach(el => {
+        el.setAttribute('data-cast-shadow', 'true');
+      });
+      
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      animate();
+    }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', () => {});
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      if (appRef.current) {
-        appRef.current.destroy(true, { children: true });
-        if (containerRef.current?.firstChild) {
-          containerRef.current.removeChild(appRef.current.view as HTMLCanvasElement);
-        }
-      }
+      document.querySelectorAll('[data-cast-shadow="true"]').forEach(el => {
+        el.removeAttribute('data-cast-shadow');
+      });
     };
-  }, [isEnabled]);
-
-  // Helper function to create gradient texture for the light cone
-  const createGradientTexture = (app: PIXI.Application) => {
-    const quality = 256;
-    const canvas = document.createElement('canvas');
-    canvas.width = quality;
-    canvas.height = 1;
-    const ctx = canvas.getContext('2d')!;
-    
-    const gradient = ctx.createLinearGradient(0, 0, quality, 0);
-    gradient.addColorStop(0, 'rgba(255, 221, 0, 0.4)');
-    gradient.addColorStop(0.3, 'rgba(255, 221, 0, 0.2)');
-    gradient.addColorStop(1, 'rgba(255, 221, 0, 0)');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, quality, 1);
-    
-    return PIXI.Texture.from(canvas);
-  };
+  }, [isEnabled, position]);
 
   return (
     <>
@@ -159,13 +121,15 @@ export const Flashlight = () => {
         )}
       </Toggle>
 
-      <div
-        ref={containerRef}
-        className="pointer-events-none fixed inset-0"
+      {/* Shadow canvas with increased opacity and contrast */}
+      <canvas
+        ref={shadowCanvasRef}
+        className="pointer-events-none fixed inset-0 z-[15]"
         style={{
-          zIndex: 15,
+          mixBlendMode: 'multiply',
           opacity: isEnabled ? 1 : 0,
           transition: 'opacity 0.3s ease',
+          filter: 'contrast(1.5)' // Added contrast
         }}
       />
 
@@ -174,10 +138,10 @@ export const Flashlight = () => {
           className="pointer-events-none absolute top-0 left-0 z-[20] w-full"
           style={{
             height: `${document.documentElement.scrollHeight}px`,
-            maskImage: `radial-gradient(circle 800px at ${position.x}px ${position.y}px, transparent, black)`,
-            WebkitMaskImage: `radial-gradient(circle 800px at ${position.x}px ${position.y}px, transparent, black)`,
-            background: 'rgba(0, 0, 0, 0.97)',
-            backdropFilter: 'blur(3px)',
+            maskImage: `radial-gradient(circle 600px at ${position.x}px ${position.y}px, transparent, black)`,
+            WebkitMaskImage: `radial-gradient(circle 600px at ${position.x}px ${position.y}px, transparent, black)`,
+            background: 'rgba(0, 0, 0, 0.95)', // Increased darkness
+            backdropFilter: 'blur(2px)', // Increased blur
             isolation: 'isolate',
           }}
         >
@@ -186,11 +150,11 @@ export const Flashlight = () => {
             style={{
               left: position.x,
               top: position.y,
-              width: '1600px',
-              height: '1600px',
+              width: '1200px', // Increased size
+              height: '1200px', // Increased size
               transform: 'translate(-50%, -50%)',
-              background: 'radial-gradient(circle, rgba(255, 221, 0, 0.3) 0%, rgba(255, 221, 0, 0.15) 40%, transparent 70%)',
-              filter: 'blur(50px)',
+              background: 'radial-gradient(circle, rgba(255, 221, 0, 0.2) 0%, rgba(255, 221, 0, 0.1) 30%, transparent 70%)',
+              filter: 'blur(40px)', // Increased blur
               mixBlendMode: 'soft-light',
             }}
           />
