@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { useTorch } from "./TorchContext";
@@ -18,53 +17,41 @@ const Torch3DContext = createContext<Torch3DContextType>({
 
 export const use3DTorch = () => useContext(Torch3DContext);
 
-// Version simplifiée du composant TorchLight
 const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]> }) => {
   const lightRef = useRef<THREE.PointLight>(null);
-  const coneRef = useRef<THREE.Mesh>(null);
+  const { camera } = useThree();
 
   useEffect(() => {
     if (lightRef.current) {
-      // Configurer la lumière pour qu'elle projette correctement des ombres
-      lightRef.current.castShadow = true;
-      lightRef.current.shadow.mapSize.width = 512;
-      lightRef.current.shadow.mapSize.height = 512;
+      lightRef.current.shadow.mapSize.width = 2048;
+      lightRef.current.shadow.mapSize.height = 2048;
       lightRef.current.shadow.camera.near = 0.5;
       lightRef.current.shadow.camera.far = 50;
     }
   }, []);
 
-  // Mise à jour des positions dans le useEffect plutôt que useFrame
-  // pour éviter des problèmes potentiels avec les props
-  useEffect(() => {
-    if (lightRef.current && coneRef.current) {
-      const x = mouse.current[0] * 5;
-      const y = mouse.current[1] * 5;
-      
-      lightRef.current.position.set(x, y, 10);
-      coneRef.current.position.set(x, y, 5);
-      
-      // Orienter le cône vers la scène de façon simplifiée
-      coneRef.current.lookAt(0, 0, -10);
-    }
-  }, [mouse.current[0], mouse.current[1]]);
+  useFrame(() => {
+    if (!lightRef.current) return;
+    
+    // Convert normalized mouse coords to world space
+    const vector = new THREE.Vector3(
+      mouse.current[0] * 5,
+      mouse.current[1] * 5,
+      10
+    ).unproject(camera);
+
+    lightRef.current.position.copy(vector);
+  });
 
   return (
-    <>
-      <pointLight
-        ref={lightRef}
-        color="#ffdd44"
-        intensity={1.5}
-        distance={30}
-        decay={2}
-        position={[0, 0, 10]} // Position initiale
-      />
-      
-      <mesh ref={coneRef} position={[0, 0, 5]}>
-        <coneGeometry args={[2, 5, 32]} />
-        <meshBasicMaterial color="#ffdd44" transparent opacity={0.15} />
-      </mesh>
-    </>
+    <pointLight
+      ref={lightRef}
+      color="#ffdd44"
+      intensity={2}
+      distance={30}
+      decay={2}
+      castShadow
+    />
   );
 };
 
@@ -92,11 +79,13 @@ const TorchMaskOverlay = () => {
   );
 };
 
-// Scène simplifiée
+// Updated Scene component to support 3D synced elements
 const Scene = () => {
   const mouse = useRef<[number, number]>([0, 0]);
   const { isTorchActive, mousePosition } = useTorch();
+  const illuminatedElementsRef = useRef<HTMLElement[]>([]);
 
+  // Update mouse position when torch is active
   useEffect(() => {
     if (isTorchActive) {
       const normalizedX = (mousePosition.x / window.innerWidth) * 2 - 1;
@@ -109,15 +98,15 @@ const Scene = () => {
     <>
       <ambientLight intensity={0.1} />
       {isTorchActive && <TorchLight mouse={mouse} />}
-      <IlluminatedPlane />
       
-      {/* Cube démo simple avec casting d'ombres */}
-      <mesh position={[0, 0, 0]} castShadow>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="#333333" />
+      {/* Background plane that receives shadows */}
+      <mesh position={[0, 0, -5]} receiveShadow>
+        <planeGeometry args={[50, 50]} />
+        <meshStandardMaterial color="#111111" />
       </mesh>
+
+      {/* 3D synced planes for illuminated elements will be added here */}
       
-      <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
     </>
   );
 };
