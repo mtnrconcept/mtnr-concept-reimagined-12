@@ -5,8 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense } from "react";
-import { Flashlight } from "./components/effects/Flashlight";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
+import { TorchProvider } from "./components/effects/TorchContext";
+import { TorchToggle } from "./components/effects/TorchToggle";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -36,16 +37,17 @@ function AnimatedRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={null}>
-          <AnimatedRoutes />
-        </Suspense>
-      </BrowserRouter>
-      {/* Particules et effet flashlight en premier plan */}
-      <ParticleEffect />
-      <Flashlight />
+      <TorchProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={null}>
+            <AnimatedRoutes />
+          </Suspense>
+        </BrowserRouter>
+        <ParticleEffect />
+        <TorchToggle />
+      </TorchProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
