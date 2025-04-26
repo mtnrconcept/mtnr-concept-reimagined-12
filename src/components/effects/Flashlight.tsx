@@ -74,9 +74,9 @@ export const Flashlight = () => {
         <div
           className="flashlight-overlay pointer-events-none fixed inset-0 z-[9999]"
           style={{
-            // Inversé les valeurs pour que la partie éclairée soit visible (black = visible)
-            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
-            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+            // Inversé le masque pour que la zone éclairée soit transparente
+            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
             background: 'rgba(0, 0, 0, 0.92)',
             backdropFilter: 'blur(1px)',
             isolation: 'isolate', // Assure que l'effet reste isolé
