@@ -22,7 +22,7 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
           transform: `rotate(${rotation}deg) scale(${scale})`,
           filter: 'contrast(1.2) brightness(1.1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.2))',
           opacity: 0.9,
-          mixBlendMode: 'lighten'
+          mixBlendMode: 'screen'
         }}
       />
     </ParallaxElement>
