@@ -29,8 +29,14 @@ export const Flashlight = () => {
       shadow.style.backgroundColor = 'black';
       shadow.style.opacity = '0';
       shadow.style.borderRadius = computedStyle.borderRadius;
-      shadow.style.transition = 'transform 0.05s ease-out';
+      shadow.style.transition = 'transform 0.05s ease-out, opacity 0.1s ease-out';
       shadow.style.pointerEvents = 'none';
+      shadow.dataset.elementType = element.tagName.toLowerCase();
+      
+      // Si l'élément a un attribut data-depth, l'utiliser pour l'effet d'ombre
+      if (element.getAttribute('data-depth')) {
+        shadow.dataset.depth = element.getAttribute('data-depth') || '';
+      }
       
       return shadow;
     };
@@ -50,6 +56,7 @@ export const Flashlight = () => {
     const updateShadows = () => {
       if (!shadowsContainerRef.current || !isEnabled) return;
       
+      // Sélectionner des éléments plus précis et pertinents pour les ombres
       const elements = document.querySelectorAll('.parallax-element, section, .card, h1, h2, p, img, button');
       shadowsContainerRef.current.innerHTML = '';
       
@@ -75,21 +82,33 @@ export const Flashlight = () => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const angle = Math.atan2(dy, dx);
         
-        // Calculate shadow offset based on distance
-        const maxOffset = 50;
-        const offsetFactor = Math.min(1, distance / 1000);
-        const offsetX = Math.cos(angle) * maxOffset * offsetFactor;
-        const offsetY = Math.sin(angle) * maxOffset * offsetFactor;
+        // Ajuster l'effet d'ombre en fonction de la profondeur (si disponible)
+        const depth = parseFloat((shadow as HTMLElement).dataset.depth || '0.5');
+        const elementType = (shadow as HTMLElement).dataset.elementType || 'div';
         
-        // Calculate shadow scale based on distance
+        // Calculer l'offset de l'ombre basé sur la distance et le type d'élément
+        let maxOffset = 50;
+        if (elementType === 'h1' || elementType === 'h2') maxOffset = 30;
+        if (elementType === 'p') maxOffset = 20;
+        if (elementType === 'button') maxOffset = 15;
+        
+        // La distance affecte l'ombre de façon non-linéaire pour un effet plus réaliste
+        const distanceFactor = Math.min(1, Math.pow(distance / 1000, 0.7));
+        const offsetX = Math.cos(angle) * maxOffset * distanceFactor;
+        const offsetY = Math.sin(angle) * maxOffset * distanceFactor;
+        
+        // Scale basé sur la distance et la profondeur
         const baseScale = 1;
-        const maxScaleIncrease = 0.5;
-        const scaleIncrease = Math.min(maxScaleIncrease, distance / 1000);
+        const scaleIncrease = Math.min(0.4, distance / 1200 + depth * 0.3);
         const shadowScale = baseScale + scaleIncrease;
         
-        // Calculate opacity based on distance
-        const maxOpacity = 0.6;
-        const opacity = Math.min(maxOpacity, (distance / 1000) * maxOpacity);
+        // Opacité qui diminue avec la distance à la source lumineuse
+        let maxOpacity = 0.6;
+        // Réduire l'opacité pour les petits éléments
+        if (rect.width < 100 || rect.height < 50) maxOpacity = 0.4;
+        if (distance > 800) maxOpacity *= 0.8; // Réduction progressive à grande distance
+        
+        const opacity = Math.min(maxOpacity, (distanceFactor * maxOpacity));
         
         (shadow as HTMLElement).style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${shadowScale})`;
         (shadow as HTMLElement).style.opacity = opacity.toString();

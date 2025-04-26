@@ -102,9 +102,25 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
           scale(${scaleEffect})
         `;
         
-        // Ombre dynamique plus prononcée basée sur la rotation - S'assurer que les valeurs de blur sont toujours positives
-        const shadowIntensity = Math.max(0, Math.abs(rotationX + rotationY) * 0.4);
-        el.style.filter = `drop-shadow(0 ${shadowIntensity}px ${shadowIntensity * 3}px rgba(0,0,0,0.5))`;
+        // Amélioration de l'ombre dynamique
+        // 1. Calculer l'intensité de l'ombre basée sur la rotation et la profondeur
+        const rotationMagnitude = Math.max(0, Math.abs(rotationX + rotationY) * 0.4);
+        
+        // 2. Facteur de profondeur - les éléments les plus proches ont des ombres plus nettes
+        const depthFactor = Math.max(0.1, 1 - depth * 0.8);
+        
+        // 3. Calculer la direction de l'ombre basée sur la position de la souris (effet de lumière)
+        const shadowOffsetX = -target.current.x * 8 * depthFactor;
+        const shadowOffsetY = Math.max(3, rotationMagnitude * depthFactor);
+        
+        // 4. Blur de l'ombre dynamique
+        const shadowBlur = Math.max(4, rotationMagnitude * 3);
+        
+        // 5. Opacité de l'ombre basée sur la profondeur
+        const shadowOpacity = Math.max(0.2, Math.min(0.7, depthFactor * 0.7));
+        
+        // Appliquer l'effet d'ombre avec tous les paramètres calculés
+        el.style.filter = `drop-shadow(${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}))`;
       });
       
       // Traitement spécial pour l'arrière-plan - mouvement très lent mais perceptible
