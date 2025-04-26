@@ -1,14 +1,17 @@
 
 import { Link } from "react-router-dom";
+import { NeonLogo } from "./NeonLogo";
 
 export default function HeroSection() {
   return (
     <section 
       id="hero-section"
-      className="container mx-auto pt-32 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
+      className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
     >
+      <NeonLogo />
+      
       <div 
-        className="glass-card p-8 sm:p-10 max-w-3xl mx-auto relative overflow-hidden"
+        className="glass-card p-8 sm:p-10 max-w-3xl mx-auto relative overflow-hidden mt-8"
         data-animate
       >
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-all duration-500" />
