@@ -7,7 +7,7 @@ export const IlluminatedCard = ({ children }: { children: React.ReactNode }) => 
   
   return (
     <div
-      ref={ref}
+      ref={ref as React.RefObject<HTMLDivElement>}
       className={`rounded-lg p-6 transition-all duration-300 ${
         isTorchActive ? 'bg-yellow-400/20' : 'bg-gray-800/50'
       }`}
@@ -19,3 +19,4 @@ export const IlluminatedCard = ({ children }: { children: React.ReactNode }) => 
     </div>
   );
 };
+

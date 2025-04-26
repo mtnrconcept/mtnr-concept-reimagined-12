@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useRef, useEffect, useLayoutEffect } from "react";
 
 interface TorchContextType {
@@ -102,21 +101,25 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {isTorchActive && (
           <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
             <defs>
+              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="white" stopOpacity="1" />
+                <stop offset="70%" stopColor="white" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="white" stopOpacity="0" />
+              </radialGradient>
               <mask id="torch-mask">
-                <rect width="100%" height="100%" fill="black" />
+                <rect width="100%" height="100%" fill="white" />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
                   r={radius}
-                  fill="white"
-                  style={{ filter: "blur(60px)" }}
+                  fill="url(#torch-gradient)"
                 />
               </mask>
             </defs>
             <rect
               width="100%"
               height="100%"
-              fill="rgba(0, 0, 0, 0.9)"
+              fill="rgba(0, 0, 0, 0.95)"
               mask="url(#torch-mask)"
             />
           </svg>
