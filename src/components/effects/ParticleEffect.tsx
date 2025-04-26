@@ -11,9 +11,8 @@ export const ParticleEffect = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Configuration des particules
     const particles: Particle[] = [];
-    const particleCount = 100;
+    const particleCount = 150; // Augmenté pour plus de particules
     
     class Particle {
       x: number;
@@ -25,30 +24,25 @@ export const ParticleEffect = () => {
       alpha: number;
 
       constructor() {
-        this.reset();
-        // Position initiale aléatoire
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-      }
-
-      reset() {
         this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
         this.alpha = Math.random() * 0.4 + 0.1;
         this.color = Math.random() > 0.5 ? '#FFF' : '#FFD700';
+        
+        // Répartition plus uniforme sur tout l'écran
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
       }
 
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Réinitialisation de la position si la particule sort du canvas
+        // Réinitialisation aléatoire quand une particule sort de l'écran
         if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-          if (this.x < 0) this.x = canvas.width;
-          if (this.x > canvas.width) this.x = 0;
-          if (this.y < 0) this.y = canvas.height;
-          if (this.y > canvas.height) this.y = 0;
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
         }
       }
 
@@ -96,7 +90,7 @@ export const ParticleEffect = () => {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-[1]"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.8 }} // Légèrement augmenté
     />
   );
 };
