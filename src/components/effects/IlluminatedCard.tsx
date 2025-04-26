@@ -19,4 +19,3 @@ export const IlluminatedCard = ({ children }: { children: React.ReactNode }) => 
     </div>
   );
 };
-

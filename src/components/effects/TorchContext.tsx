@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useRef, useEffect, useLayoutEffect } from "react";
 
 interface TorchContextType {
@@ -107,7 +108,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <stop offset="100%" stopColor="white" stopOpacity="0" />
               </radialGradient>
               <mask id="torch-mask">
-                <rect width="100%" height="100%" fill="white" />
+                <rect width="100%" height="100%" fill="black" />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
