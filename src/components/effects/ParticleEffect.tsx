@@ -12,7 +12,7 @@ export const ParticleEffect = () => {
     if (!ctx) return;
 
     const particles: Particle[] = [];
-    const particleCount = 200; // Increased to spread more particles
+    const particleCount = 200; // Nombre de particules
     
     class Particle {
       x: number;
@@ -24,25 +24,30 @@ export const ParticleEffect = () => {
       alpha: number;
 
       constructor() {
+        // Distribution complètement aléatoire sur tout l'espace du canvas
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        
         this.size = Math.random() * 2 + 1;
         this.speedX = (Math.random() - 0.5) * 0.5;
         this.speedY = (Math.random() - 0.5) * 0.5;
         this.alpha = Math.random() * 0.4 + 0.1;
         this.color = Math.random() > 0.5 ? '#FFF' : '#FFD700';
-        
-        // Spread particles more evenly across entire screen from the start
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
       }
 
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Randomly reset particles when they leave the screen
+        // Lorsqu'une particule sort de l'écran, on la replace aléatoirement ailleurs sur le canvas
         if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          // Repositionner la particule à un emplacement aléatoire sur tout le canvas
           this.x = Math.random() * canvas.width;
           this.y = Math.random() * canvas.height;
+          
+          // On peut aussi légèrement modifier sa vitesse pour plus de dynamisme
+          this.speedX = (Math.random() - 0.5) * 0.5;
+          this.speedY = (Math.random() - 0.5) * 0.5;
         }
       }
 
@@ -55,14 +60,19 @@ export const ParticleEffect = () => {
       }
     }
 
-    // Create particles distributed across entire screen
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
+    // Création des particules distribuées uniformément sur tout l'écran
+    const initParticles = () => {
+      particles.length = 0; // Vider le tableau avant de le remplir
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    };
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      // Réinitialiser les particules quand le canvas change de taille
+      initParticles();
     };
 
     resizeCanvas();
