@@ -108,7 +108,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
               </radialGradient>
               <mask id="torch-mask">
-                <rect width="100%" height="100%" fill="black" />
+                <rect width="100%" height="100%" fill="white" />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
