@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Parallax3DScene from "@/components/Parallax3DScene";
@@ -5,6 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
+import { Flashlight } from "@/components/effects/Flashlight";
 
 export default function Home() {
   useEffect(() => {
@@ -53,6 +55,9 @@ export default function Home() {
           </footer>
         </main>
       </div>
+      
+      {/* Déplacer le Flashlight en dehors du conteneur Parallax */}
+      <Flashlight />
     </div>
   );
 }
