@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 
 interface Parallax3DOptions {
@@ -9,9 +8,9 @@ interface Parallax3DOptions {
 
 export function use3DParallax(containerRef: React.RefObject<HTMLElement>, options: Parallax3DOptions = {}) {
   const {
-    strength = 25,
-    perspective = 1000,
-    easing = 0.05
+    strength = 35, // Augmenté pour plus d'effet
+    perspective = 2000,
+    easing = 0.08
   } = options;
   
   const mouse = useRef({ x: 0, y: 0 });
@@ -76,30 +75,31 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
         const rotationX = target.current.y * strength * depth;
         const rotationY = -target.current.x * strength * depth;
         
+        // Augmenté la vitesse du scroll pour les éléments en premier plan
         const translateZ = -depth * perspective;
-        const translateY = scrollY * depth * 0.5;
+        const translateY = scrollY * depth * 1.2; // Multiplié par 1.2 pour plus de vitesse
         
         el.style.transform = `
           translateY(${translateY}px)
           translateZ(${translateZ}px)
           rotateX(${rotationX}deg)
           rotateY(${rotationY}deg)
-          scale(${1 + depth * 0.3})
+          scale(${1 + depth * 0.4})
         `;
         
-        // Adjust shadowing based on angle to light source
-        const shadowIntensity = Math.abs(rotationX + rotationY) * 0.2;
-        el.style.boxShadow = `0 ${shadowIntensity}px ${shadowIntensity * 3}px rgba(0,0,0,0.3)`;
+        // Ajout d'un effet d'ombre plus prononcé
+        const shadowIntensity = Math.abs(rotationX + rotationY) * 0.3;
+        el.style.filter = `drop-shadow(0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,0.5))`;
       });
       
-      // Also update background if present
-      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth]');
+      // Traitement spécial pour l'arrière-plan
+      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.02"]');
       bgElements.forEach(el => {
-        if (el.classList.contains('parallax-element')) return; // Skip elements already processed
+        if (el.classList.contains('parallax-element')) return;
         
-        const depth = parseFloat(el.dataset.depth || '0.02');
-        const moveX = target.current.x * strength * depth * 0.5;
-        const moveY = target.current.y * strength * depth * 0.5 + (scrollY * depth * 0.2);
+        const depth = 0.02; // Très faible pour un effet lent
+        const moveX = target.current.x * strength * depth * 0.3;
+        const moveY = target.current.y * strength * depth * 0.3 + (scrollY * depth * 0.1);
         
         el.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(${1 + depth})`;
       });
