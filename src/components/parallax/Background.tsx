@@ -34,9 +34,9 @@ export const Background = ({
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           transform: `translateZ(${-depth * 800}px) scale(${1 + depth * 1.5})`, 
-          opacity: 1, // Increased from 0.9 to 1 to make the background fully visible
+          opacity: 1, 
           willChange: 'transform',
-          filter: 'brightness(0.8) contrast(1.2)', 
+          filter: 'brightness(1) contrast(1.2)', // Augmenté la luminosité de 0.8 à 1
           transition: 'transform 0.1s ease-out'
         }}
       />
