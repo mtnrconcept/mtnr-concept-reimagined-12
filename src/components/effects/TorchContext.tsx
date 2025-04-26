@@ -102,7 +102,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {isTorchActive && (
           <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
             <defs>
-              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="70%">
                 <stop offset="0%" stopColor="black" stopOpacity="1" />
                 <stop offset="70%" stopColor="black" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
