@@ -1,10 +1,9 @@
-
 import { artistImages } from './data';
 
 export default function ArtistsSection() {
   return (
     <section className="container mx-auto py-16 px-4 sm:px-6" data-animate>
-      <h2 className="font-display text-3xl md:text-4xl mb-12 text-center text-yellow-400 uppercase tracking-wide neon-text drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
+      <h2 className="section-title">
         Artistes de la cave
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
