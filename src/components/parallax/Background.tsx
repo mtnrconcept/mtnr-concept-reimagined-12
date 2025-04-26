@@ -7,7 +7,7 @@ interface BackgroundProps {
 }
 
 export const Background = ({ 
-  imagePath = "/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png", 
+  imagePath = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png", 
   depth = 0.1 
 }: BackgroundProps) => {
   console.log("Rendering background with image:", imagePath);
@@ -36,9 +36,9 @@ export const Background = ({
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           transform: `translateZ(${-depth * 1000}px) scale(${1 + depth * 1.5})`,
-          opacity: 0.5, // Ajustement de l'opacité pour mieux voir l'image
+          opacity: 0.5, 
           willChange: 'transform',
-          filter: 'brightness(0.7) contrast(1.2)', // Amélioration du contraste
+          filter: 'brightness(0.7) contrast(1.2)', 
           transition: 'transform 0.1s ease-out'
         }}
       />
