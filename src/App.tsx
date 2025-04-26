@@ -43,6 +43,7 @@ const App = () => (
           <AnimatedRoutes />
         </Suspense>
       </BrowserRouter>
+      {/* Particules et effet flashlight en premier plan */}
       <ParticleEffect />
       <Flashlight />
     </TooltipProvider>

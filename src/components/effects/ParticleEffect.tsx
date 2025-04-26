@@ -12,7 +12,7 @@ export const ParticleEffect = () => {
     if (!ctx) return;
 
     const particles: Particle[] = [];
-    const particleCount = 400; // Increased from 200
+    const particleCount = 600; // Increased for more visible effect
     let mouseX = 0;
     let mouseY = 0;
     
@@ -31,7 +31,7 @@ export const ParticleEffect = () => {
       angle: number;
 
       constructor() {
-        this.z = Math.random() * 2000; // Increased depth range
+        this.z = Math.random() * 2000; // Depth range
         const scale = this.getScale();
         
         this.baseX = Math.random() * canvas.width;
@@ -40,12 +40,12 @@ export const ParticleEffect = () => {
         this.x = this.baseX;
         this.y = this.baseY;
         
-        this.size = (Math.random() * 2 + 0.5) * scale; // Slightly smaller base size
+        this.size = (Math.random() * 2 + 1) * scale; // Increased base size for visibility
         this.speedX = ((Math.random() - 0.5) * 0.3) * scale;
         this.speedY = ((Math.random() - 0.5) * 0.3) * scale;
         this.speedZ = (Math.random() - 0.5) * 2; // Z axis movement
-        this.alpha = (Math.random() * 0.15 + 0.02) * scale; // Reduced overall opacity
-        this.color = Math.random() > 0.5 ? '#FFF' : '#FFD700';
+        this.alpha = (Math.random() * 0.3 + 0.05) * scale; // Increased opacity
+        this.color = Math.random() > 0.4 ? '#FFFFFF' : '#FFD700'; // More white particles
         this.angle = Math.random() * Math.PI * 2; // Random angle for circular motion
       }
 
@@ -60,7 +60,7 @@ export const ParticleEffect = () => {
 
         // Circular motion + wave effect
         this.angle += 0.02 * scale;
-        const radius = 1;
+        const radius = 1.5; // Slightly larger radius for more noticeable movement
         const waveX = Math.sin(this.angle) * radius * scale;
         const waveY = Math.cos(this.angle) * radius * scale;
 
@@ -140,9 +140,8 @@ export const ParticleEffect = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-[1]"
-      style={{ opacity: 0.6 }} // Slightly reduced overall canvas opacity
+      className="fixed inset-0 w-full h-full pointer-events-none z-[10]" // Increased z-index
+      style={{ opacity: 0.9 }} // Increased opacity for better visibility
     />
   );
 };
-
