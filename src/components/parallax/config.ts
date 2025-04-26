@@ -20,25 +20,25 @@ export const parallaxElements: ParallaxElementConfig[] = [
   
   // Couche la plus éloignée (plus floue)
   { type: 'paint', x: 75, y: 15, depth: 0.2, scale: 2.5, rotation: -15, blur: 3,
-    src: '/lovable-uploads/59182713-1e99-4fd2-981f-7b161eb1b592.png' },
+    src: '/lovable-uploads/59182713-1e99-4fd2-981f-7b161eb1b592.png', className: 'splash-debug' },
   { type: 'paint', x: 10, y: 20, depth: 0.25, scale: 2.2, rotation: 25, blur: 2.5,
-    src: '/lovable-uploads/904b5527-89ec-4f8f-a08c-f47969a9ff4b.png' },
-
-  // Couche intermédiaire éloignée (légèrement floue)
-  { type: 'paint', x: 85, y: 40, depth: 0.3, scale: 2.0, rotation: -20, blur: 2,
-    src: '/lovable-uploads/731ffea8-c02a-4686-880b-ae867eeb3ba8.png' },
-  { type: 'paint', x: 5, y: 45, depth: 0.35, scale: 1.8, rotation: 15, blur: 1.5,
-    src: '/lovable-uploads/ea6c53cc-8a16-497f-807b-eff8ead36bff.png' },
+    src: '/lovable-uploads/904b5527-89ec-4f8f-a08c-f47969a9ff4b.png', className: 'splash-debug' },
+    
+  // Ajout de taches de peinture supplémentaires avec des images que nous savons disponibles
+  { type: 'paint', x: 50, y: 30, depth: 0.3, scale: 2.0, rotation: 10, blur: 0,
+    src: '/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png', className: 'splash-debug' },
+  { type: 'paint', x: 30, y: 40, depth: 0.35, scale: 1.8, rotation: 5, blur: 0,
+    src: '/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png', className: 'splash-debug' },
 
   // Couche centrale (nette)
   { type: 'paint', x: 70, y: 60, depth: 0.4, scale: 1.5, rotation: 10, blur: 0,
-    src: '/lovable-uploads/da96764e-ce92-44b2-96b9-a7d8b591d333.png' },
+    src: '/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png', className: 'splash-debug' },
   { type: 'paint', x: 15, y: 65, depth: 0.45, scale: 1.4, rotation: -5, blur: 0,
-    src: '/lovable-uploads/a44dc7bf-a9b3-42c5-bdfe-4444de4c7326.png' },
+    src: '/lovable-uploads/62a9a9d9-c7b1-4cce-b401-180c42e9a514.png', className: 'splash-debug' },
 
-  // Couche rapprochée (légèrement floue)
-  { type: 'paint', x: 80, y: 75, depth: 0.5, scale: 1.2, rotation: 20, blur: 1.5,
-    src: '/lovable-uploads/dd43824e-52f1-4ade-8771-bc32971947f2.png' },
-  { type: 'paint', x: 25, y: 80, depth: 0.55, scale: 1.1, rotation: -15, blur: 2,
-    src: '/lovable-uploads/2765c033-9390-4304-a1b0-ed01a29a4d21.png' }
+  // Couche rapprochée 
+  { type: 'paint', x: 80, y: 75, depth: 0.5, scale: 1.2, rotation: 20, blur: 0,
+    src: '/lovable-uploads/211284ce-8851-4248-8f65-0ea7e3c0c8ff.png', className: 'splash-debug' },
+  { type: 'paint', x: 25, y: 80, depth: 0.55, scale: 1.1, rotation: -15, blur: 0,
+    src: '/lovable-uploads/07c10d93-651e-4ab2-a2d1-66268cbb231b.png', className: 'splash-debug' }
 ];

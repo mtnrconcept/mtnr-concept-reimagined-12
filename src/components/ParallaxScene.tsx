@@ -23,13 +23,16 @@ export default function ParallaxScene() {
 
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none border-4 border-transparent"
+        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
         style={{ 
           perspective: '2000px',
           transformStyle: 'preserve-3d',
-          zIndex: 10  // Augmenté pour s'assurer que les éléments sont au-dessus du fond
+          zIndex: 10,  // Augmenté pour s'assurer que les éléments sont au-dessus du fond
         }}
       >
+        {/* Couche colorée pour tester la visibilité */}
+        <div className="fixed top-10 left-10 w-20 h-20 bg-yellow-500 opacity-50 z-[100]" />
+
         {parallaxElements.map((element, index) => {
           if (element.type === 'background') return null;
 
@@ -43,6 +46,7 @@ export default function ParallaxScene() {
                 depth={element.depth}
                 scale={element.scale}
                 rotation={element.rotation}
+                className={element.className}
                 src={element.src!}
                 blur={element.blur}
               />
