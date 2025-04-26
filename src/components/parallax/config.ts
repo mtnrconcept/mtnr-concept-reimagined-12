@@ -9,7 +9,7 @@ export interface ParallaxElementConfig {
   className?: string;
   src?: string;
   blur?: number;
-  // Add these missing properties needed by Light component
+  // Propriétés pour le composant Light
   size?: number;
   glow?: string;
 }

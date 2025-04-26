@@ -9,7 +9,7 @@ export const Background = ({ imagePath, depth = 0.05 }: BackgroundProps) => {
     <div 
       className="fixed inset-0 w-full h-full bg-black"
       style={{
-        zIndex: -10,
+        zIndex: 1,  // Réduit pour être sûr d'être derrière les éléments
         position: "fixed",
         top: 0,
         left: 0,
@@ -34,7 +34,7 @@ export const Background = ({ imagePath, depth = 0.05 }: BackgroundProps) => {
       />
       <div 
         className="absolute inset-0 bg-black/30" 
-        style={{ zIndex: -9 }} 
+        style={{ zIndex: 2 }} 
       />
     </div>
   );

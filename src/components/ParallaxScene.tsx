@@ -24,7 +24,7 @@ export default function ParallaxScene() {
         style={{ 
           perspective: '2000px',
           transformStyle: 'preserve-3d',
-          zIndex: 1 
+          zIndex: 10  // Augmenté pour s'assurer que les éléments sont au-dessus du fond
         }}
       >
         {parallaxElements.map((element, index) => {
