@@ -12,9 +12,16 @@ export const ParticleEffect = () => {
     if (!ctx) return;
 
     const particles: Particle[] = [];
-    const particleCount = 600; // Increased for more visible effect
+    const particleCount = 600;
     let mouseX = 0;
     let mouseY = 0;
+    let scrollY = 0;
+    
+    // Track scroll position
+    const handleScroll = () => {
+      scrollY = window.scrollY;
+    };
+    window.addEventListener('scroll', handleScroll);
     
     class Particle {
       x: number;
@@ -31,7 +38,7 @@ export const ParticleEffect = () => {
       angle: number;
 
       constructor() {
-        this.z = Math.random() * 2000; // Depth range
+        this.z = Math.random() * 2000;
         const scale = this.getScale();
         
         this.baseX = Math.random() * canvas.width;
@@ -40,13 +47,15 @@ export const ParticleEffect = () => {
         this.x = this.baseX;
         this.y = this.baseY;
         
-        this.size = (Math.random() * 2 + 1) * scale; // Increased base size for visibility
-        this.speedX = ((Math.random() - 0.5) * 0.3) * scale;
-        this.speedY = ((Math.random() - 0.5) * 0.3) * scale;
-        this.speedZ = (Math.random() - 0.5) * 2; // Z axis movement
-        this.alpha = (Math.random() * 0.3 + 0.05) * scale; // Increased opacity
-        this.color = Math.random() > 0.4 ? '#FFFFFF' : '#FFD700'; // More white particles
-        this.angle = Math.random() * Math.PI * 2; // Random angle for circular motion
+        this.size = (Math.random() * 2 + 1) * scale;
+        // Increased speed multiplier from 0.3 to 0.8
+        this.speedX = ((Math.random() - 0.5) * 0.8) * scale;
+        this.speedY = ((Math.random() - 0.5) * 0.8) * scale;
+        // Increased Z axis movement speed
+        this.speedZ = (Math.random() - 0.5) * 4;
+        this.alpha = (Math.random() * 0.3 + 0.05) * scale;
+        this.color = Math.random() > 0.4 ? '#FFFFFF' : '#FFD700';
+        this.angle = Math.random() * Math.PI * 2;
       }
 
       getScale() {
@@ -56,16 +65,18 @@ export const ParticleEffect = () => {
       update() {
         const scale = this.getScale();
         const parallaxX = (mouseX - window.innerWidth / 2) * (this.z / 20000);
-        const parallaxY = (mouseY - window.innerHeight / 2) * (this.z / 20000);
+        // Add scroll-based parallax
+        const scrollParallax = scrollY * (this.z / 2000);
+        const parallaxY = (mouseY - window.innerHeight / 2) * (this.z / 20000) + scrollParallax;
 
-        // Circular motion + wave effect
-        this.angle += 0.02 * scale;
-        const radius = 1.5; // Slightly larger radius for more noticeable movement
+        // Increased angle increment for faster rotation
+        this.angle += 0.04 * scale;
+        const radius = 1.5;
         const waveX = Math.sin(this.angle) * radius * scale;
         const waveY = Math.cos(this.angle) * radius * scale;
 
-        // Update Z position for depth movement
-        this.z += this.speedZ;
+        // Update Z position with increased speed
+        this.z += this.speedZ * 1.5;
         if (this.z < 0) this.z = 2000;
         if (this.z > 2000) this.z = 0;
 
@@ -80,9 +91,9 @@ export const ParticleEffect = () => {
           this.x = this.baseX;
           this.y = this.baseY;
           this.z = Math.random() * 2000;
-          this.speedX = ((Math.random() - 0.5) * 0.3) * scale;
-          this.speedY = ((Math.random() - 0.5) * 0.3) * scale;
-          this.speedZ = (Math.random() - 0.5) * 2;
+          this.speedX = ((Math.random() - 0.5) * 0.8) * scale;
+          this.speedY = ((Math.random() - 0.5) * 0.8) * scale;
+          this.speedZ = (Math.random() - 0.5) * 4;
         }
       }
 
@@ -134,14 +145,16 @@ export const ParticleEffect = () => {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-[10]" // Increased z-index
-      style={{ opacity: 0.9 }} // Increased opacity for better visibility
+      className="fixed inset-0 w-full h-full pointer-events-none z-[10]"
+      style={{ opacity: 0.9 }}
     />
   );
 };
+
