@@ -19,14 +19,14 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
   const shadowOpacity = depth < 0.3 ? 0.6 : Math.max(0.3, 0.7 * (1 - depth));
   
   return (
-    <ParallaxElement depth={depth} x={x} y={y} className={`${className} z-50`}>
+    <ParallaxElement depth={depth} x={x} y={y} className={`${className} z-50 shadow-receiver`}>
       <img
         src={src}
         alt="Paint splash"
         className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain transition-transform duration-300"
         style={{
           transform: `rotate(${rotation}deg) scale(${scale})`,
-          filter: `contrast(2.5) brightness(2.5) saturate(1.8) blur(${blur}px) drop-shadow(0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}))`,
+          filter: `contrast(2.5) brightness(2.5) saturate(1.8) blur(${Math.max(0, blur)}px) drop-shadow(0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}))`,
           opacity: 1,
           mixBlendMode: 'screen',
           willChange: 'transform, opacity, filter',
