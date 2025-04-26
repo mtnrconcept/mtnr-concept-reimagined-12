@@ -18,12 +18,8 @@
   }
 
   body {
-    @apply bg-grunge text-primary-foreground antialiased font-sans;
+    @apply bg-background text-primary-foreground antialiased font-sans;
     letter-spacing: 0.01em;
-    background-image: url("/lovable-uploads/7eefa948-da3a-4bfd-8b4b-e19299caaa22.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
     min-height: 100dvh;
   }
 
