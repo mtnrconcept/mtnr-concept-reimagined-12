@@ -6,32 +6,23 @@ import { Toggle } from '@/components/ui/toggle';
 export const Flashlight = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    // Fonction simplifiée qui utilise uniquement clientX et clientY
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
       
-      // Suivre le curseur avec précision
-      // On stocke la position absolue du curseur (clientY + scrollY)
+      // Uniquement la position du curseur à l'écran, sans compenser le défilement
       setPosition({
         x: e.clientX,
-        y: e.clientY + window.scrollY
+        y: e.clientY
       });
     };
     
-    // Mettre à jour la position du défilement séparément
-    const handleScroll = () => {
-      if (!isEnabled) return;
-      setScrollY(window.scrollY);
-    };
-
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
     };
   }, [isEnabled]);
 
@@ -47,10 +38,6 @@ export const Flashlight = () => {
     );
   }
 
-  // Calcul de la position à l'écran en prenant la position absolue et en soustrayant le défilement
-  // Cela donne la position "fixe" par rapport à la fenêtre de visualisation
-  const fixedY = position.y - scrollY;
-
   return (
     <>
       <Toggle 
@@ -64,8 +51,8 @@ export const Flashlight = () => {
       <div
         className="pointer-events-none fixed inset-0 z-[9999]"
         style={{
-          maskImage: `radial-gradient(circle 500px at ${position.x}px ${fixedY}px, transparent, black)`,
-          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${fixedY}px, transparent, black)`,
+          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
           background: 'rgba(0, 0, 0, 0.92)',
           backdropFilter: 'blur(1px)',
         }}
@@ -74,7 +61,7 @@ export const Flashlight = () => {
           className="pointer-events-none absolute"
           style={{
             left: position.x,
-            top: fixedY,
+            top: position.y,
             width: '1000px',
             height: '1000px',
             transform: 'translate(-50%, -50%)',
