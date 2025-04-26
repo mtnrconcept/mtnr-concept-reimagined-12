@@ -9,17 +9,25 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     let scrollY = 0;
     let mouseX = 0;
     let mouseY = 0;
+    let ticking = false;
 
     const handleScroll = () => {
       scrollY = window.scrollY;
-      updateParallax();
+      requestAnimationUpdate();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       mouseX = (clientX / window.innerWidth - 0.5) * 2;
       mouseY = (clientY / window.innerHeight - 0.5) * 2;
-      updateParallax();
+      requestAnimationUpdate();
+    };
+
+    const requestAnimationUpdate = () => {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
     };
 
     const updateParallax = () => {
@@ -29,36 +37,44 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         const x = parseFloat(el.dataset.x || '0');
         const y = parseFloat(el.dataset.y || '0');
         
-        let translateY = depth * scrollY;
+        // Le fond se déplace plus lentement avec un petit depth
+        const translateY = depth * scrollY;
         
-        // Plus de mouvement pour les éléments plus proches
+        // Augmenter l'effet de mouvement pour la souris
         const translateX = mouseX * (depth * 100);
-        const rotateX = mouseY * (depth * 15);
-        const rotateY = mouseX * (depth * 15);
+        const rotateX = mouseY * (depth * 20);
+        const rotateY = mouseX * (depth * 20);
         
-        // Gestion améliorée de la profondeur Z
-        let translateZ = 0;
+        // Meilleure gestion de la profondeur Z pour un vrai effet 3D
+        const translateZ = depth * -5000;
+        
+        let transform = '';
         
         if (el.classList.contains('fixed')) {
-          // L'arrière-plan reste très loin
-          translateZ = -15000;
+          // Style spécial pour l'arrière-plan
+          transform = `
+            translate3d(${translateX * 0.2}px, ${translateY * 0.1}px, -8000px)
+            scale(1.5)
+          `;
         } else {
-          // Les autres éléments sont répartis entre -5000 et -1000
-          translateZ = -5000 + (depth * 4000);
+          // Autres éléments avec effet 3D
+          transform = `
+            translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+          `;
         }
-
-        el.style.transform = `
-          translate3d(${x + translateX}%, ${y + translateY}px, ${translateZ}px)
-          rotateX(${rotateX}deg)
-          rotateY(${rotateY}deg)
-          ${el.classList.contains('fixed') ? 'scale(2)' : ''}
-        `;
+        
+        el.style.transform = transform;
       });
+      
+      ticking = false;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
+    // Force initial render
     updateParallax();
     
     return () => {

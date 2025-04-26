@@ -21,7 +21,11 @@ export default function ParallaxScene() {
       <div 
         ref={containerRef}
         className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
-        style={{ perspective: '10000px', transformStyle: 'preserve-3d' }}
+        style={{ 
+          perspective: '2000px',
+          transformStyle: 'preserve-3d',
+          zIndex: 0 
+        }}
       >
         {parallaxElements.map((element, index) => {
           if (element.type === 'background') return null;
