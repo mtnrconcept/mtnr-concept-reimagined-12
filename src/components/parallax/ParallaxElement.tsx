@@ -11,8 +11,8 @@ interface ParallaxElementProps {
 }
 
 export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxElementProps) => {
-  // Calcul du z-index basé sur la profondeur pour un meilleur ordonnancement visuel
-  const zIndex = Math.floor(1000 - depth * 1000);
+  // Calcul du z-index basé sur la profondeur pour placer correctement les éléments
+  const zIndex = depth < 0 ? Math.floor(2000 - depth * 1000) : Math.floor(1000 - depth * 1000);
   
   return (
     <div
@@ -24,11 +24,11 @@ export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxEl
         left: `${x}%`,
         top: `${y}%`,
         zIndex,
-        // Position initiale avec effet de profondeur renforcé
-        transform: `translateZ(${-depth * 2500}px) scale(${1 + depth * 0.8})`,
-        transition: 'transform 0.02s ease-out', // Transition plus rapide
-        opacity: depth < 0.3 ? 1 : 0.9, // Éléments plus profonds légèrement plus transparents
-        filter: `blur(${depth * 5}px)`, // Flou proportionnel à la profondeur accentué
+        // Position avec effet de profondeur amplifié
+        transform: `translateZ(${-depth * 3500}px) scale(${1 + depth * 1.2})`,
+        transition: 'transform 0.02s ease-out',
+        opacity: depth < 0 ? 0.8 : depth < 0.3 ? 1 : 0.9,
+        filter: `blur(${Math.max(0, depth * 8)}px)`,
         pointerEvents: 'none',
         transformOrigin: 'center center',
       }}
