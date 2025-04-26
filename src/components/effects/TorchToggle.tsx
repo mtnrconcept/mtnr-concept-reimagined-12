@@ -10,7 +10,9 @@ export const TorchToggle = () => {
     <button
       onClick={() => setIsTorchActive(!isTorchActive)}
       className={`fixed bottom-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all hover:scale-105 ${
-        isTorchActive ? "bg-yellow-400 text-black" : "bg-gray-800 text-yellow-400"
+        isTorchActive 
+          ? "bg-yellow-400 text-black shadow-yellow-400/50" 
+          : "bg-gray-800 text-yellow-400"
       }`}
       aria-label="Toggle flashlight"
     >

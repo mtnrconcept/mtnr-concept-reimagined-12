@@ -5,84 +5,95 @@ import React, {
   useState,
   useRef,
   useEffect,
-  ReactNode,
-  RefObject,
 } from "react";
-
-interface MousePosition {
-  x: number;
-  y: number;
-}
 
 interface TorchContextType {
   isTorchActive: boolean;
   setIsTorchActive: (active: boolean) => void;
-  mousePosition: MousePosition;
-  registerElement: (el: HTMLElement) => void;
-  unregisterElement: (el: HTMLElement) => void;
-  elements: HTMLElement[];
-  containerRef: RefObject<HTMLDivElement>;
+  mousePosition: { x: number; y: number };
+  updateMousePosition: (position: { x: number; y: number }) => void;
+  containerRef: React.RefObject<HTMLDivElement>;
 }
 
-const TorchContext = createContext<TorchContextType | null>(null);
+const TorchContext = createContext<TorchContextType>({
+  isTorchActive: false,
+  setIsTorchActive: () => {},
+  mousePosition: { x: 0, y: 0 },
+  updateMousePosition: () => {},
+  containerRef: { current: null },
+});
 
-export const useTorch = () => {
-  const ctx = useContext(TorchContext);
-  if (!ctx) throw new Error("useTorch must be used within TorchProvider");
-  return ctx;
-};
+export const useTorch = () => useContext(TorchContext);
 
-const TorchLight = ({ position }: { position: MousePosition }) => (
-  <div
-    className="absolute pointer-events-none z-[9990]"
-    style={{
-      left: `${position.x}px`,
-      top: `${position.y}px`,
-      width: "300px",
-      height: "300px",
-      borderRadius: "50%",
-      background: "radial-gradient(circle, rgba(255,221,0,0.4) 0%, transparent 70%)",
-      transform: "translate(-50%, -50%)",
-      mixBlendMode: "screen",
-    }}
-  />
-);
+interface TorchProviderProps {
+  children: React.ReactNode;
+}
 
-export const TorchProvider = ({ children }: { children: ReactNode }) => {
+export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
-  const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 });
-  const [elements, setElements] = useState<HTMLElement[]>([]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const registerElement = (el: HTMLElement) =>
-    setElements((prev) => (prev.includes(el) ? prev : [...prev, el]));
-
-  const unregisterElement = (el: HTMLElement) =>
-    setElements((prev) => prev.filter((e) => e !== el));
+  const updateMousePosition = (position: { x: number; y: number }) => {
+    setMousePosition(position);
+  };
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (isTorchActive) setMousePosition({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isTorchActive) {
+        updateMousePosition({ x: e.clientX, y: e.clientY });
+      }
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
-  const value: TorchContextType = {
+  const contextValue = {
     isTorchActive,
     setIsTorchActive,
     mousePosition,
-    registerElement,
-    unregisterElement,
-    elements,
+    updateMousePosition,
     containerRef,
   };
 
+  const radius = 300;
+
   return (
-    <TorchContext.Provider value={value}>
-      <div ref={containerRef} className="torch-container relative">
+    <TorchContext.Provider value={contextValue}>
+      <div
+        ref={containerRef}
+        className="torch-container relative w-full h-full overflow-hidden"
+      >
         {children}
-        {isTorchActive && <TorchLight position={mousePosition} />}
+        {isTorchActive && (
+          <svg
+            className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none"
+            style={{ mixBlendMode: "multiply" }}
+          >
+            <defs>
+              <radialGradient id="torch-gradient">
+                <stop offset="30%" stopColor="white" stopOpacity="1" />
+                <stop offset="100%" stopColor="black" stopOpacity="1" />
+              </radialGradient>
+              <mask id="torch-mask">
+                <rect width="100%" height="100%" fill="black" />
+                <circle
+                  cx={mousePosition.x}
+                  cy={mousePosition.y}
+                  r={radius}
+                  fill="url(#torch-gradient)"
+                />
+              </mask>
+            </defs>
+            <rect
+              width="100%"
+              height="100%"
+              fill="rgba(0, 0, 0, 0.95)"
+              mask="url(#torch-mask)"
+            />
+          </svg>
+        )}
       </div>
     </TorchContext.Provider>
   );
