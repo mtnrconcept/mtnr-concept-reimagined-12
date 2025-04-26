@@ -33,8 +33,20 @@ export const use3DSync = (
     meshRef.current.position.set(vector.x, vector.y, zOffset);
 
     // Scale mesh to match DOM element size
-    const frustumHeight = 2 * Math.tan((camera.fov * Math.PI) / 360) * Math.abs(camera.position.z - zOffset);
-    const frustumWidth = frustumHeight * (size.width / size.height);
+    // Check if camera is PerspectiveCamera before accessing fov
+    let frustumHeight: number;
+    let frustumWidth: number;
+    
+    if (camera instanceof THREE.PerspectiveCamera) {
+      frustumHeight = 2 * Math.tan((camera.fov * Math.PI) / 360) * Math.abs(camera.position.z - zOffset);
+      frustumWidth = frustumHeight * (size.width / size.height);
+    } else {
+      // For OrthographicCamera or other camera types
+      // Use a different approach to calculate frustum dimensions
+      const cameraZ = Math.abs(camera.position.z - zOffset);
+      frustumHeight = 2 * cameraZ;
+      frustumWidth = frustumHeight * (size.width / size.height);
+    }
 
     meshRef.current.scale.set(
       (rect.width / size.width) * frustumWidth,

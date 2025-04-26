@@ -1,11 +1,11 @@
 
 import { forwardRef } from "react";
 import { use3DSync } from "@/hooks/use3DSync";
-import { Color } from "three";
+import * as THREE from "three";
 
 interface SyncedPlaneProps {
   domRef: React.RefObject<HTMLElement>;
-  color?: Color | string | number;
+  color?: THREE.Color | string | number;
   zOffset?: number;
   opacity?: number;
 }
