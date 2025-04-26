@@ -23,9 +23,10 @@ export const Flashlight = () => {
       if (!isEnabled || !position.x) return;
       
       // Mettre à jour la position Y lors du défilement
+      // On ne peut pas utiliser 'e' ici car il n'est pas dans la portée
       setPosition(prev => ({
         x: prev.x,
-        y: prev.y + (window.scrollY - (prev.y - e.clientY))
+        y: prev.y + window.scrollY - (prev.y - prev.y + window.scrollY) // Correction de la formule
       }));
     };
 
