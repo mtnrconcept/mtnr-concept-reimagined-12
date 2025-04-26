@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Flashlight as FlashlightIcon, FlashlightOff } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
@@ -9,8 +10,10 @@ export const Flashlight = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isEnabled) {
-        // Suivi direct sans interpolation
-        setPosition({ x: e.pageX, y: e.pageY });
+        setPosition({ 
+          x: e.clientX, 
+          y: e.clientY + window.scrollY 
+        });
       }
     };
 
@@ -26,7 +29,7 @@ export const Flashlight = () => {
   return (
     <>
       <Toggle 
-        className="fixed right-4 top-24 z-[9999] bg-black/20 hover:bg-black/40"
+        className="fixed right-4 top-4 z-[9999] bg-black/20 hover:bg-black/40"
         pressed={isEnabled}
         onPressedChange={setIsEnabled}
       >
@@ -39,11 +42,10 @@ export const Flashlight = () => {
 
       {isEnabled && (
         <div
-          className="pointer-events-none absolute top-0 left-0 z-[9999] w-full"
+          className="pointer-events-none fixed top-0 left-0 z-[9998] w-full h-full"
           style={{
-            height: `${document.body.scrollHeight}px`,
-            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
-            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+            maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
+            WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, black, transparent)`,
             background: 'rgba(0, 0, 0, 0.92)',
             backdropFilter: 'blur(1px)',
             isolation: 'isolate',
