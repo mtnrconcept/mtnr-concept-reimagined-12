@@ -10,9 +10,9 @@ export default function Parallax3DScene() {
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   
   use3DParallax(containerRef, {
-    strength: 20,
-    perspective: 1200,
-    easing: 0.08
+    strength: 40, // Augmenté pour plus d'amplitude
+    perspective: 800, // Perspective plus courte pour un effet plus dramatique
+    easing: 0.05 // Plus fluide
   });
   
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Parallax3DScene() {
       ref={containerRef}
       className="fixed inset-0 w-full h-full overflow-hidden"
       style={{ 
-        perspective: '1200px',
+        perspective: '800px', // Perspective plus courte pour effet plus marqué
         transformStyle: 'preserve-3d',
         zIndex: 0
       }}
@@ -65,7 +65,7 @@ export default function Parallax3DScene() {
               className={`max-w-[350px] max-h-[350px] object-contain ${splash.className || ''}`}
               style={{
                 transform: `rotate(${splash.rotation || 0}deg) scale(${splash.scale || 1})`,
-                filter: `contrast(2) brightness(2) saturate(1.5) blur(${splash.blur || 0}px)`,
+                filter: `contrast(2.2) brightness(2.2) saturate(1.8) blur(${splash.blur || 0}px)`, // Contrastes amplifiés
                 mixBlendMode: 'screen',
                 willChange: 'transform, opacity'
               }}
@@ -76,14 +76,24 @@ export default function Parallax3DScene() {
       {/* Neon grid effect */}
       <div className="absolute inset-0 pointer-events-none z-10">
         <div 
-          className="w-full h-full opacity-5"
+          className="w-full h-full opacity-10" // Opacité augmentée
           style={{
             backgroundImage: 'radial-gradient(circle, #ffdd00 1px, transparent 1px)',
-            backgroundSize: '30px 30px',
-            maskImage: 'linear-gradient(to bottom, transparent, black 30%, black 70%, transparent)'
+            backgroundSize: '20px 20px', // Grille plus dense
+            maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)'
           }}
         />
       </div>
+      
+      {/* Ajout d'un léger effet de brouillard pour accentuer la profondeur */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.2) 50%, transparent)',
+          opacity: 0.7,
+          mixBlendMode: 'multiply'
+        }}
+      />
     </div>
   );
 }

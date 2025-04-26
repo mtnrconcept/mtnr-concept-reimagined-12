@@ -8,7 +8,7 @@ interface BackgroundProps {
 
 export const Background = ({ 
   imagePath = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png", 
-  depth = 0.02 
+  depth = 0.08 
 }: BackgroundProps) => {
   return (
     <div 
@@ -21,7 +21,7 @@ export const Background = ({
         right: 0,
         bottom: 0,
         overflow: 'hidden',
-        perspective: '2000px',
+        perspective: '1200px',
         transformStyle: 'preserve-3d'
       }}
     >
@@ -33,24 +33,34 @@ export const Background = ({
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          transform: `translateZ(${-depth * 500}px) scale(${1 + depth})`,
-          opacity: 0.85,
+          transform: `translateZ(${-depth * 800}px) scale(${1 + depth * 1.5})`, // Échelle augmentée
+          opacity: 0.8, // Légèrement réduit pour plus de contraste
           willChange: 'transform',
-          filter: 'brightness(0.85) contrast(1.1)',
-          transition: 'transform 0.2s ease-out'
+          filter: 'brightness(0.8) contrast(1.2)', // Contraste augmenté
+          transition: 'transform 0.1s ease-out' // Transition plus rapide
         }}
       />
       
-      {/* Overlay pour renforcer la séparation */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
+      {/* Overlay plus contrasté pour renforcer la séparation */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50" />
       
-      {/* Effet grille pour la profondeur */}
+      {/* Effet grille plus visible pour la profondeur */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-10" // Opacité augmentée pour effet plus visible
         style={{
-          backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
-          transform: 'translateZ(-100px)'
+          backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
+          backgroundSize: '35px 35px', // Grille plus serrée
+          transform: 'translateZ(-50px)',
+          mixBlendMode: 'overlay'
+        }}
+      />
+      
+      {/* Vignette pour renforcer l'effet de profondeur */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%)',
+          pointerEvents: 'none'
         }}
       />
     </div>
