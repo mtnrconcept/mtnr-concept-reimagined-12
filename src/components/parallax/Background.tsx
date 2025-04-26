@@ -27,13 +27,13 @@ export const Background = ({ imagePath, depth = 0.05 }: BackgroundProps) => {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           transform: `translateZ(${-depth * 500}px) scale(${1 + depth * 2})`,
-          opacity: 0.45,
+          opacity: 0.2, // Réduit l'opacité du fond pour mieux voir les splashes
           willChange: 'transform',
-          filter: 'brightness(0.8) contrast(1.1)'
+          filter: 'brightness(0.5) contrast(1.1)'
         }}
       />
       <div 
-        className="absolute inset-0 bg-black/30" 
+        className="absolute inset-0 bg-black/70" 
         style={{ zIndex: 2 }} 
       />
     </div>

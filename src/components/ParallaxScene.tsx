@@ -13,6 +13,9 @@ export default function ParallaxScene() {
   
   useParallaxEffect(containerRef);
   
+  // Ajouter des logs pour déboguer
+  console.log('Rendering ParallaxScene with', parallaxElements.length, 'elements');
+  
   return (
     <>
       {/* Background avec l'image d'escalier */}
@@ -20,7 +23,7 @@ export default function ParallaxScene() {
 
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
+        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none border-4 border-transparent"
         style={{ 
           perspective: '2000px',
           transformStyle: 'preserve-3d',
@@ -31,6 +34,7 @@ export default function ParallaxScene() {
           if (element.type === 'background') return null;
 
           if (element.type === 'paint') {
+            console.log(`Rendering paint splash at (${element.x}, ${element.y}) with src: ${element.src}`);
             return (
               <PaintSplash
                 key={`paint-${index}`}

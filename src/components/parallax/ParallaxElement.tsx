@@ -20,7 +20,7 @@ export const ParallaxElement = ({ depth, x, y, className, children }: ParallaxEl
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        zIndex: Math.floor(100 - depth * 10), // Augmenté à 100 pour être sûr d'être au-dessus du fond
+        zIndex: 1000 - Math.floor(depth * 10), // Z-index très élevé pour garantir la visibilité
         transform: `translateZ(${-depth * 800}px)`,
         willChange: 'transform',
         opacity: 1,
