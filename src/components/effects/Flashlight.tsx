@@ -10,16 +10,33 @@ export const Flashlight = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
-      // Utilisez directement les coordonnées du curseur sans transformation
+      
+      // Prendre en compte la position de défilement pour un suivi précis
       setPosition({
         x: e.clientX,
-        y: e.clientY
+        y: e.clientY + window.scrollY
       });
+    };
+    
+    // Gérer également le défilement pour mettre à jour la position
+    const handleScroll = () => {
+      if (!isEnabled || !position.x) return;
+      
+      // Mettre à jour la position Y lors du défilement
+      setPosition(prev => ({
+        x: prev.x,
+        y: prev.y + (window.scrollY - (prev.y - e.clientY))
+      }));
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isEnabled]);
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isEnabled, position.x]);
 
   if (!isEnabled) {
     return (
@@ -46,8 +63,8 @@ export const Flashlight = () => {
       <div
         className="pointer-events-none fixed inset-0 z-[9999]"
         style={{
-          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
-          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y}px, transparent, black)`,
+          maskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y - window.scrollY}px, transparent, black)`,
+          WebkitMaskImage: `radial-gradient(circle 500px at ${position.x}px ${position.y - window.scrollY}px, transparent, black)`,
           background: 'rgba(0, 0, 0, 0.92)',
           backdropFilter: 'blur(1px)',
         }}
@@ -56,7 +73,7 @@ export const Flashlight = () => {
           className="pointer-events-none absolute"
           style={{
             left: position.x,
-            top: position.y,
+            top: position.y - window.scrollY,
             width: '1000px',
             height: '1000px',
             transform: 'translate(-50%, -50%)',
@@ -69,4 +86,3 @@ export const Flashlight = () => {
     </>
   );
 };
-
