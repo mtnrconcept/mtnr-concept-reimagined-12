@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 
 interface Parallax3DOptions {
@@ -8,7 +9,7 @@ interface Parallax3DOptions {
 
 export function use3DParallax(containerRef: React.RefObject<HTMLElement>, options: Parallax3DOptions = {}) {
   const {
-    strength = 35, // Augmenté pour plus d'effet
+    strength = 35,
     perspective = 2000,
     easing = 0.08
   } = options;
@@ -22,7 +23,6 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
     console.log("Initializing 3D parallax effect");
     
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse position from -1 to 1
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = (e.clientY / window.innerHeight) * 2 - 1;
       
@@ -38,24 +38,20 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
     };
     
     const animate = () => {
-      // Apply easing for smooth movement
       target.current.x += (mouse.current.x - target.current.x) * easing;
       target.current.y += (mouse.current.y - target.current.y) * easing;
       
-      // Only update if position has changed significantly
       if (
         Math.abs(lastPosition.current.x - target.current.x) > 0.001 ||
         Math.abs(lastPosition.current.y - target.current.y) > 0.001
       ) {
         updateParallaxElements();
-        
         lastPosition.current.x = target.current.x;
         lastPosition.current.y = target.current.y;
       }
       
       rafId.current = null;
       
-      // Continue animation if movement is still happening
       if (
         Math.abs(mouse.current.x - target.current.x) > 0.002 ||
         Math.abs(mouse.current.y - target.current.y) > 0.002
@@ -72,12 +68,12 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
       
       elements.forEach(el => {
         const depth = parseFloat(el.dataset.depth || '0.5');
-        const rotationX = target.current.y * strength * depth;
-        const rotationY = -target.current.x * strength * depth;
+        const rotationX = target.current.y * strength * depth * 0.5; // Réduit la rotation
+        const rotationY = -target.current.x * strength * depth * 0.5;
         
-        // Augmenté la vitesse du scroll pour les éléments en premier plan
+        // Ajuste la vitesse de défilement en fonction de la profondeur
+        const translateY = scrollY * depth * 0.8; // Ralentit les splashes
         const translateZ = -depth * perspective;
-        const translateY = scrollY * depth * 1.2; // Multiplié par 1.2 pour plus de vitesse
         
         el.style.transform = `
           translateY(${translateY}px)
@@ -87,28 +83,27 @@ export function use3DParallax(containerRef: React.RefObject<HTMLElement>, option
           scale(${1 + depth * 0.4})
         `;
         
-        // Ajout d'un effet d'ombre plus prononcé
-        const shadowIntensity = Math.abs(rotationX + rotationY) * 0.3;
-        el.style.filter = `drop-shadow(0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,0.5))`;
+        // Ajuste l'ombre en fonction de la profondeur
+        const shadowIntensity = Math.abs(rotationX + rotationY) * 0.2;
+        el.style.filter = `drop-shadow(0 ${shadowIntensity}px ${shadowIntensity * 2}px rgba(0,0,0,0.3))`;
       });
       
       // Traitement spécial pour l'arrière-plan
-      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.02"]');
+      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.15"]');
       bgElements.forEach(el => {
         if (el.classList.contains('parallax-element')) return;
         
-        const depth = 0.02; // Très faible pour un effet lent
-        const moveX = target.current.x * strength * depth * 0.3;
-        const moveY = target.current.y * strength * depth * 0.3 + (scrollY * depth * 0.1);
+        // Accélère le déplacement du fond
+        const moveX = target.current.x * strength * 0.15;
+        const moveY = target.current.y * strength * 0.15 + (scrollY * 0.4); // Augmente la vitesse du fond
         
-        el.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(${1 + depth})`;
+        el.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(1.15)`;
       });
     };
     
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
     
-    // Initial update
     requestAnimationFrame(animate);
     
     return () => {
