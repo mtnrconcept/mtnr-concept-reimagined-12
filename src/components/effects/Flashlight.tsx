@@ -35,6 +35,18 @@ export const Flashlight = () => {
       return shadow;
     };
 
+    const isElementVisible = (element: Element): boolean => {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.width > 0 && 
+        rect.height > 0 && 
+        rect.top < window.innerHeight && 
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth && 
+        rect.right > 0
+      );
+    };
+
     const updateShadows = () => {
       if (!shadowsContainerRef.current || !isEnabled) return;
       
@@ -42,7 +54,7 @@ export const Flashlight = () => {
       shadowsContainerRef.current.innerHTML = '';
       
       elements.forEach(element => {
-        if (!element.isVisible) return;
+        if (!isElementVisible(element)) return;
         const shadow = createShadowElement(element);
         shadowsContainerRef.current?.appendChild(shadow);
       });
