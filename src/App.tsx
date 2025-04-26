@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense } from "react";
+import { Flashlight } from "@/components/effects/Flashlight";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -36,6 +37,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <Flashlight />
       <BrowserRouter>
         <Suspense fallback={null}>
           <AnimatedRoutes />
