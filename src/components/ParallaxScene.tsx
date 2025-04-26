@@ -40,6 +40,7 @@ export default function ParallaxScene() {
                 scale={element.scale}
                 rotation={element.rotation}
                 src={element.src!}
+                blur={element.blur}
               />
             );
           }
@@ -57,15 +58,15 @@ export default function ParallaxScene() {
             );
           }
 
-          if (element.type === 'light') {
+          if (element.type === 'light' && element.size !== undefined && element.glow !== undefined) {
             return (
               <Light
                 key={`light-${index}`}
                 x={element.x!}
                 y={element.y!}
                 depth={element.depth}
-                size={element.size!}
-                glow={element.glow!}
+                size={element.size}
+                glow={element.glow}
               />
             );
           }
