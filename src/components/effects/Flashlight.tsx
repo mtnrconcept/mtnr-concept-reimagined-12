@@ -1,28 +1,58 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Flashlight as FlashlightIcon, FlashlightOff } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 
 export const Flashlight = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Fonction simplifiée qui utilise uniquement clientX et clientY
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    const updatePosition = () => {
+      if (!isEnabled) return;
+
+      // Calcul plus fluide avec légère interpolation pour éviter les sauts brusques
+      currentX += (targetX - currentX) * 0.2;
+      currentY += (targetY - currentY) * 0.2;
+
+      setPosition({
+        x: currentX,
+        y: currentY
+      });
+
+      frameRef.current = requestAnimationFrame(updatePosition);
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!isEnabled) return;
       
-      // Uniquement la position du curseur à l'écran, sans compenser le défilement
-      setPosition({
-        x: e.clientX,
-        y: e.clientY
-      });
+      // On utilise directement les coordonnées du curseur dans la fenêtre visible
+      targetX = e.clientX;
+      targetY = e.clientY;
+      
+      // Si c'est le premier mouvement, on positionne immédiatement sans animation
+      if (!frameRef.current) {
+        currentX = targetX;
+        currentY = targetY;
+        setPosition({ x: currentX, y: currentY });
+        frameRef.current = requestAnimationFrame(updatePosition);
+      }
     };
     
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
     };
   }, [isEnabled]);
 
