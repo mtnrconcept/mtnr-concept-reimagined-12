@@ -73,6 +73,8 @@ const MouseTracker = () => {
         document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
         document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
         document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
+        document.documentElement.style.setProperty('--cursor-x', `${mousePosition.x}px`);
+        document.documentElement.style.setProperty('--cursor-y', `${mousePosition.y}px`);
       };
       
       updatePosition();

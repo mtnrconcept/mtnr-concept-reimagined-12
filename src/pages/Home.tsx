@@ -8,11 +8,13 @@ import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
+import { useTorch } from "@/components/effects/TorchContext";
 import UVText from "@/components/effects/UVText";
-import { UVLogo } from "@/components/home/UVLogo";
+import { UVLamp } from "@/components/effects/UVLamp";
 
 export default function Home() {
   const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -47,8 +49,13 @@ export default function Home() {
       {/* Enhanced 3D parallax background */}
       <Parallax3DScene />
       
-      {/* Logo UV qui apparaît uniquement en mode UV */}
-      <UVLogo />
+      {/* Logo UV qui apparaît uniquement en mode UV - now using UVLamp */}
+      {uvMode && isTorchActive && (
+        <UVLamp 
+          lampRadius={500}
+          showUVLogo={true}
+        />
+      )}
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />

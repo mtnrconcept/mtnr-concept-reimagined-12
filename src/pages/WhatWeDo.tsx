@@ -5,12 +5,19 @@ import ParallaxBackground from "@/components/ParallaxBackground";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
+import { UVLamp } from "@/components/effects/UVLamp";
+import { useUVMode } from "@/components/effects/UVModeContext";
+import { useTorch } from "@/components/effects/TorchContext";
+import UVSecretMessage from "@/components/effects/UVSecretMessage";
 
 export default function WhatWeDo() {
   // Force scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
 
   return <ParallaxBackground>
       <div className="relative z-10 min-h-screen">
@@ -60,7 +67,31 @@ export default function WhatWeDo() {
               </span>
             </div>
           </div>
+          
+          {/* Hidden UV messages that appear only with the UV lamp */}
+          <UVSecretMessage 
+            message="RÉUNION SECRÈTE - JEUDI - 22H - PARKING NORD"
+            position={{ x: 75, y: 65 }}
+            fontSize="1rem"
+            color="#D2FF3F"
+          />
+          
+          <UVSecretMessage 
+            message="CODE D'ACCÈS STUDIO B: 7294"
+            position={{ x: 20, y: 40 }}
+            fontSize="0.9rem"
+            color="#9b87f5"
+            rotation={-5}
+          />
         </main>
+        
+        {/* Use the new UVLamp component with custom radius */}
+        {uvMode && isTorchActive && (
+          <UVLamp
+            lampRadius={500}
+            showUVLogo={true}
+          />
+        )}
       </div>
     </ParallaxBackground>;
 }

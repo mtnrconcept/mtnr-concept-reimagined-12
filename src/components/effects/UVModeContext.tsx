@@ -1,6 +1,4 @@
-
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
-import { useTorch } from "./TorchContext";
 
 interface UVModeContextType {
   uvMode: boolean;
@@ -29,14 +27,9 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const createUVCircle = (mousePosition: { x: number; y: number }) => {
-    if (!uvCircleRef.current) {
-      const circle = document.createElement('div');
-      circle.className = 'uv-light-circle';
-      document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
-      document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
-      document.body.appendChild(circle);
-      uvCircleRef.current = circle;
-    }
+    // We're not manually creating the circle anymore as it's handled by the UVLamp component
+    document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
+    document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
   };
 
   const removeUVCircle = () => {
