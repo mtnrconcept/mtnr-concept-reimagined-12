@@ -45,18 +45,27 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   useEffect(() => {
     if (!isActive || !videoRef.current) return;
     
-    // Mettre la vidéo au début ou à la fin selon la direction
+    const video = videoRef.current;
+    
+    // Plutôt que d'utiliser un playback rate négatif (non supporté),
+    // on adapte notre approche en fonction de la direction
     if (direction === 'down') {
-      videoRef.current.currentTime = 0;
+      // Pour descendre, on joue la vidéo normalement depuis le début
+      video.currentTime = 0;
+      video.playbackRate = 1;
     } else if (direction === 'up') {
-      // Pour l'animation vers le haut, nous inversons la vidéo en la lisant à l'envers
-      // en commençant de la fin
-      videoRef.current.currentTime = videoRef.current.duration || 0;
-      videoRef.current.playbackRate = -1;
+      // Pour monter, on utilise un effet visuel alternatif
+      // On peut soit:
+      // 1. Jouer la même vidéo mais inverser la vidéo avec CSS
+      // 2. Jouer depuis la fin vers un point spécifique
+      video.currentTime = 0;
+      video.playbackRate = 1;
+      // Applique une classe pour inverser la vidéo verticalement
+      video.classList.add('video-reversed');
     }
     
     // Démarrer la lecture
-    const playPromise = videoRef.current.play();
+    const playPromise = video.play();
     
     // Gérer les erreurs potentielles de lecture
     if (playPromise !== undefined) {
@@ -69,6 +78,8 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     const timeoutId = setTimeout(() => {
       if (videoRef.current) {
         videoRef.current.pause();
+        // Retirer la classe d'inversion si elle a été appliquée
+        videoRef.current.classList.remove('video-reversed');
       }
       // Signal que l'animation est terminée
       onAnimationComplete();
@@ -133,7 +144,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       {isActive && (
         <>
           {/* Video Background */}
-          <div className="absolute inset-0 bg-black">
+          <div className={`absolute inset-0 bg-black ${direction === 'up' ? 'video-container-up' : ''}`}>
             <video 
               ref={videoRef} 
               className="w-full h-full object-cover"

@@ -30,3 +30,13 @@
 .blur-motion {
   animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Style pour le conteneur vidéo dans la direction "up" */
+.video-container-up video {
+  transform: scaleY(-1); /* Inverse verticalement la vidéo */
+}
+
+/* Style alternatif pour inverser la vidéo quand la classe est appliquée directement */
+.video-reversed {
+  transform: scaleY(-1);
+}
