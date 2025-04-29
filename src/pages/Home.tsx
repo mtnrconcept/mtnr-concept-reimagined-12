@@ -6,7 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
-import { SmokeLogoEffect } from "@/components/home/SmokeLogoEffect";
+// Suppression de l'import SmokeLogoEffect qui dupliquait le logo
 
 export default function Home() {
   useEffect(() => {
@@ -45,8 +45,7 @@ export default function Home() {
         <Navbar />
         
         <main id="main-content" className="min-h-screen w-full pt-16">
-          {/* Utiliser notre nouvel effet de fumée */}
-          <SmokeLogoEffect />
+          {/* Suppression du composant SmokeLogoEffect qui créait un doublon */}
           
           <HeroSection />
           <StudioSection />

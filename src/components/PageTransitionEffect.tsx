@@ -48,11 +48,8 @@ export default function PageTransitionEffect() {
       transitionTimeoutRef.current = window.setTimeout(() => {
         // Appliquer l'effet de fumée directement sur le contenu
         if (contentRef.current) {
-          // Correction: fusionner les options avec l'élément dans un seul objet
-          createSmokeEffect({
-            element: contentRef.current,
-            ...pageTransitionPreset
-          });
+          // Appliquer l'effet avec la fonction createSmokeEffect qui attend un HTMLElement
+          createSmokeEffect(contentRef.current);
         }
         
         // Réinitialiser l'indicateur de transition après la fin de l'effet

@@ -16,9 +16,9 @@ export function createSmokeEffect(element: HTMLElement | null) {
   // Get element position
   const rect = element.getBoundingClientRect();
   
-  // Use fewer smoke particles
-  const smokeCount = 15;
-  const smokeDuration = 3000; // 3 seconds
+  // Use fewer smoke particles for better performance
+  const smokeCount = 10; // Réduit significativement pour de meilleures performances
+  const smokeDuration = 1500; // Réduit de moitié pour une animation plus rapide
   
   // Create smoke particles in batch using DocumentFragment
   const fragment = document.createDocumentFragment();
@@ -46,7 +46,7 @@ export function createSmokeEffect(element: HTMLElement | null) {
       `rgba(255, 215, 0, ${0.1 + random(0, 0.15)})` : 
       `rgba(255, 255, 255, ${0.1 + random(0, 0.1)})`;
     
-    // Apply efficient styles
+    // Apply efficient styles with hardware acceleration
     smoke.style.cssText = `
       position: absolute;
       left: ${x}px;
@@ -59,11 +59,12 @@ export function createSmokeEffect(element: HTMLElement | null) {
       filter: blur(5px);
       transform: scale(0.6);
       will-change: transform, opacity;
+      transform: translateZ(0);
     `;
     
     // Animation data as attributes for requestAnimationFrame
-    smoke.dataset.startTime = (performance.now() + random(0, 400)).toString();
-    smoke.dataset.duration = (smokeDuration - random(0, 500)).toString();
+    smoke.dataset.startTime = (performance.now() + random(0, 200)).toString(); // Réduit le délai
+    smoke.dataset.duration = (smokeDuration - random(0, 300)).toString(); // Réduit la durée
     
     fragment.appendChild(smoke);
   }
@@ -80,7 +81,7 @@ export function createSmokeEffect(element: HTMLElement | null) {
     
     smokeElements.forEach(smoke => {
       const startTime = parseFloat(smoke.dataset.startTime || '0');
-      const duration = parseFloat(smoke.dataset.duration || '3000');
+      const duration = parseFloat(smoke.dataset.duration || '1500'); // Réduit
       
       if (timestamp < startTime) {
         allComplete = false;
@@ -93,21 +94,21 @@ export function createSmokeEffect(element: HTMLElement | null) {
       if (progress < 1) {
         allComplete = false;
         
-        // Animation curve
+        // Animation curve - accélérée
         let opacity;
-        if (progress < 0.4) {
-          opacity = progress / 0.4;
+        if (progress < 0.3) { // Accélère l'apparition
+          opacity = progress / 0.3;
         } else {
-          opacity = 1 - ((progress - 0.4) / 0.6);
+          opacity = 1 - ((progress - 0.3) / 0.7); // Disparition progressive
         }
         
         // Simplified movement calculations
         const floatX = Math.sin(progress * Math.PI * 2) * 3;
         const floatY = Math.cos(progress * Math.PI * 2) * 2;
-        const scale = 0.6 + (progress < 0.7 ? progress * 0.6 : 0.42);
+        const scale = 0.6 + (progress < 0.5 ? progress * 0.8 : 0.4); // Expansion plus rapide
         
         smoke.style.opacity = (opacity * opacity).toString(); // quadratic easing
-        smoke.style.transform = `scale(${scale}) translate(${floatX}px, ${floatY}px)`;
+        smoke.style.transform = `translateZ(0) scale(${scale}) translate(${floatX}px, ${floatY}px)`;
       } else {
         // Remove completed elements
         smoke.remove();
@@ -124,19 +125,19 @@ export function createSmokeEffect(element: HTMLElement | null) {
     } else {
       setTimeout(() => {
         smokeContainer.remove();
-      }, 500);
+      }, 100); // Réduit le délai
     }
   }
   
   requestAnimationFrame(animateSmoke);
   
-  // Show the element with fade in
+  // Show the element with fade in - accélérée
   if (element) {
     element.style.opacity = '0';
-    element.style.transition = 'opacity 0.7s ease-in';
+    element.style.transition = 'opacity 0.4s ease-in'; // Transition accélérée
     
     setTimeout(() => {
       element.style.opacity = '1';
-    }, 300);
+    }, 100); // Délai réduit
   }
 }
