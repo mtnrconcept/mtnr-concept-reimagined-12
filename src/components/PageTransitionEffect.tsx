@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { createParticleEffect, createSmokeEffect } from '@/lib/transition-effects';
+import { createParticleEffect, createSmokeEffect } from '@/lib/transitions';
 
 export default function PageTransitionEffect() {
   const location = useLocation();
