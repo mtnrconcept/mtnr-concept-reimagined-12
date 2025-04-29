@@ -17,11 +17,16 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const [direction, setDirection] = useState<'up' | 'down' | null>(null);
   const [prevPath, setPrevPath] = useState(location.pathname);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Délais pour la synchronisation des animations
+  const videoTransitionDuration = 5000; // 5 secondes pour la vidéo
+  const contentEntranceDelay = 4000; // Le contenu apparaît 1 seconde avant la fin
+  
   // Détermine la direction de l'animation basée sur l'ordre des pages
   useEffect(() => {
     if (!isActive) return;
-
+    
     const currentIndex = pageOrder.indexOf(location.pathname);
     const prevIndex = pageOrder.indexOf(prevPath);
     
@@ -32,70 +37,72 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     } else {
       setDirection(null);
     }
-
+    
     setPrevPath(location.pathname);
   }, [isActive, location.pathname, prevPath]);
 
-  // Créer les variantes pour l'animation d'ascenseur
-  const elevatorVariants = {
+  // Gestion de la lecture vidéo
+  useEffect(() => {
+    if (!isActive || !videoRef.current) return;
+    
+    // Mettre la vidéo au début ou à la fin selon la direction
+    if (direction === 'down') {
+      videoRef.current.currentTime = 0;
+    } else if (direction === 'up') {
+      // Pour l'animation vers le haut, nous inversons la vidéo en la lisant à l'envers
+      // en commençant de la fin
+      videoRef.current.currentTime = videoRef.current.duration || 0;
+      videoRef.current.playbackRate = -1;
+    }
+    
+    // Démarrer la lecture
+    const playPromise = videoRef.current.play();
+    
+    // Gérer les erreurs potentielles de lecture
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.error('Erreur de lecture vidéo:', error);
+      });
+    }
+    
+    // Arrêter la vidéo à la fin de la transition
+    const timeoutId = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      // Signal que l'animation est terminée
+      onAnimationComplete();
+    }, videoTransitionDuration);
+    
+    return () => clearTimeout(timeoutId);
+  }, [isActive, direction, onAnimationComplete]);
+
+  // Variantes d'animation pour le contenu
+  const contentVariants = {
     initial: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '-100%' : direction === 'up' ? '100%' : 0,
+      y: direction === 'down' ? '-100vh' : direction === 'up' ? '100vh' : 0,
+      opacity: 0
     }),
     animate: {
       y: 0,
+      opacity: 1,
       transition: {
-        duration: 5,
-        ease: [0.16, 1, 0.3, 1], // Ease-out quint - un bon easing pour simulation d'ascenseur
-      },
+        delay: contentEntranceDelay / 1000, // Convertir en secondes
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1], // Ease-out quint
+      }
     },
     exit: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '100%' : direction === 'up' ? '-100%' : 0,
+      y: direction === 'down' ? '100vh' : direction === 'up' ? '-100vh' : 0,
+      opacity: 0,
       transition: {
-        duration: 5,
-        ease: [0.7, 0, 0.84, 0], // Ease-in quint - départ progressif
-      },
+        duration: 0.5,
+        ease: [0.7, 0, 0.84, 0], // Ease-in quint
+      }
     }),
   };
 
-  // Composant pour la tuile d'arrière-plan qui se répète infiniment
-  const InfiniteTileBackground = () => {
-    // Référence à 3 éléments de tuile pour créer l'effet de défilement infini
-    const tiles = Array.from({ length: 3 }, (_, i) => (
-      <div 
-        key={`tile-${i}`} 
-        className="absolute inset-x-0 h-screen bg-black"
-        style={{
-          top: `${i * 100}vh`,
-          backgroundImage: 'url("/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          height: '100vh',
-        }}
-      />
-    ));
-
-    return (
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="relative h-[300vh]" // Trois fois la hauteur de l'écran
-          initial={{ y: direction === 'up' ? '-100vh' : 0 }}
-          animate={{
-            y: direction === 'up' ? '-200vh' : '-100vh'
-          }}
-          transition={{
-            duration: 5,
-            ease: [0.16, 1, 0.3, 1],
-            repeat: 0,
-          }}
-        >
-          {tiles}
-        </motion.div>
-      </div>
-    );
-  };
-
-  // Composant pour l'effet de flou de mouvement
+  // Effet de flou appliqué séparément pour éviter les problèmes de types de keyframes
   const BlurMotionEffect = ({ children }: { children: React.ReactNode }) => {
     return (
       <motion.div
@@ -122,22 +129,32 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   };
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none" ref={containerRef}>
+    <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden" ref={containerRef}>
       {isActive && (
         <>
-          <InfiniteTileBackground />
+          {/* Video Background */}
+          <div className="absolute inset-0 bg-black">
+            <video 
+              ref={videoRef} 
+              className="w-full h-full object-cover"
+              src="/lovable-uploads/ascensceur.mp4"
+              muted
+              playsInline
+            />
+          </div>
           
           <motion.div
             custom={direction}
-            variants={elevatorVariants}
+            variants={contentVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            onAnimationComplete={onAnimationComplete}
             className="absolute inset-0 flex items-center justify-center"
           >
             <BlurMotionEffect>
-              {children}
+              <div className="bg-black bg-opacity-70 backdrop-blur-md p-6 rounded-lg">
+                {children}
+              </div>
             </BlurMotionEffect>
           </motion.div>
         </>
