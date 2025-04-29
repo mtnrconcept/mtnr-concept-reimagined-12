@@ -1,3 +1,4 @@
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -35,6 +36,15 @@
   .animate-smoke-in {
     animation: smokeIn 3s ease-out forwards;
     will-change: opacity, transform, filter;
+  }
+  
+  /* Logo dispersion particle animation */
+  .logo-particle {
+    transform-origin: center center;
+    will-change: transform, opacity;
+    transition-property: transform, opacity;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); /* ease-out-cubic */
+    opacity: 1;
   }
   
   /* Optimized particle animation with GPU acceleration */
@@ -127,3 +137,4 @@
     transition: transform 0.1s ease-out;
   }
 }
+

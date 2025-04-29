@@ -1,3 +1,4 @@
+
 import { random } from './utils';
 
 /**
@@ -113,4 +114,176 @@ export function createParticleEffect(container: HTMLElement | null) {
   setTimeout(() => {
     particleContainer.remove();
   }, 4000); // Slightly longer than animation duration to ensure all particles are gone
+}
+
+/**
+ * Creates an effect where a logo or image disperses into particles
+ * @param imageElement The image element to disperse
+ * @param options Configuration options for the effect
+ */
+export function createLogoDisperseEffect(
+  imageElement: HTMLImageElement,
+  options: {
+    particleCount?: number;
+    dispersionStrength?: number;
+    duration?: number;
+    colorPalette?: string[];
+    onComplete?: () => void;
+  } = {}
+) {
+  if (!imageElement || !imageElement.complete) return;
+
+  const {
+    particleCount = 800,
+    dispersionStrength = 1.5,
+    duration = 2000,
+    colorPalette = ['#FFD700', '#000000', '#FFFFFF'], // Jaune, noir, blanc
+    onComplete = () => {}
+  } = options;
+
+  // Créer un canvas pour capturer l'image
+  const canvas = document.createElement('canvas');
+  const rect = imageElement.getBoundingClientRect();
+  
+  // Dimensions du canvas
+  const width = Math.max(rect.width, 100);
+  const height = Math.max(rect.height, 100);
+  
+  canvas.width = width;
+  canvas.height = height;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  
+  // Dessiner l'image sur le canvas
+  ctx.drawImage(imageElement, 0, 0, width, height);
+  
+  // Créer un conteneur pour les particules en position absolue
+  const particleContainer = document.createElement('div');
+  particleContainer.style.cssText = `
+    position: absolute;
+    left: ${rect.left}px;
+    top: ${rect.top}px;
+    width: ${width}px;
+    height: ${height}px;
+    pointer-events: none;
+    z-index: 100;
+    overflow: visible;
+  `;
+  document.body.appendChild(particleContainer);
+  
+  // Générer les particules
+  const particleSize = Math.max(1, Math.min(Math.floor(Math.sqrt(width * height) / 50), 3));
+  const particleGap = Math.max(4, Math.floor(Math.sqrt(width * height) / particleCount * 5));
+  
+  const particles = [];
+  const fragment = document.createDocumentFragment();
+
+  // Échantillonner l'image et créer les particules
+  for (let y = 0; y < height; y += particleGap) {
+    for (let x = 0; x < width; x += particleGap) {
+      // Vérifier que le pixel est suffisamment opaque pour créer une particule
+      const pixelData = ctx.getImageData(x, y, 1, 1).data;
+      const alpha = pixelData[3];
+      
+      if (alpha > 50) { // Ignorer les pixels trop transparents
+        const particle = document.createElement('div');
+        
+        // Couleur de base extraite de l'image
+        let color;
+        if (pixelData[0] > 200 && pixelData[1] > 200 && pixelData[2] < 100) {
+          // C'est probablement jaune
+          color = colorPalette[0]; // #FFD700
+        } else if (pixelData[0] < 50 && pixelData[1] < 50 && pixelData[2] < 50) {
+          // C'est probablement noir
+          color = colorPalette[1]; // #000000
+        } else {
+          // Par défaut, ou blanc
+          color = colorPalette[2]; // #FFFFFF
+        }
+        
+        // Propriétés de la particule
+        const finalSize = random(particleSize * 0.5, particleSize * 1.5);
+        const angle = Math.random() * Math.PI * 2;
+        const distance = random(50, 300) * dispersionStrength;
+        const delay = random(0, duration * 0.5);
+        
+        particle.className = 'logo-particle';
+        particle.style.cssText = `
+          position: absolute;
+          left: ${x}px;
+          top: ${y}px;
+          width: ${finalSize}px;
+          height: ${finalSize}px;
+          background-color: ${color};
+          border-radius: 50%;
+          opacity: ${random(0.6, 1)};
+          transform: translate(0, 0) scale(1);
+          will-change: transform, opacity;
+          --tx: ${Math.cos(angle) * distance}px;
+          --ty: ${Math.sin(angle) * distance}px;
+          --delay: ${delay}ms;
+          --duration: ${duration}ms;
+        `;
+        
+        fragment.appendChild(particle);
+        particles.push(particle);
+      }
+    }
+  }
+  
+  // Ajouter toutes les particules en une seule opération
+  particleContainer.appendChild(fragment);
+  
+  // Appliquer l'animation avec RAF pour de meilleures performances
+  const startTime = performance.now();
+  const endTime = startTime + duration + 500; // +500ms pour les retards
+  
+  // Temporairement masquer l'image originale
+  const originalOpacity = imageElement.style.opacity;
+  imageElement.style.opacity = '0';
+  
+  function animateParticles(timestamp) {
+    const elapsed = timestamp - startTime;
+    const isComplete = elapsed >= endTime;
+    
+    if (!isComplete) {
+      particles.forEach(particle => {
+        const delay = parseFloat(particle.style.getPropertyValue('--delay'));
+        const duration = parseFloat(particle.style.getPropertyValue('--duration'));
+        const particleElapsed = elapsed - delay;
+        
+        if (particleElapsed > 0) {
+          const progress = Math.min(1, particleElapsed / duration);
+          const easeOutProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+          
+          const tx = parseFloat(particle.style.getPropertyValue('--tx'));
+          const ty = parseFloat(particle.style.getPropertyValue('--ty'));
+          
+          particle.style.transform = `translate(
+            ${tx * easeOutProgress}px, 
+            ${ty * easeOutProgress}px
+          ) scale(${1 - easeOutProgress * 0.5})`;
+          
+          particle.style.opacity = (1 - easeOutProgress).toString();
+        }
+      });
+      
+      requestAnimationFrame(animateParticles);
+    } else {
+      // Animation terminée, nettoyer
+      particleContainer.remove();
+      imageElement.style.opacity = originalOpacity; // Restaurer l'opacité originale
+      onComplete();
+    }
+  }
+  
+  requestAnimationFrame(animateParticles);
+  
+  return {
+    cancel: () => {
+      particleContainer.remove();
+      imageElement.style.opacity = originalOpacity;
+    }
+  };
 }
