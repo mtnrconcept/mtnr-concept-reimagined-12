@@ -23,8 +23,8 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
 
   useEffect(() => {
     if (lightRef.current) {
-      lightRef.current.shadow.mapSize.width = 2048;
-      lightRef.current.shadow.mapSize.height = 2048;
+      lightRef.current.shadow.mapSize.width = 204;
+      lightRef.current.shadow.mapSize.height = 204;
       lightRef.current.shadow.camera.near = 0.5;
       lightRef.current.shadow.camera.far = 50;
     }
