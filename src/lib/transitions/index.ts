@@ -4,7 +4,8 @@
  * Provides simplified access to all transition functions
  */
 
-export { createLogoDisperseEffect, DisperseOptions } from './particles/disperse-effect';
+export { createLogoDisperseEffect } from './particles/disperse-effect';
+export type { DisperseOptions } from './particles/disperse-effect';
 export { createPageTransitionEffect } from './particles/page-transition';
 export { createSmokeEffect } from './smoke-effect';
 export { createLogo3DDisperseEffect } from './three-disperse-effect';
@@ -14,4 +15,5 @@ export { random } from './utils';
 export * from './particles/types';
 
 // Legacy support for older code paths
+import { createPageTransitionEffect } from './particles/page-transition';
 export const createParticleEffect = createPageTransitionEffect;
