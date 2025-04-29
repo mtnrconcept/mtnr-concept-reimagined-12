@@ -37,6 +37,14 @@
     will-change: transform;
   }
   
+  /* Conteneur de logo commun pour une position cohérente */
+  .logo-container {
+    height: 220px; /* Hauteur fixe pour garantir la cohérence */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
   /* UV light standard - optimisé avec will-change */
   .uv-light-circle {
     position: fixed;

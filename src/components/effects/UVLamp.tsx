@@ -112,7 +112,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
     }
   }, [uvMode]);
 
-  // Display UV logo on both home page ("/") and /what-we-do page
+  // Display UV logo on both home page ("/") and /what-we-do page and /book page
   const shouldShowLogo = showUVLogo && (location.pathname === "/" || location.pathname === "/what-we-do" || location.pathname === "/book");
 
   if (!isVisible) return null;
@@ -142,11 +142,11 @@ export const UVLamp: React.FC<UVLampProps> = ({
         }}
       />
       
-      {/* UV Logo - positionné en haut de la page avec bon z-index */}
+      {/* UV Logo - positionné exactement au même endroit que le logo normal */}
       {shouldShowLogo && (
         <div 
           ref={logoRef}
-          className="fixed inset-x-0 top-32 sm:top-36 md:top-40 z-60 pointer-events-none flex justify-center items-start"
+          className="logo-container fixed inset-x-0 top-32 sm:top-36 md:top-40 z-60 pointer-events-none flex justify-center items-start"
         >
           <AnimatePresence>
             <motion.div 
@@ -161,7 +161,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
               exit={{ opacity: 0, scale: 0.9 }}
             >
               <img 
-                src="/lovable-uploads/f8b2ee4c-ca6a-4388-8c9c-bfb3c97d5f0a.png"
+                src="/lovable-uploads/1f6ea5d1-4b81-4399-84ff-abfae36229de.png"
                 alt="MTNR UV Logo"
                 className="w-full h-auto"
                 draggable={false}
