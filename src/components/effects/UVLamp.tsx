@@ -142,15 +142,15 @@ export const UVLamp: React.FC<UVLampProps> = ({
         }}
       />
       
-      {/* UV Logo - positionné en haut de la page */}
+      {/* UV Logo - positionné en haut de la page avec z-index plus élevé */}
       {shouldShowLogo && (
         <div 
           ref={logoRef}
-          className="fixed inset-x-0 top-16 z-45 pointer-events-none flex justify-center items-start pt-8 sm:pt-12 md:pt-20 lg:pt-24"
+          className="fixed inset-x-0 top-16 z-60 pointer-events-none flex justify-center items-start pt-8 sm:pt-12 md:pt-16 lg:pt-20"
         >
           <AnimatePresence>
             <motion.div 
-              className="relative w-[400px] max-w-[80vw] z-50 transition-all duration-50 ease-in-out"
+              className="relative w-[400px] max-w-[80vw] transition-all duration-50 ease-in-out"
               style={{
                 filter: `drop-shadow(0 0 8px rgba(0, 170, 255, ${glowIntensity * 0.7}))
                         drop-shadow(0 0 15px rgba(0, 170, 255, ${glowIntensity * 0.5}))
