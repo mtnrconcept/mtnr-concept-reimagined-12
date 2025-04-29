@@ -53,73 +53,6 @@ export default function PageTransitionEffect() {
   }, [location.pathname]);
 
   /**
-   * Intercepte la navigation pour déclencher la dispersion avant le changement de page
-   */
-  useEffect(() => {
-    // Intercepter les clics sur les éléments de navigation
-    const handleNavLinkClick = (e: MouseEvent) => {
-      // Vérifier si c'est un lien de navigation
-      const target = e.target as HTMLElement;
-      const linkElement = target.closest('a');
-      
-      if (linkElement && linkElement.getAttribute('href')?.startsWith('/')) {
-        const targetPath = linkElement.getAttribute('href') || '';
-        
-        // Ignorer si c'est la page actuelle ou si une navigation est déjà en cours
-        if (targetPath === location.pathname || isNavigatingRef.current) return;
-        
-        // Déterminer si on quitte la page d'accueil
-        const isLeavingHome = location.pathname === '/' && targetPath !== '/';
-        
-        // N'activer la dispersion que si on quitte la page d'accueil
-        if (isLeavingHome) {
-          console.log('Navigation interceptée:', location.pathname, '->', targetPath);
-          
-          // Empêcher la navigation par défaut
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Marquer qu'une navigation est en cours pour éviter les doubles clics
-          isNavigatingRef.current = true;
-          isLeavingHomeRef.current = true;
-          
-          // Enregistrer l'heure de début
-          navigationStartTimeRef.current = performance.now();
-          
-          // Déclencher immédiatement la dispersion
-          setTriggerLogoDispersion(true);
-          
-          // Stocker le chemin de destination
-          lastPathRef.current = targetPath;
-          
-          // Ajouter un timeout de sécurité pour naviguer même si l'animation échoue
-          if (navigationTimeoutRef.current) {
-            clearTimeout(navigationTimeoutRef.current);
-          }
-          navigationTimeoutRef.current = window.setTimeout(() => {
-            navigate(targetPath);
-            isNavigatingRef.current = false;
-          }, 1500); // Fallback après 1.5 seconde maximum
-        } else {
-          // Si on ne quitte pas la page d'accueil, naviguer directement sans animation
-          // La navigation standard s'effectue sans interférence
-        }
-      }
-    };
-    
-    // Ajouter l'écouteur global pour les clics
-    document.addEventListener('click', handleNavLinkClick, true);
-    
-    return () => {
-      document.removeEventListener('click', handleNavLinkClick, true);
-      // Nettoyer le timeout en sortant
-      if (navigationTimeoutRef.current) {
-        clearTimeout(navigationTimeoutRef.current);
-      }
-    };
-  }, [location.pathname, navigate]);
-
-  /**
    * Callback après fin de dispersion pour pouvoir réutiliser l'effet
    * et naviguer vers la nouvelle page
    */
@@ -147,7 +80,7 @@ export default function PageTransitionEffect() {
     }, 100);
   }, [navigate]);
 
-  // Logo invisible supprimé
+  // Conteneur invisible - nous utilisons maintenant OptimizedDisperseLogo
   return (
     <div
       ref={containerRef}
@@ -160,7 +93,7 @@ export default function PageTransitionEffect() {
         pointerEvents: 'none',
         zIndex: 1000,
         willChange: 'opacity, transform',
-        opacity: 0, // Rendons le conteneur toujours invisible pour masquer le logo
+        opacity: 0,
       }}
     >
       {/* Le composant DispersingLogo est maintenu pour les fonctionnalités mais ne sera plus visible */}
@@ -171,7 +104,7 @@ export default function PageTransitionEffect() {
           toPath={lastPathRef.current}
           imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
           onDispersionComplete={handleDispersionComplete}
-          className="hidden" // Classe pour cacher complètement l'élément
+          className="hidden"
         />
       )}
     </div>

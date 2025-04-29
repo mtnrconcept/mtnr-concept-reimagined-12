@@ -9,6 +9,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { pageTransitionPreset } from "@/components/effects/smoke-presets";
+import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -24,9 +25,8 @@ export default function PageTransition({
   const isInitialMountRef = useRef<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // On stocke la route précédente et le trigger pour DispersingLogo
+  // On stocke la route précédente
   const [fromPath, setFromPath] = useState(location.pathname);
-  const [triggerLogoDispersion, setTriggerLogoDispersion] = useState(false);
 
   useEffect(() => {
     // Ignorer le tout premier rendu
@@ -42,14 +42,9 @@ export default function PageTransition({
     // On démarre la transition
     window.pageTransitionInProgress = true;
 
-    // Déclenche la dispersion uniquement si on quitte vraiment "/"
-    const isLeavingHome = prevPath === "/" && location.pathname !== "/";
-    setTriggerLogoDispersion(isLeavingHome);
-
     // Effet fumée
     if (contentRef.current) {
       requestAnimationFrame(() => {
-        // Fixed here: Passing only the container element to createSmokeEffect
         createSmokeEffect(contentRef.current!);
       });
     }
@@ -57,7 +52,6 @@ export default function PageTransition({
     // Finir la transition après la durée du preset
     const timeout = setTimeout(() => {
       window.pageTransitionInProgress = false;
-      setTriggerLogoDispersion(false);
     }, pageTransitionPreset.duration || 1200);
 
     // Mettre à jour pour le prochain changement de route
@@ -67,7 +61,8 @@ export default function PageTransition({
 
   return (
     <>
-      {/* Suppression de la DispersingLogo ici */}
+      {/* Ajouter notre logo optimisé avec dispersion */}
+      <OptimizedDisperseLogo />
 
       <AnimatePresence mode="wait">
         <motion.div

@@ -8,5 +8,6 @@ export { createParticleEffect, createLogoDisperseEffect } from './particle-effec
 export { createSmokeEffect } from './smoke-effect';
 export { createLogo3DDisperseEffect } from './three-disperse-effect';
 export { createSmokeTextEffect } from './smoke-text-effect';
+export { createOptimizedDisperseEffect } from './optimized-disperse';
 export { random } from './utils';
 export * from './particles/types';
