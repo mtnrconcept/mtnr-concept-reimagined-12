@@ -32,6 +32,14 @@
   will-change: transform, opacity;
 }
 
+.exit-content {
+  pointer-events: none;
+}
+
+.enter-content {
+  pointer-events: auto;
+}
+
 /* Style pour inverser la vidéo verticalement */
 .video-reversed {
   transform: scaleY(-1);

@@ -62,12 +62,10 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     if (direction === 'down') {
       // Pour descendre, on joue la vidéo normalement depuis le début
       video.currentTime = 0;
-      video.playbackRate = 1;
       video.classList.remove('video-reversed');
     } else if (direction === 'up') {
       // Pour monter, on utilise l'effet CSS pour inverser la vidéo verticalement
       video.currentTime = 0;
-      video.playbackRate = 1;
       video.classList.add('video-reversed');
     }
     
@@ -94,9 +92,13 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     return () => clearTimeout(timeoutId);
   }, [isActive, direction, onAnimationComplete, videoTransitionDuration]);
 
-  // Variantes d'animation pour le contenu sortant
+  // Variantes d'animation pour le contenu sortant avec mouvement vertical substantiel
   const exitVariants = {
-    initial: { y: 0, opacity: 1 },
+    initial: { 
+      y: 0, 
+      opacity: 1,
+      transition: { duration: 0.1 } 
+    },
     animate: (direction: 'up' | 'down' | null) => ({
       y: direction === 'down' ? '-100vh' : direction === 'up' ? '100vh' : 0,
       opacity: 0,
@@ -107,7 +109,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     }),
   };
 
-  // Variantes d'animation pour le nouveau contenu entrant
+  // Variantes d'animation pour le nouveau contenu entrant avec mouvement vertical substantiel
   const enterVariants = {
     initial: (direction: 'up' | 'down' | null) => ({
       y: direction === 'down' ? '100vh' : direction === 'up' ? '-100vh' : 0,
@@ -131,35 +133,43 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
           <div className="elevator-video-container">
             <video 
               ref={videoRef} 
-              className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''}`}
+              className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
               src="/lovable-uploads/ascensceur.mp4"
               muted
               playsInline
             />
           </div>
           
-          {/* Animation de sortie du contenu actuel */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`exit-${prevPath}`}
-              className="elevator-content"
-              custom={direction}
-              variants={exitVariants}
-              initial="initial"
-              animate="animate"
-            >
-              {currentContent}
-            </motion.div>
-          </AnimatePresence>
+          {/* Animation de sortie du contenu actuel avec mouvement vertical complet */}
+          <motion.div
+            key={`exit-${prevPath}`}
+            className="elevator-content exit-content"
+            custom={direction}
+            variants={exitVariants}
+            initial="initial"
+            animate="animate"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            {currentContent}
+          </motion.div>
           
-          {/* Animation d'entrée du nouveau contenu avec délai */}
+          {/* Animation d'entrée du nouveau contenu avec mouvement vertical complet et délai */}
           <motion.div
             key={`enter-${location.pathname}`}
-            className="elevator-content"
+            className="elevator-content enter-content"
             custom={direction}
             variants={enterVariants}
             initial="initial"
-            animate={isActive ? {
+            animate={{
               y: 0,
               opacity: 1,
               transition: {
@@ -167,8 +177,17 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
                 duration: enterAnimationDuration,
                 ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
               }
-            } : "initial"}
-            style={{ display: !isActive ? 'none' : 'flex' }}
+            }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%", 
+              height: "100%",
+              display: isActive ? "flex" : "none",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
           >
             {children}
           </motion.div>

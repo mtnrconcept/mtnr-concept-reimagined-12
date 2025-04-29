@@ -68,11 +68,7 @@ export default function PageTransition({
         isActive={isTransitioning}
         onAnimationComplete={handleTransitionComplete}
       >
-        {children}
-      </ElevatorTransition>
-
-      {/* Affichage normal du contenu quand il n'y a pas de transition */}
-      {!isTransitioning && (
+        {/* Affichage normal du contenu quand il n'y a pas de transition */}
         <AnimatePresence mode="wait">
           <motion.div
             key={keyId}
@@ -85,7 +81,9 @@ export default function PageTransition({
               willChange: "transform, opacity",
               position: "relative",
               zIndex: 10,
-              transition: "opacity 0.5s ease"
+              transition: "opacity 0.5s ease",
+              width: "100%",
+              height: "100%"
             }}
           >
             <motion.div
@@ -105,7 +103,7 @@ export default function PageTransition({
             </motion.div>
           </motion.div>
         </AnimatePresence>
-      )}
+      </ElevatorTransition>
     </>
   );
 }
