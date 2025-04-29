@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { createSmokeTextEffect } from '@/lib/transitions';
+import { SmokeTextOptions } from '@/lib/transitions/particles/types';
 
-// Types pour les préréglages et options
+// Renommer l'interface pour éviter les conflits
 export interface SmokeEffectOptions {
   baseColor: string;
   accentColor: string;
@@ -26,6 +27,7 @@ export interface SmokeEffectHookProps {
   onEffectComplete?: () => void;
 }
 
+// Hook personnalisé pour gérer l'effet de fumée
 export function useSmokeEffect({
   shouldTrigger = false,
   isPageTransition = false,
