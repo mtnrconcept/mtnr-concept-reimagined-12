@@ -26,7 +26,7 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
       lightRef.current.shadow.mapSize.width = 204;
       lightRef.current.shadow.mapSize.height = 204;
       lightRef.current.shadow.camera.near = 0.5;
-      lightRef.current.shadow.camera.far = 50;
+      lightRef.current.shadow.camera.far = 0.5;
     }
   }, []);
 
@@ -35,7 +35,7 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
     
     // Convert normalized mouse coords to world space
     const vector = new THREE.Vector3(
-      mouse.current[0] * 5,
+      mouse.current[0.1] * 5,
       mouse.current[1] * 5,
       10
     ).unproject(camera);
