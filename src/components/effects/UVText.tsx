@@ -44,9 +44,8 @@ export default function UVText({
       const dy = mousePosition.y - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Check if mouse is close enough to illuminate the text
-      // Adjust threshold based on the size of your elements
-      const threshold = uvMode ? 600 : 300;
+      // Enhanced threshold and effects for UV mode
+      const threshold = uvMode ? 600 : 300; // Larger detection area in UV mode
       const newIsIlluminated = distance < threshold;
       
       if (newIsIlluminated !== isIlluminated) {
@@ -59,27 +58,38 @@ export default function UVText({
         const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
         hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
-        // Larger glow for UV mode with fluorescent yellow color
+        // Enhanced glow for UV mode with dynamic fluorescent yellow color
         const glowSize = uvMode ? 25 * intensity : 15 * intensity;
-        hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#D2FF3F" : uvColor}, 
-                                                 0 0 ${glowSize * 2}px ${uvMode ? "#D2FF3F" : uvColor}`;
+        const primaryGlow = uvMode ? "#D2FF3F" : uvColor;
+        const secondaryGlow = uvMode ? "#4FA9FF" : uvColor;
+        
+        hiddenTextRef.current.style.textShadow = `
+          0 0 ${glowSize}px ${primaryGlow}, 
+          0 0 ${glowSize * 2}px ${primaryGlow},
+          0 0 ${glowSize * 3}px ${secondaryGlow}
+        `;
         
         if (uvMode) {
-          // Slight vibration effect in UV mode
+          // Dynamic animation effects in UV mode
           const time = Date.now() / 1000;
-          const vibrationX = Math.sin(time * 2) * 0.5;
-          const vibrationY = Math.cos(time * 1.8) * 0.5;
+          const vibrationX = Math.sin(time * 2) * 0.8;
+          const vibrationY = Math.cos(time * 1.8) * 0.8;
           hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
           hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
+          
+          // Add letter spacing for dramatic effect in UV mode
+          hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
         } else {
           hiddenTextRef.current.style.transform = '';
           hiddenTextRef.current.style.filter = '';
+          hiddenTextRef.current.style.letterSpacing = '';
         }
       } else {
         hiddenTextRef.current.style.opacity = '0';
         hiddenTextRef.current.style.textShadow = 'none';
         hiddenTextRef.current.style.transform = '';
         hiddenTextRef.current.style.filter = '';
+        hiddenTextRef.current.style.letterSpacing = '';
       }
     };
 
@@ -92,6 +102,35 @@ export default function UVText({
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [isTorchActive, mousePosition, isIlluminated, uvColor, uvMode]);
+
+  // Auto-reveal hidden text if UV mode is active, regardless of mouse position
+  useEffect(() => {
+    if (uvMode && hiddenTextRef.current) {
+      hiddenTextRef.current.style.opacity = '1';
+      hiddenTextRef.current.style.textShadow = `
+        0 0 10px ${uvColor},
+        0 0 20px ${uvColor},
+        0 0 30px ${uvColor}
+      `;
+      hiddenTextRef.current.style.letterSpacing = '0.1em';
+      
+      // Add subtle animation
+      const animateGlow = () => {
+        if (hiddenTextRef.current) {
+          const time = Date.now() / 1000;
+          const pulseIntensity = (Math.sin(time * 2) + 1) / 2; // 0 to 1 pulsating
+          hiddenTextRef.current.style.textShadow = `
+            0 0 ${5 + (pulseIntensity * 10)}px ${uvColor},
+            0 0 ${10 + (pulseIntensity * 20)}px ${uvColor}
+          `;
+          requestAnimationFrame(animateGlow);
+        }
+      };
+      
+      const animId = requestAnimationFrame(animateGlow);
+      return () => cancelAnimationFrame(animId);
+    }
+  }, [uvMode, uvColor]);
 
   return (
     <div className={cn(
