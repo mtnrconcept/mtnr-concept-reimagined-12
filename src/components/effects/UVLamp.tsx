@@ -113,15 +113,15 @@ export const UVLamp: React.FC<UVLampProps> = ({
   }, [uvMode]);
 
   // Display UV logo on both home page ("/") and /what-we-do page
-  const shouldShowLogo = showUVLogo && (location.pathname === "/" || location.pathname === "/what-we-do");
+  const shouldShowLogo = showUVLogo && (location.pathname === "/" || location.pathname === "/what-we-do" || location.pathname === "/book");
 
   if (!isVisible) return null;
 
   return (
     <>
-      {/* Fond UV noir qui sera masqué par le cercle de lampe */}
+      {/* Fond UV avec le même background que le reste du site */}
       <div 
-        className="fixed inset-0 z-45 pointer-events-none bg-transparent"
+        className="fixed inset-0 z-45 pointer-events-none"
         style={{
           backgroundImage: `url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png")`,
           backgroundSize: 'cover',
@@ -134,7 +134,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
       <div 
         ref={uvCircleRef}
         className={cn(
-          "fixed inset-0 z-50 pointer-events-none bg-transparent",
+          "fixed inset-0 z-50 pointer-events-none",
           className
         )}
         style={{
@@ -142,15 +142,15 @@ export const UVLamp: React.FC<UVLampProps> = ({
         }}
       />
       
-      {/* UV Logo - positionné en haut de la page avec z-index plus élevé */}
+      {/* UV Logo - positionné en haut de la page avec bon z-index */}
       {shouldShowLogo && (
         <div 
           ref={logoRef}
-          className="fixed inset-x-0 top-16 z-60 pointer-events-none flex justify-center items-start pt-8 sm:pt-12 md:pt-16 lg:pt-20"
+          className="fixed inset-x-0 top-32 sm:top-36 md:top-40 z-60 pointer-events-none flex justify-center items-start"
         >
           <AnimatePresence>
             <motion.div 
-              className="relative w-[400px] max-w-[80vw] transition-all duration-50 ease-in-out"
+              className="relative w-[500px] max-w-[90vw] transition-all duration-50 ease-in-out"
               style={{
                 filter: `drop-shadow(0 0 8px rgba(0, 170, 255, ${glowIntensity * 0.7}))
                         drop-shadow(0 0 15px rgba(0, 170, 255, ${glowIntensity * 0.5}))

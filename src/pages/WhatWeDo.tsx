@@ -23,8 +23,8 @@ export default function WhatWeDo() {
       <div className="relative z-10 min-h-screen">
         <Navbar />
         
-        {/* Espace pour le logo UV qui sera positionné ici en mode UV */}
-        <div className="w-full h-20 sm:h-24 md:h-28 lg:h-32"></div>
+        {/* Espace pour le logo */}
+        <div className="w-full h-32 sm:h-36 md:h-40 lg:h-44"></div>
         
         <main className="min-h-screen w-full flex flex-col items-center pt-6 xs:pt-8 md:pt-10 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">

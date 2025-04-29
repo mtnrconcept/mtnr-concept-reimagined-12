@@ -43,7 +43,7 @@ export const NeonLogo = () => {
   }
   
   return (
-    <div className="w-full flex justify-center items-center py-12 pt-16 sm:pt-20 md:pt-24 relative z-30">
+    <div className="w-full flex justify-center items-center py-12 pt-32 sm:pt-36 md:pt-40 relative z-30">
       <div 
         className={cn(
           "relative w-[500px] max-w-[90vw]",
