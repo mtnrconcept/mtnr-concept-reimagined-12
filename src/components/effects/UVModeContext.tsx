@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { useTorch } from "./TorchContext";
 
 interface UVModeContextType {
   uvMode: boolean;

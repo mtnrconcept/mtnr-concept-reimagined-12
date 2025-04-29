@@ -5,11 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
-import { TorchProvider } from "./components/effects/TorchContext";
-import { UVModeProvider } from "./components/effects/UVModeContext";
+import { TorchProvider, useTorch } from "./components/effects/TorchContext";
+import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
 import { Torch3DProvider } from "./components/effects/Torch3DContext";
-import { useTorch } from "./components/effects/TorchContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -22,7 +21,8 @@ import { checkFeatureSupport } from "@/lib/feature-detection";
 
 // Component to display UV label
 const UVCornerLabel = () => {
-  const { uvMode, isTorchActive } = useTorch();
+  const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
   
   if (!isTorchActive || !uvMode) return null;
   

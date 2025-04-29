@@ -1,18 +1,13 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { useUVMode } from "./UVModeContext";
-import { useElementIllumination } from "./useElementIllumination";
 
 interface TorchContextType {
   isTorchActive: boolean;
   setIsTorchActive: (active: boolean) => void;
   mousePosition: { x: number; y: number };
   updateMousePosition: (position: { x: number; y: number }) => void;
-  registerElementForIllumination: (element: HTMLElement) => void;
-  unregisterElementForIllumination: (element: HTMLElement) => void;
   containerRef: React.RefObject<HTMLDivElement>;
-  uvMode: boolean;
-  toggleUVMode: () => void;
 }
 
 const TorchContext = createContext<TorchContextType>({
@@ -20,11 +15,7 @@ const TorchContext = createContext<TorchContextType>({
   setIsTorchActive: () => {},
   mousePosition: { x: 0, y: 0 },
   updateMousePosition: () => {},
-  registerElementForIllumination: () => {},
-  unregisterElementForIllumination: () => {},
   containerRef: { current: null },
-  uvMode: false,
-  toggleUVMode: () => {},
 });
 
 export const useTorch = () => useContext(TorchContext);
@@ -36,16 +27,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const { 
     uvMode, 
-    toggleUVMode, 
     uvCircleRef, 
     createUVCircle, 
     removeUVCircle 
   } = useUVMode();
-  
-  const { 
-    registerElementForIllumination, 
-    unregisterElementForIllumination 
-  } = useElementIllumination();
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
@@ -80,18 +65,14 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       removeUVCircle();
     };
-  }, [isTorchActive, uvMode, mousePosition]);
+  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
 
   const contextValue = {
     isTorchActive,
     setIsTorchActive,
     mousePosition,
     updateMousePosition,
-    registerElementForIllumination,
-    unregisterElementForIllumination,
     containerRef,
-    uvMode,
-    toggleUVMode,
   };
 
   return (
