@@ -131,7 +131,13 @@ export function createLogoDisperseEffect(
     onComplete?: () => void;
   } = {}
 ) {
-  if (!imageElement || !imageElement.complete) return;
+  if (!imageElement || !imageElement.complete) {
+    // Si l'image n'est pas chargée, appeler immédiatement onComplete et retourner
+    if (options.onComplete) {
+      setTimeout(options.onComplete, 10);
+    }
+    return { cancel: () => {} };
+  }
 
   const {
     particleCount = 800,
@@ -153,10 +159,24 @@ export function createLogoDisperseEffect(
   canvas.height = height;
   
   const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+  if (!ctx) {
+    // Si pas de contexte canvas, terminer rapidement
+    if (onComplete) {
+      setTimeout(onComplete, 10);
+    }
+    return { cancel: () => {} };
+  }
   
-  // Dessiner l'image sur le canvas
-  ctx.drawImage(imageElement, 0, 0, width, height);
+  try {
+    // Dessiner l'image sur le canvas
+    ctx.drawImage(imageElement, 0, 0, width, height);
+  } catch (error) {
+    console.error("Erreur lors du dessin de l'image:", error);
+    if (onComplete) {
+      setTimeout(onComplete, 10);
+    }
+    return { cancel: () => {} };
+  }
   
   // Créer un conteneur pour les particules en position absolue
   const particleContainer = document.createElement('div');
@@ -172,64 +192,87 @@ export function createLogoDisperseEffect(
   `;
   document.body.appendChild(particleContainer);
   
-  // Générer les particules
+  // Générer les particules - moins nombreuses pour de meilleures performances
   const particleSize = Math.max(1, Math.min(Math.floor(Math.sqrt(width * height) / 50), 3));
-  const particleGap = Math.max(4, Math.floor(Math.sqrt(width * height) / particleCount * 5));
+  const particleGap = Math.max(6, Math.floor(Math.sqrt(width * height) / particleCount * 5));
   
   const particles = [];
   const fragment = document.createDocumentFragment();
 
+  let particleCount2D = 0;
+
   // Échantillonner l'image et créer les particules
   for (let y = 0; y < height; y += particleGap) {
     for (let x = 0; x < width; x += particleGap) {
-      // Vérifier que le pixel est suffisamment opaque pour créer une particule
-      const pixelData = ctx.getImageData(x, y, 1, 1).data;
-      const alpha = pixelData[3];
+      // Limiter le nombre total de particules
+      if (particleCount2D >= options.particleCount || particleCount2D >= 400) {
+        break;
+      }
       
-      if (alpha > 50) { // Ignorer les pixels trop transparents
-        const particle = document.createElement('div');
+      try {
+        // Vérifier que le pixel est suffisamment opaque pour créer une particule
+        const pixelData = ctx.getImageData(x, y, 1, 1).data;
+        const alpha = pixelData[3];
         
-        // Couleur de base extraite de l'image
-        let color;
-        if (pixelData[0] > 200 && pixelData[1] > 200 && pixelData[2] < 100) {
-          // C'est probablement jaune
-          color = colorPalette[0]; // #FFD700
-        } else if (pixelData[0] < 50 && pixelData[1] < 50 && pixelData[2] < 50) {
-          // C'est probablement noir
-          color = colorPalette[1]; // #000000
-        } else {
-          // Par défaut, ou blanc
-          color = colorPalette[2]; // #FFFFFF
+        if (alpha > 50) { // Ignorer les pixels trop transparents
+          particleCount2D++;
+          
+          const particle = document.createElement('div');
+          
+          // Couleur de base extraite de l'image
+          let color;
+          if (pixelData[0] > 200 && pixelData[1] > 200 && pixelData[2] < 100) {
+            // C'est probablement jaune
+            color = colorPalette[0]; // #FFD700
+          } else if (pixelData[0] < 50 && pixelData[1] < 50 && pixelData[2] < 50) {
+            // C'est probablement noir
+            color = colorPalette[1]; // #000000
+          } else {
+            // Par défaut, ou blanc
+            color = colorPalette[2]; // #FFFFFF
+          }
+          
+          // Propriétés de la particule
+          const finalSize = random(particleSize * 0.5, particleSize * 1.5);
+          const angle = Math.random() * Math.PI * 2;
+          const distance = random(50, 300) * dispersionStrength;
+          const delay = random(0, duration * 0.3); // Réduire les délais pour plus de réactivité
+          
+          particle.className = 'logo-particle';
+          particle.style.cssText = `
+            position: absolute;
+            left: ${x}px;
+            top: ${y}px;
+            width: ${finalSize}px;
+            height: ${finalSize}px;
+            background-color: ${color};
+            border-radius: 50%;
+            opacity: ${random(0.6, 1)};
+            transform: translate(0, 0) scale(1);
+            will-change: transform, opacity;
+            --tx: ${Math.cos(angle) * distance}px;
+            --ty: ${Math.sin(angle) * distance}px;
+            --delay: ${delay}ms;
+            --duration: ${duration}ms;
+          `;
+          
+          fragment.appendChild(particle);
+          particles.push(particle);
         }
-        
-        // Propriétés de la particule
-        const finalSize = random(particleSize * 0.5, particleSize * 1.5);
-        const angle = Math.random() * Math.PI * 2;
-        const distance = random(50, 300) * dispersionStrength;
-        const delay = random(0, duration * 0.5);
-        
-        particle.className = 'logo-particle';
-        particle.style.cssText = `
-          position: absolute;
-          left: ${x}px;
-          top: ${y}px;
-          width: ${finalSize}px;
-          height: ${finalSize}px;
-          background-color: ${color};
-          border-radius: 50%;
-          opacity: ${random(0.6, 1)};
-          transform: translate(0, 0) scale(1);
-          will-change: transform, opacity;
-          --tx: ${Math.cos(angle) * distance}px;
-          --ty: ${Math.sin(angle) * distance}px;
-          --delay: ${delay}ms;
-          --duration: ${duration}ms;
-        `;
-        
-        fragment.appendChild(particle);
-        particles.push(particle);
+      } catch (error) {
+        console.error("Erreur lors de l'échantillonnage de l'image:", error);
+        // Continuer malgré l'erreur
       }
     }
+  }
+  
+  // Si aucune particule n'a été créée, terminer rapidement
+  if (particles.length === 0) {
+    particleContainer.remove();
+    if (onComplete) {
+      setTimeout(onComplete, 10);
+    }
+    return { cancel: () => {} };
   }
   
   // Ajouter toutes les particules en une seule opération
@@ -238,10 +281,15 @@ export function createLogoDisperseEffect(
   // Appliquer l'animation avec RAF pour de meilleures performances
   const startTime = performance.now();
   const endTime = startTime + duration + 500; // +500ms pour les retards
+  let animFrameId = 0;
   
   // Temporairement masquer l'image originale
   const originalOpacity = imageElement.style.opacity;
   imageElement.style.opacity = '0';
+  
+  function easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
   
   function animateParticles(timestamp) {
     const elapsed = timestamp - startTime;
@@ -249,41 +297,50 @@ export function createLogoDisperseEffect(
     
     if (!isComplete) {
       particles.forEach(particle => {
-        const delay = parseFloat(particle.style.getPropertyValue('--delay'));
-        const duration = parseFloat(particle.style.getPropertyValue('--duration'));
-        const particleElapsed = elapsed - delay;
-        
-        if (particleElapsed > 0) {
-          const progress = Math.min(1, particleElapsed / duration);
-          const easeOutProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+        try {
+          const delay = parseFloat(particle.style.getPropertyValue('--delay'));
+          const duration = parseFloat(particle.style.getPropertyValue('--duration'));
+          const particleElapsed = elapsed - delay;
           
-          const tx = parseFloat(particle.style.getPropertyValue('--tx'));
-          const ty = parseFloat(particle.style.getPropertyValue('--ty'));
-          
-          particle.style.transform = `translate(
-            ${tx * easeOutProgress}px, 
-            ${ty * easeOutProgress}px
-          ) scale(${1 - easeOutProgress * 0.5})`;
-          
-          particle.style.opacity = (1 - easeOutProgress).toString();
+          if (particleElapsed > 0) {
+            const progress = Math.min(1, particleElapsed / duration);
+            const easeOutProgress = easeInOutCubic(progress); // Ease-in-out cubique
+            
+            const tx = parseFloat(particle.style.getPropertyValue('--tx'));
+            const ty = parseFloat(particle.style.getPropertyValue('--ty'));
+            
+            particle.style.transform = `translate(
+              ${tx * easeOutProgress}px, 
+              ${ty * easeOutProgress}px
+            ) scale(${1 - easeOutProgress * 0.5})`;
+            
+            particle.style.opacity = (1 - easeOutProgress).toString();
+          }
+        } catch (error) {
+          // Ignorer les erreurs pour chaque particule
         }
       });
       
-      requestAnimationFrame(animateParticles);
+      animFrameId = requestAnimationFrame(animateParticles);
     } else {
       // Animation terminée, nettoyer
-      particleContainer.remove();
-      imageElement.style.opacity = originalOpacity; // Restaurer l'opacité originale
-      onComplete();
+      cleanup();
     }
   }
   
-  requestAnimationFrame(animateParticles);
+  function cleanup() {
+    if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = 0;
+    }
+    particleContainer.remove();
+    imageElement.style.opacity = originalOpacity; // Restaurer l'opacité originale
+    onComplete();
+  }
+  
+  animFrameId = requestAnimationFrame(animateParticles);
   
   return {
-    cancel: () => {
-      particleContainer.remove();
-      imageElement.style.opacity = originalOpacity;
-    }
+    cancel: cleanup
   };
 }
