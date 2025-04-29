@@ -20,11 +20,12 @@ export default function PageTransitionEffect() {
       // Appliquer l'effet de particules sur l'ancien contenu
       createParticleEffect(contentRef.current);
       
-      // Légère attente pour permettre aux particules de se disperser avant d'afficher le nouveau contenu
+      // Attente plus longue pour permettre aux particules de se disperser avant d'afficher le nouveau contenu
+      // L'effet de dispersion prend maintenant entre 3-4 secondes
       setTimeout(() => {
         // Appliquer l'effet de fumée sur le nouveau contenu
         createSmokeEffect(contentRef.current);
-      }, 300);
+      }, 1200); // Délai plus long pour laisser les particules commencer à se disperser
     }
     
     prevPathRef.current = location.pathname;

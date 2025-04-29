@@ -29,7 +29,7 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
         exit={{ 
           opacity: 0,
           filter: "blur(8px)",
-          transition: { duration: 0.7 }
+          transition: { duration: 3.5 } // Durée plus longue pour correspondre à l'animation des particules
         }}
         className="page-content-wrapper"
         style={{ 
@@ -60,9 +60,13 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
             opacity: 0,
             filter: "blur(10px)",
             y: -20,
+            transition: {
+              duration: 3.0, // Animation de sortie de 3 secondes
+              ease: [0.25, 1, 0.5, 1],
+            }
           }}
           transition={{
-            duration: 0.9,
+            duration: 3.5, // Animation d'entrée de 3.5 secondes
             ease: [0.25, 1, 0.5, 1],
           }}
           className="particles-container"
