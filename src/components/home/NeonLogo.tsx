@@ -4,14 +4,12 @@ import { cn } from '@/lib/utils';
 import { DispersingLogo } from './DispersingLogo';
 import { useLocation } from 'react-router-dom';
 import { useUVMode } from '../effects/UVModeContext';
-import { useTorch } from '../effects/TorchContext';
 
 export const NeonLogo = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
   const [shouldDisperse, setShouldDisperse] = useState(false);
   const location = useLocation();
   const { uvMode } = useUVMode();
-  const { isTorchActive } = useTorch();
   
   // Effet de scintillement du néon
   useEffect(() => {
@@ -39,10 +37,9 @@ export const NeonLogo = () => {
     }, 2000);
   };
   
-  // Si le mode UV est actif et la torche est allumée, ne pas afficher ce logo
-  // car il sera remplacé par le logo UV
-  if (uvMode && isTorchActive) {
-    return null; // Le logo UV sera affiché par UVLamp.tsx
+  // Si le mode UV est actif, ne pas afficher ce logo normal
+  if (uvMode) {
+    return null;
   }
   
   return (

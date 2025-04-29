@@ -104,4 +104,30 @@
     will-change: mask, -webkit-mask;
     transition: mask 0.2s ease-out, -webkit-mask 0.2s ease-out;
   }
+  
+  /* Nouvelles animations pour le mode UV */
+  @keyframes uv-pulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0.8; transform: scale(1.05); }
+  }
+  
+  @keyframes grid-pulse {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.15; }
+    100% { opacity: 0.1; }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-float {
+    animation: float 10s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
 }

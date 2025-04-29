@@ -50,7 +50,7 @@ export default function Home() {
       {/* Logo UV qui apparaît en mode UV */}
       {uvMode && (
         <UVLamp 
-          lampRadius={500}
+          lampRadius={300}
           showUVLogo={true}
         />
       )}

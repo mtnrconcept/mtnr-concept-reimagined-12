@@ -21,7 +21,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
 }) => {
   const location = useLocation();
   const { uvMode } = useUVMode();
-  const { isTorchActive, mousePosition } = useTorch();
+  const { mousePosition } = useTorch();
   const [isVisible, setIsVisible] = React.useState(false);
   const [glowIntensity, setGlowIntensity] = React.useState(1);
   const uvCircleRef = useRef<HTMLDivElement>(null);
@@ -112,7 +112,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
     }
   }, [uvMode]);
 
-  // On n'affiche pas le logo UV si nous ne sommes pas sur la page d'accueil
+  // On n'affiche le logo UV que sur la page d'accueil ("/")
   const shouldShowLogo = showUVLogo && (location.pathname === "/");
 
   if (!isVisible) return null;

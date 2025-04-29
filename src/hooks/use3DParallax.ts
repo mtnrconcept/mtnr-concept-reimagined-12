@@ -1,5 +1,6 @@
 
 import { useEffect, RefObject } from 'react';
+import { useUVMode } from '@/components/effects/UVModeContext';
 
 interface Parallax3DOptions {
   strength?: number;
@@ -23,6 +24,8 @@ export const use3DParallax = (
     easing = 0.1,
     layerSelector = '[data-depth]'
   } = options;
+  
+  const { uvMode } = useUVMode();
 
   useEffect(() => {
     console.log('Initializing enhanced 3D parallax effect');
@@ -63,16 +66,21 @@ export const use3DParallax = (
       elements.forEach(element => {
         const depth = parseFloat(element.dataset.depth || '0');
         
-        // Calculate 3D transforms
-        const moveX = (targetMouseX * depth * strength) / 100;
-        const moveY = (targetMouseY * depth * strength) / 100;
+        // Calculer les facteurs de mouvement avec effet amélioré en mode UV
+        const effectMultiplier = uvMode ? 1.4 : 1.0;
+        const moveX = (targetMouseX * depth * strength * effectMultiplier) / 100;
+        const moveY = (targetMouseY * depth * strength * effectMultiplier) / 100;
         const scrollY = scrollPosition * depth;
+        
+        // Appliquer des rotations plus prononcées en mode UV
+        const rotationFactorX = uvMode ? -targetMouseY / 40 : -targetMouseY / 50;
+        const rotationFactorY = uvMode ? targetMouseX / 40 : targetMouseX / 50;
         
         // Apply transforms with 3D depth
         element.style.transform = `
           translate3d(${moveX}px, ${moveY + scrollY}px, ${depth * -100}px)
-          rotateX(${-targetMouseY / 50 * depth}deg)
-          rotateY(${targetMouseX / 50 * depth}deg)
+          rotateX(${rotationFactorX * depth}deg)
+          rotateY(${rotationFactorY * depth}deg)
         `;
       });
       
@@ -92,5 +100,5 @@ export const use3DParallax = (
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(rafId);
     };
-  }, [containerRef, strength, perspective, easing, layerSelector]);
+  }, [containerRef, strength, perspective, easing, layerSelector, uvMode]);
 };
