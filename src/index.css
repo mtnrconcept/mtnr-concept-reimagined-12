@@ -1,10 +1,9 @@
-
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
 @layer components {
-  /* Styles pour l'effet de particules */
+  /* Optimized styles for particle effect */
   .particles-container {
     position: relative;
     min-height: 100%;
@@ -14,17 +13,17 @@
     z-index: 50;
   }
   
-  /* Animation pour l'apparition avec effet de fumée - plus lente */
+  /* Animation for appearance with smoke effect - optimized */
   @keyframes smokeIn {
     0% {
       opacity: 0;
-      filter: blur(15px);
-      transform: scale(0.92);
+      filter: blur(10px);
+      transform: scale(0.95);
     }
     50% {
       opacity: 0.7;
-      filter: blur(5px);
-      transform: scale(0.96);
+      filter: blur(3px);
+      transform: scale(0.98);
     }
     100% {
       opacity: 1;
@@ -33,33 +32,42 @@
     }
   }
   
-  /* Animation plus lente qui dure 3.5 secondes */
   .animate-smoke-in {
-    animation: smokeIn 3.5s ease-out forwards;
+    animation: smokeIn 3s ease-out forwards;
+    will-change: opacity, transform, filter;
   }
   
-  /* Animation pour les particules - plus lente */
+  /* Optimized particle animation with GPU acceleration */
   @keyframes particleDissolve {
     0% {
       opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1);
+      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     }
     50% {
       opacity: 0.5;
-      transform: translate3d(calc(var(--tx, 20px) * 0.5), calc(var(--ty, -30px) * 0.5), 0) scale(0.5);
+      transform: translate3d(calc(var(--tx, 20px) * 0.5), 
+                            calc(var(--ty, -30px) * 0.5), 
+                            calc(var(--tz, 0px) * 0.5))
+                 scale(0.5)
+                 rotate(calc(var(--rx, 180deg) * 0.5));
     }
     100% {
       opacity: 0;
-      transform: translate3d(var(--tx, 20px), var(--ty, -30px), 0) scale(0);
+      transform: translate3d(var(--tx, 20px), 
+                            var(--ty, -30px), 
+                            var(--tz, 0px))
+                 scale(var(--s, 0))
+                 rotate(var(--rx, 180deg));
     }
   }
   
-  /* Durée d'animation de 3 secondes minimum */
+  /* Optimize with GPU acceleration and reduced animation complexity */
   .particle {
-    animation: particleDissolve 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: particleDissolve 3s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    will-change: transform, opacity;
   }
   
-  /* Styles généraux */
+  /* General styles */
   body {
     background-color: black;
     color: white;
@@ -67,7 +75,6 @@
     min-height: 100vh;
   }
   
-  /* Autres styles existants */
   /* Styles for reveal animation */
   .reveal {
     opacity: 0;

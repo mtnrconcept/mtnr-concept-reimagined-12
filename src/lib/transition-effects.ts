@@ -1,281 +1,262 @@
+/**
+ * Optimized version of particle effects for page transitions
+ * Creates a dust-like dispersion effect for page content
+ */
+
+// Helper function to get a random value within a range
+const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
 /**
- * Crée un effet de particules sur chaque élément de la page qui disparaît
- * @param container L'élément DOM contenant la page qui va disparaître
+ * Creates an optimized particle dispersion effect for page transitions
+ * @param container The element DOM container whose content will be dispersed
  */
 export function createParticleEffect(container: HTMLElement | null) {
   if (!container) return;
   
-  // Trouver tous les éléments visibles à l'intérieur du conteneur
-  const elements = Array.from(container.querySelectorAll('*')).filter(el => {
-    const rect = el.getBoundingClientRect();
-    const style = window.getComputedStyle(el);
-    return rect.width > 10 && 
-           rect.height > 10 && 
-           style.display !== 'none' && 
-           style.visibility !== 'hidden' &&
-           style.opacity !== '0';
-  });
-  
-  // Limiter le nombre d'éléments pour éviter les problèmes de performance
-  const targetElements = elements.slice(0, 30);
-  
-  // Conteneur principal pour toutes les particules
+  // Create a container for all particles
   const particleContainer = document.createElement('div');
   particleContainer.className = 'fixed inset-0 pointer-events-none z-50';
   document.body.appendChild(particleContainer);
   
-  // Traiter chaque élément
-  targetElements.forEach(element => {
+  // Capture positions of visible elements for targeted particle generation
+  const visibleElements = Array.from(container.querySelectorAll('*'))
+    .filter(el => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 5 && rect.height > 5 && rect.top < window.innerHeight && rect.bottom > 0;
+    })
+    .slice(0, 25); // Limit to 25 elements max for better performance
+  
+  // Pre-calculate canvases for better performance
+  const canvases = visibleElements.map(element => {
     const rect = element.getBoundingClientRect();
+    const elementCanvas = document.createElement('canvas');
+    elementCanvas.width = rect.width;
+    elementCanvas.height = rect.height;
     
-    // Si l'élément est trop petit, on l'ignore
-    if (rect.width < 20 || rect.height < 20) return;
-    
-    // Le nombre de particules dépend de la taille de l'élément
-    const area = rect.width * rect.height;
-    const particleCount = Math.min(300, Math.floor(area / 250));
-    
-    // Essayer de capturer une image de l'élément pour les particules
-    let elementImage = null;
-    try {
-      // Utiliser html2canvas si disponible (non inclus dans ce code)
-      // Dans cette version simplifiée, on utilisera des particules de couleurs
-    } catch (e) {
-      console.error("Erreur lors de la capture de l'élément:", e);
-    }
-    
-    // Créer un groupe de particules pour cet élément
-    const elementContainer = document.createElement('div');
-    elementContainer.style.position = 'absolute';
-    elementContainer.style.left = rect.left + 'px';
-    elementContainer.style.top = rect.top + 'px';
-    elementContainer.style.width = rect.width + 'px';
-    elementContainer.style.height = rect.height + 'px';
-    elementContainer.style.overflow = 'visible';
-    elementContainer.style.zIndex = '9999';
-    particleContainer.appendChild(elementContainer);
-    
-    // Créer les particules
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      
-      // Position aléatoire à l'intérieur de l'élément
-      const x = Math.random() * rect.width;
-      const y = Math.random() * rect.height;
-      
-      // Taille aléatoire entre 1 et 5 pixels
-      const size = 1 + Math.random() * 4;
-      
-      // Essayer d'extraire la couleur de l'élément ou utiliser une couleur du thème
-      let color;
-      try {
-        const computedStyle = window.getComputedStyle(element as Element);
-        color = computedStyle.color || computedStyle.backgroundColor;
-        
-        // Si la couleur est transparente ou non définie, utiliser le jaune (thème)
-        if (color === 'transparent' || color === 'rgba(0, 0, 0, 0)') {
-          color = Math.random() > 0.3 ? '#FFD700' : '#FFF';
-        }
-      } catch (e) {
-        color = Math.random() > 0.3 ? '#FFD700' : '#FFF'; // Jaune ou blanc par défaut
-      }
-      
-      particle.style.position = 'absolute';
-      particle.style.left = `${x}px`;
-      particle.style.top = `${y}px`;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.backgroundColor = color;
-      particle.style.borderRadius = '50%';
-      particle.style.opacity = '1';
-      particle.style.zIndex = '9999';
-      particle.style.willChange = 'transform, opacity';
-      
-      // Animation avec requestAnimationFrame
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 1 + Math.random() * 5;
-      const lifetime = 3000 + Math.random() * 1000; // 3-4 secondes
-      const startTime = performance.now();
-      
-      elementContainer.appendChild(particle);
-      
-      // Animer la particule
-      function animateParticle() {
-        const elapsed = performance.now() - startTime;
-        const progress = elapsed / lifetime;
-        
-        if (progress >= 1) {
-          particle.remove();
-          return;
-        }
-        
-        // Formules avancées pour un mouvement plus organique
-        const easeOutQuint = 1 - Math.pow(1 - progress, 5);
-        const translateX = Math.cos(angle) * speed * elapsed * 0.1 * easeOutQuint;
-        const translateY = Math.sin(angle) * speed * elapsed * 0.1 * easeOutQuint - 
-                           (progress * progress * 25); // Ajout d'un effet de gravité
-        
-        // Ajouter une légère rotation
-        const rotate = (progress * 720 * (Math.random() > 0.5 ? 1 : -1)) % 360;
-        
-        // Scale qui diminue progressivement
-        const scale = Math.max(0, 1 - progress * 1.2);
-        
-        // Opacité qui diminue vers la fin
-        const opacity = Math.max(0, 1 - Math.pow(progress, 2));
-        
-        // Appliquer les transformations
-        particle.style.transform = `translate3D(${translateX}px, ${translateY}px, 0) 
-                                   rotate(${rotate}deg) scale(${scale})`;
-        particle.style.opacity = opacity.toString();
-        
-        requestAnimationFrame(animateParticle);
-      }
-      
-      requestAnimationFrame(animateParticle);
-    }
+    return {
+      element,
+      rect,
+      canvas: elementCanvas,
+      position: { x: rect.left, y: rect.top },
+      size: { width: rect.width, height: rect.height }
+    };
   });
   
-  // Nettoyer après l'animation
+  // Create element group containers up front (batching DOM operations)
+  const elementGroups = canvases.map(({ position, size }) => {
+    const group = document.createElement('div');
+    group.style.position = 'absolute';
+    group.style.left = `${position.x}px`;
+    group.style.top = `${position.y}px`;
+    group.style.width = `${size.width}px`;
+    group.style.height = `${size.height}px`;
+    group.style.overflow = 'visible';
+    particleContainer.appendChild(group);
+    return group;
+  });
+  
+  // Generate particles in batches
+  canvases.forEach(({ size, rect }, index) => {
+    const group = elementGroups[index];
+    const element = canvases[index].element;
+    
+    // Dynamically adjust particle count based on element size (but keep it reasonable)
+    const area = size.width * size.height;
+    const particleCount = Math.min(Math.floor(area / 600), 100);
+    
+    // Get element style information
+    const computedStyle = window.getComputedStyle(element as Element);
+    let baseColor = computedStyle.color;
+    if (baseColor === 'transparent' || baseColor === 'rgba(0, 0, 0, 0)') {
+      baseColor = Math.random() > 0.3 ? '#FFD700' : '#FFF'; // Yellow or white theme
+    }
+    
+    // Use DocumentFragment for batch append
+    const fragment = document.createDocumentFragment();
+    
+    // Create particles in one batch
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      
+      // Use hardware-accelerated properties
+      const x = random(0, size.width);
+      const y = random(0, size.height);
+      const size = random(1, 3);
+      
+      // Create initial styles with transforms
+      particle.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        top: ${y}px;
+        width: ${size}px;
+        height: ${size}px;
+        background-color: ${baseColor};
+        border-radius: 50%;
+        will-change: transform, opacity;
+        --tx: ${random(-100, 100)}px;
+        --ty: ${random(-100, 100)}px;
+        --tz: ${random(-20, 20)}px;
+        --rx: ${random(-180, 180)}deg;
+        --ry: ${random(-180, 180)}deg;
+        --s: ${random(0, 0.8)};
+      `;
+      
+      fragment.appendChild(particle);
+    }
+    
+    // Add all particles at once
+    group.appendChild(fragment);
+  });
+  
+  // Gradually hide the original container
+  if (container) {
+    container.style.transition = 'opacity 0.3s ease-out';
+    container.style.opacity = '0';
+  }
+  
+  // Set timeout to remove particles container when animation is complete
   setTimeout(() => {
     particleContainer.remove();
-  }, 4500); // Un peu plus que la durée de vie max des particules
-  
-  // Cacher le conteneur original après un court délai
-  setTimeout(() => {
-    if (container) {
-      container.style.opacity = '0';
-    }
-  }, 100);
+  }, 4000); // Slightly longer than animation duration to ensure all particles are gone
 }
 
 /**
- * Crée un effet de fumée sur un élément qui apparaît
- * @param element L'élément DOM qui apparaît
+ * Creates an optimized smoke-like effect for incoming content
+ * @param element The element to apply the smoke effect to
  */
 export function createSmokeEffect(element: HTMLElement | null) {
   if (!element) return;
   
-  // Conteneur pour l'effet de fumée
+  // Create a container for the smoke effect
   const smokeContainer = document.createElement('div');
-  smokeContainer.className = 'fixed inset-0 pointer-events-none z-40 overflow-hidden';
+  smokeContainer.className = 'fixed inset-0 pointer-events-none z-40';
   document.body.appendChild(smokeContainer);
   
-  // Obtenir la position et dimensions de l'élément
+  // Get element position
   const rect = element.getBoundingClientRect();
   
-  // Créer plusieurs nuages de fumée à différentes positions
-  const smokeCount = 25; // Augmenter pour plus de densité
-  const smokeDuration = 3500; // 3.5 secondes
+  // Use fewer smoke particles
+  const smokeCount = 15;
+  const smokeDuration = 3000; // 3 seconds
+  
+  // Create smoke particles in batch using DocumentFragment
+  const fragment = document.createDocumentFragment();
   
   for (let i = 0; i < smokeCount; i++) {
     const smoke = document.createElement('div');
     
-    // Position calculée pour couvrir l'élément de manière plus uniforme
-    const gridCols = Math.ceil(Math.sqrt(smokeCount));
-    const gridIndex = i % gridCols;
-    const gridRow = Math.floor(i / gridCols);
+    // Strategic placement around element
+    const x = rect.left + rect.width * (i % 5) / 5 + random(-20, 20);
+    const y = rect.top + rect.height * Math.floor(i / 5) / 3 + random(-20, 20);
     
-    const cellWidth = rect.width / gridCols;
-    const cellHeight = rect.height / gridCols;
-    
-    // Position avec un peu de randomisation pour l'aspect naturel
-    const x = rect.left + (gridIndex * cellWidth) + (Math.random() * cellWidth * 0.8 - cellWidth * 0.4);
-    const y = rect.top + (gridRow * cellHeight) + (Math.random() * cellHeight * 0.8 - cellHeight * 0.4);
-    
-    // Taille variable selon la position (plus gros au centre)
+    // Calculate size based on position (center = larger)
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
     const distanceFromCenter = Math.sqrt(
-      Math.pow((x - (rect.left + rect.width/2)) / (rect.width/2), 2) + 
-      Math.pow((y - (rect.top + rect.height/2)) / (rect.height/2), 2)
+      Math.pow((x - centerX) / (rect.width / 2), 2) + 
+      Math.pow((y - centerY) / (rect.height / 2), 2)
     );
     const sizeMultiplier = 1 - Math.min(0.6, distanceFromCenter * 0.6);
-    const size = (40 + Math.random() * 80) * sizeMultiplier;
+    const size = (30 + random(20, 60)) * sizeMultiplier;
     
-    smoke.style.position = 'absolute';
-    smoke.style.left = `${x}px`;
-    smoke.style.top = `${y}px`;
-    smoke.style.width = `${size}px`;
-    smoke.style.height = `${size}px`;
-    smoke.style.borderRadius = '50%';
-    
-    // Déterminer la couleur (principalement jaune/blanc mais avec opacité variable)
-    const useYellow = Math.random() > 0.3;
+    // Use the theme colors
+    const useYellow = random(0, 1) > 0.3;
     const color = useYellow ? 
-      `rgba(255, 215, 0, ${0.05 + Math.random() * 0.2})` : 
-      `rgba(255, 255, 255, ${0.05 + Math.random() * 0.15})`;
+      `rgba(255, 215, 0, ${0.1 + random(0, 0.15)})` : 
+      `rgba(255, 255, 255, ${0.1 + random(0, 0.1)})`;
     
-    smoke.style.background = `radial-gradient(circle, ${color} 0%, rgba(0,0,0,0) 70%)`;
-    smoke.style.opacity = '0';
-    smoke.style.filter = 'blur(8px)';
-    smoke.style.transform = 'scale(0.6)';
-    smoke.style.willChange = 'transform, opacity';
+    // Apply efficient styles
+    smoke.style.cssText = `
+      position: absolute;
+      left: ${x}px;
+      top: ${y}px;
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: 50%;
+      background: radial-gradient(circle, ${color} 0%, rgba(0,0,0,0) 70%);
+      opacity: 0;
+      filter: blur(5px);
+      transform: scale(0.6);
+      will-change: transform, opacity;
+    `;
     
-    // Délai variable pour que les particules n'apparaissent pas toutes en même temps
-    const delay = Math.random() * 600;
-    const duration = smokeDuration - delay;
-    const startTime = performance.now() + delay;
+    // Animation data as attributes for requestAnimationFrame
+    smoke.dataset.startTime = (performance.now() + random(0, 400)).toString();
+    smoke.dataset.duration = (smokeDuration - random(0, 500)).toString();
     
-    smokeContainer.appendChild(smoke);
+    fragment.appendChild(smoke);
+  }
+  
+  // Add all smoke elements at once
+  smokeContainer.appendChild(fragment);
+  
+  // Animate smoke particles with requestAnimationFrame for better performance
+  const smokeElements = Array.from(smokeContainer.children) as HTMLElement[];
+  
+  // Single animation loop for all particles
+  function animateSmoke(timestamp: number) {
+    let allComplete = true;
     
-    // Animer la fumée
-    function animateSmoke() {
-      const now = performance.now();
-      if (now < startTime) {
-        requestAnimationFrame(animateSmoke);
+    smokeElements.forEach(smoke => {
+      const startTime = parseFloat(smoke.dataset.startTime || '0');
+      const duration = parseFloat(smoke.dataset.duration || '3000');
+      
+      if (timestamp < startTime) {
+        allComplete = false;
         return;
       }
       
-      const elapsed = now - startTime;
+      const elapsed = timestamp - startTime;
       const progress = Math.min(1, elapsed / duration);
       
-      if (progress >= 1) {
-        smoke.remove();
-        return;
-      }
-      
-      // Animation avec une courbe d'entrée/sortie plus douce
-      let opacity;
-      if (progress < 0.4) {
-        // Entrée plus progressive
-        opacity = progress / 0.4;
+      if (progress < 1) {
+        allComplete = false;
+        
+        // Animation curve
+        let opacity;
+        if (progress < 0.4) {
+          opacity = progress / 0.4;
+        } else {
+          opacity = 1 - ((progress - 0.4) / 0.6);
+        }
+        
+        // Simplified movement calculations
+        const floatX = Math.sin(progress * Math.PI * 2) * 3;
+        const floatY = Math.cos(progress * Math.PI * 2) * 2;
+        const scale = 0.6 + (progress < 0.7 ? progress * 0.6 : 0.42);
+        
+        smoke.style.opacity = (opacity * opacity).toString(); // quadratic easing
+        smoke.style.transform = `scale(${scale}) translate(${floatX}px, ${floatY}px)`;
       } else {
-        // Sortie plus lente
-        opacity = 1 - ((progress - 0.4) / 0.6);
+        // Remove completed elements
+        smoke.remove();
+        // Remove from array
+        const index = smokeElements.indexOf(smoke);
+        if (index > -1) {
+          smokeElements.splice(index, 1);
+        }
       }
-      
-      // Ajout d'un mouvement flottant
-      const floatX = Math.sin(progress * Math.PI * 2) * 5;
-      const floatY = Math.cos(progress * Math.PI * 3) * 3;
-      
-      // Scale qui augmente puis se stabilise
-      const scale = 0.6 + (progress < 0.7 ? progress * 0.8 : 0.56);
-      
-      // Flou qui diminue progressivement
-      const blur = Math.max(0, 8 - progress * 5);
-      
-      // Appliquer les transformations
-      smoke.style.opacity = (opacity * opacity * opacity).toString(); // Cubic easing
-      smoke.style.transform = `scale(${scale}) translate(${floatX}px, ${floatY}px)`;
-      smoke.style.filter = `blur(${blur}px)`;
-      
-      requestAnimationFrame(animateSmoke);
-    }
+    });
     
-    requestAnimationFrame(animateSmoke);
+    if (!allComplete && smokeElements.length > 0) {
+      requestAnimationFrame(animateSmoke);
+    } else {
+      setTimeout(() => {
+        smokeContainer.remove();
+      }, 500);
+    }
   }
   
-  // Faire apparaître progressivement l'élément
+  requestAnimationFrame(animateSmoke);
+  
+  // Show the element with fade in
   if (element) {
     element.style.opacity = '0';
+    element.style.transition = 'opacity 0.7s ease-in';
+    
     setTimeout(() => {
-      element.style.transition = 'opacity 1s ease-in';
       element.style.opacity = '1';
-    }, 800); // Commencer à apparaître après que la fumée soit visible
+    }, 300);
   }
-  
-  // Nettoyer après l'animation
-  setTimeout(() => {
-    smokeContainer.remove();
-  }, smokeDuration + 1000); // Un peu plus que la durée max pour s'assurer que tout est terminé
 }

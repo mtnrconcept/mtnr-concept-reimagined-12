@@ -9,28 +9,36 @@ export default function PageTransitionEffect() {
   const contentRef = useRef<HTMLElement | null>(null);
   
   useEffect(() => {
-    // Trouver le conteneur principal de la page
+    // Find the main content container
     const mainContent = document.querySelector('main');
     if (!mainContent) return;
     
     contentRef.current = mainContent;
     
-    // Si c'est un changement de route (pas le chargement initial)
+    // If this is a route change (not initial load)
     if (prevPathRef.current !== location.pathname) {
-      // Appliquer l'effet de particules sur l'ancien contenu
-      createParticleEffect(contentRef.current);
+      // Apply particle effect to previous content
+      // Using requestIdleCallback to not block rendering
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => {
+          createParticleEffect(contentRef.current);
+        }, { timeout: 100 });
+      } else {
+        setTimeout(() => {
+          createParticleEffect(contentRef.current);
+        }, 10);
+      }
       
-      // Attente plus longue pour permettre aux particules de se disperser avant d'afficher le nouveau contenu
-      // L'effet de dispersion prend maintenant entre 3-4 secondes
+      // Wait for particle effect to disperse before showing new content
       setTimeout(() => {
-        // Appliquer l'effet de fumée sur le nouveau contenu
+        // Apply smoke effect to new content
         createSmokeEffect(contentRef.current);
-      }, 1200); // Délai plus long pour laisser les particules commencer à se disperser
+      }, 600);
     }
     
     prevPathRef.current = location.pathname;
   }, [location.pathname]);
   
-  // Ce composant ne rend rien visuellement
+  // This component doesn't render anything visually
   return null;
 }

@@ -1,25 +1,11 @@
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ReactNode, useRef, useEffect } from "react";
+import { ReactNode, useRef } from "react";
 
-// Transition inspirée par David Langarica avec des particules et de la fumée
+// Optimized transition inspired by David Langarica with improved performance
 export default function PageTransition({ children, keyId }: { children: ReactNode; keyId: string }) {
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Effet pour initialiser les particules lors du changement de page
-  useEffect(() => {
-    if (!contentRef.current) return;
-    
-    // Ajout de classe pour l'animation d'apparition
-    contentRef.current.classList.add('animate-smoke-in');
-    
-    return () => {
-      if (contentRef.current) {
-        contentRef.current.classList.remove('animate-smoke-in');
-      }
-    };
-  }, [keyId]);
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -28,8 +14,7 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
         animate={{ opacity: 1 }}
         exit={{ 
           opacity: 0,
-          filter: "blur(8px)",
-          transition: { duration: 3.5 } // Durée plus longue pour correspondre à l'animation des particules
+          transition: { duration: 0.4 } // Reduced duration for better performance
         }}
         className="page-content-wrapper"
         style={{ 
@@ -38,19 +23,13 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
           position: "relative",
           zIndex: 10
         }}
-        onAnimationComplete={() => {
-          // Animation terminée
-          if (contentRef.current) {
-            contentRef.current.classList.add('animation-completed');
-          }
-        }}
       >
-        {/* Conteneur pour le contenu de la page avec effet de particules/fumée */}
+        {/* Container for page content with particle/smoke effect */}
         <motion.div
           ref={contentRef}
           initial={{ 
             opacity: 0,
-            y: 20,
+            y: 10,
           }}
           animate={{ 
             opacity: 1,
@@ -58,25 +37,24 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
           }}
           exit={{
             opacity: 0,
-            filter: "blur(10px)",
-            y: -20,
+            y: -10,
             transition: {
-              duration: 3.0, // Animation de sortie de 3 secondes
+              duration: 0.3, // Fast exit for better perceived performance
               ease: [0.25, 1, 0.5, 1],
             }
           }}
           transition={{
-            duration: 3.5, // Animation d'entrée de 3.5 secondes
+            duration: 0.8, // Shorter entry animation
             ease: [0.25, 1, 0.5, 1],
           }}
           className="particles-container"
         >
           {children}
           
-          {/* Couche d'effet de particules pour la sortie */}
+          {/* Layer for particle exit effect */}
           <div className="absolute inset-0 pointer-events-none particles-exit-layer" />
           
-          {/* Couche d'effet de fumée pour l'entrée */}
+          {/* Layer for smoke enter effect */}
           <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
         </motion.div>
       </motion.div>
