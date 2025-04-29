@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -33,9 +34,9 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
   useFrame(() => {
     if (!lightRef.current) return;
     
-    // Convert normalized mouse coords to world space
+    // Convert normalized mouse coords to world space - Fixed the index access
     const vector = new THREE.Vector3(
-      mouse.current[0.1] * 5,
+      mouse.current[0] * 5,  // Changed from 0.1 to 0
       mouse.current[1] * 5,
       10
     ).unproject(camera);
