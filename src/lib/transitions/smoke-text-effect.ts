@@ -293,6 +293,9 @@ function createParticle(
   
   // Direction de la dispersion
   let dirX = 0, dirY = 0;
+  // Déclarer la variable force avant le switch pour éviter les redéclarations
+  let force = 0;
+  let angle = 0;
   
   switch(direction) {
     case 'up':
@@ -314,15 +317,15 @@ function createParticle(
     case 'custom':
       // Convertir l'angle en radians
       const angleRad = (customAngle * Math.PI) / 180;
-      const force = (1 + Math.random() * 0.5) * speed;
+      force = (1 + Math.random() * 0.5) * speed;
       dirX = Math.cos(angleRad) * force;
       dirY = Math.sin(angleRad) * force;
       break;
     case 'radial':
     default:
       // Direction radiale depuis le centre
-      const angle = Math.random() * Math.PI * 2;
-      const force = (0.5 + Math.random() * 1.5) * speed;
+      angle = Math.random() * Math.PI * 2;
+      force = (0.5 + Math.random() * 1.5) * speed;
       dirX = Math.cos(angle) * force;
       dirY = Math.sin(angle) * force;
       break;
