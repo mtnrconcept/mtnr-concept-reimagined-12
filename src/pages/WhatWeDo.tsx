@@ -1,13 +1,10 @@
+
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
-import { UVLamp } from "@/components/effects/UVLamp";
-import { useUVMode } from "@/components/effects/UVModeContext";
-import { useTorch } from "@/components/effects/TorchContext";
-import UVSecretMessage from "@/components/effects/UVSecretMessage";
 
 export default function WhatWeDo() {
   // Force scroll to top on page load
@@ -15,17 +12,10 @@ export default function WhatWeDo() {
     window.scrollTo(0, 0);
   }, []);
 
-  const { uvMode } = useUVMode();
-  const { isTorchActive } = useTorch();
-
   return <ParallaxBackground>
       <div className="relative z-10 min-h-screen">
         <Navbar />
-        
-        {/* Espace pour le logo - même taille que dans les autres pages */}
-        <div className="logo-container flex justify-center items-start pt-32 sm:pt-36 md:pt-40"></div>
-        
-        <main className="min-h-screen w-full flex flex-col items-center pt-6 xs:pt-8 md:pt-10 pb-16 px-3 xs:px-6 font-grunge">
+        <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
             <div className="relative px-[103px]">
               <NeonText text="Notre Vibe" className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center" color="yellow" flicker={true} />
@@ -70,31 +60,7 @@ export default function WhatWeDo() {
               </span>
             </div>
           </div>
-          
-          {/* Hidden UV messages that appear only with the UV lamp */}
-          <UVSecretMessage 
-            message="RÉUNION SECRÈTE - JEUDI - 22H - PARKING NORD"
-            position={{ x: 75, y: 65 }}
-            fontSize="1rem"
-            color="#D2FF3F"
-          />
-          
-          <UVSecretMessage 
-            message="CODE D'ACCÈS STUDIO B: 7294"
-            position={{ x: 20, y: 40 }}
-            fontSize="0.9rem"
-            color="#9b87f5"
-            rotation={-5}
-          />
         </main>
-        
-        {/* Use the UVLamp component with custom radius */}
-        {uvMode && isTorchActive && (
-          <UVLamp
-            lampRadius={500}
-            showUVLogo={true}
-          />
-        )}
       </div>
     </ParallaxBackground>;
 }

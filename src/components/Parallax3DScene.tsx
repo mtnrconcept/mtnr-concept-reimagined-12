@@ -5,7 +5,6 @@ import { useUVMode } from './effects/UVModeContext';
 import { parallaxElements } from './parallax/config';
 import { PaintSplash } from './parallax/PaintSplash';
 import UVSecretMessage from './effects/UVSecretMessage';
-import { Light } from './parallax/Light';
 
 export default function Parallax3DScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,9 +12,9 @@ export default function Parallax3DScene() {
   
   // Use enhanced 3D parallax effect
   use3DParallax(containerRef, {
-    strength: uvMode ? 65 : 45,  // Plus fort en mode UV
+    strength: 45,
     perspective: 1000,
-    easing: uvMode ? 0.06 : 0.08  // Plus réactif en mode UV
+    easing: 0.08
   });
   
   // Add subtle animation to elements on mount
@@ -41,13 +40,13 @@ export default function Parallax3DScene() {
         zIndex: 0
       }}
     >
-      {/* Background with blending modes - using the stairs image in both modes */}
+      {/* Background with blending modes */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-90"
         data-depth="0.05"
         style={{ 
           backgroundImage: `url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png")`,
-          filter: uvMode ? 'contrast(1.2) brightness(0.9) saturate(1.3)' : 'contrast(1.1) brightness(1.05)',
+          filter: 'contrast(1.1) brightness(1.05)',
           transition: 'all 0.5s ease-out',
         }}
       />
@@ -57,8 +56,8 @@ export default function Parallax3DScene() {
         className="absolute inset-0 bg-gradient-radial from-transparent to-black/60 pointer-events-none"
         data-depth="0.02"
         style={{
-          opacity: uvMode ? 0.85 : 0.7,
-          mixBlendMode: uvMode ? 'color-dodge' : 'multiply'
+          opacity: 0.7,
+          mixBlendMode: 'multiply'
         }}
       />
       
@@ -67,12 +66,9 @@ export default function Parallax3DScene() {
         className="absolute inset-0 opacity-10"
         data-depth="0.1"
         style={{
-          backgroundImage: uvMode 
-            ? 'linear-gradient(rgba(0, 170, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 170, 255, 0.2) 1px, transparent 1px)' 
-            : 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
-          backgroundSize: uvMode ? '30px 30px' : '40px 40px', 
-          mixBlendMode: 'overlay',
-          animation: uvMode ? 'grid-pulse 8s infinite alternate' : 'none'
+          backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
+          backgroundSize: '40px 40px', 
+          mixBlendMode: 'overlay'
         }}
       />
       
@@ -104,8 +100,7 @@ export default function Parallax3DScene() {
               backgroundImage: 'radial-gradient(circle at 30% 20%, #4FA9FF 0%, transparent 5%), radial-gradient(circle at 70% 60%, #D2FF3F 0%, transparent 5%)',
               backgroundSize: '300px 300px',
               opacity: 0.6,
-              mixBlendMode: 'screen',
-              animation: 'uv-pulse 4s infinite alternate'
+              mixBlendMode: 'screen'
             }}
           />
           
@@ -119,34 +114,6 @@ export default function Parallax3DScene() {
               opacity: 0.2,
               mixBlendMode: 'screen'
             }}
-          />
-          
-          {/* Floating UV lights */}
-          <Light 
-            x={25} 
-            y={30} 
-            depth={0.15} 
-            size={100} 
-            glow="rgba(0, 170, 255, 0.3)" 
-            className="animate-pulse-slow" 
-          />
-          
-          <Light 
-            x={75} 
-            y={65} 
-            depth={0.25} 
-            size={150} 
-            glow="rgba(210, 255, 63, 0.3)" 
-            className="animate-pulse" 
-          />
-          
-          <Light 
-            x={50} 
-            y={20} 
-            depth={0.1} 
-            size={80} 
-            glow="rgba(255, 0, 221, 0.3)" 
-            className="animate-float" 
           />
           
           {/* UV secret messages */}

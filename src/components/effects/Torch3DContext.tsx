@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -24,19 +23,19 @@ const TorchLight = ({ mouse }: { mouse: React.MutableRefObject<[number, number]>
 
   useEffect(() => {
     if (lightRef.current) {
-      lightRef.current.shadow.mapSize.width = 204;
-      lightRef.current.shadow.mapSize.height = 204;
+      lightRef.current.shadow.mapSize.width = 2048;
+      lightRef.current.shadow.mapSize.height = 2048;
       lightRef.current.shadow.camera.near = 0.5;
-      lightRef.current.shadow.camera.far = 0.5;
+      lightRef.current.shadow.camera.far = 50;
     }
   }, []);
 
   useFrame(() => {
     if (!lightRef.current) return;
     
-    // Convert normalized mouse coords to world space - Fixed the index access
+    // Convert normalized mouse coords to world space
     const vector = new THREE.Vector3(
-      mouse.current[0] * 5,  // Changed from 0.1 to 0
+      mouse.current[0] * 5,
       mouse.current[1] * 5,
       10
     ).unproject(camera);

@@ -9,6 +9,7 @@ import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
+import { Torch3DProvider } from "./components/effects/Torch3DContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -22,8 +23,9 @@ import { checkFeatureSupport } from "@/lib/feature-detection";
 // Component to display UV label
 const UVCornerLabel = () => {
   const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
   
-  if (!uvMode) return null;
+  if (!isTorchActive || !uvMode) return null;
   
   return (
     <div className="uv-corner-label">UV</div>
@@ -59,48 +61,22 @@ function AnimatedRoutes() {
   );
 }
 
-// Suiveur de curseur pour mettre à jour les variables CSS utilisées par le masque UV
-const MouseTracker = () => {
-  const { mousePosition, isTorchActive } = useTorch();
-  const { uvMode } = useUVMode();
-
-  useEffect(() => {
-    if (isTorchActive || uvMode) {
-      const updatePosition = () => {
-        document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
-        document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
-        document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
-        document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
-        document.documentElement.style.setProperty('--cursor-x', `${mousePosition.x}px`);
-        document.documentElement.style.setProperty('--cursor-y', `${mousePosition.y}px`);
-      };
-      
-      updatePosition();
-      
-      // Pour un suivi plus fluide
-      window.addEventListener('mousemove', updatePosition);
-      return () => window.removeEventListener('mousemove', updatePosition);
-    }
-  }, [mousePosition, isTorchActive, uvMode]);
-
-  return null;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <UVModeProvider>
         <TorchProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={null}>
-              <AnimatedRoutes />
-            </Suspense>
-          </BrowserRouter>
-          <ParticleEffect />
-          <TorchToggle />
-          <MouseTracker />
+          <Torch3DProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={null}>
+                <AnimatedRoutes />
+              </Suspense>
+            </BrowserRouter>
+            <ParticleEffect />
+            <TorchToggle />
+          </Torch3DProvider>
         </TorchProvider>
       </UVModeProvider>
     </TooltipProvider>

@@ -7,7 +7,6 @@
     background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 80%);
     pointer-events: none;
     z-index: 50;
-    will-change: transform;
   }
 
   .flashlight-3d {
@@ -19,7 +18,6 @@
     pointer-events: none;
     z-index: 50;
     transform: translate(var(--cursor-x), var(--cursor-y));
-    will-change: transform;
   }
 
   /** Neon cursor effect */
@@ -34,116 +32,38 @@
     z-index: 1000;
     transform: translate(-50%, -50%);
     transition: transform 0.1s ease-out;
-    will-change: transform;
   }
   
-  /* Conteneur de logo commun pour une position cohérente */
-  .logo-container {
-    height: 220px; /* Hauteur fixe pour garantir la cohérence */
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  
-  /* UV light standard - optimisé avec will-change */
+  /* UV light circle - effet adouci comme demandé */
   .uv-light-circle {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
     pointer-events: none;
     z-index: 50;
-    will-change: mask, -webkit-mask;
-    animation: uv-vibration 4s infinite;
-    background-image: url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png");
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.7) contrast(1.1) saturate(1.3);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      rgba(70, 28, 252, 0.05) 0%,
+      rgba(15, 4, 48, 0.1) 20%,
+      rgba(10, 0, 60, 0.3) 40%,
+      rgba(0, 0, 0, 0.9) 80%
+    );
+    box-shadow: 0 0 300px 150px rgba(0, 120, 255, 0.1);
+    filter: blur(20px);
   }
   
-  /* Custom UV light circle with adjustable size */
-  .uv-light-custom {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 50;
-    background-color: rgba(10, 0, 60, 0.98);
-    animation: uv-vibration 4s infinite;
-    will-change: mask, -webkit-mask;
-  }
-  
-  /* Effet de vibration pour le mode UV - optimisé */
+  /* Effet de vibration pour le mode UV */
   @keyframes uv-vibration {
-    0% { 
-      --x: var(--mx); 
-      --y: var(--my); 
-    }
-    25% { 
-      --x: calc(var(--mx) - 5px); 
-      --y: calc(var(--my) + 5px); 
-    }
-    50% { 
-      --x: calc(var(--mx) + 5px); 
-      --y: calc(var(--my) - 5px); 
-    }
-    75% { 
-      --x: calc(var(--mx) + 3px); 
-      --y: calc(var(--my) + 3px); 
-    }
-    100% { 
-      --x: var(--mx); 
-      --y: var(--my); 
-    }
-  }
-
-  /* Effet de torche inversé pour le mode UV (pour montrer le logo UV) */
-  .uv-inverse-mask {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 45; /* En dessous du masque UV mais au-dessus du contenu normal */
-    will-change: mask, -webkit-mask;
-    background-image: url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png");
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.8) contrast(1.2) saturate(1.3);
-  }
-
-  /* Modernisé: torche standard avec rayon plus large */
-  .standard-torch {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 50;
-    background-color: rgba(0, 0, 0, 0.95);
-    will-change: mask, -webkit-mask;
-    transition: mask 0.2s ease-out, -webkit-mask 0.2s ease-out;
+    0% { transform: translate(-50%, -50%) scale(1); }
+    25% { transform: translate(-50.5%, -49.5%) scale(1.01); }
+    50% { transform: translate(-49.5%, -50.5%) scale(0.99); }
+    75% { transform: translate(-50.2%, -49.8%) scale(1.005); }
+    100% { transform: translate(-50%, -50%) scale(1); }
   }
   
-  /* Nouvelles animations pour le mode UV */
-  @keyframes uv-pulse {
-    0% { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 0.8; transform: scale(1.05); }
-  }
-  
-  @keyframes grid-pulse {
-    0% { opacity: 0.1; }
-    50% { opacity: 0.15; }
-    100% { opacity: 0.1; }
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  .animate-float {
-    animation: float 10s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
+  .uv-light-circle.active {
+    animation: uv-vibration 4s infinite;
   }
 }

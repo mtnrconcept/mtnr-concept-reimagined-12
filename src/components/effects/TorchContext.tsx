@@ -13,7 +13,7 @@ interface TorchContextType {
 const TorchContext = createContext<TorchContextType>({
   isTorchActive: false,
   setIsTorchActive: () => {},
-  mousePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+  mousePosition: { x: 0, y: 0 },
   updateMousePosition: () => {},
   containerRef: { current: null },
 });
@@ -22,60 +22,35 @@ export const useTorch = () => useContext(TorchContext);
 
 export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { 
     uvMode, 
     uvCircleRef, 
     createUVCircle, 
-    removeUVCircle,
-    toggleUVMode
+    removeUVCircle 
   } = useUVMode();
-
-  // Fonction modifiée pour gérer les transitions entre modes
-  const handleTorchActivation = (active: boolean) => {
-    // Si on active la torche et qu'on est en mode UV, désactiver le mode UV
-    if (active && uvMode) {
-      toggleUVMode(); // Désactiver le mode UV
-      setTimeout(() => {
-        setIsTorchActive(true); // Activer la torche normale après un court délai
-      }, 100);
-    } 
-    // Sinon, simplement activer/désactiver la torche
-    else {
-      setIsTorchActive(active);
-    }
-  };
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
     
     // Update UV circle position if active
     if (uvCircleRef.current && uvMode) {
-      document.documentElement.style.setProperty('--mx', `${position.x}px`);
-      document.documentElement.style.setProperty('--my', `${position.y}px`);
+      uvCircleRef.current.style.left = `${position.x}px`;
+      uvCircleRef.current.style.top = `${position.y}px`;
     }
   };
 
-  // Handle mouse movement with improved performance
+  // Handle mouse movement
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isTorchActive) {
-        // Utilisation de requestAnimationFrame pour limiter les mises à jour
-        window.requestAnimationFrame(() => {
-          updateMousePosition({ x: e.clientX, y: e.clientY });
-        });
+        updateMousePosition({ x: e.clientX, y: e.clientY });
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    
-    // En cas d'écran noir, on force un mouvement initial de souris
-    if (isTorchActive) {
-      updateMousePosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-    }
-
+    window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
@@ -90,18 +65,11 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       removeUVCircle();
     };
-  }, [isTorchActive, uvMode, createUVCircle, removeUVCircle]);
-
-  // Assurer que les deux modes ne sont jamais actifs simultanément
-  useEffect(() => {
-    if (uvMode && isTorchActive) {
-      setIsTorchActive(false); // Désactiver la torche normale si le mode UV est activé
-    }
-  }, [uvMode]);
+  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
 
   const contextValue = {
     isTorchActive,
-    setIsTorchActive: handleTorchActivation,
+    setIsTorchActive,
     mousePosition,
     updateMousePosition,
     containerRef,
@@ -112,13 +80,30 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       <div ref={containerRef} className="torch-container relative w-full h-full overflow-hidden">
         {children}
         {isTorchActive && !uvMode && (
-          <div 
-            className="standard-torch"
-            style={{
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 500px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 500px)`
-            }}
-          />
+          <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
+            <defs>
+              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="black" stopOpacity="0" />
+                <stop offset="70%" stopColor="black" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.95" />
+              </radialGradient>
+              <mask id="torch-mask">
+                <rect width="100%" height="100%" fill="white" />
+                <circle
+                  cx={mousePosition.x}
+                  cy={mousePosition.y}
+                  r={800}
+                  fill="url(#torch-gradient)"
+                />
+              </mask>
+            </defs>
+            <rect
+              width="100%"
+              height="100%"
+              fill="rgba(0, 0, 0, 0.95)"
+              mask="url(#torch-mask)"
+            />
+          </svg>
         )}
       </div>
     </TorchContext.Provider>

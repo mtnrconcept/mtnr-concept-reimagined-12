@@ -9,7 +9,6 @@ import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
-import { UVLamp } from "@/components/effects/UVLamp";
 
 export default function Home() {
   const { uvMode } = useUVMode();
@@ -46,14 +45,6 @@ export default function Home() {
     <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
       {/* Enhanced 3D parallax background */}
       <Parallax3DScene />
-      
-      {/* Logo UV qui apparaît en mode UV */}
-      {uvMode && (
-        <UVLamp 
-          lampRadius={300}
-          showUVLogo={true}
-        />
-      )}
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />

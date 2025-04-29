@@ -3,13 +3,11 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { DispersingLogo } from './DispersingLogo';
 import { useLocation } from 'react-router-dom';
-import { useUVMode } from '../effects/UVModeContext';
 
 export const NeonLogo = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
   const [shouldDisperse, setShouldDisperse] = useState(false);
   const location = useLocation();
-  const { uvMode } = useUVMode();
   
   // Effet de scintillement du néon
   useEffect(() => {
@@ -37,13 +35,8 @@ export const NeonLogo = () => {
     }, 2000);
   };
   
-  // Si le mode UV est actif, ne pas afficher ce logo normal
-  if (uvMode) {
-    return null;
-  }
-  
   return (
-    <div className="logo-container w-full flex justify-center items-center pt-32 sm:pt-36 md:pt-40 relative z-30">
+    <div className="w-full flex justify-center items-center py-12 relative z-30">
       <div 
         className={cn(
           "relative w-[500px] max-w-[90vw]",
