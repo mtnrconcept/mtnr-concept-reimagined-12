@@ -53,7 +53,7 @@ export function createLogo3DDisperseEffect(
   targetElement.style.opacity = '0';
   
   // Lancer l'animation
-  const cleanupAnimation = animateParticles(
+  const { cleanupAnimation } = animateParticles(
     particleSystem.material, 
     threeContext, 
     duration, 
@@ -310,7 +310,7 @@ function animateParticles(
   threeContext: ThreeContext, 
   duration: number,
   onCompleteCallback: () => void
-): { cleanupAnimation: () => void } {
+) {
   const startTime = performance.now();
   const endTime = startTime + duration + 500; // +500ms pour terminer les animations décalées
   

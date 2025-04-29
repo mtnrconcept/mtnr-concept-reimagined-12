@@ -6,7 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
-import { Logo3DEffect } from "@/components/home/Logo3DEffect";
+import { SmokeLogoEffect } from "@/components/home/SmokeLogoEffect";
 
 export default function Home() {
   useEffect(() => {
@@ -45,8 +45,8 @@ export default function Home() {
         <Navbar />
         
         <main id="main-content" className="min-h-screen w-full pt-16">
-          {/* Remplacer NeonLogo par notre Logo3DEffect */}
-          <Logo3DEffect />
+          {/* Utiliser notre nouvel effet de fumée */}
+          <SmokeLogoEffect />
           
           <HeroSection />
           <StudioSection />
