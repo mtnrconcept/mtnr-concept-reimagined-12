@@ -36,7 +36,7 @@ export const Background = ({
           transform: `translateZ(${-depth * 800}px) scale(${1 + depth * 1.5})`, 
           opacity: 1, 
           willChange: 'transform',
-          filter: 'brightness(1) contrast(1.2)', // Augmenté la luminosité de 0.8 à 1
+          filter: 'brightness(1) contrast(1.2)',
           transition: 'transform 0.1s ease-out'
         }}
       />

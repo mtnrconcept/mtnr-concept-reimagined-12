@@ -112,8 +112,8 @@ export const UVLamp: React.FC<UVLampProps> = ({
     }
   }, [uvMode]);
 
-  // On n'affiche le logo UV que sur la page d'accueil ("/")
-  const shouldShowLogo = showUVLogo && (location.pathname === "/");
+  // Display UV logo on both home page ("/") and /what-we-do page
+  const shouldShowLogo = showUVLogo && (location.pathname === "/" || location.pathname === "/what-we-do");
 
   if (!isVisible) return null;
 
@@ -121,7 +121,13 @@ export const UVLamp: React.FC<UVLampProps> = ({
     <>
       {/* Fond UV noir qui sera masqué par le cercle de lampe */}
       <div 
-        className="fixed inset-0 z-45 pointer-events-none bg-[rgba(10,0,60,0.98)]"
+        className="fixed inset-0 z-45 pointer-events-none bg-transparent"
+        style={{
+          backgroundImage: `url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'brightness(0.7) contrast(1.1) saturate(1.3)',
+        }}
       />
       
       {/* UV Effect Overlay - avec masque inversé */}
@@ -136,15 +142,15 @@ export const UVLamp: React.FC<UVLampProps> = ({
         }}
       />
       
-      {/* UV Logo - uniquement affiché sur la page d'accueil */}
+      {/* UV Logo - positionné en haut de la page */}
       {shouldShowLogo && (
         <div 
           ref={logoRef}
-          className="fixed inset-0 flex justify-center items-center z-45 pointer-events-none"
+          className="fixed inset-x-0 top-16 z-45 pointer-events-none flex justify-center items-start pt-8 sm:pt-12 md:pt-20 lg:pt-24"
         >
           <AnimatePresence>
             <motion.div 
-              className="relative w-[500px] max-w-[90vw] z-50 transition-all duration-50 ease-in-out"
+              className="relative w-[400px] max-w-[80vw] z-50 transition-all duration-50 ease-in-out"
               style={{
                 filter: `drop-shadow(0 0 8px rgba(0, 170, 255, ${glowIntensity * 0.7}))
                         drop-shadow(0 0 15px rgba(0, 170, 255, ${glowIntensity * 0.5}))

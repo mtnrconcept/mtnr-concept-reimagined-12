@@ -67,14 +67,14 @@ export const use3DParallax = (
         const depth = parseFloat(element.dataset.depth || '0');
         
         // Calculer les facteurs de mouvement avec effet amélioré en mode UV
-        const effectMultiplier = uvMode ? 1.4 : 1.0;
+        const effectMultiplier = uvMode ? 1.6 : 1.0; // Amplifié davantage en mode UV
         const moveX = (targetMouseX * depth * strength * effectMultiplier) / 100;
         const moveY = (targetMouseY * depth * strength * effectMultiplier) / 100;
         const scrollY = scrollPosition * depth;
         
         // Appliquer des rotations plus prononcées en mode UV
-        const rotationFactorX = uvMode ? -targetMouseY / 40 : -targetMouseY / 50;
-        const rotationFactorY = uvMode ? targetMouseX / 40 : targetMouseX / 50;
+        const rotationFactorX = uvMode ? -targetMouseY / 35 : -targetMouseY / 50;
+        const rotationFactorY = uvMode ? targetMouseX / 35 : targetMouseX / 50;
         
         // Apply transforms with 3D depth
         element.style.transform = `

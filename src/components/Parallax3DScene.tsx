@@ -41,7 +41,7 @@ export default function Parallax3DScene() {
         zIndex: 0
       }}
     >
-      {/* Background with blending modes */}
+      {/* Background with blending modes - using the stairs image in both modes */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-90"
         data-depth="0.05"

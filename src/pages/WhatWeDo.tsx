@@ -22,7 +22,11 @@ export default function WhatWeDo() {
   return <ParallaxBackground>
       <div className="relative z-10 min-h-screen">
         <Navbar />
-        <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
+        
+        {/* Espace pour le logo UV qui sera positionné ici en mode UV */}
+        <div className="w-full h-20 sm:h-24 md:h-28 lg:h-32"></div>
+        
+        <main className="min-h-screen w-full flex flex-col items-center pt-6 xs:pt-8 md:pt-10 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
             <div className="relative px-[103px]">
               <NeonText text="Notre Vibe" className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center" color="yellow" flicker={true} />
@@ -85,7 +89,7 @@ export default function WhatWeDo() {
           />
         </main>
         
-        {/* Use the new UVLamp component with custom radius */}
+        {/* Use the UVLamp component with custom radius */}
         {uvMode && isTorchActive && (
           <UVLamp
             lampRadius={500}

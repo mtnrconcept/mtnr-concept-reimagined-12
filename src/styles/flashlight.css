@@ -92,6 +92,10 @@
     pointer-events: none;
     z-index: 45; /* En dessous du masque UV mais au-dessus du contenu normal */
     will-change: mask, -webkit-mask;
+    background-image: url("/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png");
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.8) contrast(1.2) saturate(1.3);
   }
 
   /* Modernisé: torche standard avec rayon plus large */
