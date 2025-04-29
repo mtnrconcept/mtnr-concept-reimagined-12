@@ -1,6 +1,14 @@
 
 import { random } from './utils';
 
+export interface DisperseOptions {
+  particleCount?: number;
+  dispersionStrength?: number;
+  duration?: number;
+  colorPalette?: string[];
+  onComplete?: () => void;
+}
+
 /**
  * Creates an optimized particle dispersion effect for page transitions
  * @param container The element DOM container whose content will be dispersed
@@ -123,13 +131,7 @@ export function createParticleEffect(container: HTMLElement | null) {
  */
 export function createLogoDisperseEffect(
   imageElement: HTMLImageElement,
-  options: {
-    particleCount?: number;
-    dispersionStrength?: number;
-    duration?: number;
-    colorPalette?: string[];
-    onComplete?: () => void;
-  } = {}
+  options: DisperseOptions = {}
 ) {
   if (!imageElement || !imageElement.complete) {
     // Si l'image n'est pas chargée, appeler immédiatement onComplete et retourner
@@ -140,10 +142,10 @@ export function createLogoDisperseEffect(
   }
 
   const {
-    particleCount = 1500,
-    dispersionStrength = 1.8,
+    particleCount = 2500,
+    dispersionStrength = 2.2,
     duration = 1800,
-    colorPalette = ['#FFD700', '#000000', '#FFFFFF'], // Jaune, noir, blanc
+    colorPalette = ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
     onComplete = () => {}
   } = options;
 
@@ -195,13 +197,13 @@ export function createLogoDisperseEffect(
   // Échantillonner les pixels de l'image pour une meilleure couverture
   // Réduire légèrement l'écart entre les particules pour une meilleure couverture
   const particleGap = Math.max(3, Math.floor(Math.sqrt(width * height) / Math.sqrt(particleCount)));
-  const particleSize = Math.max(1.5, Math.min(Math.floor(Math.sqrt(width * height) / 40), 3));
+  const particleSize = Math.max(2.5, Math.min(Math.floor(Math.sqrt(width * height) / 30), 4));
   
   const particles = [];
   const fragment = document.createDocumentFragment();
 
   let particleCount2D = 0;
-  const maxParticles = Math.min(options.particleCount || 1500, 1500);
+  const maxParticles = Math.min(options.particleCount || 2500, 2500);
 
   // Échantillonner l'image de manière plus complète
   for (let y = 0; y < height; y += particleGap) {
@@ -237,7 +239,7 @@ export function createLogoDisperseEffect(
           // Propriétés de la particule
           const finalSize = random(particleSize * 0.5, particleSize * 1.5);
           const angle = Math.random() * Math.PI * 2;
-          const distance = random(50, 300) * dispersionStrength;
+          const distance = random(50, 600) * dispersionStrength;
           const delay = random(0, duration * 0.2); // Réduire les délais pour plus de réactivité
           
           particle.className = 'logo-particle';
@@ -280,7 +282,7 @@ export function createLogoDisperseEffect(
       const particle = document.createElement('div');
       const finalSize = random(particleSize * 0.5, particleSize * 1.5);
       const angle = Math.random() * Math.PI * 2;
-      const distance = random(50, 300) * dispersionStrength;
+      const distance = random(100, 600) * dispersionStrength;
       const delay = random(0, duration * 0.2);
       
       particle.className = 'logo-particle';
@@ -319,22 +321,22 @@ export function createLogoDisperseEffect(
   // Ajouter toutes les particules en une seule opération
   particleContainer.appendChild(fragment);
   
-  // Appliquer l'animation avec RAF pour de meilleures performances
-  const startTime = performance.now();
-  const endTime = startTime + duration + 500; // +500ms pour les retards
-  let animFrameId = 0;
-  
-  // Temporairement masquer l'image originale pendant l'animation uniquement
+  // Masquer temporairement l'image originale pendant l'animation uniquement
   const originalOpacity = imageElement.style.opacity;
-  const originalDisplay = imageElement.style.display || 'block';
   
   // Masquer l'image d'origine pendant l'animation
   imageElement.style.opacity = '0';
+  imageElement.style.transition = 'opacity 300ms ease-out';
   
   // Fonction d'easing améliorée pour une animation plus fluide
   function easeInOutCubic(t: number): number {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
+  
+  // Appliquer l'animation avec RAF pour de meilleures performances
+  const startTime = performance.now();
+  const endTime = startTime + duration + 500; // +500ms pour les retards
+  let animFrameId = 0;
   
   function animateParticles(timestamp) {
     const elapsed = timestamp - startTime;
@@ -390,8 +392,7 @@ export function createLogoDisperseEffect(
     // (Sur la page d'accueil, on veut remettre l'opacité)
     if (window.location.pathname === '/') {
       imageElement.style.transition = 'opacity 300ms ease-in';
-      imageElement.style.opacity = '1';
-      imageElement.style.display = originalDisplay;
+      imageElement.style.opacity = originalOpacity || '1';
     }
     
     // Attendre que la transition de disparition soit terminée avant de supprimer

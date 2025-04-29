@@ -1,3 +1,4 @@
+
 import { useLayoutEffect, useEffect, useRef } from 'react';
 import { createLogoDisperseEffect, DisperseOptions } from '@/lib/transitions/particle-effect';
 
@@ -14,7 +15,7 @@ interface DispersingLogoProps {
 
 /**
  * Logo dispersing component.
- * Ne déclenche l’effet que si l’on quitte la page d’accueil (fromPath='/' → toPath!='/')
+ * Ne déclenche l'effet que si l'on quitte la page d'accueil (fromPath='/' → toPath!='/')
  */
 export const DispersingLogo = ({
   triggerDispersion = false,
@@ -45,13 +46,18 @@ export const DispersingLogo = ({
       toPath !== '/' &&
       logoRef.current
     ) {
+      console.log('Déclenchement dispersion logo:', fromPath, '->', toPath);
+      
       requestAnimationFrame(() => {
         const opts: DisperseOptions = {
-          particleCount: 1500,
-          dispersionStrength: 1.8,
-          duration: 1800,
+          particleCount: 2500,
+          dispersionStrength: 2.2, 
+          duration: 1600,
           colorPalette: ['#FFD700', '#222222', '#FFFFFF', '#FFD700'],
-          onComplete: () => onDispersionComplete?.(),
+          onComplete: () => {
+            console.log('Dispersion completed');
+            onDispersionComplete?.();
+          },
         };
 
         // Annuler tout effet en cours

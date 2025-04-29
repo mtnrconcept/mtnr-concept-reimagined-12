@@ -19,7 +19,7 @@ export default function PageTransitionEffect() {
   const isLeavingHomeRef = useRef<boolean>(false);
   const initialRenderRef = useRef<boolean>(true);
   
-  // Suivre l'état initial de rendu pour éviter l'animation automatique
+  // Suivre l'état initial de rendu pour éviter l'animation automatique au premier chargement
   useEffect(() => {
     if (initialRenderRef.current) {
       initialRenderRef.current = false;
@@ -38,10 +38,12 @@ export default function PageTransitionEffect() {
       isLeavingHomeRef.current = false;
     }
     
-    // Update last path for future reference
-    lastPathRef.current = location.pathname;
+    // Mettre à jour le chemin précédent pour référence future
+    if (!initialRenderRef.current) {
+      lastPathRef.current = location.pathname;
+    }
     
-    // Add safety timeout to reset navigation state if something goes wrong
+    // Ajouter un timeout de sécurité pour réinitialiser l'état de navigation si quelque chose va mal
     const resetTimeout = setTimeout(() => {
       isNavigatingRef.current = false;
       isLeavingHomeRef.current = false;
@@ -71,6 +73,8 @@ export default function PageTransitionEffect() {
         
         // N'activer la dispersion que si on quitte la page d'accueil
         if (isLeavingHome) {
+          console.log('Navigation interceptée:', location.pathname, '->', targetPath);
+          
           // Empêcher la navigation par défaut
           e.preventDefault();
           e.stopPropagation();
@@ -162,6 +166,8 @@ export default function PageTransitionEffect() {
       {/* Logo invisible qui gère l'animation de dispersion */}
       <DispersingLogo
         triggerDispersion={triggerLogoDispersion}
+        fromPath={location.pathname}
+        toPath={lastPathRef.current}
         imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
         onDispersionComplete={handleDispersionComplete}
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64"
