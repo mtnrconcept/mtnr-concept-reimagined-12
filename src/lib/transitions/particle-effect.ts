@@ -1,3 +1,4 @@
+
 import { random } from './utils';
 
 /**
@@ -139,9 +140,9 @@ export function createLogoDisperseEffect(
   }
 
   const {
-    particleCount = 800,
-    dispersionStrength = 1.5,
-    duration = 2000,
+    particleCount = 1500,
+    dispersionStrength = 1.8,
+    duration = 1800,
     colorPalette = ['#FFD700', '#000000', '#FFFFFF'], // Jaune, noir, blanc
     onComplete = () => {}
   } = options;
@@ -191,20 +192,22 @@ export function createLogoDisperseEffect(
   `;
   document.body.appendChild(particleContainer);
   
-  // Générer les particules - moins nombreuses pour de meilleures performances
-  const particleSize = Math.max(1, Math.min(Math.floor(Math.sqrt(width * height) / 50), 3));
-  const particleGap = Math.max(6, Math.floor(Math.sqrt(width * height) / particleCount * 5));
+  // Échantillonner les pixels de l'image pour une meilleure couverture
+  // Réduire légèrement l'écart entre les particules pour une meilleure couverture
+  const particleGap = Math.max(3, Math.floor(Math.sqrt(width * height) / Math.sqrt(particleCount)));
+  const particleSize = Math.max(1.5, Math.min(Math.floor(Math.sqrt(width * height) / 40), 3));
   
   const particles = [];
   const fragment = document.createDocumentFragment();
 
   let particleCount2D = 0;
+  const maxParticles = Math.min(options.particleCount || 1500, 1500);
 
-  // Échantillonner l'image et créer les particules
+  // Échantillonner l'image de manière plus complète
   for (let y = 0; y < height; y += particleGap) {
     for (let x = 0; x < width; x += particleGap) {
       // Limiter le nombre total de particules
-      if (particleCount2D >= options.particleCount || particleCount2D >= 400) {
+      if (particleCount2D >= maxParticles) {
         break;
       }
       
@@ -213,17 +216,17 @@ export function createLogoDisperseEffect(
         const pixelData = ctx.getImageData(x, y, 1, 1).data;
         const alpha = pixelData[3];
         
-        if (alpha > 50) { // Ignorer les pixels trop transparents
+        if (alpha > 30) { // Seuil d'opacité plus bas pour capturer plus de pixels
           particleCount2D++;
           
           const particle = document.createElement('div');
           
-          // Couleur de base extraite de l'image
+          // Déterminer la couleur en fonction des données du pixel
           let color;
-          if (pixelData[0] > 200 && pixelData[1] > 200 && pixelData[2] < 100) {
+          if (pixelData[0] > 180 && pixelData[1] > 180 && pixelData[2] < 120) {
             // C'est probablement jaune
             color = colorPalette[0]; // #FFD700
-          } else if (pixelData[0] < 50 && pixelData[1] < 50 && pixelData[2] < 50) {
+          } else if (pixelData[0] < 60 && pixelData[1] < 60 && pixelData[2] < 60) {
             // C'est probablement noir
             color = colorPalette[1]; // #000000
           } else {
@@ -235,7 +238,7 @@ export function createLogoDisperseEffect(
           const finalSize = random(particleSize * 0.5, particleSize * 1.5);
           const angle = Math.random() * Math.PI * 2;
           const distance = random(50, 300) * dispersionStrength;
-          const delay = random(0, duration * 0.3); // Réduire les délais pour plus de réactivité
+          const delay = random(0, duration * 0.2); // Réduire les délais pour plus de réactivité
           
           particle.className = 'logo-particle';
           particle.style.cssText = `
@@ -246,7 +249,7 @@ export function createLogoDisperseEffect(
             height: ${finalSize}px;
             background-color: ${color};
             border-radius: 50%;
-            opacity: ${random(0.6, 1)};
+            opacity: ${random(0.7, 1)};
             transform: translate(0, 0) scale(1);
             will-change: transform, opacity;
             --tx: ${Math.cos(angle) * distance}px;
@@ -262,6 +265,45 @@ export function createLogoDisperseEffect(
         console.error("Erreur lors de l'échantillonnage de l'image:", error);
         // Continuer malgré l'erreur
       }
+    }
+  }
+  
+  // Ajouter des particules supplémentaires aux endroits où l'image est plus transparente
+  // pour assurer une couverture complète
+  if (particleCount2D < maxParticles / 2) {
+    const additionalParticles = Math.min(maxParticles - particleCount2D, maxParticles / 2);
+    for (let i = 0; i < additionalParticles; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+      
+      const particle = document.createElement('div');
+      const finalSize = random(particleSize * 0.5, particleSize * 1.5);
+      const angle = Math.random() * Math.PI * 2;
+      const distance = random(50, 300) * dispersionStrength;
+      const delay = random(0, duration * 0.2);
+      
+      particle.className = 'logo-particle';
+      particle.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        top: ${y}px;
+        width: ${finalSize}px;
+        height: ${finalSize}px;
+        background-color: ${color};
+        border-radius: 50%;
+        opacity: ${random(0.7, 1)};
+        transform: translate(0, 0) scale(1);
+        will-change: transform, opacity;
+        --tx: ${Math.cos(angle) * distance}px;
+        --ty: ${Math.sin(angle) * distance}px;
+        --delay: ${delay}ms;
+        --duration: ${duration}ms;
+      `;
+      
+      fragment.appendChild(particle);
+      particles.push(particle);
+      particleCount2D++;
     }
   }
   
@@ -284,14 +326,12 @@ export function createLogoDisperseEffect(
   
   // Temporairement masquer l'image originale pendant l'animation uniquement
   const originalOpacity = imageElement.style.opacity;
-  let originalDisplay = imageElement.style.display;
-  if (!originalDisplay || originalDisplay === 'none') {
-    originalDisplay = 'block';
-  }
+  const originalDisplay = imageElement.style.display || 'block';
   
   // Masquer l'image d'origine pendant l'animation
   imageElement.style.opacity = '0';
   
+  // Fonction d'easing améliorée pour une animation plus fluide
   function easeInOutCubic(t: number): number {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -304,22 +344,25 @@ export function createLogoDisperseEffect(
       particles.forEach(particle => {
         try {
           const delay = parseFloat(particle.style.getPropertyValue('--delay'));
-          const duration = parseFloat(particle.style.getPropertyValue('--duration'));
+          const particleDuration = parseFloat(particle.style.getPropertyValue('--duration'));
           const particleElapsed = elapsed - delay;
           
           if (particleElapsed > 0) {
-            const progress = Math.min(1, particleElapsed / duration);
-            const easeOutProgress = easeInOutCubic(progress); // Ease-in-out cubique
+            // Calculer progression avec easing pour un mouvement plus fluide
+            const progress = Math.min(1, particleElapsed / particleDuration);
+            const easeProgress = easeInOutCubic(progress);
             
             const tx = parseFloat(particle.style.getPropertyValue('--tx'));
             const ty = parseFloat(particle.style.getPropertyValue('--ty'));
             
+            // Animation graduelle pour une dispersion plus fluide
             particle.style.transform = `translate(
-              ${tx * easeOutProgress}px, 
-              ${ty * easeOutProgress}px
-            ) scale(${1 - easeOutProgress * 0.5})`;
+              ${tx * easeProgress}px, 
+              ${ty * easeProgress}px
+            ) scale(${Math.max(0.2, 1 - easeProgress * 0.8)})`;
             
-            particle.style.opacity = (1 - easeOutProgress).toString();
+            // Opacité qui baisse progressivement avec easing
+            particle.style.opacity = `${Math.max(0, 1 - easeProgress * 0.9)}`;
           }
         } catch (error) {
           // Ignorer les erreurs pour chaque particule
@@ -338,17 +381,24 @@ export function createLogoDisperseEffect(
       cancelAnimationFrame(animFrameId);
       animFrameId = 0;
     }
-    particleContainer.remove();
+    
+    // Supprimer progressivement le conteneur de particules
+    particleContainer.style.transition = 'opacity 300ms ease-out';
+    particleContainer.style.opacity = '0';
     
     // Restaurer l'image d'origine uniquement si l'on est sur la page qui l'a déclenchée
     // (Sur la page d'accueil, on veut remettre l'opacité)
-    // Si l'on est sur une autre page, l'opacité reste à 0
     if (window.location.pathname === '/') {
-      imageElement.style.opacity = '1'; // Toujours restaurer à 1 pour être sûr que c'est visible
+      imageElement.style.transition = 'opacity 300ms ease-in';
+      imageElement.style.opacity = '1';
       imageElement.style.display = originalDisplay;
     }
     
-    onComplete();
+    // Attendre que la transition de disparition soit terminée avant de supprimer
+    setTimeout(() => {
+      particleContainer.remove();
+      onComplete();
+    }, 300);
   }
   
   animFrameId = requestAnimationFrame(animateParticles);

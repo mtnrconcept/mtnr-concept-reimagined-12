@@ -1,6 +1,15 @@
 
 import { useLayoutEffect, useEffect, useRef } from 'react';
-import { createLogoDisperseEffect, DisperseOptions } from '@/lib/transitions/particle-effect';
+import { createLogoDisperseEffect } from '@/lib/transitions/particle-effect';
+
+// Déplacer la définition locale des options ici au lieu de l'importer
+interface DisperseOptions {
+  particleCount?: number;
+  dispersionStrength?: number;
+  duration?: number;
+  colorPalette?: string[];
+  onComplete?: () => void;
+}
 
 interface DispersingLogoProps {
   triggerDispersion?: boolean;
@@ -30,10 +39,10 @@ export const DispersingLogo = ({
       // Use next animation frame to avoid blocking paint
       requestAnimationFrame(() => {
         const opts: DisperseOptions = {
-          particleCount: 1200,
-          dispersionStrength: 2.0,
-          duration: 2000,
-          colorPalette: ['#FFD700', '#222222', '#FFFFFF'],
+          particleCount: 1500, // Plus de particules pour une meilleure couverture du logo
+          dispersionStrength: 1.8, // Ajusté pour une dispersion plus naturelle
+          duration: 1800, // Un peu plus court mais pas trop pour garder l'effet fluide
+          colorPalette: ['#FFD700', '#222222', '#FFFFFF', '#FFD700'], // Duplicate yellow for more golden particles
           onComplete: () => {
             onDispersionComplete?.();
           },

@@ -1,9 +1,6 @@
 
 import { useLayoutEffect, useRef, useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { createSmokeEffect } from '@/lib/transitions';
-import { pageTransitionPreset } from '@/components/effects/smoke-presets';
 import { DispersingLogo } from '@/components/home/DispersingLogo';
 
 /**
@@ -20,16 +17,23 @@ export default function PageTransitionEffect() {
   const navigationTimeoutRef = useRef<number | null>(null);
   const isNavigatingRef = useRef<boolean>(false);
   const isLeavingHomeRef = useRef<boolean>(false);
-
-  // Réinitialiser l'état si on reste sur la page actuelle
+  
+  // Réinitialiser l'état quand on revient sur la page d'accueil
   useEffect(() => {
-    // Si on arrive sur une page (y compris accueil) depuis une autre page, 
-    // on ne veut pas déclencher la dispersion
-    if (!isNavigatingRef.current) {
+    // Reset state ONLY when we arrive to home from another page
+    const isComingToHome = location.pathname === '/' && lastPathRef.current !== '/';
+    
+    if (isComingToHome) {
+      // Make sure dispersion is turned off when returning to homepage
       setTriggerLogoDispersion(false);
+      isNavigatingRef.current = false;
+      isLeavingHomeRef.current = false;
     }
     
-    // Réinitialiser le flag de navigation
+    // Update last path for future reference
+    lastPathRef.current = location.pathname;
+    
+    // Add safety timeout to reset navigation state if something goes wrong
     const resetTimeout = setTimeout(() => {
       isNavigatingRef.current = false;
       isLeavingHomeRef.current = false;
@@ -56,7 +60,6 @@ export default function PageTransitionEffect() {
         
         // Déterminer si on quitte la page d'accueil
         const isLeavingHome = location.pathname === '/' && targetPath !== '/';
-        isLeavingHomeRef.current = isLeavingHome;
         
         // N'activer la dispersion que si on quitte la page d'accueil
         if (isLeavingHome) {
@@ -66,6 +69,7 @@ export default function PageTransitionEffect() {
           
           // Marquer qu'une navigation est en cours pour éviter les doubles clics
           isNavigatingRef.current = true;
+          isLeavingHomeRef.current = true;
           
           // Enregistrer l'heure de début
           navigationStartTimeRef.current = performance.now();
@@ -83,7 +87,7 @@ export default function PageTransitionEffect() {
           navigationTimeoutRef.current = window.setTimeout(() => {
             navigate(targetPath);
             isNavigatingRef.current = false;
-          }, 1000); // Fallback après 1 seconde maximum
+          }, 1500); // Fallback après 1.5 seconde maximum
         } else {
           // Si on ne quitte pas la page d'accueil, naviguer directement sans animation
           // La navigation standard s'effectue sans interférence
@@ -119,17 +123,17 @@ export default function PageTransitionEffect() {
     console.log(`Transition latency: ${Math.round(latency)}ms`);
     
     // Naviguer vers la page demandée s'il y a eu un clic de navigation
-    if (lastPathRef.current !== location.pathname && isLeavingHomeRef.current) {
+    if (isLeavingHomeRef.current) {
       navigate(lastPathRef.current);
+      isLeavingHomeRef.current = false;
     }
     
     // Réinitialiser l'état et permettre de nouvelles navigations
     setTimeout(() => {
       setTriggerLogoDispersion(false);
       isNavigatingRef.current = false;
-      isLeavingHomeRef.current = false;
     }, 100);
-  }, [location.pathname, navigate]);
+  }, [navigate]);
 
   return (
     <div
