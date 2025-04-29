@@ -1,8 +1,11 @@
+
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
+import UVText from "@/components/effects/UVText";
+
 const artists = [{
   name: "U.D Sensei",
   img: "/lovable-uploads/211284ce-8851-4248-8f65-0ea7e3c0c8ff.png",
@@ -20,11 +23,13 @@ const artists = [{
   img: "/lovable-uploads/07c10d93-651e-4ab2-a2d1-66268cbb231b.png",
   desc: "L'ombre du mic, plume acide, chronique la ruelle."
 }];
+
 export default function Artists() {
   // Force scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   return <ParallaxBackground>
       <div className="relative z-10 min-h-screen">
         <Navbar />
@@ -38,7 +43,13 @@ export default function Artists() {
             <div className="text-base xs:text-lg md:text-xl font-grunge text-gray-100 mb-7 xs:mb-10 text-center max-w-3xl mx-auto drop-shadow-md" style={{
             letterSpacing: "0.06em"
           }}>
-              Celles et ceux qui bâtissent la légende MTNR. Un collectif, des styles, une vision crue et toujours <span className="text-yellow-400">underground</span>.
+              <UVText 
+                text="Celles et ceux qui bâtissent la légende MTNR. Un collectif, des styles, une vision crue et toujours underground."
+                hiddenText="MTNR - L'ÉLITE DE L'UNDERGROUND - NOUS SOMMES LES FANTÔMES DE LA SCÈNE - LA VIBE QUI RÉSISTE"
+                uvColor="#9b87f5"
+                textSize="text-base xs:text-lg md:text-xl"
+                position="default"
+              />
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 xs:gap-7 w-full pb-16">
@@ -47,7 +58,15 @@ export default function Artists() {
                     <img src={a.img} alt={a.name} className="w-full aspect-square object-cover rounded-lg grayscale hover:grayscale-0 transition-all duration-300 scale-100 hover:scale-105" />
                   </div>
                   <div className="mt-4 font-black text-lg xs:text-xl text-yellow-400 uppercase text-center tracking-wide">{a.name}</div>
-                  <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">{a.desc}</div>
+                  <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
+                    <UVText 
+                      text={a.desc}
+                      hiddenText="MTNR ALCHIMISTE - SECRET KEEPER - GARDIEN DE LA VIBE"
+                      uvColor="#D946EF"
+                      textSize="text-xs xs:text-sm"
+                      opacity={0.01}
+                    />
+                  </div>
                 </div>)}
             </div>
           </div>

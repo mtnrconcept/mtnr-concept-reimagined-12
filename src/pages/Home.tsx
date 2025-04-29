@@ -6,6 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
+import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 
 export default function Home() {
   useEffect(() => {
@@ -49,8 +50,22 @@ export default function Home() {
           <ServicesSection />
           <ArtistsSection />
 
-          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest">
+          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative">
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
+            
+            {/* Messages cachés UV */}
+            <UVHiddenMessage 
+              message="CODES SECRETS: STUDIO 451 • CAVE 872 • MIXAGE 339"
+              color="#9b87f5"
+              className="top-2 left-1/2 transform -translate-x-1/2"
+            />
+            
+            <UVHiddenMessage 
+              message="RENDEZ-VOUS LE 13 TOUS LES MOIS • MINUIT • CODE VESTIMENTAIRE: NOIR"
+              color="#D946EF"
+              className="bottom-1 left-1/2 transform -translate-x-1/2"
+              fontSize="0.8rem"
+            />
           </footer>
         </main>
       </div>

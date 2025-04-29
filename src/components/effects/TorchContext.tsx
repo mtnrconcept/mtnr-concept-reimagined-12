@@ -9,6 +9,8 @@ interface TorchContextType {
   registerElementForIllumination: (element: HTMLElement) => void;
   unregisterElementForIllumination: (element: HTMLElement) => void;
   containerRef: React.RefObject<HTMLDivElement>;
+  uvMode: boolean;
+  toggleUVMode: () => void;
 }
 
 const TorchContext = createContext<TorchContextType>({
@@ -19,6 +21,8 @@ const TorchContext = createContext<TorchContextType>({
   registerElementForIllumination: () => {},
   unregisterElementForIllumination: () => {},
   containerRef: { current: null },
+  uvMode: false,
+  toggleUVMode: () => {},
 });
 
 export const useTorch = () => useContext(TorchContext);
@@ -27,6 +31,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [elementsToIlluminate, setElementsToIlluminate] = useState<HTMLElement[]>([]);
+  const [uvMode, setUVMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const updateMousePosition = (position: { x: number; y: number }) => {
@@ -42,6 +47,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const unregisterElementForIllumination = (element: HTMLElement) => {
     setElementsToIlluminate(prev => prev.filter(el => el !== element));
+  };
+  
+  const toggleUVMode = () => {
+    setUVMode(prev => !prev);
   };
 
   useEffect(() => {
@@ -93,6 +102,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     registerElementForIllumination,
     unregisterElementForIllumination,
     containerRef,
+    uvMode,
+    toggleUVMode,
   };
 
   return (
@@ -107,22 +118,41 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <stop offset="70%" stopColor="black" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
               </radialGradient>
+              <radialGradient id="uv-torch-gradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#2D0076" stopOpacity="0.1" />
+                <stop offset="40%" stopColor="#2D0076" stopOpacity="0.3" />
+                <stop offset="70%" stopColor="black" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.95" />
+              </radialGradient>
               <mask id="torch-mask">
                 <rect width="100%" height="100%" fill="white" />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
                   r={radius}
-                  fill="url(#torch-gradient)"
+                  fill={uvMode ? "url(#uv-torch-gradient)" : "url(#torch-gradient)"}
                 />
               </mask>
             </defs>
             <rect
               width="100%"
               height="100%"
-              fill="rgba(0, 0, 0, 0.95)"
+              fill={uvMode ? "rgba(25, 0, 50, 0.98)" : "rgba(0, 0, 0, 0.95)"}
               mask="url(#torch-mask)"
             />
+            {/* Effet de halo UV autour du curseur si en mode UV */}
+            {uvMode && (
+              <circle
+                cx={mousePosition.x}
+                cy={mousePosition.y}
+                r="100"
+                fill="none"
+                stroke="#7E69AB"
+                strokeWidth="2"
+                strokeOpacity="0.3"
+                filter="blur(5px)"
+              />
+            )}
           </svg>
         )}
       </div>
