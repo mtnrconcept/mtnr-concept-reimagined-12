@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
-import ElevatorTransition from "@/components/effects/ElevatorTransition";
+import { ElevatorTransition } from "@/components/effects/elevator";
 
 interface PageTransitionProps {
   children: ReactNode;
