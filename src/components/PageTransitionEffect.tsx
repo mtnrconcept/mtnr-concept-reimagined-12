@@ -1,3 +1,4 @@
+
 import { useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -55,7 +56,7 @@ export default function PageTransitionEffect() {
       }}
     >
       {/* Effet de fondu entre les pages */}
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0 }}
