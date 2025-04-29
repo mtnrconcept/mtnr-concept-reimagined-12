@@ -147,6 +147,7 @@ export default function PageTransitionEffect() {
     }, 100);
   }, [navigate]);
 
+  // Logo invisible supprimé
   return (
     <div
       ref={containerRef}
@@ -159,19 +160,20 @@ export default function PageTransitionEffect() {
         pointerEvents: 'none',
         zIndex: 1000,
         willChange: 'opacity, transform',
-        opacity: triggerLogoDispersion ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out',
+        opacity: 0, // Rendons le conteneur toujours invisible pour masquer le logo
       }}
     >
-      {/* Logo invisible qui gère l'animation de dispersion */}
-      <DispersingLogo
-        triggerDispersion={triggerLogoDispersion}
-        fromPath={location.pathname}
-        toPath={lastPathRef.current}
-        imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-        onDispersionComplete={handleDispersionComplete}
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64"
-      />
+      {/* Le composant DispersingLogo est maintenu pour les fonctionnalités mais ne sera plus visible */}
+      {triggerLogoDispersion && (
+        <DispersingLogo
+          triggerDispersion={triggerLogoDispersion}
+          fromPath={location.pathname}
+          toPath={lastPathRef.current}
+          imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+          onDispersionComplete={handleDispersionComplete}
+          className="hidden" // Classe pour cacher complètement l'élément
+        />
+      )}
     </div>
   );
 }

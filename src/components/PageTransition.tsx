@@ -9,7 +9,6 @@ import {
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { pageTransitionPreset } from "@/components/effects/smoke-presets";
-import { DispersingLogo } from "@/components/home/DispersingLogo";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -68,16 +67,7 @@ export default function PageTransition({
 
   return (
     <>
-      <DispersingLogo
-        triggerDispersion={triggerLogoDispersion}
-        fromPath={fromPath}
-        toPath={location.pathname}
-        imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-        onDispersionComplete={() => {
-          /* callback si besoin */
-        }}
-        className="fixed inset-0 pointer-events-none"
-      />
+      {/* Suppression de la DispersingLogo ici */}
 
       <AnimatePresence mode="wait">
         <motion.div
