@@ -1,3 +1,4 @@
+
 /**
  * Optimized version of particle effects for page transitions
  * Creates a dust-like dispersion effect for page content
@@ -82,15 +83,15 @@ export function createParticleEffect(container: HTMLElement | null) {
       // Use hardware-accelerated properties
       const x = random(0, size.width);
       const y = random(0, size.height);
-      const size = random(1, 3);
+      const particleSize = random(1, 3);
       
       // Create initial styles with transforms
       particle.style.cssText = `
         position: absolute;
         left: ${x}px;
         top: ${y}px;
-        width: ${size}px;
-        height: ${size}px;
+        width: ${particleSize}px;
+        height: ${particleSize}px;
         background-color: ${baseColor};
         border-radius: 50%;
         will-change: transform, opacity;
@@ -158,7 +159,7 @@ export function createSmokeEffect(element: HTMLElement | null) {
       Math.pow((y - centerY) / (rect.height / 2), 2)
     );
     const sizeMultiplier = 1 - Math.min(0.6, distanceFromCenter * 0.6);
-    const size = (30 + random(20, 60)) * sizeMultiplier;
+    const smokeSize = (30 + random(20, 60)) * sizeMultiplier;
     
     // Use the theme colors
     const useYellow = random(0, 1) > 0.3;
@@ -171,8 +172,8 @@ export function createSmokeEffect(element: HTMLElement | null) {
       position: absolute;
       left: ${x}px;
       top: ${y}px;
-      width: ${size}px;
-      height: ${size}px;
+      width: ${smokeSize}px;
+      height: ${smokeSize}px;
       border-radius: 50%;
       background: radial-gradient(circle, ${color} 0%, rgba(0,0,0,0) 70%);
       opacity: 0;
@@ -260,3 +261,4 @@ export function createSmokeEffect(element: HTMLElement | null) {
     }, 300);
   }
 }
+
