@@ -1,18 +1,25 @@
+
 import { useLayoutEffect, useEffect, useRef } from "react";
 import { createLogoDisperseEffect, DisperseOptions } from "@/lib/transitions/particle-effect";
 
 interface DispersingLogoProps {
+  /** Indicateur de déclenchement externe */
   triggerDispersion?: boolean;
+  /** Chemin de la route précédente */
   fromPath: string;
+  /** Chemin de la route cible */
   toPath: string;
+  /** Callback une fois la dispersion terminée */
   onDispersionComplete?: () => void;
+  /** Classes CSS additionnelles */
   className?: string;
+  /** Source de l'image du logo */
   imageSrc: string;
 }
 
 /**
  * DispersingLogo
- * Ne se lance que lorsqu'on quitte la home (fromPath="/" -> toPath!="/")
+ * Ne déclenche l'effet que lorsqu'on quitte la page d'accueil (fromPath='/' → toPath!='/')
  */
 export const DispersingLogo = ({
   triggerDispersion = false,
@@ -27,15 +34,15 @@ export const DispersingLogo = ({
   const prevTriggerRef = useRef<boolean>(false);
   const isInitialMountRef = useRef<boolean>(true);
 
+  // Gestion du déclenchement de la dispersion
   useLayoutEffect(() => {
-    // Ignore le premier rendu
     if (isInitialMountRef.current) {
+      // Ignorer le premier rendu
       isInitialMountRef.current = false;
       prevTriggerRef.current = triggerDispersion;
       return;
     }
-
-    // Conditions : passage faux->vrai, et quitter "/"
+    // Conditions : passage false → true & quitter '/'
     if (
       triggerDispersion &&
       !prevTriggerRef.current &&
@@ -51,14 +58,18 @@ export const DispersingLogo = ({
           colorPalette: ["#FFD700", "#222222", "#FFFFFF", "#FFD700"],
           onComplete: () => onDispersionComplete?.(),
         };
-        // Annule l'effet en cours et relance
+        // Annuler l'effet actuel avant de lancer le nouveau
         effectRef.current?.cancel();
-        effectRef.current = createLogoDisperseEffect(logoRef.current!, opts);
+        effectRef.current = createLogoDisperseEffect(
+          logoRef.current!,
+          opts
+        );
       });
     }
     prevTriggerRef.current = triggerDispersion;
   }, [triggerDispersion, fromPath, toPath, onDispersionComplete]);
 
+  // Cleanup à la destruction du composant
   useEffect(() => {
     return () => {
       effectRef.current?.cancel();
@@ -67,7 +78,7 @@ export const DispersingLogo = ({
   }, []);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`}>      
       <img
         ref={logoRef}
         src={imageSrc}
