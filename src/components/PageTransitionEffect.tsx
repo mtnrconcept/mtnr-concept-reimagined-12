@@ -32,7 +32,6 @@ export default function PageTransitionEffect() {
     const isComingToHome = location.pathname === '/' && lastPathRef.current !== '/';
     
     if (isComingToHome) {
-      // Make sure dispersion is turned off when returning to homepage
       setTriggerLogoDispersion(false);
       isNavigatingRef.current = false;
       isLeavingHomeRef.current = false;
@@ -52,61 +51,6 @@ export default function PageTransitionEffect() {
     return () => clearTimeout(resetTimeout);
   }, [location.pathname]);
 
-  /**
-   * Callback après fin de dispersion pour pouvoir réutiliser l'effet
-   * et naviguer vers la nouvelle page
-   */
-  const handleDispersionComplete = useCallback(() => {
-    // Nettoyer le timeout car l'animation s'est terminée normalement
-    if (navigationTimeoutRef.current) {
-      clearTimeout(navigationTimeoutRef.current);
-      navigationTimeoutRef.current = null;
-    }
-    
-    // Mesurer la latence
-    const latency = performance.now() - navigationStartTimeRef.current;
-    console.log(`Transition latency: ${Math.round(latency)}ms`);
-    
-    // Naviguer vers la page demandée s'il y a eu un clic de navigation
-    if (isLeavingHomeRef.current) {
-      navigate(lastPathRef.current);
-      isLeavingHomeRef.current = false;
-    }
-    
-    // Réinitialiser l'état et permettre de nouvelles navigations
-    setTimeout(() => {
-      setTriggerLogoDispersion(false);
-      isNavigatingRef.current = false;
-    }, 100);
-  }, [navigate]);
-
-  // Conteneur invisible - nous utilisons maintenant OptimizedDisperseLogo
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 1000,
-        willChange: 'opacity, transform',
-        opacity: 0,
-      }}
-    >
-      {/* Le composant DispersingLogo est maintenu pour les fonctionnalités mais ne sera plus visible */}
-      {triggerLogoDispersion && (
-        <DispersingLogo
-          triggerDispersion={triggerLogoDispersion}
-          fromPath={location.pathname}
-          toPath={lastPathRef.current}
-          imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-          onDispersionComplete={handleDispersionComplete}
-          className="hidden"
-        />
-      )}
-    </div>
-  );
+  // Conteneur invisible - les transitions sont maintenant gérées par OptimizedDisperseLogo
+  return null;
 }

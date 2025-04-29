@@ -38,9 +38,9 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     if (!isDisperseActive || !logoRef.current) return;
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 800, // Réduire le nombre de particules pour améliorer les performances
+      particleCount: 800, // Nombre optimal de particules pour un bon équilibre
       dispersionStrength: 2.5,
-      duration: 1200, // Animation plus rapide
+      duration: 1200,
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
         setIsDisperseActive(false);
@@ -64,7 +64,7 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
         visibility: isDisperseActive ? 'visible' : 'hidden'
       }}
     >
-      <div className="relative w-48 h-48 flex items-center justify-center">
+      <div className="relative w-64 h-64 flex items-center justify-center">
         <img
           ref={logoRef}
           src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
