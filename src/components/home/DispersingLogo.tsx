@@ -19,16 +19,17 @@ export const DispersingLogo = ({
   const logoRef = useRef<HTMLImageElement>(null);
   const effectRef = useRef<{ cancel: () => void } | null>(null);
   
-  // Gérer le déclenchement de l'effet de dispersion
+  // Optimisation critique : déclencher immédiatement l'effet lorsque triggerDispersion change
   useEffect(() => {
-    if (triggerDispersion && dispersionState === 'idle' && logoRef.current) {
+    if (triggerDispersion && logoRef.current) {
+      // Réagir immédiatement, sans attendre un état intermédiaire
       setDispersionState('dispersing');
       
-      // Créer l'effet de dispersion
+      // Créer l'effet de dispersion avec des paramètres optimisés
       effectRef.current = createLogoDisperseEffect(logoRef.current, {
-        particleCount: 800,
-        dispersionStrength: 1.5,
-        duration: 2000,
+        particleCount: 600, // Réduit de 800 à 600 pour améliorer les performances
+        dispersionStrength: 2.0, // Augmenté pour un effet plus visible même s'il est plus court
+        duration: 1200, // Réduit significativement la durée pour réduire la latence
         colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
         onComplete: () => {
           setDispersionState('dispersed');
@@ -44,7 +45,7 @@ export const DispersingLogo = ({
         effectRef.current = null;
       }
     };
-  }, [triggerDispersion, dispersionState, onDispersionComplete]);
+  }, [triggerDispersion, onDispersionComplete]);
   
   return (
     <div className={`relative ${className}`}>
@@ -53,6 +54,7 @@ export const DispersingLogo = ({
         src={imageSrc} 
         alt="MTNR Concept"
         className="w-full h-auto"
+        style={{ willChange: 'transform, opacity' }} // Optimisation des performances
         draggable={false}
       />
     </div>
