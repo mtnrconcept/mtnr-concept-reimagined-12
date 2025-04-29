@@ -89,34 +89,36 @@ export default function ElectricParticles({
   
   return (
     <>
-      <style jsx>{`
-        @keyframes electricParticle {
-          0% {
-            opacity: 0;
-            transform: translateY(0) translateX(0);
+      <style>
+        {`
+          @keyframes electricParticle {
+            0% {
+              opacity: 0;
+              transform: translateY(0) translateX(0);
+            }
+            20% {
+              opacity: 0.8;
+              transform: translateY(-10px) translateX(5px);
+            }
+            40% {
+              opacity: 0.4;
+              transform: translateY(5px) translateX(10px);
+            }
+            60% {
+              opacity: 0.8;
+              transform: translateY(-5px) translateX(-5px);
+            }
+            80% {
+              opacity: 0.3;
+              transform: translateY(10px) translateX(5px);
+            }
+            100% {
+              opacity: 0;
+              transform: translateY(0) translateX(0);
+            }
           }
-          20% {
-            opacity: 0.8;
-            transform: translateY(-10px) translateX(5px);
-          }
-          40% {
-            opacity: 0.4;
-            transform: translateY(5px) translateX(10px);
-          }
-          60% {
-            opacity: 0.8;
-            transform: translateY(-5px) translateX(-5px);
-          }
-          80% {
-            opacity: 0.3;
-            transform: translateY(10px) translateX(5px);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(0) translateX(0);
-          }
-        }
-      `}</style>
+        `}
+      </style>
       <div 
         ref={containerRef} 
         className="pointer-events-none overflow-visible z-10 fixed"
