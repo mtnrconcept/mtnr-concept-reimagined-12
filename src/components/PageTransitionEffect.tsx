@@ -6,11 +6,11 @@ import { createParticleEffect, createSmokeEffect } from '@/lib/transition-effect
 export default function PageTransitionEffect() {
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLElement | null>(null);
   
   useEffect(() => {
     // Trouver le conteneur principal de la page
-    const mainContent = document.querySelector('main') as HTMLElement;
+    const mainContent = document.querySelector('main');
     if (!mainContent) return;
     
     contentRef.current = mainContent;
