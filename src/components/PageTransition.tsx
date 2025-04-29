@@ -1,3 +1,4 @@
+
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useRef, useEffect, useLayoutEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -68,7 +69,6 @@ export default function PageTransition({ children, keyId }: PageTransitionProps)
         fromPath={fromPath}
         toPath={location.pathname}
         imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-        onDispersionComplete={() => {/* callback si besoin */}}
         className="fixed inset-0 pointer-events-none"
       />
 

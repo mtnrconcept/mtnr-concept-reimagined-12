@@ -2,10 +2,12 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { DispersingLogo } from './DispersingLogo';
+import { useLocation } from 'react-router-dom';
 
 export const NeonLogo = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
   const [shouldDisperse, setShouldDisperse] = useState(false);
+  const location = useLocation();
   
   // Effet de scintillement du néon
   useEffect(() => {
@@ -50,6 +52,8 @@ export const NeonLogo = () => {
           imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
           triggerDispersion={shouldDisperse}
           onDispersionComplete={handleDispersionComplete}
+          fromPath={location.pathname}
+          toPath={location.pathname}
         />
       </div>
     </div>
