@@ -87,8 +87,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none"
             style={{
               background: "rgba(0, 0, 0, 0.95)",
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 100px, black 300px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 100px, black 300px)`
+              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 180px, black 400px)`,
+              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 180px, black 400px)`
             }}
           />
         )}

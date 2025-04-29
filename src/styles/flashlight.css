@@ -42,8 +42,8 @@
     pointer-events: none;
     z-index: 50;
     background-color: rgba(10, 0, 60, 0.98);
-    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 10%, black 100%);
-    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 10%, black 100%);
+    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 150px, black 500px);
+    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 150px, black 500px);
     animation: uv-vibration 4s infinite;
   }
   
@@ -63,7 +63,7 @@
     height: 100%;
     pointer-events: none;
     z-index: 45; /* En dessous du masque UV mais au-dessus du contenu normal */
-    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 200px, transparent 300px);
-    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 200px, transparent 300px);
+    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 300px, transparent 400px);
+    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 300px, transparent 400px);
   }
 }

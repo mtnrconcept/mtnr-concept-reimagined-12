@@ -11,6 +11,7 @@ interface UVSecretMessageProps {
   depth?: string;
   rotation?: number;
   className?: string;
+  fontSize?: string;
 }
 
 export default function UVSecretMessage({
@@ -20,7 +21,8 @@ export default function UVSecretMessage({
   color = "#D2FF3F",
   depth = "0.1",
   rotation = 0,
-  className = ""
+  className = "",
+  fontSize
 }: UVSecretMessageProps) {
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
@@ -48,7 +50,7 @@ export default function UVSecretMessage({
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
-        fontSize: size,
+        fontSize: fontSize || size,
         color,
         textShadow: `0 0 10px ${color}, 0 0 20px ${color}`,
         opacity: 0,
