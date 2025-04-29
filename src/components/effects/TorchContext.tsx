@@ -37,20 +37,23 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     // Update UV circle position if active
     if (uvCircleRef.current && uvMode) {
-      uvCircleRef.current.style.left = `${position.x}px`;
-      uvCircleRef.current.style.top = `${position.y}px`;
+      document.documentElement.style.setProperty('--mx', `${position.x}px`);
+      document.documentElement.style.setProperty('--my', `${position.y}px`);
     }
   };
 
-  // Handle mouse movement
+  // Handle mouse movement with improved performance
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isTorchActive) {
-        updateMousePosition({ x: e.clientX, y: e.clientY });
+        // Utilisation de requestAnimationFrame pour limiter les mises à jour
+        window.requestAnimationFrame(() => {
+          updateMousePosition({ x: e.clientX, y: e.clientY });
+        });
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
@@ -65,7 +68,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       removeUVCircle();
     };
-  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
+  }, [isTorchActive, uvMode, createUVCircle, removeUVCircle]);
 
   const contextValue = {
     isTorchActive,
@@ -84,8 +87,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none"
             style={{
               background: "rgba(0, 0, 0, 0.95)",
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 100px, black 300px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 100px, black 300px)`
+              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 100px, black 300px)`,
+              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 100px, black 300px)`
             }}
           />
         )}

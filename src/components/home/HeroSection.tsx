@@ -1,10 +1,16 @@
+
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
+import { useUVMode } from "../effects/UVModeContext";
+
 export default function HeroSection() {
-  return <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+  const { uvMode } = useUVMode();
+  
+  return (
+    <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
       <NeonLogo />
       
-      <div className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10" data-animate>
+      <div className={`relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl ${uvMode ? 'bg-opacity-60' : 'bg-black/70'} border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10`} data-animate>
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
@@ -38,5 +44,6 @@ export default function HeroSection() {
           </Link>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 }

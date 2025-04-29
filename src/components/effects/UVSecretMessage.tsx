@@ -26,18 +26,19 @@ export default function UVSecretMessage({
   const { isTorchActive } = useTorch();
   const elementRef = useRef<HTMLDivElement>(null);
   
-  // Show element only when UV mode is active
+  // Show element only when UV mode is active, but make it more visible inside the UV circle
   useEffect(() => {
     if (elementRef.current) {
       if (uvMode && isTorchActive) {
         elementRef.current.style.opacity = "1";
         elementRef.current.style.animation = "uvPulse 4s infinite";
+        elementRef.current.style.textShadow = `0 0 10px ${color}, 0 0 20px ${color}, 0 0 30px ${color}`;
       } else {
         elementRef.current.style.opacity = "0";
         elementRef.current.style.animation = "none";
       }
     }
-  }, [uvMode, isTorchActive]);
+  }, [uvMode, isTorchActive, color]);
 
   return (
     <div
@@ -56,7 +57,8 @@ export default function UVSecretMessage({
         fontWeight: 'bold',
         letterSpacing: '0.05em',
         textTransform: 'uppercase',
-        fontFamily: 'monospace'
+        fontFamily: 'monospace',
+        zIndex: 100
       }}
     >
       {message}

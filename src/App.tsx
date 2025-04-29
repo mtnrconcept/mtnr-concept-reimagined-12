@@ -67,9 +67,19 @@ const MouseTracker = () => {
   const { uvMode } = useUVMode();
 
   useEffect(() => {
-    if (isTorchActive && uvMode) {
-      document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
-      document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
+    if (isTorchActive) {
+      const updatePosition = () => {
+        document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
+        document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
+        document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
+        document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
+      };
+      
+      updatePosition();
+      
+      // Pour un suivi plus fluide
+      window.addEventListener('mousemove', updatePosition);
+      return () => window.removeEventListener('mousemove', updatePosition);
     }
   }, [mousePosition, isTorchActive, uvMode]);
 
