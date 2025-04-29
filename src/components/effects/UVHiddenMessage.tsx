@@ -20,10 +20,10 @@ export default function UVHiddenMessage({
   offsetY = 0
 }: UVHiddenMessageProps) {
   const messageRef = useRef<HTMLDivElement>(null);
-  const { isTorchActive, mousePosition } = useTorch();
+  const { isTorchActive, mousePosition, uvMode } = useTorch();
 
   useEffect(() => {
-    if (!messageRef.current || !isTorchActive) return;
+    if (!messageRef.current || !isTorchActive || !uvMode) return;
 
     const handleMouseMove = () => {
       if (!messageRef.current) return;
@@ -45,7 +45,7 @@ export default function UVHiddenMessage({
         // Apply effects
         messageRef.current.style.opacity = `${Math.min(0.95, intensity)}`;
         messageRef.current.style.filter = `blur(${Math.max(0, 3 - (intensity * 6))}px)`;
-        messageRef.current.style.textShadow = `0 0 ${5 + (intensity * 15)}px ${color}`;
+        messageRef.current.style.textShadow = `0 0 ${5 + (intensity * 15)}px ${color}, 0 0 ${10 + (intensity * 30)}px ${color}`;
       } else {
         messageRef.current.style.opacity = '0';
         messageRef.current.style.filter = 'blur(4px)';
@@ -58,10 +58,10 @@ export default function UVHiddenMessage({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, color]);
+  }, [isTorchActive, mousePosition, color, uvMode]);
 
-  // Only render when torch is active
-  if (!isTorchActive) return null;
+  // Only render when torch is active and in UV mode
+  if (!isTorchActive || !uvMode) return null;
 
   return (
     <div

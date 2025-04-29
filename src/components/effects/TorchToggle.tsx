@@ -38,14 +38,22 @@ export const TorchToggle = () => {
           
           <button
             onClick={toggleUVMode}
-            className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 ${
+            className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 relative ${
               uvMode 
-                ? "bg-purple-600 text-white shadow-purple-600/50" 
+                ? "bg-blue-500 text-white shadow-blue-500/50" 
                 : "bg-gray-800 text-purple-400"
             }`}
             aria-label="Toggle UV mode"
           >
             <Eye className="w-6 h-6" />
+            {uvMode && (
+              <span className="absolute inset-0 rounded-full animate-ping bg-blue-500 opacity-50"></span>
+            )}
+            {uvMode && (
+              <span className="absolute text-[8px] font-bold -top-1 -right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow">
+                UV
+              </span>
+            )}
           </button>
         </>
       )}

@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -129,5 +130,76 @@
     z-index: 1000;
     transform: translate(-50%, -50%);
     transition: transform 0.1s ease-out;
+  }
+  
+  /** UV Mode Styles */
+  .uv-mode-active {
+    color: #00AAFF;
+  }
+  
+  .uv-mode-active .neon-text {
+    color: #00FFAA !important;
+    text-shadow: 0 0 5px #00FFAA, 0 0 15px #00FFAA, 0 0 25px #00FFAA !important;
+  }
+  
+  .uv-mode-active h1, 
+  .uv-mode-active h2, 
+  .uv-mode-active h3 {
+    color: #00FFAA;
+    text-shadow: 0 0 8px #00FFAA;
+  }
+  
+  .uv-nav-link {
+    color: #00AAFF !important;
+    text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
+    position: relative;
+  }
+  
+  .uv-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #00AAFF;
+    box-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
+    opacity: 1;
+  }
+  
+  .uv-button {
+    box-shadow: 0 0 15px #00AAFF, inset 0 0 10px #00AAFF;
+    border-color: #00AAFF !important;
+  }
+  
+  .uv-mode-active .bg-yellow-400,
+  .uv-mode-active .text-yellow-400,
+  .uv-mode-active [class*="yellow"] {
+    background-color: #CCFF00 !important;
+    color: #CCFF00 !important;
+    text-shadow: 0 0 10px #CCFF00;
+  }
+  
+  .uv-mode-active .border-yellow-400 {
+    border-color: #00AAFF !important;
+    box-shadow: 0 0 15px #00AAFF;
+  }
+  
+  @keyframes uvPulse {
+    0% { opacity: 0.8; filter: brightness(1); }
+    50% { opacity: 1; filter: brightness(1.2); }
+    100% { opacity: 0.8; filter: brightness(1); }
+  }
+  
+  .uv-mode-active .neon-text,
+  .uv-mode-active .logo-container {
+    animation: uvPulse 2s infinite;
+  }
+  
+  /* Effet de bordure lumineuse pour les cartes en mode UV */
+  .uv-mode-active [class*="paper-texture"],
+  .uv-mode-active [class*="bg-black"] {
+    border: 1px solid #00AAFF !important;
+    box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
   }
 }

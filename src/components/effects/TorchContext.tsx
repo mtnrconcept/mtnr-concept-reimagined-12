@@ -64,6 +64,53 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
+  // Appliquer un effet global sur le document lorsque le mode UV est activé
+  useEffect(() => {
+    if (isTorchActive && uvMode) {
+      // Ajouter une classe au body pour les styles globaux du mode UV
+      document.body.classList.add('uv-mode-active');
+      
+      // Trouver tous les éléments de navigation et leur ajouter une lueur UV
+      const navLinks = document.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.classList.add('uv-nav-link');
+      });
+      
+      // Appliquer un effet aux boutons
+      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
+      buttons.forEach(button => {
+        button.classList.add('uv-button');
+      });
+      
+    } else {
+      document.body.classList.remove('uv-mode-active');
+      
+      const navLinks = document.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.classList.remove('uv-nav-link');
+      });
+      
+      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
+      buttons.forEach(button => {
+        button.classList.remove('uv-button');
+      });
+    }
+    
+    return () => {
+      document.body.classList.remove('uv-mode-active');
+      
+      const navLinks = document.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.classList.remove('uv-nav-link');
+      });
+      
+      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
+      buttons.forEach(button => {
+        button.classList.remove('uv-button');
+      });
+    };
+  }, [isTorchActive, uvMode]);
+
   useLayoutEffect(() => {
     if (!isTorchActive) return;
 
@@ -82,7 +129,11 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const offsetY = (dy / norm) * shadowLength;
       const blurRadius = 20 + (distance / 10);
       
-      el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 0, 0, 0.5)`;
+      if (uvMode) {
+        el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 170, 255, 0.5)`;
+      } else {
+        el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 0, 0, 0.5)`;
+      }
     });
 
     return () => {
@@ -90,7 +141,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         el.style.boxShadow = "";
       });
     };
-  }, [mousePosition, elementsToIlluminate, isTorchActive]);
+  }, [mousePosition, elementsToIlluminate, isTorchActive, uvMode]);
 
   const radius = 600;
   
@@ -119,11 +170,15 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
               </radialGradient>
               <radialGradient id="uv-torch-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#2D0076" stopOpacity="0.1" />
-                <stop offset="40%" stopColor="#2D0076" stopOpacity="0.3" />
-                <stop offset="70%" stopColor="black" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="black" stopOpacity="0.95" />
+                <stop offset="0%" stopColor="#1A0080" stopOpacity="0.1" />
+                <stop offset="30%" stopColor="#1A0080" stopOpacity="0.3" />
+                <stop offset="60%" stopColor="black" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.98" />
               </radialGradient>
+              <filter id="uv-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="10" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
               <mask id="torch-mask">
                 <rect width="100%" height="100%" fill="white" />
                 <circle
@@ -137,21 +192,31 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             <rect
               width="100%"
               height="100%"
-              fill={uvMode ? "rgba(25, 0, 50, 0.98)" : "rgba(0, 0, 0, 0.95)"}
+              fill={uvMode ? "rgba(5, 0, 40, 0.98)" : "rgba(0, 0, 0, 0.95)"}
               mask="url(#torch-mask)"
             />
             {/* Effet de halo UV autour du curseur si en mode UV */}
             {uvMode && (
-              <circle
-                cx={mousePosition.x}
-                cy={mousePosition.y}
-                r="100"
-                fill="none"
-                stroke="#7E69AB"
-                strokeWidth="2"
-                strokeOpacity="0.3"
-                filter="blur(5px)"
-              />
+              <>
+                <circle
+                  cx={mousePosition.x}
+                  cy={mousePosition.y}
+                  r="120"
+                  fill="none"
+                  stroke="#00AAFF"
+                  strokeWidth="2"
+                  strokeOpacity="0.5"
+                  filter="blur(5px)"
+                />
+                <circle
+                  cx={mousePosition.x}
+                  cy={mousePosition.y}
+                  r="20"
+                  fill="#00AAFF"
+                  opacity="0.3"
+                  filter="blur(8px)"
+                />
+              </>
             )}
           </svg>
         )}

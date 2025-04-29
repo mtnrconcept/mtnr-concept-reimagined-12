@@ -24,7 +24,7 @@ export default function UVText({
 }: UVTextProps) {
   const textRef = useRef<HTMLDivElement>(null);
   const hiddenTextRef = useRef<HTMLParagraphElement>(null);
-  const { isTorchActive, mousePosition } = useTorch();
+  const { isTorchActive, mousePosition, uvMode } = useTorch();
   const [isIlluminated, setIsIlluminated] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function UVText({
       
       // Check if mouse is close enough to illuminate the text
       // Adjust threshold based on the size of your elements
-      const threshold = 300;
+      const threshold = uvMode ? 500 : 300;
       const newIsIlluminated = distance < threshold;
       
       if (newIsIlluminated !== isIlluminated) {
@@ -54,11 +54,29 @@ export default function UVText({
       if (newIsIlluminated) {
         // Calculate intensity based on distance (stronger when closer)
         const intensity = 1 - (distance / threshold);
-        hiddenTextRef.current.style.opacity = `${Math.min(1, intensity * 3)}`;
-        hiddenTextRef.current.style.textShadow = `0 0 ${15 * intensity}px ${uvColor}`;
+        const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
+        hiddenTextRef.current.style.opacity = `${opacityValue}`;
+        
+        // Larger glow for UV mode
+        const glowSize = uvMode ? 25 * intensity : 15 * intensity;
+        hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#00AAFF" : uvColor}, 
+                                                 0 0 ${glowSize * 2}px ${uvMode ? "#00AAFF" : uvColor}`;
+        
+        if (uvMode) {
+          // Effet de vibration légère en mode UV
+          const vibrationX = Math.sin(Date.now() / 200) * 0.5;
+          const vibrationY = Math.cos(Date.now() / 180) * 0.5;
+          hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
+          hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
+        } else {
+          hiddenTextRef.current.style.transform = '';
+          hiddenTextRef.current.style.filter = '';
+        }
       } else {
         hiddenTextRef.current.style.opacity = '0';
         hiddenTextRef.current.style.textShadow = 'none';
+        hiddenTextRef.current.style.transform = '';
+        hiddenTextRef.current.style.filter = '';
       }
     };
 
@@ -70,7 +88,7 @@ export default function UVText({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, isIlluminated, uvColor]);
+  }, [isTorchActive, mousePosition, isIlluminated, uvColor, uvMode]);
 
   return (
     <div className={cn(
@@ -81,6 +99,9 @@ export default function UVText({
       <div 
         ref={textRef} 
         className={cn("visible select-none transition-opacity", textSize)}
+        style={{
+          opacity: uvMode && isIlluminated ? 0.3 : 1
+        }}
       >
         {text}
       </div>
@@ -95,7 +116,7 @@ export default function UVText({
         )}
         style={{
           opacity: isIlluminated ? 1 : opacity,
-          color: uvColor,
+          color: uvMode ? "#00AAFF" : uvColor,
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}
