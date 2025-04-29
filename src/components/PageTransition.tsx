@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useRef, useEffect } from "react";
 
-// Optimized transition inspired by David Langarica with improved performance
+// Transition optimisée inspirée par David Langarica, avec effet de fumée uniquement
 export default function PageTransition({ children, keyId }: { children: ReactNode; keyId: string }) {
   const contentRef = useRef<HTMLDivElement>(null);
   
@@ -40,7 +40,7 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
           zIndex: 10
         }}
       >
-        {/* Container for page content with particle/smoke effect */}
+        {/* Container for page content with smoke effect */}
         <motion.div
           ref={contentRef}
           initial={{ 
@@ -63,12 +63,9 @@ export default function PageTransition({ children, keyId }: { children: ReactNod
             duration: 0.8, // Shorter entry animation
             ease: [0.25, 1, 0.5, 1],
           }}
-          className="particles-container"
+          className="smoke-container"
         >
           {children}
-          
-          {/* Layer for particle exit effect */}
-          <div className="absolute inset-0 pointer-events-none particles-exit-layer" />
           
           {/* Layer for smoke enter effect */}
           <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />

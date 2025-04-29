@@ -42,16 +42,16 @@ export const smokeEffectPresets: SmokeEffectOptions[] = [
   }
 ];
 
-// Préréglage spécifique pour les transitions de page (optimisé pour la performance)
+// Préréglage amélioré pour les transitions de page (optimisé pour l'effet de fumée)
 export const pageTransitionPreset: SmokeEffectOptions = {
   baseColor: '#FFD700',
   accentColor: '#FFFFFF',
-  particleCount: 100, // Réduit pour de meilleures performances
+  particleCount: 140, // Plus de particules pour un effet de fumée plus visible
   direction: 'radial',
-  speed: 1.0,
-  intensity: 1.3,
-  turbulence: 0.4, // Réduit pour des mouvements plus fluides
-  duration: 1000, // Plus rapide pour de meilleures transitions
+  speed: 0.9,  // Vitesse légèrement réduite pour plus de fluidité
+  intensity: 1.5, // Intensité augmentée pour un meilleur effet visuel
+  turbulence: 0.5, // Turbulence modérée pour un effet de fumée réaliste
+  duration: 1200, // Un peu plus rapide pour une meilleure réactivité
   colorVariation: true,
-  blurAmount: 0.8, // Moins de flou pour de meilleures performances
+  blurAmount: 1.2, // Plus de flou pour un effet de fumée plus prononcé
 };

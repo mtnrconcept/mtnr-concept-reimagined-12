@@ -4,13 +4,13 @@
 @import 'tailwindcss/utilities';
 
 @layer components {
-  /* Optimized styles for particle effect */
-  .particles-container {
+  /* Optimized styles for smoke effect */
+  .smoke-container {
     position: relative;
     min-height: 100%;
   }
   
-  .particles-exit-layer {
+  .smoke-enter-layer {
     z-index: 50;
   }
   
@@ -84,36 +84,6 @@
     border-radius: 50%;
     animation: smoke-float 3s ease-out forwards;
     will-change: transform, opacity, filter;
-  }
-  
-  /* Optimized particle animation with GPU acceleration */
-  @keyframes particleDissolve {
-    0% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-    }
-    50% {
-      opacity: 0.5;
-      transform: translate3d(calc(var(--tx, 20px) * 0.5), 
-                            calc(var(--ty, -30px) * 0.5), 
-                            calc(var(--tz, 0px) * 0.5))
-                 scale(0.5)
-                 rotate(calc(var(--rx, 180deg) * 0.5));
-    }
-    100% {
-      opacity: 0;
-      transform: translate3d(var(--tx, 20px), 
-                            var(--ty, -30px), 
-                            var(--tz, 0px))
-                 scale(var(--s, 0))
-                 rotate(var(--rx, 180deg));
-    }
-  }
-  
-  /* Optimize with GPU acceleration and reduced animation complexity */
-  .particle {
-    animation: particleDissolve 3s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-    will-change: transform, opacity;
   }
   
   /* General styles */

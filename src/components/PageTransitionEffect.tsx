@@ -1,9 +1,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { createParticleEffect, createSmokeEffect } from '@/lib/transitions';
+import { createSmokeEffect } from '@/lib/transitions';
 import { pageTransitionPreset } from '@/components/effects/smoke-presets';
-import { createSmokeTextEffect } from '@/lib/transitions';
 
 export default function PageTransitionEffect() {
   const location = useLocation();
@@ -45,36 +44,18 @@ export default function PageTransitionEffect() {
       // Indiquer qu'une transition est en cours
       setIsTransitioning(true);
       
-      // Trouver le logo (s'il existe sur la page)
-      const logoContainer = document.querySelector('.smoke-logo-container');
-      const logoImg = logoContainer?.querySelector('img');
-      
-      // Ne pas avoir plusieurs animations en même temps
-      // Prioriser l'effet de particules pour une transition rapide
-      if (window.requestIdleCallback) {
-        window.requestIdleCallback(() => {
-          if (contentRef.current) {
-            createParticleEffect(contentRef.current);
-          }
-        }, { timeout: 50 });  // Timeout plus court pour démarrer plus vite
-      } else {
-        setTimeout(() => {
-          if (contentRef.current) {
-            createParticleEffect(contentRef.current);
-          }
-        }, 10);
-      }
-      
-      // Attendre que l'effet de particule se disperse avant d'afficher le nouveau contenu
+      // Utiliser un délai court pour permettre au navigateur de traiter les changements visuels
       transitionTimeoutRef.current = window.setTimeout(() => {
-        // Appliquer l'effet de fumée au nouveau contenu
+        // Appliquer l'effet de fumée directement sur le contenu
         if (contentRef.current) {
-          createSmokeEffect(contentRef.current);
+          createSmokeEffect(contentRef.current, pageTransitionPreset);
         }
         
-        // Réinitialiser l'indicateur de transition
-        setIsTransitioning(false);
-      }, 500); // Transition plus rapide
+        // Réinitialiser l'indicateur de transition après la fin de l'effet
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, pageTransitionPreset.duration || 1000);
+      }, 150); // Court délai pour le début de transition
     }
     
     prevPathRef.current = location.pathname;
