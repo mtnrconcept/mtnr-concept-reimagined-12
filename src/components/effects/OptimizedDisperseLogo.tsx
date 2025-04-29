@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { createLogoDisperseEffect } from '@/lib/transitions/particle-effect';
+import { createLogoDisperseEffect } from '@/lib/transitions/particles/disperse-effect';
 
 interface OptimizedDisperseLogoProps {
   onTransitionComplete?: () => void;
