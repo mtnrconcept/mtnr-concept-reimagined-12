@@ -1,3 +1,4 @@
+
 import { useLayoutEffect, useEffect, useRef } from 'react';
 import { createLogoDisperseEffect, DisperseOptions } from '@/lib/transitions/particle-effect';
 
@@ -20,27 +21,32 @@ export const DispersingLogo = ({
 }: DispersingLogoProps) => {
   const logoRef = useRef<HTMLImageElement>(null);
   const effectRef = useRef<{ cancel: () => void } | null>(null);
+  const prevTriggerRef = useRef<boolean>(false);
 
-  // Trigger dispersion immediately after layout flush
+  // Trigger dispersion immediately after layout flush, but only when going from false to true
   useLayoutEffect(() => {
-    if (!triggerDispersion || !logoRef.current) return;
+    // Ne déclencher que si triggerDispersion passe de false à true
+    if (triggerDispersion && !prevTriggerRef.current && logoRef.current) {
+      // Use next animation frame to avoid blocking paint
+      requestAnimationFrame(() => {
+        const opts: DisperseOptions = {
+          particleCount: 600,
+          dispersionStrength: 2.0,
+          duration: 1200,
+          colorPalette: ['#FFD700', '#222222', '#FFFFFF'],
+          onComplete: () => {
+            onDispersionComplete?.();
+          },
+        };
 
-    // Use next animation frame to avoid blocking paint
-    requestAnimationFrame(() => {
-      const opts: DisperseOptions = {
-        particleCount: 600,
-        dispersionStrength: 2.0,
-        duration: 1200,
-        colorPalette: ['#FFD700', '#222222', '#FFFFFF'],
-        onComplete: () => {
-          onDispersionComplete?.();
-        },
-      };
-
-      // Cancel any existing effect
-      effectRef.current?.cancel();
-      effectRef.current = createLogoDisperseEffect(logoRef.current!, opts);
-    });
+        // Cancel any existing effect
+        effectRef.current?.cancel();
+        effectRef.current = createLogoDisperseEffect(logoRef.current!, opts);
+      });
+    }
+    
+    // Mettre à jour la référence de l'état précédent
+    prevTriggerRef.current = triggerDispersion;
   }, [triggerDispersion, onDispersionComplete]);
 
   // Cleanup on unmount
@@ -51,6 +57,12 @@ export const DispersingLogo = ({
     };
   }, []);
 
+  // Ne pas cacher le logo par défaut, seulement pendant l'animation de dispersion
+  const logoStyle = {
+    willChange: 'transform, opacity',
+    opacity: 1, // Toujours visible par défaut
+  };
+
   return (
     <div className={`relative ${className}`}>
       <img
@@ -58,7 +70,7 @@ export const DispersingLogo = ({
         src={imageSrc}
         alt="logo"
         className="w-full h-auto"
-        style={{ willChange: 'transform, opacity' }}
+        style={logoStyle}
         draggable={false}
       />
     </div>

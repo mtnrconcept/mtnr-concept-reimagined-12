@@ -19,14 +19,20 @@ export default function PageTransitionEffect() {
   const navigationStartTimeRef = useRef<number>(0);
   const navigationTimeoutRef = useRef<number | null>(null);
   const isNavigatingRef = useRef<boolean>(false);
+  const isLeavingHomeRef = useRef<boolean>(false);
 
   // Réinitialiser l'état si on reste sur la page actuelle
   useEffect(() => {
-    // Attendre que l'animation soit terminée avant de réinitialiser
+    // Si on arrive sur une page (y compris accueil) depuis une autre page, 
+    // on ne veut pas déclencher la dispersion
+    if (!isNavigatingRef.current) {
+      setTriggerLogoDispersion(false);
+    }
+    
+    // Réinitialiser le flag de navigation
     const resetTimeout = setTimeout(() => {
-      if (!isNavigatingRef.current) {
-        setTriggerLogoDispersion(false);
-      }
+      isNavigatingRef.current = false;
+      isLeavingHomeRef.current = false;
     }, 1000);
     
     return () => clearTimeout(resetTimeout);
@@ -48,30 +54,40 @@ export default function PageTransitionEffect() {
         // Ignorer si c'est la page actuelle ou si une navigation est déjà en cours
         if (targetPath === location.pathname || isNavigatingRef.current) return;
         
-        // Empêcher la navigation par défaut
-        e.preventDefault();
-        e.stopPropagation();
+        // Déterminer si on quitte la page d'accueil
+        const isLeavingHome = location.pathname === '/' && targetPath !== '/';
+        isLeavingHomeRef.current = isLeavingHome;
         
-        // Marquer qu'une navigation est en cours pour éviter les doubles clics
-        isNavigatingRef.current = true;
-        
-        // Enregistrer l'heure de début
-        navigationStartTimeRef.current = performance.now();
-        
-        // Déclencher immédiatement la dispersion
-        setTriggerLogoDispersion(true);
-        
-        // Stocker le chemin de destination
-        lastPathRef.current = targetPath;
-        
-        // Ajouter un timeout de sécurité pour naviguer même si l'animation échoue
-        if (navigationTimeoutRef.current) {
-          clearTimeout(navigationTimeoutRef.current);
+        // N'activer la dispersion que si on quitte la page d'accueil
+        if (isLeavingHome) {
+          // Empêcher la navigation par défaut
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Marquer qu'une navigation est en cours pour éviter les doubles clics
+          isNavigatingRef.current = true;
+          
+          // Enregistrer l'heure de début
+          navigationStartTimeRef.current = performance.now();
+          
+          // Déclencher immédiatement la dispersion
+          setTriggerLogoDispersion(true);
+          
+          // Stocker le chemin de destination
+          lastPathRef.current = targetPath;
+          
+          // Ajouter un timeout de sécurité pour naviguer même si l'animation échoue
+          if (navigationTimeoutRef.current) {
+            clearTimeout(navigationTimeoutRef.current);
+          }
+          navigationTimeoutRef.current = window.setTimeout(() => {
+            navigate(targetPath);
+            isNavigatingRef.current = false;
+          }, 1000); // Fallback après 1 seconde maximum
+        } else {
+          // Si on ne quitte pas la page d'accueil, naviguer directement sans animation
+          // La navigation standard s'effectue sans interférence
         }
-        navigationTimeoutRef.current = window.setTimeout(() => {
-          navigate(targetPath);
-          isNavigatingRef.current = false;
-        }, 1000); // Fallback après 1 seconde maximum
       }
     };
     
@@ -103,7 +119,7 @@ export default function PageTransitionEffect() {
     console.log(`Transition latency: ${Math.round(latency)}ms`);
     
     // Naviguer vers la page demandée s'il y a eu un clic de navigation
-    if (lastPathRef.current !== location.pathname) {
+    if (lastPathRef.current !== location.pathname && isLeavingHomeRef.current) {
       navigate(lastPathRef.current);
     }
     
@@ -111,6 +127,7 @@ export default function PageTransitionEffect() {
     setTimeout(() => {
       setTriggerLogoDispersion(false);
       isNavigatingRef.current = false;
+      isLeavingHomeRef.current = false;
     }, 100);
   }, [location.pathname, navigate]);
 

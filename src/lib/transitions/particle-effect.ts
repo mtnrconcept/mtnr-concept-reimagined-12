@@ -1,4 +1,3 @@
-
 import { random } from './utils';
 
 /**
@@ -283,8 +282,14 @@ export function createLogoDisperseEffect(
   const endTime = startTime + duration + 500; // +500ms pour les retards
   let animFrameId = 0;
   
-  // Temporairement masquer l'image originale
+  // Temporairement masquer l'image originale pendant l'animation uniquement
   const originalOpacity = imageElement.style.opacity;
+  let originalDisplay = imageElement.style.display;
+  if (!originalDisplay || originalDisplay === 'none') {
+    originalDisplay = 'block';
+  }
+  
+  // Masquer l'image d'origine pendant l'animation
   imageElement.style.opacity = '0';
   
   function easeInOutCubic(t: number): number {
@@ -334,7 +339,15 @@ export function createLogoDisperseEffect(
       animFrameId = 0;
     }
     particleContainer.remove();
-    imageElement.style.opacity = originalOpacity; // Restaurer l'opacité originale
+    
+    // Restaurer l'image d'origine uniquement si l'on est sur la page qui l'a déclenchée
+    // (Sur la page d'accueil, on veut remettre l'opacité)
+    // Si l'on est sur une autre page, l'opacité reste à 0
+    if (window.location.pathname === '/') {
+      imageElement.style.opacity = '1'; // Toujours restaurer à 1 pour être sûr que c'est visible
+      imageElement.style.display = originalDisplay;
+    }
+    
     onComplete();
   }
   
