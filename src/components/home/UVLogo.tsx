@@ -66,7 +66,7 @@ export const UVLogo = () => {
           exit={{ opacity: 0, scale: 0.9 }}
         >
           <img 
-            src="/lovable-uploads/d4a3f48e-d5e7-45c0-91b8-cc0a34c0bdd2.png" 
+            src="/lovable-uploads/aaae9aeb-9678-49a4-8be3-4305ab554a55.png" 
             alt="MTNR UV Logo"
             className="w-full h-auto"
             draggable={false}
