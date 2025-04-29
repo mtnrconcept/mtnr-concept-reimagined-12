@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
+import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 
 function AnimatedRoutes() {
@@ -30,16 +30,19 @@ function AnimatedRoutes() {
   }, []);
   
   return (
-    <PageTransition keyId={location.pathname}>
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/what-we-do" element={<WhatWeDo />} />
-        <Route path="/artists" element={<Artists />} />
-        <Route path="/book" element={<Book />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </PageTransition>
+    <>
+      <PageTransitionEffect />
+      <PageTransition keyId={location.pathname}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/what-we-do" element={<WhatWeDo />} />
+          <Route path="/artists" element={<Artists />} />
+          <Route path="/book" element={<Book />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PageTransition>
+    </>
   );
 }
 
