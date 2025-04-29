@@ -61,6 +61,21 @@ function AnimatedRoutes() {
   );
 }
 
+// Suiveur de curseur pour mettre à jour les variables CSS utilisées par le masque UV
+const MouseTracker = () => {
+  const { mousePosition, isTorchActive } = useTorch();
+  const { uvMode } = useUVMode();
+
+  useEffect(() => {
+    if (isTorchActive && uvMode) {
+      document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
+      document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
+    }
+  }, [mousePosition, isTorchActive, uvMode]);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -76,6 +91,7 @@ const App = () => (
             </BrowserRouter>
             <ParticleEffect />
             <TorchToggle />
+            <MouseTracker />
           </Torch3DProvider>
         </TorchProvider>
       </UVModeProvider>

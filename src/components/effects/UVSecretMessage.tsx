@@ -1,5 +1,7 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useUVMode } from "./UVModeContext";
+import { useTorch } from "./TorchContext";
 
 interface UVSecretMessageProps {
   message: string;
@@ -20,8 +22,26 @@ export default function UVSecretMessage({
   rotation = 0,
   className = ""
 }: UVSecretMessageProps) {
+  const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
+  const elementRef = useRef<HTMLDivElement>(null);
+  
+  // Show element only when UV mode is active
+  useEffect(() => {
+    if (elementRef.current) {
+      if (uvMode && isTorchActive) {
+        elementRef.current.style.opacity = "1";
+        elementRef.current.style.animation = "uvPulse 4s infinite";
+      } else {
+        elementRef.current.style.opacity = "0";
+        elementRef.current.style.animation = "none";
+      }
+    }
+  }, [uvMode, isTorchActive]);
+
   return (
     <div
+      ref={elementRef}
       data-depth={depth}
       className={`parallax-element absolute pointer-events-none select-none ${className}`}
       style={{
@@ -36,7 +56,6 @@ export default function UVSecretMessage({
         fontWeight: 'bold',
         letterSpacing: '0.05em',
         textTransform: 'uppercase',
-        animation: 'uvPulse 4s infinite',
         fontFamily: 'monospace'
       }}
     >

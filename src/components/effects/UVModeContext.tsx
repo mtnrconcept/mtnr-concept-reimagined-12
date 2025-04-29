@@ -31,7 +31,7 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const createUVCircle = (mousePosition: { x: number; y: number }) => {
     if (!uvCircleRef.current) {
       const circle = document.createElement('div');
-      circle.className = 'uv-light-circle active';
+      circle.className = 'uv-light-circle';
       circle.style.left = `${mousePosition.x}px`;
       circle.style.top = `${mousePosition.y}px`;
       document.body.appendChild(circle);
