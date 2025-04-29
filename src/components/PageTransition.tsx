@@ -31,9 +31,6 @@ export default function PageTransition({
       prevPathRef.current = location.pathname;
       return;
     }
-
-    // La navigation est maintenant gérée par OptimizedDisperseLogo
-    // Nous gérons ici uniquement l'état de chargement de la page
   }, [location.pathname]);
 
   const handleDisperseComplete = () => {

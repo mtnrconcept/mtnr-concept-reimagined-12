@@ -32,6 +32,11 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
           // Activer l'effet de dispersion et stocker la destination
           setIsDisperseActive(true);
           setPendingNavigation(href);
+          
+          // Mise à jour de window.pageTransitionInProgress pour d'autres composants
+          window.pageTransitionInProgress = true;
+          
+          console.log('Logo dispersion activated for navigation to:', href);
         }
       }
     };
@@ -47,16 +52,24 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
       particleCount: 800,
       dispersionStrength: 2.5,
-      duration: 1200,
+      duration: 1000, // Durée de dispersion d'une seconde
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
+        console.log('Dispersion effect completed');
+        
         // Attendre 500ms après la dispersion avant de naviguer
         setTimeout(() => {
           if (pendingNavigation) {
+            console.log('Navigating to:', pendingNavigation);
             navigate(pendingNavigation);
             setPendingNavigation(null);
           }
           setIsDisperseActive(false);
+          
+          // Indiquer que la transition est terminée
+          window.pageTransitionInProgress = false;
+          
+          // Appeler le callback de fin si fourni
           onTransitionComplete?.();
         }, 500);
       }

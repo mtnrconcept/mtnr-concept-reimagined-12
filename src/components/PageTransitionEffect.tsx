@@ -3,8 +3,8 @@ import { useRef, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 /**
- * Composant optimisé pour des transitions de pages ultra-fluides 
- * et une dispersion de logo esthétiquement satisfaisante.
+ * Composant pour gérer les transitions de pages ultra-fluides 
+ * avec le support de l'animation de dispersion du logo.
  */
 export default function PageTransitionEffect() {
   const location = useLocation();
@@ -18,6 +18,6 @@ export default function PageTransitionEffect() {
     }
   }, []);
 
-  // Plus besoin de code supplémentaire ici car OptimizedDisperseLogo gère la navigation
+  // Ce composant ne fait plus d'animation directe, car OptimizedDisperseLogo gère toute la navigation
   return null;
 }
