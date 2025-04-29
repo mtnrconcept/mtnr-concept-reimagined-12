@@ -30,7 +30,7 @@ export default function Artists() {
         <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
           <div className="w-full max-w-5xl">
-            <div className="px-[240px] mx-[83px]">
+            <div className="mx-[83px] px-0">
               <NeonText text="Le Crew" className="text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={15} />
             </div>
