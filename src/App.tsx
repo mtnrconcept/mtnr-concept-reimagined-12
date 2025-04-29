@@ -9,7 +9,6 @@ import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
-import { Torch3DProvider } from "./components/effects/Torch3DContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -23,9 +22,8 @@ import { checkFeatureSupport } from "@/lib/feature-detection";
 // Component to display UV label
 const UVCornerLabel = () => {
   const { uvMode } = useUVMode();
-  const { isTorchActive } = useTorch();
   
-  if (!isTorchActive || !uvMode) return null;
+  if (!uvMode) return null;
   
   return (
     <div className="uv-corner-label">UV</div>
@@ -67,7 +65,7 @@ const MouseTracker = () => {
   const { uvMode } = useUVMode();
 
   useEffect(() => {
-    if (isTorchActive) {
+    if (isTorchActive || uvMode) {
       const updatePosition = () => {
         document.documentElement.style.setProperty('--mx', `${mousePosition.x}px`);
         document.documentElement.style.setProperty('--my', `${mousePosition.y}px`);
@@ -93,18 +91,16 @@ const App = () => (
     <TooltipProvider>
       <UVModeProvider>
         <TorchProvider>
-          <Torch3DProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={null}>
-                <AnimatedRoutes />
-              </Suspense>
-            </BrowserRouter>
-            <ParticleEffect />
-            <TorchToggle />
-            <MouseTracker />
-          </Torch3DProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Suspense fallback={null}>
+              <AnimatedRoutes />
+            </Suspense>
+          </BrowserRouter>
+          <ParticleEffect />
+          <TorchToggle />
+          <MouseTracker />
         </TorchProvider>
       </UVModeProvider>
     </TooltipProvider>

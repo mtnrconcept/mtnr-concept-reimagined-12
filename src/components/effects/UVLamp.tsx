@@ -4,6 +4,7 @@ import { useUVMode } from './UVModeContext';
 import { useTorch } from './TorchContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
 
 interface UVLampProps {
   siteUrl?: string;
@@ -18,6 +19,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
   className,
   showUVLogo = true
 }) => {
+  const location = useLocation();
   const { uvMode } = useUVMode();
   const { isTorchActive, mousePosition } = useTorch();
   const [isVisible, setIsVisible] = React.useState(false);
@@ -84,7 +86,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
   useEffect(() => {
     let flickerInterval: ReturnType<typeof setInterval> | null = null;
     
-    if (uvMode && isTorchActive && showUVLogo) {
+    if (uvMode && showUVLogo) {
       flickerInterval = setInterval(() => {
         setGlowIntensity(Math.random() * 0.4 + 1.1);
       }, 100);
@@ -95,11 +97,11 @@ export const UVLamp: React.FC<UVLampProps> = ({
         clearInterval(flickerInterval);
       }
     };
-  }, [uvMode, isTorchActive, showUVLogo]);
+  }, [uvMode, showUVLogo]);
 
   // Visibility management based on UV mode
   useEffect(() => {
-    const visible = uvMode && isTorchActive;
+    const visible = uvMode;
     
     // Use a slight delay for turning off to avoid flashes
     if (visible) {
@@ -108,7 +110,10 @@ export const UVLamp: React.FC<UVLampProps> = ({
       const timeout = setTimeout(() => setIsVisible(false), 100);
       return () => clearTimeout(timeout);
     }
-  }, [uvMode, isTorchActive]);
+  }, [uvMode]);
+
+  // On n'affiche pas le logo UV si nous ne sommes pas sur la page d'accueil
+  const shouldShowLogo = showUVLogo && (location.pathname === "/");
 
   if (!isVisible) return null;
 
@@ -131,8 +136,8 @@ export const UVLamp: React.FC<UVLampProps> = ({
         }}
       />
       
-      {/* UV Logo */}
-      {showUVLogo && (
+      {/* UV Logo - uniquement affiché sur la page d'accueil */}
+      {shouldShowLogo && (
         <div 
           ref={logoRef}
           className="fixed inset-0 flex justify-center items-center z-45 pointer-events-none"

@@ -13,7 +13,7 @@ interface TorchContextType {
 const TorchContext = createContext<TorchContextType>({
   isTorchActive: false,
   setIsTorchActive: () => {},
-  mousePosition: { x: 0, y: 0 },
+  mousePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
   updateMousePosition: () => {},
   containerRef: { current: null },
 });
@@ -29,8 +29,24 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     uvMode, 
     uvCircleRef, 
     createUVCircle, 
-    removeUVCircle 
+    removeUVCircle,
+    toggleUVMode
   } = useUVMode();
+
+  // Fonction modifiée pour gérer les transitions entre modes
+  const handleTorchActivation = (active: boolean) => {
+    // Si on active la torche et qu'on est en mode UV, désactiver le mode UV
+    if (active && uvMode) {
+      toggleUVMode(); // Désactiver le mode UV
+      setTimeout(() => {
+        setIsTorchActive(true); // Activer la torche normale après un court délai
+      }, 100);
+    } 
+    // Sinon, simplement activer/désactiver la torche
+    else {
+      setIsTorchActive(active);
+    }
+  };
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
@@ -76,9 +92,16 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [isTorchActive, uvMode, createUVCircle, removeUVCircle]);
 
+  // Assurer que les deux modes ne sont jamais actifs simultanément
+  useEffect(() => {
+    if (uvMode && isTorchActive) {
+      setIsTorchActive(false); // Désactiver la torche normale si le mode UV est activé
+    }
+  }, [uvMode]);
+
   const contextValue = {
     isTorchActive,
-    setIsTorchActive,
+    setIsTorchActive: handleTorchActivation,
     mousePosition,
     updateMousePosition,
     containerRef,
