@@ -7,15 +7,15 @@
   }
   
   .uv-mode-active .neon-text {
-    color: #4FF0FF !important;
-    text-shadow: 0 0 5px #00AAFF, 0 0 15px #00AAFF, 0 0 25px #00AAFF !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F, 0 0 15px #D2FF3F, 0 0 25px #D2FF3F !important;
   }
   
   .uv-mode-active h1, 
   .uv-mode-active h2, 
   .uv-mode-active h3 {
-    color: #4FF0FF;
-    text-shadow: 0 0 8px #00AAFF;
+    color: #D2FF3F;
+    text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
   }
   
   .uv-nav-link {
@@ -37,9 +37,11 @@
   }
   
   .uv-button {
+    background: transparent !important;
     box-shadow: 0 0 15px #00AAFF, inset 0 0 10px #00AAFF;
     border: 1px solid #00AAFF !important;
-    color: #4FF0FF !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 8px #D2FF3F;
   }
   
   .uv-mode-active .bg-black,
@@ -47,15 +49,20 @@
   .uv-mode-active .bg-gray-800,
   .uv-mode-active .bg-gray-900 {
     background-color: rgba(15, 0, 70, 0.8) !important;
-    border: 1px solid #2680FF !important;
-    box-shadow: 0 0 15px rgba(38, 128, 255, 0.3) !important;
+    border: 1px solid #0066FF !important;
+    box-shadow: 0 0 15px rgba(0, 102, 255, 0.3) !important;
   }
   
   .uv-mode-active .text-yellow-400,
-  .uv-mode-active .bg-yellow-400 {
+  .uv-mode-active .text-primary {
     color: #D2FF3F !important;
+    text-shadow: 0 0 8px #D2FF3F !important;
+  }
+  
+  .uv-mode-active .bg-yellow-400,
+  .uv-mode-active .bg-primary {
     background-color: #D2FF3F !important;
-    text-shadow: 0 0 8px #A2FF00 !important;
+    box-shadow: 0 0 12px rgba(210, 255, 63, 0.6) !important;
   }
   
   .uv-mode-active .border-yellow-400 {
@@ -77,6 +84,15 @@
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
   }
   
+  /* Les conteneurs avec du contenu en mode UV */
+  .uv-mode-active .container {
+    background-color: rgba(10, 0, 60, 0.4) !important;
+    border-radius: 12px;
+    border: 1px solid #0066FF !important;
+    box-shadow: 0 0 20px rgba(0, 102, 255, 0.2) !important;
+  }
+  
+  /* Effet de pulsation subtile */
   @keyframes uvPulse {
     0% { opacity: 0.8; filter: brightness(1); }
     50% { opacity: 1; filter: brightness(1.2); }
@@ -90,8 +106,8 @@
   
   /* UV glow pour les textes */
   .uv-hidden-text {
-    color: #4FF0FF !important;
-    text-shadow: 0 0 5px #00AAFF, 0 0 10px #00AAFF !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F !important;
   }
   
   /* UV label dans le coin inférieur droit */
@@ -100,11 +116,38 @@
     bottom: 1rem;
     right: 1rem;
     background-color: transparent;
-    color: #4FF0FF;
+    color: #00AAFF;
     font-size: 1.5rem;
     font-weight: bold;
     text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
     opacity: 0.8;
     z-index: 100;
+  }
+
+  /* Navbar style en mode UV */
+  .uv-mode-active nav {
+    background-color: rgba(10, 0, 40, 0.7) !important;
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.3) !important;
+  }
+  
+  .uv-mode-active nav a {
+    color: #4FA9FF !important;
+    text-shadow: 0 0 5px #00AAFF !important;
+  }
+  
+  /* Effet de halo autour des boutons "Book" */
+  .uv-mode-active a[href*="book"], 
+  .uv-mode-active button:has(span:contains("Book")) {
+    background-color: transparent !important;
+    border: 1px solid #D2FF3F !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F !important;
+    box-shadow: 0 0 15px rgba(210, 255, 63, 0.6) !important;
+  }
+  
+  /* Styles spéciaux pour le footer en mode UV */
+  .uv-mode-active footer {
+    color: #4FA9FF !important;
+    text-shadow: 0 0 8px rgba(0, 170, 255, 0.5) !important;
   }
 }

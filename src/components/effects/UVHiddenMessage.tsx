@@ -13,7 +13,7 @@ interface UVHiddenMessageProps {
 
 export default function UVHiddenMessage({
   message,
-  color = "#4FF0FF",
+  color = "#D2FF3F",
   className = "",
   fontSize = "1rem",
   offsetX = 0,
@@ -46,7 +46,7 @@ export default function UVHiddenMessage({
         messageRef.current.style.opacity = `${Math.min(0.95, intensity * 1.5)}`;
         messageRef.current.style.filter = `blur(${Math.max(0, 2 - (intensity * 5))}px) brightness(1.3)`;
         
-        // Strong blue glow effect
+        // Strong glow effect matching the desired color
         const glowIntensity = 5 + (intensity * 25);
         messageRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity * 2}px ${color}`;
         

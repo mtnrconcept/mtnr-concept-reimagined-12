@@ -17,7 +17,7 @@ export default function UVText({
   text,
   className,
   hiddenText,
-  uvColor = "#4FF0FF",
+  uvColor = "#D2FF3F", // Couleur jaune fluo pour correspondre à l'image de référence
   textSize = "text-base",
   opacity = 0.05,
   position = "default"
@@ -57,10 +57,10 @@ export default function UVText({
         const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
         hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
-        // Larger glow for UV mode with vibrant blue color
+        // Larger glow for UV mode avec couleur jaune fluo
         const glowSize = uvMode ? 25 * intensity : 15 * intensity;
-        hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#00AAFF" : uvColor}, 
-                                                 0 0 ${glowSize * 2}px ${uvMode ? "#00AAFF" : uvColor}`;
+        hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#D2FF3F" : uvColor}, 
+                                                 0 0 ${glowSize * 2}px ${uvMode ? "#D2FF3F" : uvColor}`;
         
         if (uvMode) {
           // Effet de vibration légère en mode UV
@@ -117,7 +117,7 @@ export default function UVText({
         )}
         style={{
           opacity: isIlluminated ? 1 : opacity,
-          color: uvMode ? "#4FF0FF" : uvColor,
+          color: uvMode ? "#D2FF3F" : uvColor,
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}

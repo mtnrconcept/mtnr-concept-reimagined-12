@@ -33,9 +33,16 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [elementsToIlluminate, setElementsToIlluminate] = useState<HTMLElement[]>([]);
   const [uvMode, setUVMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const uvCircleRef = useRef<HTMLDivElement>(null);
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
+    
+    // Mettre à jour la position du cercle UV si actif
+    if (uvCircleRef.current && uvMode) {
+      uvCircleRef.current.style.left = `${position.x}px`;
+      uvCircleRef.current.style.top = `${position.y}px`;
+    }
   };
 
   const registerElementForIllumination = (element: HTMLElement) => {
@@ -64,33 +71,83 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
+  // Créer l'élément de cercle UV lorsque le mode UV est activé
+  useEffect(() => {
+    if (isTorchActive && uvMode) {
+      if (!uvCircleRef.current) {
+        const circle = document.createElement('div');
+        circle.className = 'uv-light-circle active';
+        circle.style.left = `${mousePosition.x}px`;
+        circle.style.top = `${mousePosition.y}px`;
+        document.body.appendChild(circle);
+        uvCircleRef.current = circle;
+      }
+    } else {
+      if (uvCircleRef.current) {
+        uvCircleRef.current.remove();
+        uvCircleRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (uvCircleRef.current) {
+        uvCircleRef.current.remove();
+        uvCircleRef.current = null;
+      }
+    };
+  }, [isTorchActive, uvMode, mousePosition]);
+
   // Appliquer un effet global sur le document lorsque le mode UV est activé
   useEffect(() => {
+    const logos = document.querySelectorAll('img[src*="logo"]');
+    const navLinks = document.querySelectorAll('nav a');
+    const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
+    
     if (isTorchActive && uvMode) {
       // Ajouter une classe au body pour les styles globaux du mode UV
       document.body.classList.add('uv-mode-active');
       
-      // Trouver tous les éléments de navigation et leur ajouter une lueur UV
-      const navLinks = document.querySelectorAll('nav a');
+      // Appliquer des effets aux éléments de navigation
       navLinks.forEach(link => {
         link.classList.add('uv-nav-link');
       });
       
       // Appliquer un effet aux boutons
-      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
       buttons.forEach(button => {
         button.classList.add('uv-button');
       });
       
+      // Jouer un son subtil si disponible (optionnel)
+      try {
+        // Créer un son subtil de "click" électronique
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(220, audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) {
+        // Ignorer les erreurs si le Web Audio API n'est pas supporté
+        console.log("Audio API non supportée", e);
+      }
+      
     } else {
       document.body.classList.remove('uv-mode-active');
       
-      const navLinks = document.querySelectorAll('nav a');
       navLinks.forEach(link => {
         link.classList.remove('uv-nav-link');
       });
       
-      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
       buttons.forEach(button => {
         button.classList.remove('uv-button');
       });
@@ -99,12 +156,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       document.body.classList.remove('uv-mode-active');
       
-      const navLinks = document.querySelectorAll('nav a');
       navLinks.forEach(link => {
         link.classList.remove('uv-nav-link');
       });
       
-      const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
       buttons.forEach(button => {
         button.classList.remove('uv-button');
       });
@@ -130,7 +185,9 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const blurRadius = 20 + (distance / 10);
       
       if (uvMode) {
-        el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 170, 255, 0.5)`;
+        // Effet plus prononcé en mode UV avec couleur bleu néon
+        el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 170, 255, 0.7)`;
+        el.style.transition = "box-shadow 0.3s ease-out";
       } else {
         el.style.boxShadow = `${offsetX}px ${offsetY}px ${blurRadius}px rgba(0, 0, 0, 0.5)`;
       }
@@ -142,9 +199,6 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       });
     };
   }, [mousePosition, elementsToIlluminate, isTorchActive, uvMode]);
-
-  // Ajusté à 800 pour un effet plus large et doux comme sur l'image
-  const radius = 800;
   
   const contextValue = {
     isTorchActive,
@@ -162,64 +216,30 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <TorchContext.Provider value={contextValue}>
       <div ref={containerRef} className="torch-container relative w-full h-full overflow-hidden">
         {children}
-        {isTorchActive && (
+        {isTorchActive && !uvMode && (
           <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
             <defs>
               <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="black" stopOpacity="1" />
+                <stop offset="0%" stopColor="black" stopOpacity="0" />
                 <stop offset="70%" stopColor="black" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="black" stopOpacity="0" />
-              </radialGradient>
-              <radialGradient id="uv-torch-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#0F0430" stopOpacity="0" />
-                <stop offset="30%" stopColor="#150840" stopOpacity="0.1" />
-                <stop offset="60%" stopColor="#170860" stopOpacity="0.3" />
-                <stop offset="80%" stopColor="black" stopOpacity="0.7" />
                 <stop offset="100%" stopColor="black" stopOpacity="0.95" />
               </radialGradient>
-              <filter id="uv-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="15" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
               <mask id="torch-mask">
                 <rect width="100%" height="100%" fill="white" />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
-                  r={radius}
-                  fill={uvMode ? "url(#uv-torch-gradient)" : "url(#torch-gradient)"}
+                  r={800}
+                  fill="url(#torch-gradient)"
                 />
               </mask>
             </defs>
             <rect
               width="100%"
               height="100%"
-              fill={uvMode ? "rgba(10, 0, 60, 0.98)" : "rgba(0, 0, 0, 0.95)"}
+              fill="rgba(0, 0, 0, 0.95)"
               mask="url(#torch-mask)"
             />
-            {/* Effet de halo UV autour du curseur si en mode UV */}
-            {uvMode && (
-              <>
-                <circle
-                  cx={mousePosition.x}
-                  cy={mousePosition.y}
-                  r="180"
-                  fill="none"
-                  stroke="#0066FF"
-                  strokeWidth="2"
-                  strokeOpacity="0.3"
-                  filter="blur(8px)"
-                />
-                <circle
-                  cx={mousePosition.x}
-                  cy={mousePosition.y}
-                  r="30"
-                  fill="#0066FF"
-                  opacity="0.2"
-                  filter="blur(12px)"
-                />
-              </>
-            )}
           </svg>
         )}
       </div>
