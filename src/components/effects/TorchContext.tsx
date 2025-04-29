@@ -54,6 +54,12 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    
+    // En cas d'écran noir, on force un mouvement initial de souris
+    if (isTorchActive) {
+      updateMousePosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+    }
+
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
@@ -84,11 +90,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {children}
         {isTorchActive && !uvMode && (
           <div 
-            className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none"
+            className="standard-torch"
             style={{
-              background: "rgba(0, 0, 0, 0.95)",
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px, black 650px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px, black 650px)`
+              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px)`,
+              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px)`
             }}
           />
         )}

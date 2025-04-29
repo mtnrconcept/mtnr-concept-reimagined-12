@@ -11,6 +11,19 @@ export const TorchToggle = () => {
   const { uvMode, toggleUVMode } = useUVMode();
   const { is3DModeActive, toggle3DMode } = use3DTorch();
 
+  const handleToggleTorch = () => {
+    // Force à false d'abord pour reset l'état si nécessaire
+    if (isTorchActive) {
+      setIsTorchActive(false);
+      // Petit délai avant de réactiver si l'utilisateur veut allumer la torche
+      setTimeout(() => {
+        setIsTorchActive(true);
+      }, 50);
+    } else {
+      setIsTorchActive(true);
+    }
+  };
+
   const handleToggleUV = () => {
     // Add small vibration on mobile if supported
     if ("vibrate" in navigator) {
@@ -27,7 +40,7 @@ export const TorchToggle = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50 flex gap-2">
       <Button
-        onClick={() => setIsTorchActive(!isTorchActive)}
+        onClick={handleToggleTorch}
         className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 ${
           isTorchActive 
             ? "bg-yellow-400 text-black shadow-yellow-400/50" 

@@ -24,66 +24,96 @@ export const UVLamp: React.FC<UVLampProps> = ({
   const [glowIntensity, setGlowIntensity] = React.useState(1);
   const uvCircleRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   
   // UV light size adjustments based on prop
   useEffect(() => {
     if (uvCircleRef.current) {
-      // Inversons le masque: transparent à l'intérieur (pour laisser le mode UV s'afficher) et noir à l'extérieur
+      // Correct mask: only show UV effect WITHIN the circle (transparent) and normal outside (black)
       const maskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0px, transparent ${lampRadius}px, black ${lampRadius + 2}px)`;
       uvCircleRef.current.style.mask = maskValue;
       uvCircleRef.current.style.webkitMask = maskValue;
     }
     
     if (logoRef.current && showUVLogo) {
+      // Logo mask should only appear WITHIN the circle
       const logoMaskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0px, black ${lampRadius * 0.7}px, transparent ${lampRadius * 0.8}px)`;
       logoRef.current.style.mask = logoMaskValue;
       logoRef.current.style.webkitMask = logoMaskValue;
     }
   }, [lampRadius, showUVLogo]);
   
-  // Gestion optimisée de la position
+  // Position management with optimized performance
   useEffect(() => {
     if (isVisible) {
-      let ticking = false;
-      
       const updatePosition = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
-            document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
-            ticking = false;
-          });
-          ticking = true;
+        // Cancel any pending animation frame
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
         }
+        
+        // Schedule a new animation frame
+        rafRef.current = requestAnimationFrame(() => {
+          document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
+          document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
+          rafRef.current = null;
+        });
       };
       
+      // Initial position update
       updatePosition();
-      window.addEventListener('mousemove', updatePosition, { passive: true });
-      return () => window.removeEventListener('mousemove', updatePosition);
+      
+      // Position updates on mouse move
+      const handleMouseMove = () => updatePosition();
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        
+        // Cancel any pending animation frame on cleanup
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      };
     }
   }, [mousePosition, isVisible]);
   
-  // Scintillement effect for UV logo
+  // Flickering effect for UV logo with optimized performance
   useEffect(() => {
+    let flickerInterval: ReturnType<typeof setInterval> | null = null;
+    
     if (uvMode && isTorchActive && showUVLogo) {
-      const interval = setInterval(() => {
+      flickerInterval = setInterval(() => {
         setGlowIntensity(Math.random() * 0.4 + 1.1);
-      }, 50);
-      
-      return () => clearInterval(interval);
+      }, 100);
     }
+    
+    return () => {
+      if (flickerInterval !== null) {
+        clearInterval(flickerInterval);
+      }
+    };
   }, [uvMode, isTorchActive, showUVLogo]);
 
   // Visibility management based on UV mode
   useEffect(() => {
-    setIsVisible(uvMode && isTorchActive);
+    const visible = uvMode && isTorchActive;
+    
+    // Use a slight delay for turning off to avoid flashes
+    if (visible) {
+      setIsVisible(true);
+    } else {
+      const timeout = setTimeout(() => setIsVisible(false), 100);
+      return () => clearTimeout(timeout);
+    }
   }, [uvMode, isTorchActive]);
 
   if (!isVisible) return null;
 
   return (
     <>
-      {/* UV Effect Overlay - now with inverted mask */}
+      {/* UV Effect Overlay - correct mask implementation */}
       <div 
         ref={uvCircleRef}
         className={cn(
