@@ -20,6 +20,9 @@ import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 
+// Initialize query client outside of component for stability
+const queryClient = new QueryClient();
+
 // Component to display UV label
 const UVCornerLabel = () => {
   const { uvMode } = useUVMode();
@@ -82,8 +85,5 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
-// Initialize query client outside of component for stability
-const queryClient = new QueryClient();
 
 export default App;
