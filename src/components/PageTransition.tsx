@@ -1,3 +1,4 @@
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ReactNode,
@@ -49,7 +50,8 @@ export default function PageTransition({
     // Effet fumée
     if (contentRef.current) {
       requestAnimationFrame(() => {
-        createSmokeEffect(contentRef.current!, pageTransitionPreset);
+        // Fixed here: Passing only the container element to createSmokeEffect
+        createSmokeEffect(contentRef.current!);
       });
     }
 
