@@ -21,8 +21,6 @@ export default function PageTransition({
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // On stocke la route précédente
   const [fromPath, setFromPath] = useState(location.pathname);
 
   useEffect(() => {
@@ -35,6 +33,7 @@ export default function PageTransition({
 
     // Détecter les changements de route et activer la transition
     if (location.pathname !== prevPathRef.current) {
+      console.log(`Changement détecté: ${prevPathRef.current} -> ${location.pathname}`);
       setIsTransitioning(true);
       setFromPath(prevPathRef.current);
       prevPathRef.current = location.pathname;
@@ -68,41 +67,39 @@ export default function PageTransition({
         isActive={isTransitioning}
         onAnimationComplete={handleTransitionComplete}
       >
-        {/* Affichage normal du contenu quand il n'y a pas de transition */}
-        <AnimatePresence mode="wait">
+        {/* Contenu normal de la page */}
+        <motion.div
+          key={keyId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          className="page-content-wrapper"
+          style={{
+            perspective: "1400px",
+            willChange: "transform, opacity",
+            position: "relative",
+            zIndex: 10,
+            transition: "opacity 0.5s ease",
+            width: "100%",
+            height: "100%"
+          }}
+        >
           <motion.div
-            key={keyId}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.4 } }}
-            className="page-content-wrapper"
-            style={{
-              perspective: "1400px",
-              willChange: "transform, opacity",
-              position: "relative",
-              zIndex: 10,
-              transition: "opacity 0.5s ease",
-              width: "100%",
-              height: "100%"
+            ref={contentRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{
+              opacity: 0,
+              y: -10,
+              transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
             }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+            className="smoke-container"
           >
-            <motion.div
-              ref={contentRef}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{
-                opacity: 0,
-                y: -10,
-                transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
-              }}
-              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-              className="smoke-container"
-            >
-              {children}
-              <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
-            </motion.div>
+            {children}
+            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
           </motion.div>
-        </AnimatePresence>
+        </motion.div>
       </ElevatorTransition>
     </>
   );

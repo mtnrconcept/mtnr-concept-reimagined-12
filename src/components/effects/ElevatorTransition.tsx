@@ -1,6 +1,5 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { safeBlur } from '@/lib/animation-utils';
 
@@ -17,22 +16,16 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const location = useLocation();
   const [direction, setDirection] = useState<'up' | 'down' | null>(null);
   const [prevPath, setPrevPath] = useState(location.pathname);
+  const [exitContent, setExitContent] = useState<React.ReactNode | null>(null);
+  const [enterContent, setEnterContent] = useState<React.ReactNode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [currentContent, setCurrentContent] = useState<React.ReactNode>(children);
   
   // Configuration des timings
   const videoTransitionDuration = 5000; // 5 secondes pour la vidéo complète
   const exitAnimationDuration = 4.0; // Durée de sortie en secondes
   const enterAnimationDuration = 2.5; // Durée d'entrée en secondes
   const contentEntranceDelay = videoTransitionDuration - (enterAnimationDuration * 1000); // Le contenu apparaît pendant les dernières 2.5 secondes
-  
-  // Met à jour le contenu actuel lorsque les enfants changent et que la transition n'est pas active
-  useEffect(() => {
-    if (!isActive) {
-      setCurrentContent(children);
-    }
-  }, [children, isActive]);
   
   // Détermine la direction de l'animation basée sur l'ordre des pages
   useEffect(() => {
@@ -41,16 +34,38 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     const currentIndex = pageOrder.indexOf(location.pathname);
     const prevIndex = pageOrder.indexOf(prevPath);
     
+    console.log(`Transition de: ${prevPath} (${prevIndex}) vers ${location.pathname} (${currentIndex})`);
+    
     if (currentIndex > prevIndex) {
+      console.log('Direction: descente');
       setDirection('down');
     } else if (currentIndex < prevIndex) {
+      console.log('Direction: montée');
       setDirection('up');
     } else {
+      console.log('Même page, pas de direction spécifique');
       setDirection(null);
     }
-    
-    setPrevPath(location.pathname);
   }, [isActive, location.pathname, prevPath]);
+
+  // Mettre à jour le contenu de sortie et d'entrée
+  useEffect(() => {
+    if (isActive) {
+      // Enregistrer le contenu actuel comme contenu de sortie
+      setExitContent(children);
+      setEnterContent(null);
+      
+      // Après un court délai, mettre à jour le contenu d'entrée
+      const timeout = setTimeout(() => {
+        setEnterContent(children);
+      }, contentEntranceDelay);
+      
+      return () => clearTimeout(timeout);
+    } else {
+      setExitContent(null);
+      setEnterContent(null);
+    }
+  }, [isActive, children, contentEntranceDelay]);
 
   // Gestion de la lecture vidéo
   useEffect(() => {
@@ -86,44 +101,12 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
         videoRef.current.classList.remove('video-reversed');
       }
       // Signal que l'animation est terminée
+      setPrevPath(location.pathname);
       onAnimationComplete();
     }, videoTransitionDuration);
     
     return () => clearTimeout(timeoutId);
-  }, [isActive, direction, onAnimationComplete, videoTransitionDuration]);
-
-  // Variantes d'animation pour le contenu sortant avec mouvement vertical substantiel
-  const exitVariants = {
-    initial: { 
-      y: 0, 
-      opacity: 1,
-      transition: { duration: 0.1 } 
-    },
-    animate: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '-100vh' : direction === 'up' ? '100vh' : 0,
-      opacity: 0,
-      transition: {
-        duration: exitAnimationDuration,
-        ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
-      }
-    }),
-  };
-
-  // Variantes d'animation pour le nouveau contenu entrant avec mouvement vertical substantiel
-  const enterVariants = {
-    initial: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '100vh' : direction === 'up' ? '-100vh' : 0,
-      opacity: 0
-    }),
-    animate: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: enterAnimationDuration,
-        ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
-      }
-    },
-  };
+  }, [isActive, direction, onAnimationComplete, videoTransitionDuration, location.pathname]);
 
   return (
     <div className="elevator-container" ref={containerRef}>
@@ -140,59 +123,49 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
             />
           </div>
           
-          {/* Animation de sortie du contenu actuel avec mouvement vertical complet */}
-          <motion.div
-            key={`exit-${prevPath}`}
-            className="elevator-content exit-content"
-            custom={direction}
-            variants={exitVariants}
-            initial="initial"
-            animate="animate"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            {currentContent}
-          </motion.div>
+          {/* Animation de sortie du contenu actuel */}
+          {exitContent && (
+            <div
+              className={`elevator-content exit-content ${
+                direction === 'down' ? 'slide-out-up' : 
+                direction === 'up' ? 'slide-out-down' : ''
+              }`}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              {exitContent}
+            </div>
+          )}
           
-          {/* Animation d'entrée du nouveau contenu avec mouvement vertical complet et délai */}
-          <motion.div
-            key={`enter-${location.pathname}`}
-            className="elevator-content enter-content"
-            custom={direction}
-            variants={enterVariants}
-            initial="initial"
-            animate={{
-              y: 0,
-              opacity: 1,
-              transition: {
-                delay: contentEntranceDelay / 1000,
-                duration: enterAnimationDuration,
-                ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
-              }
-            }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%", 
-              height: "100%",
-              display: isActive ? "flex" : "none",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            {children}
-          </motion.div>
+          {/* Animation d'entrée du nouveau contenu */}
+          {enterContent && (
+            <div
+              className={`elevator-content enter-content ${
+                direction === 'down' ? 'slide-in-up' : 
+                direction === 'up' ? 'slide-in-down' : ''
+              }`}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%", 
+                height: "100%",
+                animationDelay: `${contentEntranceDelay / 1000}s`
+              }}
+            >
+              {enterContent}
+            </div>
+          )}
         </>
       )}
+      
+      {/* Contenu normal lorsque la transition n'est pas active */}
+      {!isActive && children}
     </div>
   );
 };
