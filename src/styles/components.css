@@ -1,0 +1,87 @@
+
+@layer components {
+  /** Smoke effect container */
+  .smoke-container {
+    @apply relative min-h-full;
+  }
+
+  .smoke-enter-layer {
+    @apply absolute inset-0 pointer-events-none z-50;
+  }
+
+  /** Smoke-in keyframes and utility */
+  @keyframes smokeIn {
+    0% {
+      opacity: 0;
+      filter: blur(8px);
+      transform: scale(0.96);
+    }
+    50% {
+      opacity: 0.6;
+      filter: blur(2px);
+      transform: scale(0.99);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+  }
+
+  .animate-smoke-in {
+    animation: smokeIn 0.8s ease-out forwards;
+    will-change: opacity, transform, filter;
+  }
+
+  /** Logo particle transition */
+  .logo-particle {
+    transform-origin: center;
+    will-change: transform, opacity;
+    transition: transform 0.8s cubic-bezier(0.215,0.61,0.355,1), opacity 0.8s cubic-bezier(0.215,0.61,0.355,1);
+  }
+
+  /** 3D logo container */
+  .logo-3d-effect-container {
+    @apply relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /** Smoke particle float animation */
+  @keyframes smoke-float {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(1) rotate(0deg);
+      filter: blur(4px);
+    }
+    50% {
+      opacity: 0.7;
+      transform: translateY(-25px) scale(1.4) rotate(7deg);
+      filter: blur(6px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50px) scale(1.8) rotate(12deg);
+      filter: blur(10px);
+    }
+  }
+
+  .smoke-particle {
+    @apply absolute rounded-full;
+    animation: smoke-float 1.2s ease-out forwards;
+    will-change: transform, opacity, filter;
+  }
+
+  /** Reveal animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

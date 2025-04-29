@@ -1,0 +1,13 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Global resets and base styles
+ */
+@layer base {
+  html, body, #root {
+    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
+  }
+}

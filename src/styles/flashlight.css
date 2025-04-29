@@ -1,0 +1,36 @@
+
+@layer components {
+  /** Flashlight overlay */
+  .flashlight {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 80%);
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .flashlight-3d {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, rgba(0,0,0,0.95) 60%);
+    pointer-events: none;
+    z-index: 50;
+    transform: translate(var(--cursor-x), var(--cursor-y));
+  }
+
+  /** Neon cursor effect */
+  .neon-cursor {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,0,0.3);
+    box-shadow: 0 0 10px rgba(255,255,0,0.8);
+    pointer-events: none;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+  }
+}
