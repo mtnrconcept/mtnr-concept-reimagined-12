@@ -57,46 +57,13 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     }),
   };
 
-  // Créer des variantes pour l'effet de flou de mouvement
-  const blurVariants = {
-    initial: { filter: 'blur(0px)' },
-    animate: {
-      filter: [
-        'blur(0px)',
-        'blur(8px)',
-        'blur(12px)',
-        'blur(8px)',
-        'blur(0px)',
-      ],
-      transition: {
-        duration: 5,
-        times: [0, 0.2, 0.5, 0.8, 1],
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
-    exit: {
-      filter: [
-        'blur(0px)',
-        'blur(8px)',
-        'blur(12px)',
-        'blur(8px)',
-        'blur(0px)',
-      ],
-      transition: { 
-        duration: 5,
-        times: [0, 0.2, 0.5, 0.8, 1],
-        ease: [0.7, 0, 0.84, 0],
-      },
-    },
-  };
-
   // Composant pour la tuile d'arrière-plan qui se répète infiniment
   const InfiniteTileBackground = () => {
     // Référence à 3 éléments de tuile pour créer l'effet de défilement infini
     const tiles = Array.from({ length: 3 }, (_, i) => (
       <div 
         key={`tile-${i}`} 
-        className={`absolute inset-x-0 h-screen bg-black`}
+        className="absolute inset-x-0 h-screen bg-black"
         style={{
           top: `${i * 100}vh`,
           backgroundImage: 'url("/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png")',
@@ -114,10 +81,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
           className="relative h-[300vh]" // Trois fois la hauteur de l'écran
           initial={{ y: direction === 'up' ? '-100vh' : 0 }}
           animate={{
-            y: [
-              direction === 'up' ? '-100vh' : 0,
-              direction === 'up' ? '-200vh' : '-100vh',
-            ]
+            y: direction === 'up' ? '-200vh' : '-100vh'
           }}
           transition={{
             duration: 5,
@@ -128,6 +92,32 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
           {tiles}
         </motion.div>
       </div>
+    );
+  };
+
+  // Composant pour l'effet de flou de mouvement
+  const BlurMotionEffect = ({ children }: { children: React.ReactNode }) => {
+    return (
+      <motion.div
+        initial={{ filter: "blur(0px)" }}
+        animate={{
+          filter: [
+            "blur(0px)",
+            "blur(8px)",
+            "blur(12px)",
+            "blur(8px)",
+            "blur(0px)"
+          ]
+        }}
+        transition={{
+          duration: 5,
+          times: [0, 0.2, 0.5, 0.8, 1],
+          ease: [0.16, 1, 0.3, 1]
+        }}
+        className="w-full h-full"
+      >
+        {children}
+      </motion.div>
     );
   };
 
@@ -146,15 +136,9 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
             onAnimationComplete={onAnimationComplete}
             className="absolute inset-0 flex items-center justify-center"
           >
-            <motion.div 
-              variants={blurVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full h-full"
-            >
+            <BlurMotionEffect>
               {children}
-            </motion.div>
+            </BlurMotionEffect>
           </motion.div>
         </>
       )}
