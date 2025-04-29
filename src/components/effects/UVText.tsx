@@ -1,10 +1,10 @@
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, ReactNode } from "react";
 import { useTorch } from "./TorchContext";
 import { cn } from "@/lib/utils";
 
 interface UVTextProps {
-  text: string;
+  text: ReactNode;
   className?: string;
   hiddenText?: string;
   uvColor?: string;
@@ -22,7 +22,7 @@ export default function UVText({
   opacity = 0.05,
   position = "default"
 }: UVTextProps) {
-  const textRef = useRef<HTMLParagraphElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const hiddenTextRef = useRef<HTMLParagraphElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const [isIlluminated, setIsIlluminated] = useState(false);
@@ -78,12 +78,12 @@ export default function UVText({
       position === "absolute" ? "absolute inset-0" : "",
       className
     )}>
-      <p 
+      <div 
         ref={textRef} 
         className={cn("visible select-none transition-opacity", textSize)}
       >
         {text}
-      </p>
+      </div>
       
       <p 
         ref={hiddenTextRef}
@@ -98,7 +98,7 @@ export default function UVText({
           color: uvColor,
         }}
       >
-        {hiddenText || text}
+        {hiddenText || (typeof text === 'string' ? text : null)}
       </p>
     </div>
   );
