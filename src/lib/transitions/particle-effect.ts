@@ -133,7 +133,10 @@ export function createLogoDisperseEffect(
   imageElement: HTMLImageElement,
   options: DisperseOptions = {}
 ) {
+  console.log("🚀 Dispersion du logo en cours...");
+  
   if (!imageElement || !imageElement.complete) {
+    console.error("❌ Image non chargée, impossible de créer l'effet de dispersion");
     // Si l'image n'est pas chargée, appeler immédiatement onComplete et retourner
     if (options.onComplete) {
       setTimeout(options.onComplete, 10);
@@ -149,9 +152,13 @@ export function createLogoDisperseEffect(
     onComplete = () => {}
   } = options;
 
+  console.log(`✨ Création de l'effet avec ${particleCount} particules, force: ${dispersionStrength}, durée: ${duration}ms`);
+
   // Créer un canvas pour capturer l'image
   const canvas = document.createElement('canvas');
   const rect = imageElement.getBoundingClientRect();
+  
+  console.log(`📐 Dimensions du logo: ${rect.width}x${rect.height}`);
   
   // Dimensions du canvas
   const width = Math.max(rect.width, 100);
@@ -162,6 +169,7 @@ export function createLogoDisperseEffect(
   
   const ctx = canvas.getContext('2d');
   if (!ctx) {
+    console.error("❌ Impossible d'obtenir le contexte du canvas");
     // Si pas de contexte canvas, terminer rapidement
     if (onComplete) {
       setTimeout(onComplete, 10);
@@ -172,8 +180,9 @@ export function createLogoDisperseEffect(
   try {
     // Dessiner l'image sur le canvas
     ctx.drawImage(imageElement, 0, 0, width, height);
+    console.log("✅ Image dessinée sur le canvas");
   } catch (error) {
-    console.error("Erreur lors du dessin de l'image:", error);
+    console.error("❌ Erreur lors du dessin de l'image:", error);
     if (onComplete) {
       setTimeout(onComplete, 10);
     }
@@ -182,28 +191,44 @@ export function createLogoDisperseEffect(
   
   // Créer un conteneur pour les particules en position absolue
   const particleContainer = document.createElement('div');
+  particleContainer.className = 'particle-container';
   particleContainer.style.cssText = `
-    position: absolute;
-    left: ${rect.left}px;
-    top: ${rect.top}px;
-    width: ${width}px;
-    height: ${height}px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
-    z-index: 100;
+    z-index: 9999;
     overflow: visible;
   `;
   document.body.appendChild(particleContainer);
+  console.log("✅ Conteneur de particules créé et ajouté au DOM");
+  
+  // Créer un clone visible du logo au centre de l'écran pour l'animation
+  const logoClone = document.createElement('div');
+  logoClone.style.cssText = `
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: ${width}px;
+    height: ${height}px;
+    z-index: 9998;
+  `;
+  particleContainer.appendChild(logoClone);
   
   // Échantillonner les pixels de l'image pour une meilleure couverture
-  // Réduire légèrement l'écart entre les particules pour une meilleure couverture
   const particleGap = Math.max(3, Math.floor(Math.sqrt(width * height) / Math.sqrt(particleCount)));
   const particleSize = Math.max(2.5, Math.min(Math.floor(Math.sqrt(width * height) / 30), 4));
+  
+  console.log(`🔍 Taille des particules: ${particleSize}px, espace entre particules: ${particleGap}px`);
   
   const particles = [];
   const fragment = document.createDocumentFragment();
 
   let particleCount2D = 0;
-  const maxParticles = Math.min(options.particleCount || 2500, 2500);
+  const maxParticles = Math.min(options.particleCount || 2500, 3000);
 
   // Échantillonner l'image de manière plus complète
   for (let y = 0; y < height; y += particleGap) {
@@ -218,7 +243,7 @@ export function createLogoDisperseEffect(
         const pixelData = ctx.getImageData(x, y, 1, 1).data;
         const alpha = pixelData[3];
         
-        if (alpha > 30) { // Seuil d'opacité plus bas pour capturer plus de pixels
+        if (alpha > 20) { // Seuil d'opacité plus bas pour capturer plus de pixels
           particleCount2D++;
           
           const particle = document.createElement('div');
@@ -242,11 +267,17 @@ export function createLogoDisperseEffect(
           const distance = random(50, 600) * dispersionStrength;
           const delay = random(0, duration * 0.2); // Réduire les délais pour plus de réactivité
           
+          // Position centrée sur l'écran
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          const offsetX = x - width / 2;
+          const offsetY = y - height / 2;
+          
           particle.className = 'logo-particle';
           particle.style.cssText = `
             position: absolute;
-            left: ${x}px;
-            top: ${y}px;
+            left: ${centerX + offsetX}px;
+            top: ${centerY + offsetY}px;
             width: ${finalSize}px;
             height: ${finalSize}px;
             background-color: ${color};
@@ -254,6 +285,7 @@ export function createLogoDisperseEffect(
             opacity: ${random(0.7, 1)};
             transform: translate(0, 0) scale(1);
             will-change: transform, opacity;
+            box-shadow: 0 0 ${finalSize * 0.5}px rgba(255, 215, 0, 0.3);
             --tx: ${Math.cos(angle) * distance}px;
             --ty: ${Math.sin(angle) * distance}px;
             --delay: ${delay}ms;
@@ -264,19 +296,22 @@ export function createLogoDisperseEffect(
           particles.push(particle);
         }
       } catch (error) {
-        console.error("Erreur lors de l'échantillonnage de l'image:", error);
+        console.error("❌ Erreur lors de l'échantillonnage de l'image:", error);
         // Continuer malgré l'erreur
       }
     }
   }
   
-  // Ajouter des particules supplémentaires aux endroits où l'image est plus transparente
-  // pour assurer une couverture complète
-  if (particleCount2D < maxParticles / 2) {
-    const additionalParticles = Math.min(maxParticles - particleCount2D, maxParticles / 2);
-    for (let i = 0; i < additionalParticles; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
+  console.log(`✅ ${particleCount2D} particules créées à partir de l'image`);
+  
+  // Si pas assez de particules ont été créées, ajouter des particules supplémentaires
+  if (particleCount2D < maxParticles * 0.5) {
+    const additionalCount = Math.min(maxParticles - particleCount2D, maxParticles * 0.5);
+    console.log(`➕ Ajout de ${additionalCount} particules supplémentaires pour améliorer l'effet`);
+    
+    for (let i = 0; i < additionalCount; i++) {
+      const x = (Math.random() - 0.5) * width;
+      const y = (Math.random() - 0.5) * height;
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       
       const particle = document.createElement('div');
@@ -285,11 +320,15 @@ export function createLogoDisperseEffect(
       const distance = random(100, 600) * dispersionStrength;
       const delay = random(0, duration * 0.2);
       
+      // Position centrée sur l'écran
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      
       particle.className = 'logo-particle';
       particle.style.cssText = `
         position: absolute;
-        left: ${x}px;
-        top: ${y}px;
+        left: ${centerX + x}px;
+        top: ${centerY + y}px;
         width: ${finalSize}px;
         height: ${finalSize}px;
         background-color: ${color};
@@ -297,6 +336,7 @@ export function createLogoDisperseEffect(
         opacity: ${random(0.7, 1)};
         transform: translate(0, 0) scale(1);
         will-change: transform, opacity;
+        box-shadow: 0 0 ${finalSize * 0.5}px rgba(255, 215, 0, 0.3);
         --tx: ${Math.cos(angle) * distance}px;
         --ty: ${Math.sin(angle) * distance}px;
         --delay: ${delay}ms;
@@ -311,6 +351,7 @@ export function createLogoDisperseEffect(
   
   // Si aucune particule n'a été créée, terminer rapidement
   if (particles.length === 0) {
+    console.error("❌ Aucune particule créée, annulation de l'effet");
     particleContainer.remove();
     if (onComplete) {
       setTimeout(onComplete, 10);
@@ -320,11 +361,9 @@ export function createLogoDisperseEffect(
   
   // Ajouter toutes les particules en une seule opération
   particleContainer.appendChild(fragment);
+  console.log(`🎉 ${particles.length} particules ajoutées au DOM`);
   
-  // Masquer temporairement l'image originale pendant l'animation uniquement
-  const originalOpacity = imageElement.style.opacity;
-  
-  // Masquer l'image d'origine pendant l'animation
+  // Masquer l'image originale pendant l'animation
   imageElement.style.opacity = '0';
   imageElement.style.transition = 'opacity 300ms ease-out';
   
@@ -388,23 +427,27 @@ export function createLogoDisperseEffect(
     particleContainer.style.transition = 'opacity 300ms ease-out';
     particleContainer.style.opacity = '0';
     
-    // Restaurer l'image d'origine uniquement si l'on est sur la page qui l'a déclenchée
-    // (Sur la page d'accueil, on veut remettre l'opacité)
-    if (window.location.pathname === '/') {
-      imageElement.style.transition = 'opacity 300ms ease-in';
-      imageElement.style.opacity = originalOpacity || '1';
-    }
+    console.log("✅ Animation terminée, nettoyage en cours");
     
     // Attendre que la transition de disparition soit terminée avant de supprimer
     setTimeout(() => {
       particleContainer.remove();
       onComplete();
+      console.log("🏁 Effet de dispersion terminé, callback appelé");
     }, 300);
   }
   
+  console.log("▶️ Démarrage de l'animation de particules");
   animFrameId = requestAnimationFrame(animateParticles);
   
   return {
-    cancel: cleanup
+    cancel: () => {
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = 0;
+      }
+      particleContainer.remove();
+      console.log("⚠️ Animation de dispersion annulée manuellement");
+    }
   };
 }

@@ -12,7 +12,6 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
   const navigate = useNavigate();
   const [isDisperseActive, setIsDisperseActive] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-  const [previousPath, setPreviousPath] = useState(location.pathname);
   const logoRef = useRef<HTMLImageElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
   const isFirstMount = useRef(true);
@@ -52,8 +51,8 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     console.log('Démarrage de l\'effet de dispersion du logo');
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 1200, // Augmenté pour un effet plus visible
-      dispersionStrength: 2.8, // Augmenté pour une dispersion plus dramatique
+      particleCount: 2000, // Augmenté significativement pour un effet très visible
+      dispersionStrength: 3.2, // Augmenté pour une dispersion plus spectaculaire
       duration: 1000, // Durée de dispersion d'une seconde
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
