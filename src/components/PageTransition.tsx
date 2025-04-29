@@ -45,7 +45,8 @@ export default function PageTransition({ children, keyId }: PageTransitionProps)
     if (contentRef.current) {
       // Laisser le navigateur préparer le DOM
       requestAnimationFrame(() => {
-        createSmokeEffect(contentRef.current!, pageTransitionPreset);
+        // Le problème vient de cette ligne - createSmokeEffect attend un seul argument
+        createSmokeEffect(contentRef.current!);
       });
     }
 
