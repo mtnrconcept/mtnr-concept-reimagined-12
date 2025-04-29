@@ -42,16 +42,16 @@ export const smokeEffectPresets: SmokeEffectOptions[] = [
   }
 ];
 
-// Préréglage amélioré pour les transitions de page (optimisé pour la performance)
+// Préréglage amélioré pour les transitions de page avec effet ease-in-out
 export const pageTransitionPreset: SmokeEffectOptions = {
   baseColor: '#FFD700',
   accentColor: '#FFFFFF',
-  particleCount: 90, // Nombre de particules réduit
+  particleCount: 110, // Plus de particules pour un effet plus visible
   direction: 'radial',
-  speed: 1.3,  // Vitesse augmentée
-  intensity: 1.5,
+  speed: 1.4,  // Vitesse optimale pour l'animation ease
+  intensity: 1.6,
   turbulence: 0.5,
-  duration: 800, // Durée significativement réduite pour une transition plus rapide
+  duration: 1200, // Durée optimisée pour une transition fluide mais rapide
   colorVariation: true,
   blurAmount: 1.2,
 };

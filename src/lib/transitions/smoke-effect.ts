@@ -2,6 +2,13 @@
 import { random } from './utils';
 
 /**
+ * Fonction d'easing pour l'animation ease-in-out (démarrage doux, accélération, décélération)
+ */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/**
  * Creates an optimized smoke-like effect for incoming content
  * @param element The element to apply the smoke effect to
  */
@@ -17,8 +24,8 @@ export function createSmokeEffect(element: HTMLElement | null) {
   const rect = element.getBoundingClientRect();
   
   // Use fewer smoke particles for better performance
-  const smokeCount = 10; // Réduit significativement pour de meilleures performances
-  const smokeDuration = 1500; // Réduit de moitié pour une animation plus rapide
+  const smokeCount = 12; // Légèrement augmenté pour un meilleur effet visuel
+  const smokeDuration = 1500; // Durée adaptée pour l'ease-in-out
   
   // Create smoke particles in batch using DocumentFragment
   const fragment = document.createDocumentFragment();
@@ -63,8 +70,8 @@ export function createSmokeEffect(element: HTMLElement | null) {
     `;
     
     // Animation data as attributes for requestAnimationFrame
-    smoke.dataset.startTime = (performance.now() + random(0, 200)).toString(); // Réduit le délai
-    smoke.dataset.duration = (smokeDuration - random(0, 300)).toString(); // Réduit la durée
+    smoke.dataset.startTime = (performance.now() + random(0, 200)).toString(); 
+    smoke.dataset.duration = (smokeDuration - random(0, 300)).toString(); 
     
     fragment.appendChild(smoke);
   }
@@ -81,7 +88,7 @@ export function createSmokeEffect(element: HTMLElement | null) {
     
     smokeElements.forEach(smoke => {
       const startTime = parseFloat(smoke.dataset.startTime || '0');
-      const duration = parseFloat(smoke.dataset.duration || '1500'); // Réduit
+      const duration = parseFloat(smoke.dataset.duration || '1500');
       
       if (timestamp < startTime) {
         allComplete = false;
@@ -94,18 +101,19 @@ export function createSmokeEffect(element: HTMLElement | null) {
       if (progress < 1) {
         allComplete = false;
         
-        // Animation curve - accélérée
+        // Animation curve avec easing cubic pour ease-in-out
         let opacity;
-        if (progress < 0.3) { // Accélère l'apparition
-          opacity = progress / 0.3;
+        if (progress < 0.3) { 
+          opacity = easeInOutCubic(progress / 0.3); // Apparition progressive
         } else {
-          opacity = 1 - ((progress - 0.3) / 0.7); // Disparition progressive
+          opacity = 1 - easeInOutCubic((progress - 0.3) / 0.7); // Disparition progressive
         }
         
-        // Simplified movement calculations
-        const floatX = Math.sin(progress * Math.PI * 2) * 3;
-        const floatY = Math.cos(progress * Math.PI * 2) * 2;
-        const scale = 0.6 + (progress < 0.5 ? progress * 0.8 : 0.4); // Expansion plus rapide
+        // Movement calculations with easing
+        const progressForMovement = easeInOutCubic(progress);
+        const floatX = Math.sin(progressForMovement * Math.PI * 2) * 3;
+        const floatY = Math.cos(progressForMovement * Math.PI * 2) * 2;
+        const scale = 0.6 + (progress < 0.5 ? easeInOutCubic(progress / 0.5) * 0.8 : 0.4);
         
         smoke.style.opacity = (opacity * opacity).toString(); // quadratic easing
         smoke.style.transform = `translateZ(0) scale(${scale}) translate(${floatX}px, ${floatY}px)`;
@@ -125,19 +133,19 @@ export function createSmokeEffect(element: HTMLElement | null) {
     } else {
       setTimeout(() => {
         smokeContainer.remove();
-      }, 100); // Réduit le délai
+      }, 100);
     }
   }
   
   requestAnimationFrame(animateSmoke);
   
-  // Show the element with fade in - accélérée
+  // Show the element with fade in - avec courbe easing
   if (element) {
     element.style.opacity = '0';
-    element.style.transition = 'opacity 0.4s ease-in'; // Transition accélérée
+    element.style.transition = 'opacity 0.5s cubic-bezier(0.65, 0, 0.35, 1)'; // Transition ease-in-out cubic
     
     setTimeout(() => {
       element.style.opacity = '1';
-    }, 100); // Délai réduit
+    }, 100);
   }
 }
