@@ -40,10 +40,10 @@ export default function Home() {
     <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
       <Parallax3DScene />
       
-      <div className="relative z-20 min-h-screen">
+      <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
         
-        <main id="main-content" className="min-h-screen w-full pt-16">
+        <main id="main-content" className="flex-grow w-full">
           <HeroSection />
           <StudioSection />
           <ServicesSection />

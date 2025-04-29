@@ -45,7 +45,6 @@ export default function PageTransition({ children, keyId }: PageTransitionProps)
     if (contentRef.current) {
       // Laisser le navigateur préparer le DOM
       requestAnimationFrame(() => {
-        // Le problème vient de cette ligne - createSmokeEffect attend un seul argument
         createSmokeEffect(contentRef.current!);
       });
     }
@@ -84,9 +83,9 @@ export default function PageTransition({ children, keyId }: PageTransitionProps)
         >
           <motion.div
             ref={contentRef}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 0 }} /* Modifié y: 10 -> y: 0 pour éviter le décalage */
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10, transition: { duration: 0.3, ease: [0.25,1,0.5,1] } }}
+            exit={{ opacity: 0, y: 0, transition: { duration: 0.3, ease: [0.25,1,0.5,1] } }} /* Modifié y: -10 -> y: 0 */
             transition={{ duration: 0.8, ease: [0.25,1,0.5,1] }}
             className="smoke-container"
           >
