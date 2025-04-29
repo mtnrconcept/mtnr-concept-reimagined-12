@@ -30,9 +30,9 @@ export const DispersingLogo = ({
       // Use next animation frame to avoid blocking paint
       requestAnimationFrame(() => {
         const opts: DisperseOptions = {
-          particleCount: 600,
+          particleCount: 1200,
           dispersionStrength: 2.0,
-          duration: 1200,
+          duration: 2000,
           colorPalette: ['#FFD700', '#222222', '#FFFFFF'],
           onComplete: () => {
             onDispersionComplete?.();
