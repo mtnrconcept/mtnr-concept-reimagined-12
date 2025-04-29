@@ -20,7 +20,7 @@ export default function WhatWeDo() {
             <div className="relative">
               <NeonText 
                 text="Notre Vibe"
-                className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center inline-block"
+                className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center"
                 color="yellow"
                 flicker={true}
               />
