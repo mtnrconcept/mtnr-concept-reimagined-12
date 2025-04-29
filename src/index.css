@@ -134,23 +134,24 @@
   
   /** UV Mode Styles */
   .uv-mode-active {
-    color: #00AAFF;
+    color: #4FA9FF;
+    background-color: rgba(10, 0, 60, 0.98) !important;
   }
   
   .uv-mode-active .neon-text {
-    color: #00FFAA !important;
-    text-shadow: 0 0 5px #00FFAA, 0 0 15px #00FFAA, 0 0 25px #00FFAA !important;
+    color: #4FF0FF !important;
+    text-shadow: 0 0 5px #00AAFF, 0 0 15px #00AAFF, 0 0 25px #00AAFF !important;
   }
   
   .uv-mode-active h1, 
   .uv-mode-active h2, 
   .uv-mode-active h3 {
-    color: #00FFAA;
-    text-shadow: 0 0 8px #00FFAA;
+    color: #4FF0FF;
+    text-shadow: 0 0 8px #00AAFF;
   }
   
   .uv-nav-link {
-    color: #00AAFF !important;
+    color: #4FA9FF !important;
     text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
     position: relative;
   }
@@ -169,20 +170,43 @@
   
   .uv-button {
     box-shadow: 0 0 15px #00AAFF, inset 0 0 10px #00AAFF;
-    border-color: #00AAFF !important;
+    border: 1px solid #00AAFF !important;
+    color: #4FF0FF !important;
   }
   
-  .uv-mode-active .bg-yellow-400,
+  .uv-mode-active .bg-black,
+  .uv-mode-active .bg-black\/80,
+  .uv-mode-active .bg-gray-800,
+  .uv-mode-active .bg-gray-900 {
+    background-color: rgba(15, 0, 70, 0.8) !important;
+    border: 1px solid #2680FF !important;
+    box-shadow: 0 0 15px rgba(38, 128, 255, 0.3) !important;
+  }
+  
   .uv-mode-active .text-yellow-400,
-  .uv-mode-active [class*="yellow"] {
-    background-color: #CCFF00 !important;
-    color: #CCFF00 !important;
-    text-shadow: 0 0 10px #CCFF00;
+  .uv-mode-active .bg-yellow-400 {
+    color: #D2FF3F !important;
+    background-color: #D2FF3F !important;
+    text-shadow: 0 0 8px #A2FF00 !important;
   }
   
   .uv-mode-active .border-yellow-400 {
-    border-color: #00AAFF !important;
+    border-color: #4FA9FF !important;
     box-shadow: 0 0 15px #00AAFF;
+  }
+
+  .uv-mode-active [class*="paper-texture"],
+  .uv-mode-active [class*="grunge-border"] {
+    border: 1px solid #4FA9FF !important;
+    box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
+    background-color: rgba(15, 0, 70, 0.8) !important;
+  }
+  
+  /* Effet de bordure lumineuse pour les cartes en mode UV */
+  .uv-mode-active .card,
+  .uv-mode-active [class*="border"] {
+    border: 1px solid #4FA9FF !important;
+    box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
   }
   
   @keyframes uvPulse {
@@ -196,10 +220,23 @@
     animation: uvPulse 2s infinite;
   }
   
-  /* Effet de bordure lumineuse pour les cartes en mode UV */
-  .uv-mode-active [class*="paper-texture"],
-  .uv-mode-active [class*="bg-black"] {
-    border: 1px solid #00AAFF !important;
-    box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
+  /* UV glow pour les textes */
+  .uv-hidden-text {
+    color: #4FF0FF !important;
+    text-shadow: 0 0 5px #00AAFF, 0 0 10px #00AAFF !important;
+  }
+  
+  /* UV label dans le coin inférieur droit */
+  .uv-corner-label {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background-color: transparent;
+    color: #4FF0FF;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
+    opacity: 0.8;
+    z-index: 100;
   }
 }

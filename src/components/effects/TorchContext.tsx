@@ -143,7 +143,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [mousePosition, elementsToIlluminate, isTorchActive, uvMode]);
 
-  const radius = 600;
+  // Ajusté à 800 pour un effet plus large et doux comme sur l'image
+  const radius = 800;
   
   const contextValue = {
     isTorchActive,
@@ -170,13 +171,14 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <stop offset="100%" stopColor="black" stopOpacity="0" />
               </radialGradient>
               <radialGradient id="uv-torch-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#1A0080" stopOpacity="0.1" />
-                <stop offset="30%" stopColor="#1A0080" stopOpacity="0.3" />
-                <stop offset="60%" stopColor="black" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="black" stopOpacity="0.98" />
+                <stop offset="0%" stopColor="#0F0430" stopOpacity="0" />
+                <stop offset="30%" stopColor="#150840" stopOpacity="0.1" />
+                <stop offset="60%" stopColor="#170860" stopOpacity="0.3" />
+                <stop offset="80%" stopColor="black" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.95" />
               </radialGradient>
               <filter id="uv-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="10" result="blur" />
+                <feGaussianBlur stdDeviation="15" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
               <mask id="torch-mask">
@@ -192,7 +194,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             <rect
               width="100%"
               height="100%"
-              fill={uvMode ? "rgba(5, 0, 40, 0.98)" : "rgba(0, 0, 0, 0.95)"}
+              fill={uvMode ? "rgba(10, 0, 60, 0.98)" : "rgba(0, 0, 0, 0.95)"}
               mask="url(#torch-mask)"
             />
             {/* Effet de halo UV autour du curseur si en mode UV */}
@@ -201,20 +203,20 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
-                  r="120"
+                  r="180"
                   fill="none"
-                  stroke="#00AAFF"
+                  stroke="#0066FF"
                   strokeWidth="2"
-                  strokeOpacity="0.5"
-                  filter="blur(5px)"
+                  strokeOpacity="0.3"
+                  filter="blur(8px)"
                 />
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
-                  r="20"
-                  fill="#00AAFF"
-                  opacity="0.3"
-                  filter="blur(8px)"
+                  r="30"
+                  fill="#0066FF"
+                  opacity="0.2"
+                  filter="blur(12px)"
                 />
               </>
             )}

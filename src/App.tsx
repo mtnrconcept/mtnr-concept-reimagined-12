@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider } from "./components/effects/TorchContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
 import { Torch3DProvider } from "./components/effects/Torch3DContext";
+import { useTorch } from "./components/effects/TorchContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -17,6 +19,17 @@ import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
+
+// Composant pour afficher le label UV
+const UVCornerLabel = () => {
+  const { uvMode, isTorchActive } = useTorch();
+  
+  if (!isTorchActive || !uvMode) return null;
+  
+  return (
+    <div className="uv-corner-label">UV</div>
+  );
+};
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -42,6 +55,7 @@ function AnimatedRoutes() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
+      <UVCornerLabel />
     </>
   );
 }

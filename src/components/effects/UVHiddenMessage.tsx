@@ -13,7 +13,7 @@ interface UVHiddenMessageProps {
 
 export default function UVHiddenMessage({
   message,
-  color = "#9b87f5",
+  color = "#4FF0FF",
   className = "",
   fontSize = "1rem",
   offsetX = 0,
@@ -37,19 +37,29 @@ export default function UVHiddenMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Modify visibility based on distance
-      const threshold = 300;
+      // Modify visibility based on distance - increased threshold for wider effect
+      const threshold = 600;
       if (distance < threshold) {
         const intensity = 1 - (distance / threshold);
         
         // Apply effects
-        messageRef.current.style.opacity = `${Math.min(0.95, intensity)}`;
-        messageRef.current.style.filter = `blur(${Math.max(0, 3 - (intensity * 6))}px)`;
-        messageRef.current.style.textShadow = `0 0 ${5 + (intensity * 15)}px ${color}, 0 0 ${10 + (intensity * 30)}px ${color}`;
+        messageRef.current.style.opacity = `${Math.min(0.95, intensity * 1.5)}`;
+        messageRef.current.style.filter = `blur(${Math.max(0, 2 - (intensity * 5))}px) brightness(1.3)`;
+        
+        // Strong blue glow effect
+        const glowIntensity = 5 + (intensity * 25);
+        messageRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity * 2}px ${color}`;
+        
+        // Add subtle motion
+        const time = Date.now() / 1000;
+        const vibrationX = Math.sin(time * 1.5) * 0.7;
+        const vibrationY = Math.cos(time * 1.3) * 0.7;
+        messageRef.current.style.transform = `translate(${offsetX + vibrationX}px, ${offsetY + vibrationY}px)`;
       } else {
         messageRef.current.style.opacity = '0';
         messageRef.current.style.filter = 'blur(4px)';
         messageRef.current.style.textShadow = 'none';
+        messageRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
       }
     };
 
@@ -58,7 +68,7 @@ export default function UVHiddenMessage({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, color, uvMode]);
+  }, [isTorchActive, mousePosition, color, uvMode, offsetX, offsetY]);
 
   // Only render when torch is active and in UV mode
   if (!isTorchActive || !uvMode) return null;
@@ -73,7 +83,8 @@ export default function UVHiddenMessage({
         opacity: 0,
         transform: `translate(${offsetX}px, ${offsetY}px)`,
         textShadow: `0 0 5px ${color}`,
-        letterSpacing: '0.05em',
+        letterSpacing: '0.07em',
+        fontWeight: 'bold',
       }}
     >
       {message}

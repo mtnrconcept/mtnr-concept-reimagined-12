@@ -17,7 +17,7 @@ export default function UVText({
   text,
   className,
   hiddenText,
-  uvColor = "#8B5CF6",
+  uvColor = "#4FF0FF",
   textSize = "text-base",
   opacity = 0.05,
   position = "default"
@@ -44,7 +44,7 @@ export default function UVText({
       
       // Check if mouse is close enough to illuminate the text
       // Adjust threshold based on the size of your elements
-      const threshold = uvMode ? 500 : 300;
+      const threshold = uvMode ? 600 : 300;
       const newIsIlluminated = distance < threshold;
       
       if (newIsIlluminated !== isIlluminated) {
@@ -57,15 +57,16 @@ export default function UVText({
         const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
         hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
-        // Larger glow for UV mode
+        // Larger glow for UV mode with vibrant blue color
         const glowSize = uvMode ? 25 * intensity : 15 * intensity;
         hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#00AAFF" : uvColor}, 
                                                  0 0 ${glowSize * 2}px ${uvMode ? "#00AAFF" : uvColor}`;
         
         if (uvMode) {
           // Effet de vibration légère en mode UV
-          const vibrationX = Math.sin(Date.now() / 200) * 0.5;
-          const vibrationY = Math.cos(Date.now() / 180) * 0.5;
+          const time = Date.now() / 1000;
+          const vibrationX = Math.sin(time * 2) * 0.5;
+          const vibrationY = Math.cos(time * 1.8) * 0.5;
           hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
           hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
         } else {
@@ -116,7 +117,7 @@ export default function UVText({
         )}
         style={{
           opacity: isIlluminated ? 1 : opacity,
-          color: uvMode ? "#00AAFF" : uvColor,
+          color: uvMode ? "#4FF0FF" : uvColor,
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}
