@@ -22,7 +22,7 @@ export const useTorch = () => useContext(TorchContext);
 
 export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { 
@@ -92,8 +92,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           <div 
             className="standard-torch"
             style={{
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px)`
+              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 500px)`,
+              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 500px)`
             }}
           />
         )}

@@ -12,16 +12,8 @@ export const TorchToggle = () => {
   const { is3DModeActive, toggle3DMode } = use3DTorch();
 
   const handleToggleTorch = () => {
-    // Force à false d'abord pour reset l'état si nécessaire
-    if (isTorchActive) {
-      setIsTorchActive(false);
-      // Petit délai avant de réactiver si l'utilisateur veut allumer la torche
-      setTimeout(() => {
-        setIsTorchActive(true);
-      }, 50);
-    } else {
-      setIsTorchActive(true);
-    }
+    // Inverser simplement l'état de la torche
+    setIsTorchActive(!isTorchActive);
   };
 
   const handleToggleUV = () => {

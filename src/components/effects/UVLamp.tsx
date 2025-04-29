@@ -29,8 +29,9 @@ export const UVLamp: React.FC<UVLampProps> = ({
   // UV light size adjustments based on prop
   useEffect(() => {
     if (uvCircleRef.current) {
-      // Correct mask: only show UV effect WITHIN the circle (transparent) and normal outside (black)
-      const maskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0px, transparent ${lampRadius}px, black ${lampRadius + 2}px)`;
+      // Mask INVERSÉ : show UV effect ONLY within the circle (transparent)
+      // and normal outside the circle (black overlay)
+      const maskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0px, transparent ${lampRadius}px, rgba(10, 0, 60, 0.98) ${lampRadius + 2}px)`;
       uvCircleRef.current.style.mask = maskValue;
       uvCircleRef.current.style.webkitMask = maskValue;
     }
@@ -113,11 +114,16 @@ export const UVLamp: React.FC<UVLampProps> = ({
 
   return (
     <>
-      {/* UV Effect Overlay - correct mask implementation */}
+      {/* Fond UV noir qui sera masqué par le cercle de lampe */}
+      <div 
+        className="fixed inset-0 z-45 pointer-events-none bg-[rgba(10,0,60,0.98)]"
+      />
+      
+      {/* UV Effect Overlay - avec masque inversé */}
       <div 
         ref={uvCircleRef}
         className={cn(
-          "fixed inset-0 z-50 pointer-events-none bg-[rgba(10,0,60,0.98)]",
+          "fixed inset-0 z-50 pointer-events-none bg-transparent",
           className
         )}
         style={{
@@ -144,7 +150,7 @@ export const UVLamp: React.FC<UVLampProps> = ({
               exit={{ opacity: 0, scale: 0.9 }}
             >
               <img 
-                src={siteUrl ? `${siteUrl}/lovable-uploads/aaae9aeb-9678-49a4-8be3-4305ab554a55.png` : "/lovable-uploads/aaae9aeb-9678-49a4-8be3-4305ab554a55.png"}
+                src="/lovable-uploads/f8b2ee4c-ca6a-4388-8c9c-bfb3c97d5f0a.png"
                 alt="MTNR UV Logo"
                 className="w-full h-auto"
                 draggable={false}

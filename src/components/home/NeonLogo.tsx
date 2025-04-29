@@ -42,7 +42,7 @@ export const NeonLogo = () => {
   // Si le mode UV est actif et la torche est allumée, ne pas afficher ce logo
   // car il sera remplacé par le logo UV
   if (uvMode && isTorchActive) {
-    return null;
+    return null; // Le logo UV sera affiché par UVLamp.tsx
   }
   
   return (
