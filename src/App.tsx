@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider } from "./components/effects/TorchContext";
+import { UVModeProvider } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
 import { Torch3DProvider } from "./components/effects/Torch3DContext";
 import { useTorch } from "./components/effects/TorchContext";
@@ -20,7 +20,7 @@ import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 
-// Composant pour afficher le label UV
+// Component to display UV label
 const UVCornerLabel = () => {
   const { uvMode, isTorchActive } = useTorch();
   
@@ -63,19 +63,21 @@ function AnimatedRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TorchProvider>
-        <Torch3DProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={null}>
-              <AnimatedRoutes />
-            </Suspense>
-          </BrowserRouter>
-          <ParticleEffect />
-          <TorchToggle />
-        </Torch3DProvider>
-      </TorchProvider>
+      <UVModeProvider>
+        <TorchProvider>
+          <Torch3DProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={null}>
+                <AnimatedRoutes />
+              </Suspense>
+            </BrowserRouter>
+            <ParticleEffect />
+            <TorchToggle />
+          </Torch3DProvider>
+        </TorchProvider>
+      </UVModeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

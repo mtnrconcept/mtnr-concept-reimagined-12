@@ -1,21 +1,23 @@
 
 import React from "react";
 import { useTorch } from "./TorchContext";
+import { useUVMode } from "./UVModeContext";
 import { use3DTorch } from "./Torch3DContext";
 import { Flashlight, Box, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const TorchToggle = () => {
-  const { isTorchActive, setIsTorchActive, uvMode, toggleUVMode } = useTorch();
+  const { isTorchActive, setIsTorchActive } = useTorch();
+  const { uvMode, toggleUVMode } = useUVMode();
   const { is3DModeActive, toggle3DMode } = use3DTorch();
 
   const handleToggleUV = () => {
-    // Ajouter une petite vibration sur mobile si supporté
+    // Add small vibration on mobile if supported
     if ("vibrate" in navigator) {
       try {
         navigator.vibrate(50);
       } catch (e) {
-        console.log("Vibration non supportée", e);
+        console.log("Vibration not supported", e);
       }
     }
     

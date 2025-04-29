@@ -1,6 +1,7 @@
 
 import { useRef, useEffect } from "react";
 import { useTorch } from "./TorchContext";
+import { useUVMode } from "./UVModeContext";
 
 interface UVHiddenMessageProps {
   message: string;
@@ -20,7 +21,8 @@ export default function UVHiddenMessage({
   offsetY = 0
 }: UVHiddenMessageProps) {
   const messageRef = useRef<HTMLDivElement>(null);
-  const { isTorchActive, mousePosition, uvMode } = useTorch();
+  const { isTorchActive, mousePosition } = useTorch();
+  const { uvMode } = useUVMode();
 
   useEffect(() => {
     if (!messageRef.current || !isTorchActive || !uvMode) return;

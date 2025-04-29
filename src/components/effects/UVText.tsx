@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect, useState, ReactNode } from "react";
 import { useTorch } from "./TorchContext";
+import { useUVMode } from "./UVModeContext";
 import { cn } from "@/lib/utils";
 
 interface UVTextProps {
@@ -17,14 +18,15 @@ export default function UVText({
   text,
   className,
   hiddenText,
-  uvColor = "#D2FF3F", // Couleur jaune fluo pour correspondre à l'image de référence
+  uvColor = "#D2FF3F", // Fluorescent yellow color to match reference image
   textSize = "text-base",
   opacity = 0.05,
   position = "default"
 }: UVTextProps) {
   const textRef = useRef<HTMLDivElement>(null);
   const hiddenTextRef = useRef<HTMLParagraphElement>(null);
-  const { isTorchActive, mousePosition, uvMode } = useTorch();
+  const { isTorchActive, mousePosition } = useTorch();
+  const { uvMode } = useUVMode();
   const [isIlluminated, setIsIlluminated] = useState(false);
 
   useEffect(() => {
@@ -57,13 +59,13 @@ export default function UVText({
         const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
         hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
-        // Larger glow for UV mode avec couleur jaune fluo
+        // Larger glow for UV mode with fluorescent yellow color
         const glowSize = uvMode ? 25 * intensity : 15 * intensity;
         hiddenTextRef.current.style.textShadow = `0 0 ${glowSize}px ${uvMode ? "#D2FF3F" : uvColor}, 
                                                  0 0 ${glowSize * 2}px ${uvMode ? "#D2FF3F" : uvColor}`;
         
         if (uvMode) {
-          // Effet de vibration légère en mode UV
+          // Slight vibration effect in UV mode
           const time = Date.now() / 1000;
           const vibrationX = Math.sin(time * 2) * 0.5;
           const vibrationY = Math.cos(time * 1.8) * 0.5;
