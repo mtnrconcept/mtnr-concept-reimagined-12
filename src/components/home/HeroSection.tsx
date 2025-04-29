@@ -1,24 +1,15 @@
-
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
-
 export default function HeroSection() {
-  return (
-    <section 
-      id="hero-section"
-      className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
-    >
+  return <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
       <NeonLogo />
       
-      <div 
-        className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10"
-        data-animate
-      >
+      <div className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10" data-animate>
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
-          <span className="block">Bienvenue à</span>
-          <span className="block mt-2">MTNR Studio</span>
+          <span className="block text-center font-light">Bienvenue à</span>
+          <span className="block mt-2 font-normal text-center">MTNR Studio</span>
         </h1>
         
         <div className="text-white text-xl sm:text-2xl mb-8 font-medium tracking-wide">
@@ -38,21 +29,14 @@ export default function HeroSection() {
         </div>
         
         <div className="mt-10 flex flex-wrap gap-4 justify-center">
-          <Link 
-            to="/book" 
-            className="relative px-8 py-3 bg-yellow-400 text-black font-bold rounded-lg overflow-hidden group hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all duration-300"
-          >
+          <Link to="/book" className="relative px-8 py-3 bg-yellow-400 text-black font-bold rounded-lg overflow-hidden group hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all duration-300">
             <span className="relative z-10">Book ta session</span>
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
-          <Link 
-            to="/what-we-do" 
-            className="px-8 py-3 bg-black/60 border border-yellow-400/50 text-white font-bold rounded-lg shadow-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:bg-black/80 hover:border-yellow-400 transition-all duration-300"
-          >
+          <Link to="/what-we-do" className="px-8 py-3 bg-black/60 border border-yellow-400/50 text-white font-bold rounded-lg shadow-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:bg-black/80 hover:border-yellow-400 transition-all duration-300">
             En savoir plus
           </Link>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
