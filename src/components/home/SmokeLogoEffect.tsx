@@ -8,6 +8,7 @@ export const SmokeLogoEffect = () => {
   const [shouldDisperse, setShouldDisperse] = useState(false);
   const logoRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const animationTriggeredRef = useRef(false);
   
   const { isVisible, isAnimating, triggerSmokeEffect } = useSmokeEffect({
     shouldTrigger: shouldDisperse,
@@ -16,24 +17,33 @@ export const SmokeLogoEffect = () => {
     containerRef,
     onEffectComplete: () => {
       setShouldDisperse(false);
+      animationTriggeredRef.current = false;
     }
   });
   
-  // Déclenchement automatique de l'effet de dispersion après un délai
+  // Ne déclencher l'effet qu'une seule fois au chargement
   useEffect(() => {
-    // Ne pas déclencher l'effet si une transition de page est en cours
-    if ((window as any).pageTransitionInProgress) return;
-    
-    const disperseTimeout = setTimeout(() => {
-      setShouldDisperse(true);
-    }, 2000); // Attendre 2 secondes avant de disperser
-    
-    return () => clearTimeout(disperseTimeout);
-  }, []);
+    // Ne déclencher l'effet que si:
+    // 1. L'animation n'a pas encore été déclenchée
+    // 2. Aucune transition de page n'est en cours
+    // 3. L'animation n'est pas déjà en cours
+    if (!animationTriggeredRef.current && 
+        !(window as any).pageTransitionInProgress && 
+        !isAnimating && 
+        !shouldDisperse) {
+      animationTriggeredRef.current = true;
+      const timer = setTimeout(() => {
+        setShouldDisperse(true);
+      }, 1000); // Attendre 1 seconde après le chargement
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating, shouldDisperse]);
 
   // Appliquer l'effet de fumée
   useEffect(() => {
-    if (shouldDisperse && !isAnimating) {
+    if (shouldDisperse && !isAnimating && !animationTriggeredRef.current) {
+      animationTriggeredRef.current = true;
       const cleanup = triggerSmokeEffect();
       return () => cleanup.cancel();
     }
@@ -49,10 +59,7 @@ export const SmokeLogoEffect = () => {
         logoRef={logoRef}
         glowEffect={true}
         onLoad={() => {
-          // Déclencher l'effet après le chargement complet de l'image
-          if (!shouldDisperse && !window.pageTransitionInProgress) {
-            setShouldDisperse(true);
-          }
+          // Ne pas déclencher d'effet automatique ici pour éviter les déclenchements multiples
         }}
       />
     </div>

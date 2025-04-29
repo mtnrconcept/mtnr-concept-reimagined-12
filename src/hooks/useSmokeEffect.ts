@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createSmokeTextEffect } from '@/lib/transitions';
 import { SmokeTextOptions } from '@/lib/transitions/particles/types';
 
@@ -38,6 +38,9 @@ export function useSmokeEffect({
 }: SmokeEffectHookProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const effectInstanceRef = useRef<{ cancel: () => void } | null>(null);
+  const tempLogoRef = useRef<HTMLImageElement | null>(null);
+  
   const [currentOptions, setCurrentOptions] = useState<SmokeEffectOptions>(
     presets?.[0] || {
       baseColor: '#FFD700', // Jaune
@@ -53,6 +56,22 @@ export function useSmokeEffect({
     }
   );
 
+  // Nettoyer toute animation en cours lors du démontage
+  useEffect(() => {
+    return () => {
+      if (effectInstanceRef.current) {
+        effectInstanceRef.current.cancel();
+        effectInstanceRef.current = null;
+      }
+      
+      // Retirer tout logo temporaire
+      if (tempLogoRef.current && containerRef.current?.contains(tempLogoRef.current)) {
+        containerRef.current.removeChild(tempLogoRef.current);
+        tempLogoRef.current = null;
+      }
+    };
+  }, [containerRef]);
+
   // Fonction pour faire tourner les effets pour que chaque animation soit différente
   const rotateEffectOptions = () => {
     if (!presets || presets.length === 0) return;
@@ -63,7 +82,7 @@ export function useSmokeEffect({
     setCurrentOptions(prev => ({
       ...prev,
       ...randomPreset,
-      duration: 2500 + Math.random() * 1000, // Entre 2.5 et 3.5 secondes
+      duration: 2500 + Math.random() * 500, // Entre 2.5 et 3 secondes (réduit le max pour plus de fluidité)
     }));
   };
 
@@ -71,7 +90,26 @@ export function useSmokeEffect({
   const triggerSmokeEffect = () => {
     // Ne pas déclencher l'animation si une transition de page est en cours
     // et que ce n'est pas une animation de transition de page
-    if ((window as any).pageTransitionInProgress && !isPageTransition) return;
+    if ((window as any).pageTransitionInProgress && !isPageTransition) {
+      return { cancel: () => {} };
+    }
+    
+    // Ne pas déclencher si une animation est déjà en cours
+    if (isAnimating) {
+      return { cancel: () => {} };
+    }
+    
+    // Nettoyer toute animation précédente
+    if (effectInstanceRef.current) {
+      effectInstanceRef.current.cancel();
+      effectInstanceRef.current = null;
+    }
+    
+    // Retirer tout logo temporaire précédent
+    if (tempLogoRef.current && containerRef.current?.contains(tempLogoRef.current)) {
+      containerRef.current.removeChild(tempLogoRef.current);
+      tempLogoRef.current = null;
+    }
     
     if (logoRef.current && isVisible) {
       // Indiquer que le logo est en cours d'animation
@@ -79,40 +117,50 @@ export function useSmokeEffect({
       setIsAnimating(true);
       
       // Créer une copie temporaire du logo pour l'effet
-      const tempLogo = logoRef.current.cloneNode(true) as HTMLImageElement;
-      tempLogo.style.position = 'absolute';
-      tempLogo.style.top = '0';
-      tempLogo.style.left = '0';
-      tempLogo.style.width = '100%';
-      tempLogo.style.height = '100%';
+      tempLogoRef.current = logoRef.current.cloneNode(true) as HTMLImageElement;
+      tempLogoRef.current.style.position = 'absolute';
+      tempLogoRef.current.style.top = '0';
+      tempLogoRef.current.style.left = '0';
+      tempLogoRef.current.style.width = '100%';
+      tempLogoRef.current.style.height = '100%';
+      tempLogoRef.current.style.objectFit = 'contain'; // Assure que l'image n'est pas déformée
       
       if (containerRef.current) {
-        containerRef.current.appendChild(tempLogo);
+        containerRef.current.appendChild(tempLogoRef.current);
       }
       
+      // Optimiser les paramètres pour une meilleure fluidité
+      const optimizedOptions = {
+        ...currentOptions,
+        particleCount: Math.min(currentOptions.particleCount, 120), // Limiter le nombre de particules
+        speed: Math.min(currentOptions.speed, 1.2),  // Vitesse raisonnable
+        turbulence: Math.min(currentOptions.turbulence, 0.7) // Moins de turbulence pour plus de fluidité
+      };
+      
       // Appliquer l'effet de fumée avec les options actuelles
-      const cleanup = createSmokeTextEffect(tempLogo, {
-        particleCount: currentOptions.particleCount,
-        duration: currentOptions.duration,
-        baseColor: currentOptions.baseColor,
-        accentColor: currentOptions.accentColor,
-        direction: currentOptions.direction,
-        customAngle: currentOptions.customAngle,
-        intensity: currentOptions.intensity,
-        speed: currentOptions.speed,
-        colorVariation: currentOptions.colorVariation,
-        blurAmount: currentOptions.blurAmount,
-        turbulence: currentOptions.turbulence,
+      effectInstanceRef.current = createSmokeTextEffect(tempLogoRef.current, {
+        particleCount: optimizedOptions.particleCount,
+        duration: optimizedOptions.duration,
+        baseColor: optimizedOptions.baseColor,
+        accentColor: optimizedOptions.accentColor,
+        direction: optimizedOptions.direction,
+        customAngle: optimizedOptions.customAngle,
+        intensity: optimizedOptions.intensity,
+        speed: optimizedOptions.speed,
+        colorVariation: optimizedOptions.colorVariation,
+        blurAmount: optimizedOptions.blurAmount,
+        turbulence: optimizedOptions.turbulence,
         particleMix: { 
-          smoke: 0.5, 
-          spark: 0.3, 
-          ember: 0.2 
+          smoke: 0.6,  // Plus de fumée
+          spark: 0.25, // Moins d'étincelles
+          ember: 0.15  // Moins de braises
         },
         onComplete: () => {
           // Réinitialiser l'effet après un délai
           setTimeout(() => {
-            if (containerRef.current && containerRef.current.contains(tempLogo)) {
-              containerRef.current.removeChild(tempLogo);
+            if (tempLogoRef.current && containerRef.current?.contains(tempLogoRef.current)) {
+              containerRef.current.removeChild(tempLogoRef.current);
+              tempLogoRef.current = null;
             }
             setIsVisible(true);
             setIsAnimating(false);
@@ -123,11 +171,11 @@ export function useSmokeEffect({
             if (onEffectComplete) {
               onEffectComplete();
             }
-          }, 800);
+          }, 500); // Réduit le délai pour plus de réactivité
         }
       });
       
-      return cleanup;
+      return effectInstanceRef.current;
     }
     
     return { cancel: () => {} };

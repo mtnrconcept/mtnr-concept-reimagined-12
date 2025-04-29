@@ -10,6 +10,7 @@ export default function PageTransitionEffect() {
   const prevPathRef = useRef<string>(location.pathname);
   const contentRef = useRef<HTMLElement | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const transitionTimeoutRef = useRef<number | null>(null);
   
   // Référence globale pour indiquer une transition en cours
   // Utilisée par d'autres composants pour synchroniser leurs animations
@@ -19,10 +20,20 @@ export default function PageTransitionEffect() {
     // Nettoyer lors du démontage
     return () => {
       window.pageTransitionInProgress = false;
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
     };
   }, [isTransitioning]);
   
   useEffect(() => {
+    // Nettoyer tout timeout existant pour éviter les chevauchements
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+    
     // Trouver le conteneur de contenu principal
     const mainContent = document.querySelector('main');
     if (!mainContent) return;
@@ -38,44 +49,32 @@ export default function PageTransitionEffect() {
       const logoContainer = document.querySelector('.smoke-logo-container');
       const logoImg = logoContainer?.querySelector('img');
       
-      // Appliquer l'effet de fumée sur le logo d'abord s'il existe
-      if (logoImg && logoImg instanceof HTMLImageElement) {
-        createSmokeTextEffect(logoImg, {
-          ...pageTransitionPreset,
-          onComplete: () => {
-            // Après la dispersion du logo, appliquer l'effet de particules au reste du contenu
-            if (window.requestIdleCallback) {
-              window.requestIdleCallback(() => {
-                createParticleEffect(contentRef.current);
-              }, { timeout: 100 });
-            } else {
-              setTimeout(() => {
-                createParticleEffect(contentRef.current);
-              }, 10);
-            }
+      // Ne pas avoir plusieurs animations en même temps
+      // Prioriser l'effet de particules pour une transition rapide
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => {
+          if (contentRef.current) {
+            createParticleEffect(contentRef.current);
           }
-        });
+        }, { timeout: 50 });  // Timeout plus court pour démarrer plus vite
       } else {
-        // Si pas de logo, appliquer directement l'effet de particules au contenu
-        if (window.requestIdleCallback) {
-          window.requestIdleCallback(() => {
+        setTimeout(() => {
+          if (contentRef.current) {
             createParticleEffect(contentRef.current);
-          }, { timeout: 100 });
-        } else {
-          setTimeout(() => {
-            createParticleEffect(contentRef.current);
-          }, 10);
-        }
+          }
+        }, 10);
       }
       
       // Attendre que l'effet de particule se disperse avant d'afficher le nouveau contenu
-      setTimeout(() => {
+      transitionTimeoutRef.current = window.setTimeout(() => {
         // Appliquer l'effet de fumée au nouveau contenu
-        createSmokeEffect(contentRef.current);
+        if (contentRef.current) {
+          createSmokeEffect(contentRef.current);
+        }
         
         // Réinitialiser l'indicateur de transition
         setIsTransitioning(false);
-      }, 600);
+      }, 500); // Transition plus rapide
     }
     
     prevPathRef.current = location.pathname;
