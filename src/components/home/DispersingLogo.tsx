@@ -1,94 +1,81 @@
--import { useLayoutEffect, useEffect, useRef } from 'react';
--import { createLogoDisperseEffect, DisperseOptions } from '@/lib/transitions/particle-effect';
-+import { useLayoutEffect, useEffect, useRef } from 'react';
-+import { createLogoDisperseEffect, DisperseOptions } from '@/lib/transitions/particle-effect';
+import { useLayoutEffect, useEffect, useRef } from "react";
+import { createLogoDisperseEffect, DisperseOptions } from "@/lib/transitions/particle-effect";
 
- interface DispersingLogoProps {
-   /** Indicateur de déclenchement externe */
-   triggerDispersion?: boolean;
-   /** Chemin de la route précédente */
-   fromPath: string;
-   /** Chemin de la route cible */
-   toPath: string;
-   /** Callback une fois la dispersion terminée */
-   onDispersionComplete?: () => void;
-   /** Classes CSS additionnelles */
-   className?: string;
-   /** Source de l'image du logo */
-   imageSrc: string;
- }
+interface DispersingLogoProps {
+  triggerDispersion?: boolean;
+  fromPath: string;
+  toPath: string;
+  onDispersionComplete?: () => void;
+  className?: string;
+  imageSrc: string;
+}
 
- /** 
-  * DispersingLogo
-  * Ne déclenche l'effet que lorsqu'on quitte la page d'accueil (fromPath='/' → toPath!='/')
-  */
--export const DispersingLogo = ({
-+export const DispersingLogo = ({
-   triggerDispersion = false,
-   fromPath,
-   toPath,
-   onDispersionComplete,
-   className = '',
-   imageSrc,
- }: DispersingLogoProps) => {
-   const logoRef = useRef<HTMLImageElement>(null);
-   const effectRef = useRef<{ cancel: () => void } | null>(null);
-   const prevTriggerRef = useRef<boolean>(false);
-   const isInitialMountRef = useRef<boolean>(true);
+/**
+ * DispersingLogo
+ * Ne se lance que lorsqu'on quitte la home (fromPath="/" -> toPath!="/")
+ */
+export const DispersingLogo = ({
+  triggerDispersion = false,
+  fromPath,
+  toPath,
+  onDispersionComplete,
+  className = "",
+  imageSrc,
+}: DispersingLogoProps) => {
+  const logoRef = useRef<HTMLImageElement>(null);
+  const effectRef = useRef<{ cancel: () => void } | null>(null);
+  const prevTriggerRef = useRef<boolean>(false);
+  const isInitialMountRef = useRef<boolean>(true);
 
-   // Gestion du déclenchement de la dispersion
-   useLayoutEffect(() => {
-     if (isInitialMountRef.current) {
-       // Ignorer le premier rendu
-       isInitialMountRef.current = false;
-       prevTriggerRef.current = triggerDispersion;
-       return;
-     }
-     // Conditions : passage false → true & quitter '/'
-     if (
-       triggerDispersion &&
-       !prevTriggerRef.current &&
-       fromPath === '/' &&
-       toPath !== '/' &&
-       logoRef.current
-     ) {
-       requestAnimationFrame(() => {
-         const opts: DisperseOptions = {
-           particleCount: 1500,
-           dispersionStrength: 1.8,
-           duration: 1800,
-           colorPalette: ['#FFD700', '#222222', '#FFFFFF', '#FFD700'],
-           onComplete: () => onDispersionComplete?.(),
-         };
-         // Annuler l'effet actuel avant de lancer le nouveau
-         effectRef.current?.cancel();
-         effectRef.current = createLogoDisperseEffect(
-           logoRef.current!,
-           opts
-         );
-       });
-     }
-     prevTriggerRef.current = triggerDispersion;
-   }, [triggerDispersion, fromPath, toPath, onDispersionComplete]);
+  useLayoutEffect(() => {
+    // Ignore le premier rendu
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      prevTriggerRef.current = triggerDispersion;
+      return;
+    }
 
-   // Cleanup à la destruction du composant
-   useEffect(() => {
-     return () => {
-       effectRef.current?.cancel();
-       effectRef.current = null;
-     };
-   }, []);
+    // Conditions : passage faux->vrai, et quitter "/"
+    if (
+      triggerDispersion &&
+      !prevTriggerRef.current &&
+      fromPath === "/" &&
+      toPath !== "/" &&
+      logoRef.current
+    ) {
+      requestAnimationFrame(() => {
+        const opts: DisperseOptions = {
+          particleCount: 1500,
+          dispersionStrength: 1.8,
+          duration: 1800,
+          colorPalette: ["#FFD700", "#222222", "#FFFFFF", "#FFD700"],
+          onComplete: () => onDispersionComplete?.(),
+        };
+        // Annule l'effet en cours et relance
+        effectRef.current?.cancel();
+        effectRef.current = createLogoDisperseEffect(logoRef.current!, opts);
+      });
+    }
+    prevTriggerRef.current = triggerDispersion;
+  }, [triggerDispersion, fromPath, toPath, onDispersionComplete]);
 
-   return (
-     <div className={`relative ${className}`}>      
-       <img
-         ref={logoRef}
-         src={imageSrc}
-         alt="logo"
-         className="w-full h-auto"
-         style={{ willChange: 'transform, opacity', opacity: 1 }}
-         draggable={false}
-       />
-     </div>
-   );
- };
+  useEffect(() => {
+    return () => {
+      effectRef.current?.cancel();
+      effectRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div className={`relative ${className}`}>
+      <img
+        ref={logoRef}
+        src={imageSrc}
+        alt="logo"
+        className="w-full h-auto"
+        style={{ willChange: "transform, opacity", opacity: 1 }}
+        draggable={false}
+      />
+    </div>
+  );
+};
