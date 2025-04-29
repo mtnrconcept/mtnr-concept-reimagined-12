@@ -50,6 +50,9 @@ export const SmokeLogoEffect = () => {
 
   // Déclenchement automatique de l'effet de dispersion après un délai
   useEffect(() => {
+    // Ne pas déclencher l'effet si une transition de page est en cours
+    if ((window as any).pageTransitionInProgress) return;
+    
     const disperseTimeout = setTimeout(() => {
       setShouldDisperse(true);
     }, 2000); // Attendre 2 secondes avant de disperser
@@ -59,6 +62,9 @@ export const SmokeLogoEffect = () => {
 
   // Appliquer l'effet de fumée
   useEffect(() => {
+    // Ne pas déclencher l'animation si une transition de page est en cours
+    if ((window as any).pageTransitionInProgress) return;
+    
     if (shouldDisperse && logoRef.current && isLogoVisible) {
       // Indiquer que le logo est en cours d'animation
       setIsLogoVisible(false);
@@ -162,7 +168,7 @@ export const SmokeLogoEffect = () => {
   };
   
   return (
-    <div ref={containerRef} className="w-full flex justify-center items-center py-12 relative z-30">
+    <div ref={containerRef} className="smoke-logo-container w-full flex justify-center items-center py-12 relative z-30">
       <AnimatePresence mode="wait">
         {isLogoVisible && (
           <motion.div 
@@ -189,7 +195,7 @@ export const SmokeLogoEffect = () => {
               draggable={false}
               onLoad={() => {
                 // Déclencher l'effet après le chargement complet de l'image
-                if (!shouldDisperse) {
+                if (!shouldDisperse && !window.pageTransitionInProgress) {
                   setShouldDisperse(true);
                 }
               }}

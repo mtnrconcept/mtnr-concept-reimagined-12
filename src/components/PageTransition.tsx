@@ -1,10 +1,26 @@
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ReactNode, useRef } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 
 // Optimized transition inspired by David Langarica with improved performance
 export default function PageTransition({ children, keyId }: { children: ReactNode; keyId: string }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Indiquer aux autres composants que nous sommes en train de faire une transition
+  useEffect(() => {
+    // Définir la variable globale au montage
+    window.pageTransitionInProgress = true;
+    
+    // Réinitialiser après un court délai pour permettre aux animations de démarrer
+    const timeout = setTimeout(() => {
+      window.pageTransitionInProgress = false;
+    }, 1500); // Assez long pour couvrir la durée des animations
+    
+    return () => {
+      clearTimeout(timeout);
+      window.pageTransitionInProgress = false;
+    };
+  }, [keyId]);
   
   return (
     <AnimatePresence mode="wait">

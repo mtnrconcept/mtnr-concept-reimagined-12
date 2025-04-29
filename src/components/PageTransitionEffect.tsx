@@ -1,44 +1,91 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createParticleEffect, createSmokeEffect } from '@/lib/transitions';
+import { createSmokeTextEffect } from '@/lib/transitions';
 
 export default function PageTransitionEffect() {
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
   const contentRef = useRef<HTMLElement | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Référence globale pour indiquer une transition en cours
+  // Utilisée par d'autres composants pour synchroniser leurs animations
+  useEffect(() => {
+    window.pageTransitionInProgress = isTransitioning;
+    
+    // Nettoyer lors du démontage
+    return () => {
+      window.pageTransitionInProgress = false;
+    };
+  }, [isTransitioning]);
   
   useEffect(() => {
-    // Find the main content container
+    // Trouver le conteneur de contenu principal
     const mainContent = document.querySelector('main');
     if (!mainContent) return;
     
     contentRef.current = mainContent;
     
-    // If this is a route change (not initial load)
+    // Si c'est un changement de route (pas le chargement initial)
     if (prevPathRef.current !== location.pathname) {
-      // Apply particle effect to previous content
-      // Using requestIdleCallback to not block rendering
-      if (window.requestIdleCallback) {
-        window.requestIdleCallback(() => {
-          createParticleEffect(contentRef.current);
-        }, { timeout: 100 });
+      // Indiquer qu'une transition est en cours
+      setIsTransitioning(true);
+      
+      // Trouver le logo (s'il existe sur la page)
+      const logoContainer = document.querySelector('.smoke-logo-container');
+      const logoImg = logoContainer?.querySelector('img');
+      
+      // Appliquer l'effet de fumée sur le logo d'abord s'il existe
+      if (logoImg && logoImg instanceof HTMLImageElement) {
+        createSmokeTextEffect(logoImg, {
+          particleCount: 180,
+          baseColor: '#FFD700', // Jaune
+          accentColor: '#FFFFFF', // Blanc
+          direction: 'radial',
+          duration: 1200,
+          speed: 1.3,
+          intensity: 1.5,
+          onComplete: () => {
+            // Après la dispersion du logo, appliquer l'effet de particules au reste du contenu
+            if (window.requestIdleCallback) {
+              window.requestIdleCallback(() => {
+                createParticleEffect(contentRef.current);
+              }, { timeout: 100 });
+            } else {
+              setTimeout(() => {
+                createParticleEffect(contentRef.current);
+              }, 10);
+            }
+          }
+        });
       } else {
-        setTimeout(() => {
-          createParticleEffect(contentRef.current);
-        }, 10);
+        // Si pas de logo, appliquer directement l'effet de particules au contenu
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(() => {
+            createParticleEffect(contentRef.current);
+          }, { timeout: 100 });
+        } else {
+          setTimeout(() => {
+            createParticleEffect(contentRef.current);
+          }, 10);
+        }
       }
       
-      // Wait for particle effect to disperse before showing new content
+      // Attendre que l'effet de particule se disperse avant d'afficher le nouveau contenu
       setTimeout(() => {
-        // Apply smoke effect to new content
+        // Appliquer l'effet de fumée au nouveau contenu
         createSmokeEffect(contentRef.current);
+        
+        // Réinitialiser l'indicateur de transition
+        setIsTransitioning(false);
       }, 600);
     }
     
     prevPathRef.current = location.pathname;
   }, [location.pathname]);
   
-  // This component doesn't render anything visually
+  // Ce composant ne rend rien visuellement
   return null;
 }
