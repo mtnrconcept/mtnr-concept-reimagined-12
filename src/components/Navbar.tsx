@@ -65,6 +65,22 @@ export default function Navbar() {
     }
   };
 
+  // Fonction pour naviguer entre les pages de manière sécurisée
+  const handleNavigation = (path: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    // Fermer le menu mobile si ouvert
+    if (menuOpen) {
+      setMenuOpen(false);
+    }
+    
+    // Utiliser l'historique pour naviguer en douceur sans recharger la page
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   return (
     <motion.nav 
       className={cn(
@@ -105,6 +121,7 @@ export default function Navbar() {
             <motion.li key={link.path} variants={itemVariants}>
               <Link
                 to={link.path}
+                onClick={(e) => handleNavigation(link.path, e)}
                 className={cn(
                   "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
                   pathname === link.path 
@@ -127,6 +144,7 @@ export default function Navbar() {
           <motion.li variants={itemVariants}>
             <Link 
               to="/book" 
+              onClick={(e) => handleNavigation('/book', e)}
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
             >
               <span className="relative z-10">Book Now</span>
@@ -155,7 +173,7 @@ export default function Navbar() {
               >
                 <Link
                   to={link.path}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => handleNavigation(link.path, e)}
                   className={cn(
                     "block px-6 py-3 font-medium transition-all",
                     pathname === link.path ? "text-primary" : "text-white/80"
@@ -173,7 +191,7 @@ export default function Navbar() {
             >
               <Link 
                 to="/book" 
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => handleNavigation('/book', e)}
                 className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Book Now

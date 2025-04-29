@@ -18,11 +18,14 @@ export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContain
       {/* Fond en position fixe */}
       <Background imagePath={backgroundImage} />
       
-      {/* Conteneur des éléments de parallax */}
+      {/* Conteneur des éléments de parallax avec une plus grande hauteur */}
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
-        style={{ perspective: '1000px' }}
+        className="fixed inset-0 w-full h-full overflow-visible pointer-events-none"
+        style={{ 
+          perspective: '1000px',
+          height: '300vh', // Augmente la hauteur pour permettre le défilement
+        }}
       />
       
       {/* Contenu de la page, à l'avant-plan avec zIndex élevé */}
