@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
+import ElevatorTransition from "@/components/effects/ElevatorTransition";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -19,6 +20,7 @@ export default function PageTransition({
   const isInitialMountRef = useRef<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // On stocke la route précédente
   const [fromPath, setFromPath] = useState(location.pathname);
@@ -29,6 +31,13 @@ export default function PageTransition({
       isInitialMountRef.current = false;
       prevPathRef.current = location.pathname;
       return;
+    }
+
+    // Détecter les changements de route et activer la transition
+    if (location.pathname !== prevPathRef.current) {
+      setIsTransitioning(true);
+      setFromPath(prevPathRef.current);
+      prevPathRef.current = location.pathname;
     }
   }, [location.pathname]);
 
@@ -44,10 +53,27 @@ export default function PageTransition({
     setIsLoading(false);
   };
 
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
+    console.log('Transition d\'ascenseur terminée');
+  };
+
   return (
     <>
       {/* Logo avec dispersion et callback de fin */}
       <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
+
+      {/* Effet d'ascenseur */}
+      <ElevatorTransition 
+        isActive={isTransitioning}
+        onAnimationComplete={handleTransitionComplete}
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md flex items-center justify-center">
+          <div className="text-white text-4xl font-bold">
+            Transition en cours...
+          </div>
+        </div>
+      </ElevatorTransition>
 
       <AnimatePresence mode="wait">
         <motion.div

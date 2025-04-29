@@ -1,0 +1,59 @@
+
+.elevator-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.elevator-tile {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  background-color: black;
+  will-change: transform;
+}
+
+.elevator-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, filter;
+}
+
+/* Animation du flou de mouvement */
+@keyframes blurMotion {
+  0% { filter: blur(0px); }
+  20% { filter: blur(8px); }
+  50% { filter: blur(12px); }
+  80% { filter: blur(8px); }
+  100% { filter: blur(0px); }
+}
+
+.blur-motion {
+  animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animation d'entrée et de sortie avec perspective */
+@keyframes elevatorPerspectiveUp {
+  0% { transform: translateY(100%) perspective(1000px) rotateX(5deg); }
+  100% { transform: translateY(0) perspective(1000px) rotateX(0deg); }
+}
+
+@keyframes elevatorPerspectiveDown {
+  0% { transform: translateY(-100%) perspective(1000px) rotateX(-5deg); }
+  100% { transform: translateY(0) perspective(1000px) rotateX(0deg); }
+}
+
+.elevator-enter-up {
+  animation: elevatorPerspectiveUp 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.elevator-enter-down {
+  animation: elevatorPerspectiveDown 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
