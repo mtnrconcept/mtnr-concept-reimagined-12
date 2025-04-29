@@ -1,76 +1,99 @@
-
 import { motion, AnimatePresence } from "framer-motion";
-import { ReactNode, useRef, useEffect } from "react";
+import { ReactNode, useRef, useEffect, useLayoutEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { createSmokeEffect } from '@/lib/transitions';
+import { pageTransitionPreset } from '@/components/effects/smoke-presets';
+import { DispersingLogo } from '@/components/home/DispersingLogo';
 
-// Transition optimisée inspirée par David Langarica, avec effet de fumée uniquement
-export default function PageTransition({ children, keyId }: { children: ReactNode; keyId: string }) {
+interface PageTransitionProps {
+  children: ReactNode;
+  keyId: string;
+}
+
+export default function PageTransition({ children, keyId }: PageTransitionProps) {
+  const location = useLocation();
+  const prevPathRef = useRef<string>(location.pathname);
+  const isInitialMountRef = useRef<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
-  
-  // Indiquer aux autres composants que nous sommes en train de faire une transition
+
+  // Pour stocker la route précédente à passer au DispersingLogo
+  const [fromPath, setFromPath] = useState<string>(location.pathname);
+  const [triggerLogoDispersion, setTriggerLogoDispersion] = useState<boolean>(false);
+
+  // Gérer la transition de page (fumée + dispersion logo)
   useEffect(() => {
-    // Définir la variable globale au montage
+    // Ignorer le premier rendu
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      prevPathRef.current = location.pathname;
+      return;
+    }
+
+    const prevPath = prevPathRef.current;
+    // Mettre à jour fromPath pour le composant DispersingLogo
+    setFromPath(prevPath);
+
+    // Indiquer globalement qu'une transition est en cours
     window.pageTransitionInProgress = true;
-    
-    // Réinitialiser après un court délai pour permettre aux animations de démarrer
+
+    // Déterminer si on quitte la page d'accueil
+    const isLeavingHome = prevPath === '/' && location.pathname !== '/';
+    setTriggerLogoDispersion(isLeavingHome);
+
+    // Appliquer l'effet fumée
+    if (contentRef.current) {
+      // Laisser le navigateur préparer le DOM
+      requestAnimationFrame(() => {
+        createSmokeEffect(contentRef.current!, pageTransitionPreset);
+      });
+    }
+
+    // Réinitialiser après la durée de la transition
     const timeout = setTimeout(() => {
       window.pageTransitionInProgress = false;
-    }, 1500); // Assez long pour couvrir la durée des animations
-    
-    return () => {
-      clearTimeout(timeout);
-      window.pageTransitionInProgress = false;
-    };
-  }, [keyId]);
-  
+      setTriggerLogoDispersion(false);
+    }, pageTransitionPreset.duration || 1200);
+
+    // Mettre à jour la route précédente
+    prevPathRef.current = location.pathname;
+
+    return () => clearTimeout(timeout);
+  }, [location.pathname]);
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={keyId}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ 
-          opacity: 0,
-          transition: { duration: 0.4 } // Reduced duration for better performance
-        }}
-        className="page-content-wrapper"
-        style={{ 
-          perspective: "1400px", 
-          willChange: "transform, opacity",
-          position: "relative",
-          zIndex: 10
-        }}
-      >
-        {/* Container for page content with smoke effect */}
+    <>
+      {/* DispersingLogo se déclenche uniquement si on quitte '/' */}
+      <DispersingLogo
+        triggerDispersion={triggerLogoDispersion}
+        fromPath={fromPath}
+        toPath={location.pathname}
+        imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+        onDispersionComplete={() => {/* callback si besoin */}}
+        className="fixed inset-0 pointer-events-none"
+      />
+
+      <AnimatePresence mode="wait">
         <motion.div
-          ref={contentRef}
-          initial={{ 
-            opacity: 0,
-            y: 10,
-          }}
-          animate={{ 
-            opacity: 1,
-            y: 0,
-          }}
-          exit={{
-            opacity: 0,
-            y: -10,
-            transition: {
-              duration: 0.3, // Fast exit for better perceived performance
-              ease: [0.25, 1, 0.5, 1],
-            }
-          }}
-          transition={{
-            duration: 0.8, // Shorter entry animation
-            ease: [0.25, 1, 0.5, 1],
-          }}
-          className="smoke-container"
+          key={keyId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          className="page-content-wrapper"
+          style={{ perspective: '1400px', willChange: 'transform, opacity', position: 'relative', zIndex: 10 }}
         >
-          {children}
-          
-          {/* Layer for smoke enter effect */}
-          <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
+          <motion.div
+            ref={contentRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.3, ease: [0.25,1,0.5,1] } }}
+            transition={{ duration: 0.8, ease: [0.25,1,0.5,1] }}
+            className="smoke-container"
+          >
+            {children}
+            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }
