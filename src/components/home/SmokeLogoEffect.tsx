@@ -4,10 +4,38 @@ import { cn } from '@/lib/utils';
 import { createSmokeTextEffect } from '@/lib/transitions';
 import { AnimatePresence, motion } from 'framer-motion';
 
+// Interface pour les options de l'effet
+interface SmokeEffectOptions {
+  baseColor: string;
+  accentColor: string;
+  particleCount: number;
+  direction: 'up' | 'down' | 'left' | 'right' | 'radial' | 'custom';
+  customAngle?: number;
+  speed: number;
+  intensity: number;
+  turbulence: number;
+  duration: number;
+  colorVariation: boolean;
+  blurAmount: number;
+}
+
 export const SmokeLogoEffect = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
   const [shouldDisperse, setShouldDisperse] = useState(false);
   const [isLogoVisible, setIsLogoVisible] = useState(true);
+  const [effectOptions, setEffectOptions] = useState<SmokeEffectOptions>({
+    baseColor: '#FFD700',   // Jaune
+    accentColor: '#FFFFFF', // Blanc
+    particleCount: 150,
+    direction: 'radial',
+    speed: 1,
+    intensity: 1.5,
+    turbulence: 0.6,
+    duration: 3000,
+    colorVariation: true,
+    blurAmount: 1.2,
+  });
+  
   const logoRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -47,14 +75,24 @@ export const SmokeLogoEffect = () => {
         containerRef.current.appendChild(tempLogo);
       }
       
-      // Appliquer l'effet de fumée
+      // Appliquer l'effet de fumée avec les options personnalisées
       const cleanup = createSmokeTextEffect(tempLogo, {
-        particleCount: 150,
-        duration: 3000,
-        baseColor: '#FFD700', // Jaune
-        accentColor: '#FFFFFF', // Blanc
-        direction: 'radial',
-        intensity: 1.5,
+        particleCount: effectOptions.particleCount,
+        duration: effectOptions.duration,
+        baseColor: effectOptions.baseColor,
+        accentColor: effectOptions.accentColor,
+        direction: effectOptions.direction,
+        customAngle: effectOptions.customAngle,
+        intensity: effectOptions.intensity,
+        speed: effectOptions.speed,
+        colorVariation: effectOptions.colorVariation,
+        blurAmount: effectOptions.blurAmount,
+        turbulence: effectOptions.turbulence,
+        particleMix: { 
+          smoke: 0.5, 
+          spark: 0.3, 
+          ember: 0.2 
+        },
         onComplete: () => {
           // Réinitialiser l'effet après un délai
           setTimeout(() => {
@@ -63,7 +101,10 @@ export const SmokeLogoEffect = () => {
             }
             setIsLogoVisible(true);
             setShouldDisperse(false);
-          }, 500);
+            
+            // Changer les options pour la prochaine animation
+            rotateEffectOptions();
+          }, 800);
         }
       });
       
@@ -74,7 +115,51 @@ export const SmokeLogoEffect = () => {
         }
       };
     }
-  }, [shouldDisperse, isLogoVisible]);
+  }, [shouldDisperse, isLogoVisible, effectOptions]);
+  
+  // Fonction pour faire tourner les effets pour que chaque animation soit différente
+  const rotateEffectOptions = () => {
+    // Liste de préréglages pour varier les effets
+    const presets = [
+      {
+        baseColor: '#FFD700', // Jaune
+        accentColor: '#FFFFFF',
+        direction: 'radial' as const,
+        speed: 1,
+        intensity: 1.5,
+        particleCount: 150,
+        turbulence: 0.6,
+      },
+      {
+        baseColor: '#F5DD00', // Jaune légèrement différent
+        accentColor: '#FFFFCC', // Jaune pâle
+        direction: 'up' as const,
+        speed: 1.2,
+        intensity: 1.3,
+        particleCount: 180,
+        turbulence: 0.8,
+      },
+      {
+        baseColor: '#FFD700',
+        accentColor: '#FFFFFF',
+        direction: 'custom' as const,
+        customAngle: 45, // 45 degrés (en haut à droite)
+        speed: 0.9,
+        intensity: 1.6,
+        particleCount: 130,
+        turbulence: 0.4,
+      }
+    ];
+    
+    // Choisir un préréglage au hasard
+    const randomPreset = presets[Math.floor(Math.random() * presets.length)];
+    
+    setEffectOptions(prev => ({
+      ...prev,
+      ...randomPreset,
+      duration: 2500 + Math.random() * 1000, // Entre 2.5 et 3.5 secondes
+    }));
+  };
   
   return (
     <div ref={containerRef} className="w-full flex justify-center items-center py-12 relative z-30">

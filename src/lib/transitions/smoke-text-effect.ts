@@ -5,17 +5,33 @@
  */
 
 import { random } from './utils';
+import { createSafeFilter } from '@/lib/animation-utils';
 
 // Options pour personnaliser l'effet de fumée
 interface SmokeTextOptions {
-  particleCount?: number; // Nombre de particules de fumée
-  duration?: number; // Durée de l'animation en ms
-  baseColor?: string; // Couleur de base des particules
-  accentColor?: string; // Couleur d'accent pour certaines particules
-  onComplete?: () => void; // Callback à la fin de l'animation
+  particleCount?: number;         // Nombre de particules de fumée
+  duration?: number;              // Durée de l'animation en ms
+  baseColor?: string;             // Couleur de base des particules
+  accentColor?: string;           // Couleur d'accent pour certaines particules
+  onComplete?: () => void;        // Callback à la fin de l'animation
   easing?: (t: number) => number; // Fonction d'easing pour l'animation
-  direction?: 'up' | 'down' | 'left' | 'right' | 'radial'; // Direction de dispersion
-  intensity?: number; // Intensité de l'effet (taille et vitesse)
+  direction?: 'up' | 'down' | 'left' | 'right' | 'radial' | 'custom'; // Direction de dispersion
+  customAngle?: number;           // Angle personnalisé (en degrés) si direction = 'custom'
+  intensity?: number;             // Intensité de l'effet (taille et vitesse)
+  speed?: number;                 // Multiplicateur de vitesse global
+  colorVariation?: boolean;       // Activer la variation de couleurs
+  blurAmount?: number;            // Quantité de flou
+  turbulence?: number;            // Niveau de turbulence dans le mouvement
+  smokeOpacity?: number;          // Opacité max de la fumée (0-1)
+  growFactor?: number;            // Facteur de croissance des particules
+  particleMix?: {                 // Distribution des types de particules
+    smoke?: number;               // Pourcentage de particules de fumée (0-1)
+    spark?: number;               // Pourcentage de particules d'étincelles (0-1)
+    ember?: number;               // Pourcentage de particules de braises (0-1)
+  };
+  gravity?: number;               // Effet de gravité (positif = vers le bas)
+  windEffect?: number;            // Effet de vent (positif = vers la droite)
+  rotationSpeed?: number;         // Vitesse de rotation des particules
 }
 
 // Types de particules
@@ -35,6 +51,11 @@ interface ParticleElement {
   rotation: number;
   rotationSpeed: number;
   animationDelay: number;
+  turbulenceFactors?: {
+    x: number;
+    y: number;
+    time: number;
+  };
 }
 
 /**
@@ -46,6 +67,7 @@ export function createSmokeTextEffect(
 ) {
   if (!targetElement) return { cancel: () => {} };
   
+  // Fusionner les options par défaut avec celles fournies
   const {
     particleCount = 100,
     duration = 3000,
@@ -54,8 +76,27 @@ export function createSmokeTextEffect(
     onComplete = () => {},
     easing = (t) => 1 - Math.pow(1 - t, 3), // easeOutCubic par défaut
     direction = 'radial',
-    intensity = 1
+    customAngle = 0,
+    intensity = 1,
+    speed = 1,
+    colorVariation = true,
+    blurAmount = 1,
+    turbulence = 0.5,
+    smokeOpacity = 0.8,
+    growFactor = 2,
+    particleMix = { smoke: 0.6, spark: 0.3, ember: 0.1 },
+    gravity = 0,
+    windEffect = 0,
+    rotationSpeed = 1
   } = options;
+  
+  // Normaliser les proportions de particleMix pour s'assurer qu'elles totalisent 1
+  const totalMix = (particleMix.smoke || 0) + (particleMix.spark || 0) + (particleMix.ember || 0);
+  const normalizedMix = {
+    smoke: totalMix > 0 ? (particleMix.smoke || 0) / totalMix : 0.6,
+    spark: totalMix > 0 ? (particleMix.spark || 0) / totalMix : 0.3,
+    ember: totalMix > 0 ? (particleMix.ember || 0) / totalMix : 0.1
+  };
   
   // Récupérer les dimensions et position de l'élément cible
   const rect = targetElement.getBoundingClientRect();
@@ -88,7 +129,14 @@ export function createSmokeTextEffect(
     baseColor,
     accentColor,
     direction,
-    intensity
+    customAngle,
+    intensity,
+    speed,
+    blurAmount,
+    turbulence,
+    smokeOpacity,
+    normalizedMix,
+    rotationSpeed
   );
   
   // Ajouter les particules au conteneur
@@ -123,7 +171,18 @@ export function createSmokeTextEffect(
       
       if (particleProgress < 1) {
         allComplete = false;
-        updateParticle(particle, particleProgress, easing);
+        updateParticle(
+          particle, 
+          particleProgress, 
+          easing, 
+          { 
+            growFactor,
+            colorVariation,
+            gravity,
+            windEffect,
+            turbulence
+          }
+        );
       } else {
         // Masquer la particule une fois terminée
         particle.element.style.opacity = '0';
@@ -167,28 +226,35 @@ function createParticleMix(
   baseColor: string,
   accentColor: string,
   direction: string,
-  intensity: number
+  customAngle: number,
+  intensity: number,
+  speed: number,
+  blurAmount: number,
+  turbulence: number,
+  smokeOpacity: number,
+  mix: { smoke: number, spark: number, ember: number },
+  rotationSpeed: number
 ) {
   // Distribution des différents types de particules
-  const smokeCount = Math.round(count * 0.6); // 60% de fumée
-  const sparkCount = Math.round(count * 0.3); // 30% d'étincelles
-  const emberCount = count - smokeCount - sparkCount; // Le reste en braises
+  const smokeCount = Math.round(count * mix.smoke);
+  const sparkCount = Math.round(count * mix.spark);
+  const emberCount = count - smokeCount - sparkCount;
   
   // Créer les particules de fumée
   for (let i = 0; i < smokeCount; i++) {
-    const particle = createParticle('smoke', rect, baseColor, direction, intensity);
+    const particle = createParticle('smoke', rect, baseColor, direction, customAngle, intensity * speed, blurAmount, turbulence, smokeOpacity, rotationSpeed);
     particles.push(particle);
   }
   
   // Créer les particules d'étincelles
   for (let i = 0; i < sparkCount; i++) {
-    const particle = createParticle('spark', rect, accentColor, direction, intensity);
+    const particle = createParticle('spark', rect, accentColor, direction, customAngle, intensity * speed * 1.2, blurAmount * 0.3, turbulence * 1.5, smokeOpacity * 1.2, rotationSpeed * 1.5);
     particles.push(particle);
   }
   
   // Créer les particules de braises
   for (let i = 0; i < emberCount; i++) {
-    const particle = createParticle('ember', rect, baseColor, direction, intensity * 1.2);
+    const particle = createParticle('ember', rect, baseColor, direction, customAngle, intensity * speed * 1.1, blurAmount * 0.7, turbulence * 1.2, smokeOpacity * 1.1, rotationSpeed * 0.8);
     particles.push(particle);
   }
 }
@@ -201,7 +267,12 @@ function createParticle(
   rect: DOMRect,
   color: string,
   direction: string,
-  intensity: number
+  customAngle: number,
+  speed: number,
+  blurAmount: number,
+  turbulence: number,
+  opacity: number,
+  rotationSpeed: number
 ): ParticleElement {
   // Calculer position initiale basée sur le rectangle de l'élément cible
   // Dispersion depuis le centre de l'élément pour un effet plus naturel
@@ -226,51 +297,58 @@ function createParticle(
   switch(direction) {
     case 'up':
       dirX = random(-0.5, 0.5);
-      dirY = random(-2, -1) * intensity;
+      dirY = random(-2, -1) * speed;
       break;
     case 'down':
       dirX = random(-0.5, 0.5);
-      dirY = random(1, 2) * intensity;
+      dirY = random(1, 2) * speed;
       break;
     case 'left':
-      dirX = random(-2, -1) * intensity;
+      dirX = random(-2, -1) * speed;
       dirY = random(-0.5, 0.5);
       break;
     case 'right':
-      dirX = random(1, 2) * intensity;
+      dirX = random(1, 2) * speed;
       dirY = random(-0.5, 0.5);
+      break;
+    case 'custom':
+      // Convertir l'angle en radians
+      const angleRad = (customAngle * Math.PI) / 180;
+      const force = (1 + Math.random() * 0.5) * speed;
+      dirX = Math.cos(angleRad) * force;
+      dirY = Math.sin(angleRad) * force;
       break;
     case 'radial':
     default:
       // Direction radiale depuis le centre
       const angle = Math.random() * Math.PI * 2;
-      const force = (0.5 + Math.random() * 1.5) * intensity;
+      const force = (0.5 + Math.random() * 1.5) * speed;
       dirX = Math.cos(angle) * force;
       dirY = Math.sin(angle) * force;
       break;
   }
   
   // Paramètres spécifiques selon le type de particule
-  let size: number, opacity: number, particleColor: string, blur: number;
+  let size: number, particleOpacity: number, particleColor: string, blur: number;
   
   switch(type) {
     case 'smoke':
-      size = random(20, 50) * intensity;
-      opacity = random(0.4, 0.8);
+      size = random(20, 50) * speed;
+      particleOpacity = random(0.4, 0.8) * opacity;
       particleColor = adjustColorLightness(color, random(-20, 20));
-      blur = random(5, 12);
+      blur = random(5, 12) * blurAmount;
       break;
     case 'spark':
-      size = random(2, 8) * intensity;
-      opacity = random(0.7, 1);
+      size = random(2, 8) * speed;
+      particleOpacity = random(0.7, 1) * opacity;
       particleColor = adjustColorLightness(color, random(20, 40)); // Plus lumineux
-      blur = random(0, 2);
+      blur = random(0, 2) * blurAmount;
       break;
     case 'ember':
-      size = random(4, 12) * intensity;
-      opacity = random(0.6, 0.9);
+      size = random(4, 12) * speed;
+      particleOpacity = random(0.6, 0.9) * opacity;
       particleColor = adjustColorSaturation(color, random(80, 100)); // Plus saturé
-      blur = random(2, 6);
+      blur = random(2, 6) * blurAmount;
       break;
   }
   
@@ -288,12 +366,19 @@ function createParticle(
     height: ${size}px;
     border-radius: ${borderRadius};
     background-color: ${particleColor};
-    opacity: ${opacity};
+    opacity: ${particleOpacity};
     filter: blur(${blur}px);
     transform: rotate(0deg);
     pointer-events: none;
     will-change: transform, opacity;
   `;
+  
+  // Facteurs de turbulence pour le mouvement aléatoire
+  const turbulenceFactors = {
+    x: random(-1, 1),
+    y: random(-1, 1),
+    time: random(0, 1000)
+  };
   
   return {
     element,
@@ -301,13 +386,14 @@ function createParticle(
     initialX,
     initialY,
     direction: { x: dirX, y: dirY },
-    speed: random(0.8, 1.2) * intensity,
+    speed,
     size,
-    opacity,
+    opacity: particleOpacity,
     hue: 0, // Pour les variations de couleur pendant l'animation
     rotation: random(0, 360),
-    rotationSpeed: random(-1, 1) * (type === 'smoke' ? 5 : 2),
-    animationDelay: random(0, 500) // Délai avant que la particule commence à se déplacer
+    rotationSpeed: random(-1, 1) * rotationSpeed * (type === 'smoke' ? 5 : 2),
+    animationDelay: random(0, 500), // Délai avant que la particule commence à se déplacer
+    turbulenceFactors
   };
 }
 
@@ -317,15 +403,36 @@ function createParticle(
 function updateParticle(
   particle: ParticleElement,
   progress: number,
-  easing: (t: number) => number
+  easing: (t: number) => number,
+  options: {
+    growFactor: number;
+    colorVariation: boolean;
+    gravity: number;
+    windEffect: number;
+    turbulence: number;
+  }
 ) {
-  const { element, initialX, initialY, direction, speed, rotationSpeed } = particle;
+  const { element, initialX, initialY, direction, speed, rotationSpeed, turbulenceFactors } = particle;
+  const { growFactor, colorVariation, gravity, windEffect, turbulence } = options;
+  
   const easedProgress = easing(progress);
   
   // Calcul des transformations
   const moveDistance = 100 * speed * easedProgress;
-  const newX = initialX + direction.x * moveDistance;
-  const newY = initialY + direction.y * moveDistance;
+  
+  // Appliquer turbulence, gravité et effet de vent
+  const turbulenceFactor = turbulence * Math.sin((progress * 10) + (turbulenceFactors?.time || 0));
+  const turbX = turbulenceFactors ? turbulenceFactors.x * turbulenceFactor * 20 : 0;
+  const turbY = turbulenceFactors ? turbulenceFactors.y * turbulenceFactor * 20 : 0;
+  
+  // Appliquer gravité (augmente avec le temps)
+  const gravityEffect = gravity * easedProgress * 50;
+  
+  // Appliquer effet de vent (constant)
+  const windEffectValue = windEffect * 20;
+  
+  const newX = initialX + (direction.x * moveDistance) + turbX + windEffectValue;
+  const newY = initialY + (direction.y * moveDistance) + turbY + gravityEffect;
   
   // Rotation progressive
   const rotation = particle.rotation + (rotationSpeed * easedProgress * 360);
@@ -358,7 +465,7 @@ function updateParticle(
   switch(particle.type) {
     case 'smoke':
       // La fumée grossit
-      scaleFactor = 1 + easedProgress * 2;
+      scaleFactor = 1 + easedProgress * growFactor;
       break;
     case 'spark':
       // Les étincelles rétrécissent
@@ -377,7 +484,7 @@ function updateParticle(
   element.style.opacity = `${particle.opacity * opacityFactor}`;
   
   // Pour les braises et les étincelles, on peut faire varier la couleur
-  if (particle.type === 'ember' || particle.type === 'spark') {
+  if (colorVariation && (particle.type === 'ember' || particle.type === 'spark')) {
     particle.hue += 0.5; // Changement subtil de teinte
     if (particle.type === 'ember') {
       element.style.backgroundColor = `hsl(${particle.hue % 30 + 35}, 100%, 60%)`; // Variations de jaune-orangé
@@ -409,13 +516,66 @@ function adjustColorLightness(color: string, percent: number): string {
 }
 
 /**
- * Ajuste la saturation d'une couleur
+ * Ajuste la saturation d'une couleur (conversion de hex à HSL puis HSL à hex)
  */
 function adjustColorSaturation(color: string, percent: number): string {
-  // Cette fonction pourrait être améliorée pour une manipulation plus précise des couleurs
   if (color.startsWith('#')) {
-    // Conversion simplifiée pour l'exemple
-    return color; // Pour l'instant, retourne la couleur d'origine
+    // Convertir hex en RGB
+    const r = parseInt(color.slice(1, 3), 16) / 255;
+    const g = parseInt(color.slice(3, 5), 16) / 255;
+    const b = parseInt(color.slice(5, 7), 16) / 255;
+    
+    // Convertir RGB en HSL
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      
+      h /= 6;
+    }
+    
+    // Ajuster la saturation
+    s = Math.min(1, s * (percent / 100));
+    
+    // Convertir HSL à RGB
+    let r1 = 0, g1 = 0, b1 = 0;
+    
+    if (s === 0) {
+      r1 = g1 = b1 = l;
+    } else {
+      const hue2rgb = (p: number, q: number, t: number) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      
+      r1 = hue2rgb(p, q, h + 1/3);
+      g1 = hue2rgb(p, q, h);
+      b1 = hue2rgb(p, q, h - 1/3);
+    }
+    
+    // Convertir RGB à hex
+    const toHex = (x: number) => {
+      const hex = Math.round(x * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
   }
   return color;
 }
