@@ -1,0 +1,133 @@
+
+/* Base styles pour le texte néon */
+.neon-text {
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 900;
+  transition: text-shadow 0.3s, color 0.3s;
+  will-change: text-shadow, color;
+}
+
+/* État éteint par défaut */
+.neon-text {
+  opacity: 0.7;
+  text-shadow: none;
+}
+
+/* État allumé avec effet de lueur */
+.neon-text.neon-on {
+  opacity: 1;
+}
+
+/* Couleurs de lueur */
+.neon-text.neon-glow-yellow.neon-on {
+  color: #eedd44;
+  text-shadow: 
+    0 0 5px rgba(255, 221, 0, 0.8),
+    0 0 10px rgba(255, 221, 0, 0.5),
+    0 0 15px rgba(255, 221, 0, 0.3),
+    0 0 20px rgba(255, 221, 0, 0.2),
+    0 0 40px rgba(255, 221, 0, 0.1);
+}
+
+.neon-text.neon-glow-white.neon-on {
+  color: #ffffff;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 15px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(0, 160, 255, 0.2),
+    0 0 40px rgba(0, 160, 255, 0.1);
+}
+
+.neon-text.neon-glow-black.neon-on {
+  color: #ffffff;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 15px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation de scintillement */
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5),
+      0 0 15px rgba(255, 221, 0, 0.3),
+      0 0 20px rgba(255, 221, 0, 0.2),
+      0 0 40px rgba(255, 221, 0, 0.1);
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
+  }
+}
+
+.neon-text.neon-flicker.neon-on {
+  animation: neon-flicker 3s infinite alternate;
+}
+
+/* Animation de pulsation électrique */
+@keyframes neon-pulse {
+  0% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5);
+  }
+  50% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5),
+      0 0 15px rgba(255, 221, 0, 0.3),
+      0 0 30px rgba(255, 221, 0, 0.2),
+      0 0 60px rgba(255, 221, 0, 0.1);
+  }
+  100% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5);
+  }
+}
+
+/* Effet de charge électrique autour du texte */
+.neon-text.neon-on::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: transparent;
+  border-radius: 4px;
+  opacity: 0;
+  animation: electric-border 4s ease-in-out infinite;
+}
+
+@keyframes electric-border {
+  0%, 100% {
+    opacity: 0;
+    box-shadow: none;
+  }
+  5%, 95% {
+    opacity: 0;
+  }
+  30%, 70% {
+    opacity: 0.5;
+    box-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.7),
+      0 0 10px rgba(255, 221, 0, 0.5),
+      0 0 15px rgba(255, 221, 0, 0.3);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 
+      0 0 10px rgba(255, 221, 0, 0.8),
+      0 0 20px rgba(255, 221, 0, 0.6),
+      0 0 30px rgba(255, 221, 0, 0.4);
+  }
+}

@@ -2,6 +2,8 @@
 import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 export default function WhatWeDo() {
   // Force scroll to top on page load
@@ -15,9 +17,19 @@ export default function WhatWeDo() {
         <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
-            <h1 className="text-primary text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 uppercase text-center font-black drop-shadow-lg" style={{ letterSpacing: "0.16em" }}>
-              Notre Vibe
-            </h1>
+            <div className="relative">
+              <NeonText 
+                text="Notre Vibe"
+                className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center"
+                color="yellow"
+                flicker={true}
+              />
+              <ElectricParticles 
+                targetSelector=".neon-text" 
+                color="#ffdd00"
+                quantity={12}
+              />
+            </div>
             
             <div className="bg-black/80 grunge-border paper-texture px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl">
               <b className="text-yellow-400 font-extrabold">MTNR Studio</b>, c'est le choix de la marge.<br />
