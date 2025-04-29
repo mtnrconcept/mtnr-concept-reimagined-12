@@ -16,7 +16,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     isActive,
     onAnimationComplete,
     videoRef,
-    currentPath: children
+    currentPath: children  // Nous passons children, qui est un ReactNode
   });
 
   return (
