@@ -17,7 +17,15 @@ export default function PageTransitionEffect() {
   const navigationTimeoutRef = useRef<number | null>(null);
   const isNavigatingRef = useRef<boolean>(false);
   const isLeavingHomeRef = useRef<boolean>(false);
+  const initialRenderRef = useRef<boolean>(true);
   
+  // Suivre l'état initial de rendu pour éviter l'animation automatique
+  useEffect(() => {
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+    }
+  }, []);
+
   // Réinitialiser l'état quand on revient sur la page d'accueil
   useEffect(() => {
     // Reset state ONLY when we arrive to home from another page

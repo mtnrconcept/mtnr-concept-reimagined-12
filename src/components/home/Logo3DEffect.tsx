@@ -20,12 +20,7 @@ export const Logo3DEffect = () => {
     return () => clearInterval(interval);
   }, []);
 
-
-    
-    return () => clearTimeout(disperseTimeout);
-  }, []);
-
-  // Appliquer l'effet de dispersion 3D
+  // Appliquer l'effet de dispersion 3D - désactivé par défaut
   useEffect(() => {
     if (shouldDisperse && logoRef.current && isLogoVisible) {
       // Indiquer que le logo est en cours d'animation

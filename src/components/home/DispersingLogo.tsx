@@ -31,9 +31,17 @@ export const DispersingLogo = ({
   const logoRef = useRef<HTMLImageElement>(null);
   const effectRef = useRef<{ cancel: () => void } | null>(null);
   const prevTriggerRef = useRef<boolean>(false);
+  const isInitialMountRef = useRef<boolean>(true);
 
   // Trigger dispersion immediately after layout flush, but only when going from false to true
   useLayoutEffect(() => {
+    // Ignorer le premier rendu pour éviter l'animation automatique
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      prevTriggerRef.current = triggerDispersion;
+      return;
+    }
+
     // Ne déclencher que si triggerDispersion passe de false à true
     if (triggerDispersion && !prevTriggerRef.current && logoRef.current) {
       // Use next animation frame to avoid blocking paint
