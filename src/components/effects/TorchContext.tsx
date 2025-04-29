@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { useUVMode } from "./UVModeContext";
 
@@ -86,8 +87,8 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none"
             style={{
               background: "rgba(0, 0, 0, 0.95)",
-              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 220px, black 500px)`,
-              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 220px, black 500px)`
+              mask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px, black 650px)`,
+              WebkitMask: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, transparent 0%, black 350px, black 650px)`
             }}
           />
         )}

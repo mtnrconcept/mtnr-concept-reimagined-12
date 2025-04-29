@@ -7,6 +7,7 @@
     background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 80%);
     pointer-events: none;
     z-index: 50;
+    will-change: transform;
   }
 
   .flashlight-3d {
@@ -18,6 +19,7 @@
     pointer-events: none;
     z-index: 50;
     transform: translate(var(--cursor-x), var(--cursor-y));
+    will-change: transform;
   }
 
   /** Neon cursor effect */
@@ -32,18 +34,17 @@
     z-index: 1000;
     transform: translate(-50%, -50%);
     transition: transform 0.1s ease-out;
+    will-change: transform;
   }
   
-  /* UV light circle avec effet adouci et masque correct */
+  /* UV light standard - optimisé avec will-change */
   .uv-light-circle {
     position: fixed;
     width: 100%;
     height: 100%;
     pointer-events: none;
     z-index: 50;
-    background-color: rgba(10, 0, 60, 0.98);
-    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 150px, black 500px);
-    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 150px, black 500px);
+    will-change: mask, -webkit-mask;
     animation: uv-vibration 4s infinite;
   }
   
@@ -56,15 +57,31 @@
     z-index: 50;
     background-color: rgba(10, 0, 60, 0.98);
     animation: uv-vibration 4s infinite;
+    will-change: mask, -webkit-mask;
   }
   
-  /* Effet de vibration pour le mode UV */
+  /* Effet de vibration pour le mode UV - optimisé */
   @keyframes uv-vibration {
-    0% { --x: var(--mx); --y: var(--my); }
-    25% { --x: calc(var(--mx) - 5px); --y: calc(var(--my) + 5px); }
-    50% { --x: calc(var(--mx) + 5px); --y: calc(var(--my) - 5px); }
-    75% { --x: calc(var(--mx) + 3px); --y: calc(var(--my) + 3px); }
-    100% { --x: var(--mx); --y: var(--my); }
+    0% { 
+      --x: var(--mx); 
+      --y: var(--my); 
+    }
+    25% { 
+      --x: calc(var(--mx) - 5px); 
+      --y: calc(var(--my) + 5px); 
+    }
+    50% { 
+      --x: calc(var(--mx) + 5px); 
+      --y: calc(var(--my) - 5px); 
+    }
+    75% { 
+      --x: calc(var(--mx) + 3px); 
+      --y: calc(var(--my) + 3px); 
+    }
+    100% { 
+      --x: var(--mx); 
+      --y: var(--my); 
+    }
   }
 
   /* Effet de torche inversé pour le mode UV (pour montrer le logo UV) */
@@ -74,7 +91,16 @@
     height: 100%;
     pointer-events: none;
     z-index: 45; /* En dessous du masque UV mais au-dessus du contenu normal */
-    mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 300px, transparent 400px);
-    -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black 300px, transparent 400px);
+    will-change: mask, -webkit-mask;
+  }
+
+  /* Modernisé: torche standard avec rayon plus large */
+  .standard-torch {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.95);
+    will-change: mask, -webkit-mask;
   }
 }

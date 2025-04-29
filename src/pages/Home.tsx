@@ -49,7 +49,7 @@ export default function Home() {
       {/* Enhanced 3D parallax background */}
       <Parallax3DScene />
       
-      {/* Logo UV qui apparaît uniquement en mode UV - now using UVLamp */}
+      {/* Logo UV qui apparaît uniquement en mode UV - with the corrected mask */}
       {uvMode && isTorchActive && (
         <UVLamp 
           lampRadius={500}

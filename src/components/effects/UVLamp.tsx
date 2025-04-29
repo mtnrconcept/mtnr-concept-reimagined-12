@@ -22,74 +22,84 @@ export const UVLamp: React.FC<UVLampProps> = ({
   const { isTorchActive, mousePosition } = useTorch();
   const [isVisible, setIsVisible] = React.useState(false);
   const [glowIntensity, setGlowIntensity] = React.useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
   const uvCircleRef = useRef<HTMLDivElement>(null);
-  const uvInverseMaskRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
   
   // UV light size adjustments based on prop
   useEffect(() => {
     if (uvCircleRef.current) {
-      const maskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black ${lampRadius / 2}px, black ${lampRadius}px)`;
+      // Inversons le masque: transparent à l'intérieur (pour laisser le mode UV s'afficher) et noir à l'extérieur
+      const maskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0px, transparent ${lampRadius}px, black ${lampRadius + 2}px)`;
       uvCircleRef.current.style.mask = maskValue;
       uvCircleRef.current.style.webkitMask = maskValue;
     }
     
-    if (uvInverseMaskRef.current && showUVLogo) {
-      const inverseMaskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0%, black ${lampRadius * 0.75}px, transparent ${lampRadius}px)`;
-      uvInverseMaskRef.current.style.mask = inverseMaskValue;
-      uvInverseMaskRef.current.style.webkitMask = inverseMaskValue;
+    if (logoRef.current && showUVLogo) {
+      const logoMaskValue = `radial-gradient(circle at var(--x, 50%) var(--y, 50%), black 0px, black ${lampRadius * 0.7}px, transparent ${lampRadius * 0.8}px)`;
+      logoRef.current.style.mask = logoMaskValue;
+      logoRef.current.style.webkitMask = logoMaskValue;
     }
   }, [lampRadius, showUVLogo]);
   
+  // Gestion optimisée de la position
+  useEffect(() => {
+    if (isVisible) {
+      let ticking = false;
+      
+      const updatePosition = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
+            document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+      
+      updatePosition();
+      window.addEventListener('mousemove', updatePosition, { passive: true });
+      return () => window.removeEventListener('mousemove', updatePosition);
+    }
+  }, [mousePosition, isVisible]);
+  
   // Scintillement effect for UV logo
   useEffect(() => {
-    if (uvMode && isTorchActive) {
+    if (uvMode && isTorchActive && showUVLogo) {
       const interval = setInterval(() => {
         setGlowIntensity(Math.random() * 0.4 + 1.1);
       }, 50);
       
       return () => clearInterval(interval);
     }
-  }, [uvMode, isTorchActive]);
+  }, [uvMode, isTorchActive, showUVLogo]);
 
   // Visibility management based on UV mode
   useEffect(() => {
     setIsVisible(uvMode && isTorchActive);
   }, [uvMode, isTorchActive]);
 
-  // Position updates for the UV circle and mask
-  useEffect(() => {
-    if (isVisible) {
-      const updatePosition = () => {
-        document.documentElement.style.setProperty('--x', `${mousePosition.x}px`);
-        document.documentElement.style.setProperty('--y', `${mousePosition.y}px`);
-      };
-      
-      updatePosition();
-      
-      window.addEventListener('mousemove', updatePosition);
-      return () => window.removeEventListener('mousemove', updatePosition);
-    }
-  }, [mousePosition, isVisible]);
-
   if (!isVisible) return null;
 
   return (
     <>
-      {/* UV Circle Effect */}
+      {/* UV Effect Overlay - now with inverted mask */}
       <div 
         ref={uvCircleRef}
         className={cn(
-          "uv-light-circle fixed inset-0 z-50 pointer-events-none",
+          "fixed inset-0 z-50 pointer-events-none bg-[rgba(10,0,60,0.98)]",
           className
         )}
+        style={{
+          animation: "uv-vibration 4s infinite"
+        }}
       />
       
-      {/* UV Inverse Mask for Logo */}
+      {/* UV Logo */}
       {showUVLogo && (
         <div 
-          ref={uvInverseMaskRef}
-          className="uv-inverse-mask fixed inset-0 flex justify-center items-center z-45"
+          ref={logoRef}
+          className="fixed inset-0 flex justify-center items-center z-45 pointer-events-none"
         >
           <AnimatePresence>
             <motion.div 
@@ -116,4 +126,3 @@ export const UVLamp: React.FC<UVLampProps> = ({
     </>
   );
 };
-
