@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createParticleEffect, createSmokeEffect } from '@/lib/transitions';
+import { pageTransitionPreset } from '@/components/effects/smoke-presets';
 import { createSmokeTextEffect } from '@/lib/transitions';
 
 export default function PageTransitionEffect() {
@@ -40,13 +41,7 @@ export default function PageTransitionEffect() {
       // Appliquer l'effet de fumée sur le logo d'abord s'il existe
       if (logoImg && logoImg instanceof HTMLImageElement) {
         createSmokeTextEffect(logoImg, {
-          particleCount: 180,
-          baseColor: '#FFD700', // Jaune
-          accentColor: '#FFFFFF', // Blanc
-          direction: 'radial',
-          duration: 1200,
-          speed: 1.3,
-          intensity: 1.5,
+          ...pageTransitionPreset,
           onComplete: () => {
             // Après la dispersion du logo, appliquer l'effet de particules au reste du contenu
             if (window.requestIdleCallback) {
