@@ -1,87 +1,78 @@
-
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { createSmokeEffect } from '@/lib/transitions';
 import { pageTransitionPreset } from '@/components/effects/smoke-presets';
 import { DispersingLogo } from '@/components/home/DispersingLogo';
 
+/**
+ * Composant optimisé pour des transitions de pages ultra-fluides 
+ * et une dispersion de logo esthétiquement satisfaisante.
+ */
 export default function PageTransitionEffect() {
   const location = useLocation();
-  const prevPathRef = useRef<string>(location.pathname);
-  const contentRef = useRef<HTMLElement | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimeoutRef = useRef<number | null>(null);
   const [triggerLogoDispersion, setTriggerLogoDispersion] = useState(false);
-  
-  // Référence globale pour indiquer une transition en cours
-  // Utilisée par d'autres composants pour synchroniser leurs animations
-  useEffect(() => {
-    window.pageTransitionInProgress = isTransitioning;
-    
-    // Nettoyer lors du démontage
-    return () => {
-      window.pageTransitionInProgress = false;
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-        transitionTimeoutRef.current = null;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Déclenche la transition : smoke + dispersion du logo
+   */
+  const triggerTransition = useCallback(() => {
+    // On active la dispersion
+    setTriggerLogoDispersion(true);
+    // On attend la prochaine frame pour garantir que le DOM est prêt
+    requestAnimationFrame(() => {
+      if (containerRef.current) {
+        createSmokeEffect(containerRef.current);
       }
-    };
-  }, [isTransitioning]);
-  
-  useEffect(() => {
-    // Nettoyer tout timeout existant pour éviter les chevauchements
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-      transitionTimeoutRef.current = null;
-    }
-    
-    // Trouver le conteneur de contenu principal
-    const mainContent = document.querySelector('main');
-    if (!mainContent) return;
-    
-    contentRef.current = mainContent;
-    
-    // Si c'est un changement de route (pas le chargement initial)
-    if (prevPathRef.current !== location.pathname) {
-      // Indiquer qu'une transition est en cours
-      setIsTransitioning(true);
-      
-      // Déclencher la dispersion du logo
-      setTriggerLogoDispersion(true);
-      
-      // Trouver le logo pour l'effet de dispersion
-      const logo = document.querySelector('.navbar-logo img') as HTMLImageElement;
-      
-      // Utiliser un délai court pour permettre au navigateur de traiter les changements visuels
-      transitionTimeoutRef.current = window.setTimeout(() => {
-        // Appliquer l'effet de fumée directement sur le contenu
-        if (contentRef.current) {
-          // Appliquer l'effet sur le contenu principal
-          createSmokeEffect(contentRef.current);
-        }
-        
-        // Réinitialiser l'indicateur de transition après la fin de l'effet
-        setTimeout(() => {
-          setIsTransitioning(false);
-          // Réinitialiser le déclencheur de dispersion du logo
-          setTriggerLogoDispersion(false);
-        }, pageTransitionPreset.duration || 1200);
-      }, 150); // Court délai pour le début de transition
-    }
-    
-    prevPathRef.current = location.pathname;
-  }, [location.pathname]);
-  
-  // Ce composant ne rend qu'un élément invisible pour la dispersion du logo
+    });
+  }, []);
+
+  /**
+   * Callback après fin de dispersion pour pouvoir réutiliser l'effet
+   */
+  const handleDispersionComplete = useCallback(() => {
+    setTriggerLogoDispersion(false);
+  }, []);
+
+  // À chaque changement de route, on lance notre magie
+  useLayoutEffect(() => {
+    triggerTransition();
+  }, [location.pathname, triggerTransition]);
+
   return (
-    <div className="fixed pointer-events-none" style={{ visibility: 'hidden' }}>
-      {/* Composant invisible pour gérer la dispersion du logo */}
-      <DispersingLogo 
-        triggerDispersion={triggerLogoDispersion} 
+    <div
+      ref={containerRef}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        // Indication pour le GPU d'optimiser ces propriétés
+        willChange: 'opacity, transform',
+      }}
+    >
+      {/* Effet de fondu entre les pages */}
+      <AnimatePresence exitBeforeEnter>
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: (pageTransitionPreset.duration || 1200) / 1000,
+            ease: 'easeInOut',
+          }}
+        />
+      </AnimatePresence>
+
+      {/* Logo invisible qui gère l'animation de dispersion */}
+      <DispersingLogo
+        triggerDispersion={triggerLogoDispersion}
         imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-        onDispersionComplete={() => {
-          // Callback après la dispersion du logo (peut être utilisé pour d'autres synchronisations)
-        }}
+        onDispersionComplete={handleDispersionComplete}
       />
     </div>
   );
