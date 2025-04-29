@@ -25,6 +25,8 @@ export function createOptimizedDisperseEffect(
     onComplete = () => {}
   } = options;
 
+  console.log('Initialisation de l\'effet de dispersion avec', particleCount, 'particules');
+
   // Créer un canvas pour le rendu optimisé
   const canvas = document.createElement('canvas');
   const rect = targetElement.getBoundingClientRect();
@@ -130,6 +132,7 @@ export function createOptimizedDisperseEffect(
   }
   
   particleContainer.appendChild(fragment);
+  console.log(`${particles.length} particules créées pour l'effet de dispersion`);
   
   // Fonction d'easing
   function easeOutQuint(t: number): number {
@@ -176,6 +179,7 @@ export function createOptimizedDisperseEffect(
     
     if (isComplete) {
       // Animation terminée
+      console.log('Animation de particules terminée');
       cleanup();
     } else {
       animFrameId = requestAnimationFrame(animate);
@@ -200,6 +204,7 @@ export function createOptimizedDisperseEffect(
   
   // Démarrer l'animation
   animFrameId = requestAnimationFrame(animate);
+  console.log('Animation d\'effet de dispersion démarrée');
   
   return {
     cancel: () => {
@@ -208,6 +213,7 @@ export function createOptimizedDisperseEffect(
         animFrameId = 0;
       }
       particleContainer.remove();
+      console.log('Animation de dispersion annulée');
     }
   };
 }

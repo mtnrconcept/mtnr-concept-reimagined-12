@@ -29,14 +29,14 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
         if (href && href.startsWith('/') && href !== location.pathname) {
           event.preventDefault();
           
+          console.log('Navigation interceptée vers:', href);
+          
           // Activer l'effet de dispersion et stocker la destination
           setIsDisperseActive(true);
           setPendingNavigation(href);
           
           // Mise à jour de window.pageTransitionInProgress pour d'autres composants
           window.pageTransitionInProgress = true;
-          
-          console.log('Logo dispersion activated for navigation to:', href);
         }
       }
     };
@@ -48,19 +48,21 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
   // Gérer l'effet de dispersion et la navigation différée
   useEffect(() => {
     if (!isDisperseActive || !logoRef.current) return;
+    
+    console.log('Démarrage de l\'effet de dispersion du logo');
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 800,
-      dispersionStrength: 2.5,
+      particleCount: 1200, // Augmenté pour un effet plus visible
+      dispersionStrength: 2.8, // Augmenté pour une dispersion plus dramatique
       duration: 1000, // Durée de dispersion d'une seconde
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
-        console.log('Dispersion effect completed');
+        console.log('Animation de dispersion terminée');
         
         // Attendre 500ms après la dispersion avant de naviguer
         setTimeout(() => {
           if (pendingNavigation) {
-            console.log('Navigating to:', pendingNavigation);
+            console.log('Navigation vers:', pendingNavigation);
             navigate(pendingNavigation);
             setPendingNavigation(null);
           }

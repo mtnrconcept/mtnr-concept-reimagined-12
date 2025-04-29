@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
-import { pageTransitionPreset } from "@/components/effects/smoke-presets";
 import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
 
 interface PageTransitionProps {
@@ -34,6 +33,7 @@ export default function PageTransition({
   }, [location.pathname]);
 
   const handleDisperseComplete = () => {
+    console.log('Dispersion terminée, application de l\'effet de fumée');
     // OptimizedDisperseLogo a terminé la dispersion et attendu 500ms
     // Nous pouvons maintenant appliquer l'effet de fumée à la page
     if (contentRef.current) {
