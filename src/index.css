@@ -47,6 +47,14 @@
     opacity: 1;
   }
   
+  /* 3D Logo effect styles */
+  .logo-3d-effect-container {
+    position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+  
   /* Optimized particle animation with GPU acceleration */
   @keyframes particleDissolve {
     0% {
@@ -137,4 +145,3 @@
     transition: transform 0.1s ease-out;
   }
 }
-

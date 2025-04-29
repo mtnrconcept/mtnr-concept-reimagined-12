@@ -6,6 +6,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import ArtistsSection from "@/components/home/ArtistsSection";
+import { Logo3DEffect } from "@/components/home/Logo3DEffect";
 
 export default function Home() {
   useEffect(() => {
@@ -44,6 +45,9 @@ export default function Home() {
         <Navbar />
         
         <main id="main-content" className="min-h-screen w-full pt-16">
+          {/* Remplacer NeonLogo par notre Logo3DEffect */}
+          <Logo3DEffect />
+          
           <HeroSection />
           <StudioSection />
           <ServicesSection />
@@ -54,8 +58,6 @@ export default function Home() {
           </footer>
         </main>
       </div>
-      
-      {/* Le composant Flashlight est maintenant géré globalement dans App.tsx */}
     </div>
   );
 }
