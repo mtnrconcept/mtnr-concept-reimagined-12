@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { createLogoDisperseEffect } from '@/lib/transitions/particle-effect';
 
 interface OptimizedDisperseLogoProps {
@@ -9,42 +9,56 @@ interface OptimizedDisperseLogoProps {
 
 export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDisperseLogoProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isDisperseActive, setIsDisperseActive] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [previousPath, setPreviousPath] = useState(location.pathname);
   const logoRef = useRef<HTMLImageElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
   const isFirstMount = useRef(true);
 
-  // Surveillance des changements de route
+  // Écouter les clics sur les liens de navigation
   useEffect(() => {
-    // Ignorer le premier montage
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
-    }
-
-    // Activer la dispersion uniquement lors d'un changement de page
-    if (location.pathname !== previousPath) {
-      console.log('Route changed:', previousPath, '->', location.pathname);
-      setIsDisperseActive(true);
+    const handleLinkClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const linkElement = target.closest('a');
       
-      // Mise à jour pour le prochain changement
-      setPreviousPath(location.pathname);
-    }
-  }, [location.pathname, previousPath]);
+      if (linkElement && linkElement.getAttribute('href') && !linkElement.getAttribute('target')) {
+        // Vérifier si c'est un lien interne
+        const href = linkElement.getAttribute('href');
+        if (href && href.startsWith('/') && href !== location.pathname) {
+          event.preventDefault();
+          
+          // Activer l'effet de dispersion et stocker la destination
+          setIsDisperseActive(true);
+          setPendingNavigation(href);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
+    return () => document.removeEventListener('click', handleLinkClick);
+  }, [location.pathname]);
 
-  // Gérer l'effet de dispersion
+  // Gérer l'effet de dispersion et la navigation différée
   useEffect(() => {
     if (!isDisperseActive || !logoRef.current) return;
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 800, // Nombre optimal de particules pour un bon équilibre
+      particleCount: 800,
       dispersionStrength: 2.5,
       duration: 1200,
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
-        setIsDisperseActive(false);
-        onTransitionComplete?.();
+        // Attendre 500ms après la dispersion avant de naviguer
+        setTimeout(() => {
+          if (pendingNavigation) {
+            navigate(pendingNavigation);
+            setPendingNavigation(null);
+          }
+          setIsDisperseActive(false);
+          onTransitionComplete?.();
+        }, 500);
       }
     });
 
@@ -52,7 +66,7 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     return () => {
       dispersionEffect.cancel();
     };
-  }, [isDisperseActive, onTransitionComplete]);
+  }, [isDisperseActive, onTransitionComplete, pendingNavigation, navigate]);
 
   return (
     <div 

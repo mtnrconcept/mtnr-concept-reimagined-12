@@ -1,11 +1,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ReactNode,
-  useRef,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, useRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { pageTransitionPreset } from "@/components/effects/smoke-presets";
@@ -37,33 +32,19 @@ export default function PageTransition({
       return;
     }
 
-    const prevPath = prevPathRef.current;
-    setFromPath(prevPath);
-    setIsLoading(true);
-
-    // On démarre la transition
-    window.pageTransitionInProgress = true;
-
-    // Finir la transition après la durée du preset plus le délai
-    const timeout = setTimeout(() => {
-      window.pageTransitionInProgress = false;
-    }, pageTransitionPreset.duration + 500); // Ajouté 500ms de délai
-
-    // Mettre à jour pour le prochain changement de route
-    prevPathRef.current = location.pathname;
-    return () => clearTimeout(timeout);
+    // La navigation est maintenant gérée par OptimizedDisperseLogo
+    // Nous gérons ici uniquement l'état de chargement de la page
   }, [location.pathname]);
 
   const handleDisperseComplete = () => {
-    // Attendre 500ms après la dispersion du logo avant d'effectuer l'effet de fumée
-    setTimeout(() => {
-      if (contentRef.current) {
-        createSmokeEffect(contentRef.current);
-      }
-      
-      // On désactive l'état de chargement
-      setIsLoading(false);
-    }, 500);
+    // OptimizedDisperseLogo a terminé la dispersion et attendu 500ms
+    // Nous pouvons maintenant appliquer l'effet de fumée à la page
+    if (contentRef.current) {
+      createSmokeEffect(contentRef.current);
+    }
+    
+    // Réinitialiser l'état de chargement
+    setIsLoading(false);
   };
 
   return (
@@ -75,7 +56,7 @@ export default function PageTransition({
         <motion.div
           key={keyId}
           initial={{ opacity: 0 }}
-          animate={{ opacity: isLoading ? 0 : 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.4 } }}
           className="page-content-wrapper"
           style={{
@@ -89,13 +70,13 @@ export default function PageTransition({
           <motion.div
             ref={contentRef}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 10 : 0 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{
               opacity: 0,
               y: -10,
               transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
             }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1], delay: isLoading ? 0.5 : 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
             className="smoke-container"
           >
             {children}
