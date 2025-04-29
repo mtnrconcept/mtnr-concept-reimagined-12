@@ -20,11 +20,7 @@ export const Logo3DEffect = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Déclenchement automatique de l'effet de dispersion après un délai
-  useEffect(() => {
-    const disperseTimeout = setTimeout(() => {
-      setShouldDisperse(true);
-    }, 3000); // Attendre 3 secondes avant de disperser
+
     
     return () => clearTimeout(disperseTimeout);
   }, []);
