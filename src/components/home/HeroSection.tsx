@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
 import { useUVMode } from "../effects/UVModeContext";
@@ -7,7 +6,7 @@ export default function HeroSection() {
   const { uvMode } = useUVMode();
   
   return (
-    <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+    <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center mt-20 sm:mt-24 md:mt-28 lg:mt-32">
       <NeonLogo />
       
       <div className={`relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl ${uvMode ? 'bg-opacity-60' : 'bg-black/70'} border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10`} data-animate>
