@@ -7,6 +7,20 @@
   overflow: hidden;
 }
 
+.elevator-video-container {
+  position: absolute;
+  inset: 0;
+  background-color: black;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.elevator-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .elevator-content {
   position: relative;
   z-index: 2;
@@ -15,7 +29,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform, filter;
+  will-change: transform, opacity;
+}
+
+/* Style pour inverser la vidéo verticalement */
+.video-reversed {
+  transform: scaleY(-1);
 }
 
 /* Animation du flou de mouvement */
@@ -29,14 +48,4 @@
 
 .blur-motion {
   animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Style pour le conteneur vidéo dans la direction "up" */
-.video-container-up video {
-  transform: scaleY(-1); /* Inverse verticalement la vidéo */
-}
-
-/* Style alternatif pour inverser la vidéo quand la classe est appliquée directement */
-.video-reversed {
-  transform: scaleY(-1);
 }

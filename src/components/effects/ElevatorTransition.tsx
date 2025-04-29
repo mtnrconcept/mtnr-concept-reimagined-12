@@ -1,7 +1,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import { safeBlur } from '@/lib/animation-utils';
 
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
@@ -18,10 +19,20 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const [prevPath, setPrevPath] = useState(location.pathname);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentContent, setCurrentContent] = useState<React.ReactNode>(children);
   
-  // Délais pour la synchronisation des animations
-  const videoTransitionDuration = 5000; // 5 secondes pour la vidéo
-  const contentEntranceDelay = 4000; // Le contenu apparaît 1 seconde avant la fin
+  // Configuration des timings
+  const videoTransitionDuration = 5000; // 5 secondes pour la vidéo complète
+  const exitAnimationDuration = 4.0; // Durée de sortie en secondes
+  const enterAnimationDuration = 2.5; // Durée d'entrée en secondes
+  const contentEntranceDelay = videoTransitionDuration - (enterAnimationDuration * 1000); // Le contenu apparaît pendant les dernières 2.5 secondes
+  
+  // Met à jour le contenu actuel lorsque les enfants changent et que la transition n'est pas active
+  useEffect(() => {
+    if (!isActive) {
+      setCurrentContent(children);
+    }
+  }, [children, isActive]);
   
   // Détermine la direction de l'animation basée sur l'ordre des pages
   useEffect(() => {
@@ -47,20 +58,16 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     
     const video = videoRef.current;
     
-    // Plutôt que d'utiliser un playback rate négatif (non supporté),
-    // on adapte notre approche en fonction de la direction
+    // Configuration de la vidéo en fonction de la direction
     if (direction === 'down') {
       // Pour descendre, on joue la vidéo normalement depuis le début
       video.currentTime = 0;
       video.playbackRate = 1;
+      video.classList.remove('video-reversed');
     } else if (direction === 'up') {
-      // Pour monter, on utilise un effet visuel alternatif
-      // On peut soit:
-      // 1. Jouer la même vidéo mais inverser la vidéo avec CSS
-      // 2. Jouer depuis la fin vers un point spécifique
+      // Pour monter, on utilise l'effet CSS pour inverser la vidéo verticalement
       video.currentTime = 0;
       video.playbackRate = 1;
-      // Applique une classe pour inverser la vidéo verticalement
       video.classList.add('video-reversed');
     }
     
@@ -78,7 +85,6 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     const timeoutId = setTimeout(() => {
       if (videoRef.current) {
         videoRef.current.pause();
-        // Retirer la classe d'inversion si elle a été appliquée
         videoRef.current.classList.remove('video-reversed');
       }
       // Signal que l'animation est terminée
@@ -86,87 +92,85 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     }, videoTransitionDuration);
     
     return () => clearTimeout(timeoutId);
-  }, [isActive, direction, onAnimationComplete]);
+  }, [isActive, direction, onAnimationComplete, videoTransitionDuration]);
 
-  // Variantes d'animation pour le contenu
-  const contentVariants = {
-    initial: (direction: 'up' | 'down' | null) => ({
+  // Variantes d'animation pour le contenu sortant
+  const exitVariants = {
+    initial: { y: 0, opacity: 1 },
+    animate: (direction: 'up' | 'down' | null) => ({
       y: direction === 'down' ? '-100vh' : direction === 'up' ? '100vh' : 0,
+      opacity: 0,
+      transition: {
+        duration: exitAnimationDuration,
+        ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
+      }
+    }),
+  };
+
+  // Variantes d'animation pour le nouveau contenu entrant
+  const enterVariants = {
+    initial: (direction: 'up' | 'down' | null) => ({
+      y: direction === 'down' ? '100vh' : direction === 'up' ? '-100vh' : 0,
       opacity: 0
     }),
     animate: {
       y: 0,
       opacity: 1,
       transition: {
-        delay: contentEntranceDelay / 1000, // Convertir en secondes
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1], // Ease-out quint
+        duration: enterAnimationDuration,
+        ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
       }
     },
-    exit: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '100vh' : direction === 'up' ? '-100vh' : 0,
-      opacity: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.7, 0, 0.84, 0], // Ease-in quint
-      }
-    }),
-  };
-
-  // Effet de flou appliqué séparément pour éviter les problèmes de types de keyframes
-  const BlurMotionEffect = ({ children }: { children: React.ReactNode }) => {
-    return (
-      <motion.div
-        initial={{ filter: "blur(0px)" }}
-        animate={{
-          filter: [
-            "blur(0px)",
-            "blur(8px)",
-            "blur(12px)",
-            "blur(8px)",
-            "blur(0px)"
-          ]
-        }}
-        transition={{
-          duration: 5,
-          times: [0, 0.2, 0.5, 0.8, 1],
-          ease: [0.16, 1, 0.3, 1]
-        }}
-        className="w-full h-full"
-      >
-        {children}
-      </motion.div>
-    );
   };
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden" ref={containerRef}>
+    <div className="elevator-container" ref={containerRef}>
       {isActive && (
         <>
           {/* Video Background */}
-          <div className={`absolute inset-0 bg-black ${direction === 'up' ? 'video-container-up' : ''}`}>
+          <div className="elevator-video-container">
             <video 
               ref={videoRef} 
-              className="w-full h-full object-cover"
+              className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''}`}
               src="/lovable-uploads/ascensceur.mp4"
               muted
               playsInline
             />
           </div>
           
+          {/* Animation de sortie du contenu actuel */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`exit-${prevPath}`}
+              className="elevator-content"
+              custom={direction}
+              variants={exitVariants}
+              initial="initial"
+              animate="animate"
+            >
+              {currentContent}
+            </motion.div>
+          </AnimatePresence>
+          
+          {/* Animation d'entrée du nouveau contenu avec délai */}
           <motion.div
+            key={`enter-${location.pathname}`}
+            className="elevator-content"
             custom={direction}
-            variants={contentVariants}
+            variants={enterVariants}
             initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex items-center justify-center"
+            animate={isActive ? {
+              y: 0,
+              opacity: 1,
+              transition: {
+                delay: contentEntranceDelay / 1000,
+                duration: enterAnimationDuration,
+                ease: [0.25, 1, 0.5, 1], // Courbe d'ease-out (easy ease)
+              }
+            } : "initial"}
+            style={{ display: !isActive ? 'none' : 'flex' }}
           >
-            <BlurMotionEffect>
-              <div className="bg-black bg-opacity-70 backdrop-blur-md p-6 rounded-lg">
-                {children}
-              </div>
-            </BlurMotionEffect>
+            {children}
           </motion.div>
         </>
       )}
