@@ -1,6 +1,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
+import { useNavigation } from './NavigationContext';
+import { useLocation } from 'react-router-dom';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -16,6 +18,26 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isTransitioning } = useNavigation();
+  const location = useLocation();
+  
+  // Réinitialiser la vidéo lors des changements de page
+  useEffect(() => {
+    if (!videoRef.current) return;
+    
+    const resetVideo = async () => {
+      try {
+        // Recharger et relancer la vidéo pour simuler une transition
+        videoRef.current!.currentTime = 0;
+        await videoRef.current!.play();
+        console.log("Vidéo redémarrée suite au changement de page");
+      } catch (error) {
+        console.error("Erreur lors du redémarrage de la vidéo:", error);
+      }
+    };
+    
+    resetVideo();
+  }, [location.pathname]);
   
   // S'assurer que la vidéo est chargée et qu'elle joue correctement
   useEffect(() => {
@@ -75,6 +97,21 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     console.error("Erreur de chargement vidéo:", e);
     setVideoError(true);
   };
+
+  // Effet de transition lors des changements de page
+  useEffect(() => {
+    if (!videoRef.current) return;
+    
+    if (isTransitioning) {
+      // Appliquer des effets visuels pendant la transition
+      videoRef.current.style.filter = "blur(3px) brightness(0.8)";
+      videoRef.current.playbackRate = 1.2; // Accélérer légèrement la lecture
+    } else {
+      // Restaurer l'apparence normale
+      videoRef.current.style.filter = "";
+      videoRef.current.playbackRate = 1.0;
+    }
+  }, [isTransitioning]);
 
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">

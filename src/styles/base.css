@@ -13,7 +13,7 @@
   }
 }
 
-/* S'assurer que la vidéo d'arrière-plan est toujours visible */
+/* S'assurer que la vidéo d'arrière-plan est toujours visible et responsive */
 .background-video {
   position: fixed !important;
   top: 0;
@@ -26,6 +26,7 @@
   z-index: 0 !important;
   min-width: 100% !important;
   min-height: 100% !important;
+  transition: filter 0.5s ease-in-out;
 }
 
 /* Animation de fondu pour les transitions de page */
@@ -36,6 +37,7 @@
 
 .page-transition-enter {
   opacity: 0;
+  animation: fadeIn 0.5s forwards;
 }
 
 .page-transition-enter-active {
@@ -50,4 +52,15 @@
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 500ms;
+}
+
+/* Animation de pulsation pour les transitions vidéo */
+@keyframes videoPulse {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+  100% { filter: brightness(1); }
+}
+
+.video-transitioning {
+  animation: videoPulse 0.8s ease-in-out;
 }
