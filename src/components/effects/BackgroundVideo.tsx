@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useUVMode } from './UVModeContext';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from './NavigationContext';
+import { useTorch } from './TorchContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -17,52 +18,75 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState(videoUrl);
   const navigation = useNavigation();
-  
-  // Composition 1.mp4 pour le mode UV actif
-  const currentVideoUrl = uvMode ? videoUrl : videoUrlUV;
   
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
+    const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
+    setCurrentVideo(newVideoUrl);
+    
+    // Si la torche est active, jouer immédiatement la vidéo
+    if (isTorchActive) {
+      playVideoTransition();
+    }
+    
+    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
+  }, [uvMode, videoUrl, videoUrlUV, isTorchActive]);
+
+  // Jouer la vidéo quand la torche est activée/désactivée
+  useEffect(() => {
+    if (!isFirstLoad) {
+      playVideoTransition();
+    }
+  }, [isTorchActive]);
+
+  // Fonction pour jouer la vidéo en transition
+  const playVideoTransition = async () => {
     const videoElement = videoRef.current;
-    if (!videoElement) return;
+    if (!videoElement || isTransitioning) return;
     
-    // Recharger la vidéo quand le mode UV change
-    videoElement.load();
-    videoElement.pause();
-    videoElement.currentTime = 0;
-    
-    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${currentVideoUrl}`);
-  }, [uvMode, currentVideoUrl]);
+    try {
+      console.log('Transition vidéo déclenchée (torche ou navigation)');
+      setIsTransitioning(true);
+      videoElement.load();
+      videoElement.currentTime = 0;
+      videoElement.playbackRate = 1.0;
+      
+      // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
+      const handleVideoEnded = () => {
+        console.log('Vidéo terminée, mise en pause');
+        videoElement.pause();
+        videoElement.currentTime = 0;
+        setIsTransitioning(false);
+        // Retirer l'écouteur pour éviter des déclenchements multiples
+        videoElement.removeEventListener('ended', handleVideoEnded);
+      };
+      
+      // S'assurer qu'on n'a pas d'écouteurs en double
+      videoElement.removeEventListener('ended', handleVideoEnded);
+      // Ajouter l'écouteur d'événement
+      videoElement.addEventListener('ended', handleVideoEnded);
+      
+      await videoElement.play();
+    } catch (error) {
+      console.error('Erreur lors de la lecture de la vidéo:', error);
+      setIsTransitioning(false);
+      if (videoElement) {
+        videoElement.removeEventListener('ended', () => {});
+      }
+    }
+  };
 
   // Écouter les événements de navigation pour jouer la vidéo instantanément
   useEffect(() => {
-    const playVideoTransition = async () => {
-      const videoElement = videoRef.current;
-      if (!videoElement || isTransitioning) return;
-      
-      try {
-        console.log('Événement de navigation capté, lecture immédiate de la vidéo');
-        setIsTransitioning(true);
-        videoElement.currentTime = 0;
-        videoElement.playbackRate = 1.0;
-        await videoElement.play();
-      } catch (error) {
-        console.error('Erreur lors de la lecture de la vidéo:', error);
-        setIsTransitioning(false);
-      }
-    };
-    
-    // Enregistrer l'écouteur d'événements de navigation
     const unregister = navigation.registerVideoTransitionListener(playVideoTransition);
-    
-    return () => {
-      unregister();
-    };
-  }, [navigation, isTransitioning]);
+    return unregister;
+  }, [navigation]);
   
   // Gestion de la lecture/pause de la vidéo lors des transitions de page
   useEffect(() => {
@@ -77,37 +101,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       console.log('Vidéo initialisée en pause');
     } else {
       // Lors des changements de route, jouer la vidéo une seule fois
-      const playVideo = async () => {
-        try {
-          setIsTransitioning(true);
-          videoElement.currentTime = 0; // Assurer que la vidéo commence du début
-          videoElement.playbackRate = 1.0;
-          
-          // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
-          const handleVideoEnded = () => {
-            console.log('Vidéo terminée, mise en pause');
-            videoElement.pause();
-            videoElement.currentTime = 0;
-            setIsTransitioning(false);
-            // Retirer l'écouteur pour éviter des déclenchements multiples
-            videoElement.removeEventListener('ended', handleVideoEnded);
-          };
-          
-          // S'assurer qu'on n'a pas d'écouteurs en double
-          videoElement.removeEventListener('ended', handleVideoEnded);
-          // Ajouter l'écouteur d'événement
-          videoElement.addEventListener('ended', handleVideoEnded);
-          
-          await videoElement.play();
-          console.log('Vidéo lancée au changement de route');
-        } catch (error) {
-          console.error('Erreur lors de la lecture de la vidéo:', error);
-          setIsTransitioning(false);
-          videoElement.removeEventListener('ended', () => {});
-        }
-      };
-      
-      playVideo();
+      playVideoTransition();
     }
     
     // Gestion de la visibilité de la page
@@ -133,7 +127,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.removeEventListener('ended', () => {});
       }
     };
-  }, [location.pathname, isFirstLoad, isTransitioning]);
+  }, [location.pathname, isFirstLoad]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
@@ -146,7 +140,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         muted
         preload="auto"
       >
-        <source src={currentVideoUrl} type="video/mp4" />
+        <source src={currentVideo} type="video/mp4" />
       </video>
       
       {/* Grille */}
