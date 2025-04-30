@@ -1,7 +1,6 @@
-
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import ParallaxBackground from "@/components/ParallaxBackground";
+import ParallaxBackgroundEffect from "@/components/ParallaxBackgroundEffect";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
@@ -38,7 +37,7 @@ export default function WhatWeDo() {
   }, []);
 
   return (
-    <ParallaxBackground>
+    <ParallaxBackgroundEffect>
       <div className="relative z-10 min-h-screen">
         <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-32 px-3 xs:px-6 font-grunge">
@@ -171,28 +170,8 @@ export default function WhatWeDo() {
               ))}
             </div>
           </motion.section>
-          
-          {/* Call to action */}
-          <motion.div 
-            className="w-full max-w-3xl bg-gradient-to-r from-black via-yellow-950/40 to-black p-6 rounded-xl border border-yellow-500/30 text-center"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.7 }}
-          >
-            <h3 className="text-2xl font-bold text-yellow-400 mb-4">Prêt à donner vie à ton son?</h3>
-            <p className="text-gray-300 mb-6">
-              Que tu sois débutant ou confirmé, on a ce qu'il te faut pour faire décoller ton projet.
-            </p>
-            <motion.button 
-              whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255,221,0,0.5)" }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-3 bg-yellow-500 text-black font-bold rounded-lg shadow-lg"
-            >
-              Book une session
-            </motion.button>
-          </motion.div>
         </main>
       </div>
-    </ParallaxBackground>
+    </ParallaxBackgroundEffect>
   );
 }
