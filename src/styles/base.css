@@ -20,13 +20,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
   object-fit: cover !important;
-  z-index: 0 !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  transition: filter 0.5s ease-in-out;
+  z-index: -1 !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  transition: filter 0.8s ease-in-out;
 }
 
 /* Animation de fondu pour les transitions de page */
@@ -37,12 +37,14 @@
 
 .page-transition-enter {
   opacity: 0;
-  animation: fadeIn 0.5s forwards;
+  animation: fadeIn 1.5s forwards;
+  animation-delay: 0.5s;
 }
 
 .page-transition-enter-active {
   opacity: 1;
-  transition: opacity 500ms;
+  transition: opacity 1.5s;
+  transition-delay: 0.5s;
 }
 
 .page-transition-exit {
@@ -51,7 +53,7 @@
 
 .page-transition-exit-active {
   opacity: 0;
-  transition: opacity 500ms;
+  transition: opacity 0.8s;
 }
 
 /* Animation de pulsation pour les transitions vidéo */
@@ -62,5 +64,33 @@
 }
 
 .video-transitioning {
-  animation: videoPulse 0.8s ease-in-out;
+  animation: videoPulse 2.5s ease-in-out;
+}
+
+/* Transition de contenu fluide */
+.content-transition-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.content-exit {
+  position: absolute;
+  width: 100%;
+  opacity: 1;
+  transition: opacity 0.8s ease-out;
+}
+
+.content-exit-active {
+  opacity: 0;
+}
+
+.content-enter {
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+  transition-delay: 1.2s;
+}
+
+.content-enter-active {
+  opacity: 1;
 }

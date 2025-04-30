@@ -20,11 +20,21 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     
     // Déclencher la transition vidéo
     navigation.triggerVideoTransition();
+    console.log("Transition vidéo déclenchée par PageContentTransition");
 
+    // Attendre la fin de la vidéo pour afficher le nouveau contenu
+    // La durée doit correspondre à la durée de la vidéo
+    const videoDuration = 2500; // Durée en millisecondes (ajuster selon votre vidéo)
+    
     // Garder l'ancien contenu pendant la transition de sortie
     const timer = setTimeout(() => {
       setDisplayChildren(children);
-    }, 500); // Réduit à 500ms pour être plus rapide
+      
+      // Terminer la transition après que le nouveau contenu soit affiché
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 500);
+    }, videoDuration / 2); // Afficher le nouveau contenu à mi-chemin de la vidéo
 
     return () => clearTimeout(timer);
   }, [children, location, navigation]);
@@ -37,14 +47,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 0.2,
-            duration: 0.5
+            delay: 0.5, // Délai avant l'apparition du nouveau contenu
+            duration: 0.8
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 0.3
+            duration: 0.5
           }
         }}
         className="relative z-10 min-h-screen w-full pointer-events-auto"

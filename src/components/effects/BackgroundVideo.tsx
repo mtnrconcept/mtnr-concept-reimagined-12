@@ -17,29 +17,62 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 }) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isTransitioning } = useNavigation();
+  const { isTransitioning: navTransitioning } = useNavigation();
   const location = useLocation();
   
-  // Réinitialiser la vidéo lors des changements de page
+  // Déclencher la transition vidéo lors des changements de page
   useEffect(() => {
     if (!videoRef.current) return;
     
-    const resetVideo = async () => {
+    console.log("Changement de page détecté, démarrage transition vidéo");
+    setIsTransitioning(true);
+    
+    const performTransition = async () => {
       try {
-        // Recharger et relancer la vidéo pour simuler une transition
+        // Réinitialiser la vidéo pour la transition
         videoRef.current!.currentTime = 0;
+        
+        // Ajuster les effets visuels pendant la transition
+        videoRef.current!.style.filter = "brightness(1.2)";
+        
+        // Ajouter la classe de transition
+        videoRef.current!.classList.add("video-transitioning");
+        
+        // Lancer la lecture de la vidéo depuis le début
         await videoRef.current!.play();
-        console.log("Vidéo redémarrée suite au changement de page");
+        
+        // Attendre que la vidéo se termine (une seule fois pour la transition)
+        const handleVideoEnd = () => {
+          console.log("Transition vidéo terminée");
+          setIsTransitioning(false);
+          
+          // Restaurer l'apparence normale
+          videoRef.current!.style.filter = "";
+          videoRef.current!.classList.remove("video-transitioning");
+          
+          // Supprimer l'écouteur après utilisation
+          videoRef.current!.removeEventListener('ended', handleVideoEnd);
+          
+          // Redémarrer la lecture en boucle
+          videoRef.current!.currentTime = 0;
+          videoRef.current!.play().catch(err => console.error("Erreur lors du redémarrage après transition:", err));
+        };
+        
+        // Écouter la fin de la vidéo pour terminer la transition
+        videoRef.current!.addEventListener('ended', handleVideoEnd, { once: true });
+        
       } catch (error) {
-        console.error("Erreur lors du redémarrage de la vidéo:", error);
+        console.error("Erreur lors de la transition vidéo:", error);
+        setIsTransitioning(false);
       }
     };
     
-    resetVideo();
+    performTransition();
   }, [location.pathname]);
   
-  // S'assurer que la vidéo est chargée et qu'elle joue correctement
+  // Configuration initiale de la vidéo
   useEffect(() => {
     if (!videoRef.current) return;
     
@@ -51,16 +84,31 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     videoElement.loop = true;
     videoElement.autoplay = true;
     
-    // Charger la vidéo
-    videoElement.load();
+    // Essayer de jouer la vidéo au chargement initial
+    const playVideo = async () => {
+      try {
+        await videoElement.play();
+        console.log("Lecture initiale de la vidéo réussie");
+      } catch (error) {
+        console.error("Erreur de lecture initiale:", error);
+        
+        // En cas d'échec, essayez à nouveau lors de la première interaction utilisateur
+        const resumePlayback = async () => {
+          try {
+            await videoElement.play();
+            document.removeEventListener('click', resumePlayback);
+          } catch (err) {
+            console.error("Échec de reprise de la lecture:", err);
+          }
+        };
+        
+        document.addEventListener('click', resumePlayback, { once: true });
+      }
+    };
     
-    // Tenter de lire la vidéo
-    videoElement.play().catch(error => {
-      console.error("Erreur de lecture vidéo:", error);
-      setVideoError(true);
-    });
+    playVideo();
     
-    // Précharger la vidéo via un lien en tête du document
+    // Précharger la vidéo
     const link = document.createElement('link');
     link.rel = 'preload';
     link.href = videoUrl;
@@ -75,6 +123,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       if (videoElement) {
         videoElement.pause();
+        videoElement.src = "";
+        videoElement.load();
       }
     };
   }, [videoUrl]);
@@ -83,13 +133,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const handleVideoLoad = () => {
     setIsVideoLoaded(true);
     console.log("Vidéo chargée avec succès");
-    
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.error("Erreur lors de la lecture après chargement:", err);
-        setVideoError(true);
-      });
-    }
   };
 
   // Gestion des erreurs de vidéo
@@ -97,21 +140,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     console.error("Erreur de chargement vidéo:", e);
     setVideoError(true);
   };
-
-  // Effet de transition lors des changements de page
-  useEffect(() => {
-    if (!videoRef.current) return;
-    
-    if (isTransitioning) {
-      // Appliquer des effets visuels pendant la transition
-      videoRef.current.style.filter = "blur(3px) brightness(0.8)";
-      videoRef.current.playbackRate = 1.2; // Accélérer légèrement la lecture
-    } else {
-      // Restaurer l'apparence normale
-      videoRef.current.style.filter = "";
-      videoRef.current.playbackRate = 1.0;
-    }
-  }, [isTransitioning]);
 
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">

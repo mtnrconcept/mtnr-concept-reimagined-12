@@ -14,16 +14,20 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const listenersRef = useRef<(() => void)[]>([]);
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
+  const lastTransitionTimeRef = useRef<number>(0);
 
   const triggerVideoTransition = useCallback(() => {
-    // Éviter les déclenchements multiples rapprochés
-    if (transitionInProgressRef.current) {
-      console.log("Transition déjà en cours, ignorée");
+    const now = Date.now();
+    
+    // Ne déclencher la transition que si au moins 2 secondes se sont écoulées depuis la dernière
+    if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < 2000)) {
+      console.log("Transition déjà en cours ou trop récente, ignorée");
       return;
     }
     
     console.log("Déclenchement transition vidéo");
     transitionInProgressRef.current = true;
+    lastTransitionTimeRef.current = now;
     setIsTransitioning(true);
     
     // Nettoyer tout timeout existant
@@ -40,13 +44,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     });
     
-    // Réinitialiser l'état de transition après un délai plus long
-    // pour permettre à la vidéo de commencer sa lecture
+    // Réinitialiser l'état de transition après la durée de la vidéo
+    // pour permettre à la vidéo de terminer sa lecture
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
       console.log("État de transition réinitialisé");
-    }, 1000); // Temps suffisant pour laisser la vidéo commencer
+    }, 2500); // Durée de la vidéo (ajuster selon votre vidéo)
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {

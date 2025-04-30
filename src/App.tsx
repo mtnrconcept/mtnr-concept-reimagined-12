@@ -17,7 +17,6 @@ import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
 import { checkFeatureSupport } from "@/lib/feature-detection";
-import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 
 // Initialize query client outside of component for stability
@@ -47,7 +46,7 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Vidéo de fond qui est maintenant en arrière-plan de toutes les pages */}
+      {/* Une seule instance de BackgroundVideo au niveau global */}
       <BackgroundVideo />
       
       <PageTransition keyId={location.pathname}>
@@ -75,7 +74,6 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Suspense fallback={null}>
-                  <BackgroundVideoController />
                   <AnimatedRoutes />
                 </Suspense>
               </BrowserRouter>
