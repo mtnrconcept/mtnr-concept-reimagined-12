@@ -1,55 +1,45 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useVideoPreload } from '@/hooks/useVideoPreload';
 
 export const BackgroundVideoController = () => {
-  useEffect(() => {
-    // Préchargement des vidéos - Une seule fois au démarrage de l'application
-    const preloadVideos = async () => {
-      console.info('Préchargement des vidéos de fond');
+  const [preloadComplete, setPreloadComplete] = useState(false);
+  
+  // Précharger les vidéos avec la nouvelle logique améliorée
+  const { preloadStatus, isPreloading } = useVideoPreload({
+    videoUrls: [
+      '/lovable-uploads/Video%20fond%20normale.mp4',
+      '/lovable-uploads/Video%20fond%20UV.mp4'
+    ],
+    onPreloadComplete: (results) => {
+      console.log('Résultats du préchargement:', results);
+      setPreloadComplete(true);
       
-      const videoUrls = [
-        '/lovable-uploads/Video fond normale.mp4',
-        '/lovable-uploads/Video fond UV.mp4'
-      ];
-      
-      for (const url of videoUrls) {
-        try {
-          // Créer un élément vidéo pour précharger
-          const video = document.createElement('video');
-          video.preload = 'auto';
-          video.muted = true;
-          video.src = url;
-          video.load();
+      // Diagnostiquer les problèmes éventuels
+      Object.entries(results).forEach(([url, isAvailable]) => {
+        if (!isAvailable) {
+          console.warn(`⚠️ La vidéo ${url} n'est pas disponible ou ne peut pas être préchargée.`);
           
-          // Ajouter les écouteurs pour suivre le préchargement
-          video.addEventListener('loadeddata', () => {
-            console.log(`Vidéo ${url} préchargée avec succès`);
-          });
-          
-          video.addEventListener('error', (e) => {
-            console.error(`Erreur lors du préchargement de ${url}:`, e);
-          });
-          
-          // Alternative avec link preload
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.href = url;
-          link.as = 'video';
-          link.type = 'video/mp4';
-          document.head.appendChild(link);
-        } catch (error) {
-          console.error(`Erreur lors du préchargement de ${url}:`, error);
+          // Suggestion de vérification
+          console.info(`Veuillez vérifier que le fichier existe dans le dossier public/lovable-uploads/`);
+          console.info(`et que le nom est exactement correct (sensible à la casse).`);
         }
+      });
+    }
+  });
+  
+  // Signaler l'état du préchargement
+  useEffect(() => {
+    if (preloadComplete) {
+      console.info('✅ Préchargement des vidéos terminé');
+      
+      // Vérifier les résultats
+      const allVideosAvailable = Object.values(preloadStatus).every(status => status === true);
+      if (!allVideosAvailable) {
+        console.warn('⚠️ Certaines vidéos n\'ont pas pu être préchargées');
       }
-    };
-
-    // Précharger les vidéos au démarrage
-    preloadVideos();
-    
-    return () => {
-      // Nettoyage si nécessaire
-    };
-  }, []);
+    }
+  }, [preloadComplete, preloadStatus]);
 
   // Composant invisible qui gère uniquement le préchargement
   return null;

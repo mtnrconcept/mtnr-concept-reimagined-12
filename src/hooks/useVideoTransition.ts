@@ -1,13 +1,53 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 import { useUVMode } from '@/components/effects/UVModeContext';
+import { useVideoPreload } from './useVideoPreload';
+import { useVideoLoad } from './useVideoLoad';
 
 export const useVideoTransition = () => {
   const normalVideoRef = useRef<HTMLVideoElement>(null);
   const uvVideoRef = useRef<HTMLVideoElement>(null);
   const { registerVideoRef, registerVideoTransitionListener } = useNavigation();
   const { uvMode } = useUVMode();
+  const [videoAvailability, setVideoAvailability] = useState({
+    normal: true,
+    uv: true
+  });
+  
+  const normalVideoUrl = '/lovable-uploads/Video%20fond%20normale.mp4';
+  const uvVideoUrl = '/lovable-uploads/Video%20fond%20UV.mp4';
+  
+  // Précharger les vidéos et vérifier leur disponibilité
+  const { preloadStatus } = useVideoPreload({
+    videoUrls: [normalVideoUrl, uvVideoUrl],
+    onPreloadComplete: (results) => {
+      setVideoAvailability({
+        normal: results[normalVideoUrl] ?? false,
+        uv: results[uvVideoUrl] ?? false
+      });
+      
+      console.log('Statut de préchargement des vidéos:', results);
+    }
+  });
+  
+  // Configuration des gestionnaires d'erreur et de chargement
+  const { verifyVideoPlayability } = useVideoLoad({
+    onVideoError: (src) => {
+      if (src.includes('normale')) {
+        setVideoAvailability(prev => ({ ...prev, normal: false }));
+      } else if (src.includes('UV')) {
+        setVideoAvailability(prev => ({ ...prev, uv: false }));
+      }
+    },
+    onVideoLoaded: (src) => {
+      if (src.includes('normale')) {
+        setVideoAvailability(prev => ({ ...prev, normal: true }));
+      } else if (src.includes('UV')) {
+        setVideoAvailability(prev => ({ ...prev, uv: true }));
+      }
+    }
+  });
   
   // Register video refs in NavigationContext
   useEffect(() => {
@@ -24,9 +64,6 @@ export const useVideoTransition = () => {
   
   // Set up initial video configurations
   useEffect(() => {
-    const normalVideo = normalVideoRef.current;
-    const uvVideo = uvVideoRef.current;
-    
     const configureVideo = (video: HTMLVideoElement | null) => {
       if (!video) return;
       
@@ -38,8 +75,8 @@ export const useVideoTransition = () => {
       video.setAttribute("webkit-playsinline", "");
     };
     
-    configureVideo(normalVideo);
-    configureVideo(uvVideo);
+    configureVideo(normalVideoRef.current);
+    configureVideo(uvVideoRef.current);
     
     console.log('Vidéos configurées au chargement initial');
   }, []);
@@ -79,23 +116,58 @@ export const useVideoTransition = () => {
     };
   }, []);
   
-  // Subscribe to transition events
-  useEffect(() => {
-    const unregister = registerVideoTransitionListener(async () => {
-      // Choose video based on UV mode
-      const video = uvMode ? uvVideoRef.current : normalVideoRef.current;
-      
-      if (!video || !document.body.contains(video)) {
-        console.warn("Élément vidéo non disponible pour transition");
-        return;
+  // Fonction pour vérifier la jouabilité avant de déclencher une transition
+  const verifyAndPrepareVideo = useCallback(async (isUVMode: boolean): Promise<boolean> => {
+    const videoUrl = isUVMode ? uvVideoUrl : normalVideoUrl;
+    const videoRef = isUVMode ? uvVideoRef.current : normalVideoRef.current;
+    
+    if (!videoRef) {
+      console.warn("Référence vidéo non disponible");
+      return false;
+    }
+    
+    try {
+      // Vérifier si la vidéo est jouable
+      const isPlayable = await verifyVideoPlayability(videoUrl);
+      if (!isPlayable) {
+        console.error(`La vidéo ${videoUrl} n'est pas jouable, transition annulée`);
+        return false;
       }
       
+      // Préparation de la vidéo
+      videoRef.currentTime = 0;
+      videoRef.loop = false;
+      videoRef.muted = true;
+      videoRef.playsInline = true;
+      
+      console.log(`Vidéo ${isUVMode ? 'UV' : 'normale'} vérifiée et prête pour la transition`);
+      return true;
+    } catch (error) {
+      console.error(`Erreur lors de la vérification de la vidéo ${videoUrl}:`, error);
+      return false;
+    }
+  }, [normalVideoUrl, uvVideoUrl, verifyVideoPlayability]);
+  
+  // Subscribe to transition events with improved error handling
+  useEffect(() => {
+    const unregister = registerVideoTransitionListener(async () => {
       try {
-        console.log(`🎬 Démarrage transition vidéo ${uvMode ? 'UV' : 'normale'}`);
+        // Vérifier que la vidéo est disponible avant de tenter la transition
+        const canTransition = await verifyAndPrepareVideo(uvMode);
+        if (!canTransition) {
+          console.warn("Transition vidéo annulée suite à la vérification");
+          return;
+        }
         
-        // Set up video for transition
-        video.loop = false;
-        video.currentTime = 0;
+        // Choose video based on UV mode
+        const video = uvMode ? uvVideoRef.current : normalVideoRef.current;
+        
+        if (!video || !document.body.contains(video)) {
+          console.warn("Élément vidéo non disponible pour transition");
+          return;
+        }
+        
+        console.log(`🎬 Démarrage transition vidéo ${uvMode ? 'UV' : 'normale'}`);
         
         // Add class for visual effects
         video.classList.add("video-transitioning");
@@ -119,6 +191,9 @@ export const useVideoTransition = () => {
             console.log("✅ Vidéo démarrée avec succès après récupération");
           } catch (fallbackError) {
             console.error("❌❌ Échec de la récupération:", fallbackError);
+            
+            // En cas d'échec total, on simule une fin de vidéo
+            video.dispatchEvent(new Event('ended'));
           }
         }
       } catch (error) {
@@ -127,7 +202,13 @@ export const useVideoTransition = () => {
     });
     
     return unregister;
-  }, [registerVideoTransitionListener, uvMode]);
+  }, [registerVideoTransitionListener, uvMode, verifyAndPrepareVideo]);
   
-  return { normalVideoRef, uvVideoRef };
+  return { 
+    normalVideoRef, 
+    uvVideoRef, 
+    videoAvailability,
+    normalVideoUrl,
+    uvVideoUrl
+  };
 };

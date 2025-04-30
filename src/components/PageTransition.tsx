@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect } from "react";
 import { motion } from "framer-motion";
 import PageContentTransition from "@/components/PageContentTransition";
 import { useNavigation } from "./effects/NavigationContext";
+import { useVideoLoad } from "@/hooks/useVideoLoad";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -14,16 +15,27 @@ export default function PageTransition({
   keyId,
 }: PageTransitionProps) {
   const navigation = useNavigation();
+  const { verifyVideoPlayability } = useVideoLoad();
   
   // Déclencher la transition lors du changement de page
   useEffect(() => {
     console.log("Changement de page détecté, keyId:", keyId);
     
     // S'assurer que le DOM est prêt avant de tenter la transition vidéo
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       try {
         // Vérifier si on a des éléments vidéo disponibles avant de déclencher
-        if (navigation.normalVideoRef.current || navigation.uvVideoRef.current) {
+        const normalVideoAvailable = navigation.normalVideoRef.current && 
+          document.body.contains(navigation.normalVideoRef.current);
+        const uvVideoAvailable = navigation.uvVideoRef.current &&
+          document.body.contains(navigation.uvVideoRef.current);
+        
+        if (normalVideoAvailable || uvVideoAvailable) {
+          // Vérifier rapidement si les vidéos sont jouables avant de déclencher
+          const normalVideoSrc = navigation.normalVideoRef.current?.querySelector('source')?.src;
+          const uvVideoSrc = navigation.uvVideoRef.current?.querySelector('source')?.src;
+          
+          // Si au moins une vidéo est disponible, on peut déclencher la transition
           navigation.triggerVideoTransition();
           console.log("Transition vidéo déclenchée lors du changement de page");
         } else {
@@ -35,7 +47,7 @@ export default function PageTransition({
     }, 200);
     
     return () => clearTimeout(timer);
-  }, [keyId, navigation]);
+  }, [keyId, navigation, verifyVideoPlayability]);
 
   // Variants pour l'animation 3D
   const pageVariants = {
