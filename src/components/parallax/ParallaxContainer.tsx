@@ -10,10 +10,9 @@ import { Vent } from './Vent';
 
 interface ParallaxContainerProps {
   children: React.ReactNode;
-  backgroundImage: string;
 }
 
-export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContainerProps) => {
+export const ParallaxContainer = ({ children }: ParallaxContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useParallaxEffects({ containerRef });
@@ -32,8 +31,8 @@ export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContain
   
   return (
     <>
-      {/* Fond en position fixe */}
-      <Background imagePath={backgroundImage} />
+      {/* Fond avec vidéo en position fixe */}
+      <Background />
       
       {/* Conteneur des éléments de parallax avec une plus grande hauteur */}
       <div 
@@ -42,7 +41,7 @@ export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContain
         style={{ 
           perspective: '1000px',
           transformStyle: 'preserve-3d',
-          zIndex: 1
+          zIndex: 2
         }}
       >
         {parallaxElements.map((element, index) => {
