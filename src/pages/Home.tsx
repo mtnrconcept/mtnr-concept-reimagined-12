@@ -8,7 +8,6 @@ import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
-import BackgroundVideo from "@/components/effects/BackgroundVideo";
 
 export default function Home() {
   const { uvMode } = useUVMode();
@@ -42,9 +41,6 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
-      {/* Vidéo de fond d'escalier */}
-      <BackgroundVideo />
-      
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
         

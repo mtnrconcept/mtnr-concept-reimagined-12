@@ -19,6 +19,7 @@ import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
+import BackgroundVideo from "./components/effects/BackgroundVideo";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -48,6 +49,9 @@ function AnimatedRoutes() {
   
   return (
     <>
+      {/* Vidéo de fond qui est maintenant en arrière-plan de toutes les pages */}
+      <BackgroundVideo />
+      
       <PageTransitionEffect />
       <PageTransition keyId={location.pathname}>
         <Routes location={location} key={location.pathname}>

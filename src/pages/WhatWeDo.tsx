@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
-import BackgroundVideo from "@/components/effects/BackgroundVideo";
 
 export default function WhatWeDo() {
   // Force scroll to top on page load
@@ -14,9 +13,6 @@ export default function WhatWeDo() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
-      {/* Vidéo de fond d'escalier */}
-      <BackgroundVideo />
-      
       <div className="relative z-10 min-h-screen">
         <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">

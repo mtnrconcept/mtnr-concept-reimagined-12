@@ -1,31 +1,45 @@
 
 import React, { useEffect, useRef } from 'react';
+import { useUVMode } from './UVModeContext';
+import { useLocation } from 'react-router-dom';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
+  videoUrlUV?: string;
   fallbackImage?: string;
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/staircase-video.mp4", 
+  videoUrl = "/lovable-uploads/Composition 1.mp4", 
+  videoUrlUV = "/lovable-uploads/Composition 1_1.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { uvMode } = useUVMode();
+  const location = useLocation();
+  
+  // Détermine quelle vidéo utiliser en fonction du mode UV
+  const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
   
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
+    // Mettre la vidéo en pause initialement
+    videoElement.pause();
+    videoElement.currentTime = 0;
+    
     const playVideo = async () => {
       try {
-        await videoElement.play();
         videoElement.playbackRate = 0.6; // Ralentir légèrement pour un effet plus dramatique
+        await videoElement.play();
         console.log('Vidéo en lecture');
       } catch (error) {
         console.error('Erreur lors de la lecture de la vidéo:', error);
       }
     };
     
+    // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
       if (document.hidden) {
         videoElement.pause();
@@ -35,12 +49,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     };
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Lancer la vidéo sur changement de route
     playVideo();
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      videoElement.pause();
     };
-  }, []);
+  }, [location.pathname, currentVideoUrl]); // Relancer l'effet quand la route ou la vidéo change
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
@@ -50,11 +67,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         className="absolute inset-0 min-w-full min-h-full object-cover"
         poster={fallbackImage}
         playsInline
-        autoPlay
-        loop
         muted
       >
-        <source src={videoUrl} type="video/mp4" />
+        <source src={currentVideoUrl} type="video/mp4" />
       </video>
       
       {/* Overlay pour assombrir légèrement la vidéo */}

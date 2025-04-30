@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
 import ElevatorTransition from "@/components/effects/ElevatorTransition";
+import PageContentTransition from "@/components/PageContentTransition";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -75,38 +76,21 @@ export default function PageTransition({
         </div>
       </ElevatorTransition>
 
-      <AnimatePresence mode="wait">
+      {/* Utilisation du nouveau composant de transition */}
+      <PageContentTransition>
         <motion.div
-          key={keyId}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          ref={contentRef}
           className="page-content-wrapper"
           style={{
             perspective: "1400px",
             willChange: "transform, opacity",
             position: "relative",
-            zIndex: 10,
-            transition: "opacity 0.5s ease"
+            zIndex: 10
           }}
         >
-          <motion.div
-            ref={contentRef}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{
-              opacity: 0,
-              y: -10,
-              transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
-            }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-            className="smoke-container"
-          >
-            {children}
-            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
-          </motion.div>
+          {children}
         </motion.div>
-      </AnimatePresence>
+      </PageContentTransition>
     </>
   );
 }
