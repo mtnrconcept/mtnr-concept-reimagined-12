@@ -1,0 +1,54 @@
+
+/* Animations pour le déplacement vers le bas */
+
+/* Animation repetile - vers le bas avec 5 niveaux d'intensité */
+@keyframes teleport-down-1 {
+  0%   { transform: translateY(0); filter: blur(0px); }
+  100% { transform: translateY(100%); filter: blur(3px); }
+}
+
+@keyframes teleport-down-2 {
+  0%   { transform: translateY(0); filter: blur(0px); }
+  100% { transform: translateY(100%); filter: blur(5px); }
+}
+
+@keyframes teleport-down-3 {
+  0%   { transform: translateY(0); filter: blur(0px); }
+  100% { transform: translateY(100%); filter: blur(8px); }
+}
+
+@keyframes teleport-down-4 {
+  0%   { transform: translateY(0); filter: blur(0px); }
+  100% { transform: translateY(100%); filter: blur(12px); }
+}
+
+@keyframes teleport-down-5 {
+  0%   { transform: translateY(0); filter: blur(0px); }
+  100% { transform: translateY(100%); filter: blur(15px); }
+}
+
+/* Classes pour les différentes intensités de teleport vers le bas */
+.loop-down-1 {
+  animation: teleport-down-1 2.4s ease-in-out infinite;
+  animation-direction: normal;
+}
+
+.loop-down-2 {
+  animation: teleport-down-2 2.0s ease-in-out infinite;
+  animation-direction: normal;
+}
+
+.loop-down-3 {
+  animation: teleport-down-3 1.6s ease-in-out infinite;
+  animation-direction: normal;
+}
+
+.loop-down-4 {
+  animation: teleport-down-4 1.2s ease-in-out infinite;
+  animation-direction: normal;
+}
+
+.loop-down-5 {
+  animation: teleport-down-5 1.0s ease-in-out infinite;
+  animation-direction: normal;
+}

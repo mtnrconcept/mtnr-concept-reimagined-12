@@ -1,0 +1,15 @@
+
+/* Fichier principal regroupant tous les styles d'ascenseur */
+
+/* Importer les composants CSS de base */
+@import './container.css';
+
+/* Importer les animations de déplacement */
+@import './animations-up.css';
+@import './animations-down.css';
+
+/* Importer les transitions de slide */
+@import './slide-transitions.css';
+
+/* Importer les styles de fond */
+@import './background.css';
