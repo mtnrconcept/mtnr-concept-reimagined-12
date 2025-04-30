@@ -18,7 +18,7 @@ export const BackgroundVideoController = () => {
     // Limiter à un seul préchargement à la fois
     sequential: true,
     onPreloadComplete: (results) => {
-      console.log('Résultats du préchargement:', results);
+      console.info('Résultats du préchargement:', results);
       setPreloadComplete(true);
       
       // Diagnostiquer les problèmes éventuels

@@ -31,14 +31,14 @@ export const useVideoPreload = ({
         // Éviter les préchargements simultanés du même URL
         activePreloads.current.add(url);
         
-        // Vérifier d'abord si la vidéo est accessible
+        // Vérifier d'abord si la vidéo est accessible avec une requête HEAD
         try {
           const response = await fetch(url, { method: 'HEAD', cache: 'force-cache' });
           const isAvailable = response.ok;
           preloadResults[url] = isAvailable;
           
           if (isAvailable) {
-            // Créer un lien de préchargement dans le DOM
+            // Utiliser un lien preload avec le bon type
             const link = document.createElement('link');
             link.rel = 'preload';
             link.href = url;
@@ -46,14 +46,9 @@ export const useVideoPreload = ({
             link.type = 'video/mp4';
             document.head.appendChild(link);
             
-            // Solution compatible Chrome: ne pas créer trop d'éléments vidéo
-            // Au lieu de créer un élément vidéo, faire une promesse avec timeout
-            await new Promise<void>((resolve) => {
-              // Timeout après 3 secondes pour ne pas bloquer
-              setTimeout(() => {
-                resolve();
-              }, 3000);
-            });
+            // Éviter de créer des éléments vidéo pour le préchargement
+            // Chrome a une limite de WebMediaPlayers
+            console.log(`Préchargement ${completedPreloads + 1}/${videoUrls.length} terminé`);
           } else {
             console.error(`La vidéo n'est pas accessible: ${url}, status: ${response.status}`);
           }
@@ -70,12 +65,11 @@ export const useVideoPreload = ({
       }
       
       completedPreloads++;
-      console.log(`Préchargement ${completedPreloads}/${videoUrls.length} terminé`);
     };
     
     const preloadVideos = async () => {
       try {
-        console.log('Préchargement des vidéos:', videoUrls);
+        console.info('Préchargement des vidéos:', videoUrls);
         
         if (sequential) {
           // Mode séquentiel: un préchargement à la fois pour éviter les problèmes Chrome

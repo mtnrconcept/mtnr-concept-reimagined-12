@@ -16,7 +16,6 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
-import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 
 // Initialize query client outside of component for stability
@@ -36,13 +35,6 @@ const UVCornerLabel = () => {
 
 function AnimatedRoutes() {
   const location = useLocation();
-  
-  // Run feature detection once on component mount
-  useEffect(() => {
-    checkFeatureSupport('vr');
-    checkFeatureSupport('ambient-light-sensor');
-    checkFeatureSupport('battery');
-  }, []);
   
   return (
     <>

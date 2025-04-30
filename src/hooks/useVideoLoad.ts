@@ -18,7 +18,7 @@ export const useVideoLoad = ({ fallbackImage, onVideoError, onVideoLoaded }: Use
     
     setIsVideoLoaded(true);
     setVideoError(false);
-    console.log("Vidéo chargée avec succès:", src);
+    console.info("Vidéo chargée avec succès:", src);
     
     if (onVideoLoaded) {
       onVideoLoaded(src);
@@ -40,47 +40,21 @@ export const useVideoLoad = ({ fallbackImage, onVideoError, onVideoLoaded }: Use
   
   const verifyVideoPlayability = useCallback(async (videoUrl: string): Promise<boolean> => {
     try {
-      // Vérifier si l'URL est accessible
-      const response = await fetch(videoUrl, { method: 'HEAD' });
+      // Vérification simplifiée pour éviter trop de requêtes
+      if (!videoUrl) return false;
+      
+      // Vérifier uniquement les métadonnées au lieu de l'ensemble du fichier
+      const response = await fetch(videoUrl, { 
+        method: 'HEAD',
+        cache: 'force-cache'
+      });
+      
       if (!response.ok) {
         console.error(`La vidéo ${videoUrl} n'est pas accessible. Status: ${response.status}`);
         return false;
       }
       
-      // Test plus avancé avec un élément vidéo
-      return new Promise((resolve) => {
-        const tempVideo = document.createElement('video');
-        tempVideo.muted = true;
-        tempVideo.preload = 'metadata';
-        
-        const onSuccess = () => {
-          tempVideo.removeEventListener('loadedmetadata', onSuccess);
-          tempVideo.removeEventListener('error', onError);
-          clearTimeout(timeout);
-          resolve(true);
-        };
-        
-        const onError = () => {
-          tempVideo.removeEventListener('loadedmetadata', onSuccess);
-          tempVideo.removeEventListener('error', onError);
-          clearTimeout(timeout);
-          resolve(false);
-        };
-        
-        // Timeout de sécurité
-        const timeout = setTimeout(() => {
-          tempVideo.removeEventListener('loadedmetadata', onSuccess);
-          tempVideo.removeEventListener('error', onError);
-          console.warn(`Timeout lors de la vérification de ${videoUrl}`);
-          resolve(false);
-        }, 5000);
-        
-        tempVideo.addEventListener('loadedmetadata', onSuccess);
-        tempVideo.addEventListener('error', onError);
-        
-        tempVideo.src = videoUrl;
-        tempVideo.load();
-      });
+      return true;
     } catch (error) {
       console.error(`Erreur lors de la vérification de ${videoUrl}:`, error);
       return false;
