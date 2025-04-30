@@ -30,6 +30,20 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     }
   }, [hasUserInteraction]);
 
+  // Effectuer un changement de source vidéo lorsque le mode UV change
+  useEffect(() => {
+    if (!isFirstLoad && videoRef.current && hasUserInteraction) {
+      console.log('Mode UV changé, source vidéo mise à jour:', currentVideo);
+      videoRef.current.src = currentVideo;
+      videoRef.current.load();
+      
+      // Si la torche est active, lancer automatiquement la vidéo
+      if (isTorchActive) {
+        playVideoTransition();
+      }
+    }
+  }, [uvMode]); // Dépend uniquement du changement de mode UV
+
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
@@ -43,17 +57,14 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       if (videoElement.src !== currentVideo) {
         console.log('Changement de source vidéo vers:', currentVideo);
         videoElement.src = currentVideo;
-        
-        // Attendre que les métadonnées soient chargées avant de continuer
-        if (videoElement.readyState < 2) {
-          await new Promise((resolve) => {
-            const handleMetadata = () => {
-              videoElement.removeEventListener('loadedmetadata', handleMetadata);
-              resolve(null);
-            };
-            videoElement.addEventListener('loadedmetadata', handleMetadata);
-          });
-        }
+        await new Promise<void>((resolve) => {
+          const handleLoadedData = () => {
+            videoElement.removeEventListener('loadeddata', handleLoadedData);
+            resolve();
+          };
+          videoElement.addEventListener('loadeddata', handleLoadedData);
+          videoElement.load();
+        });
       }
       
       videoElement.currentTime = 0;
@@ -70,11 +81,15 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         videoElement.removeEventListener('ended', handleVideoEnded);
       };
       
-      videoElement.removeEventListener('ended', handleVideoEnded);
       videoElement.addEventListener('ended', handleVideoEnded);
       
-      console.log('Lecture de la vidéo...');
-      await videoElement.play();
+      console.log('Lecture de la vidéo...', currentVideo);
+      await videoElement.play().catch(error => {
+        console.error('Erreur de lecture automatique:', error);
+        // Essayer de jouer avec son muet explicitement
+        videoElement.muted = true;
+        return videoElement.play();
+      });
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);

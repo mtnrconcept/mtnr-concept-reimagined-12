@@ -34,9 +34,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
   
   // Gérer les effets de transitions et d'initialisation dans un effet séparé
-  // pour éviter les renders infinis
   useEffect(() => {
-    // Utiliser notre hook d'effets, mais déplacer les dépendances ici
+    // Initialiser la vidéo au premier chargement
     const videoElement = videoRef.current;
     
     if (!videoElement) return;
@@ -44,6 +43,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     // S'assurer que la vidéo a la bonne source dès le début
     if (videoElement.src !== currentVideo) {
       videoElement.src = currentVideo;
+      videoElement.load();
     }
     
     if (isFirstLoad) {
@@ -76,6 +76,18 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
+  // Ajouter un effet pour détecter explicitement les changements de mode UV
+  useEffect(() => {
+    if (isTorchActive && hasUserInteraction && !isFirstLoad) {
+      console.log("Changement détecté - UV:", uvMode, "Torche:", isTorchActive);
+      // Petite temporisation pour éviter les conflits
+      const timer = setTimeout(() => {
+        playVideoTransition();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [uvMode, isTorchActive]);
+
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
       {/* Vidéo avec source dynamique */}
@@ -91,6 +103,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       {/* Overlays visuels */}
       <VideoOverlay />
+      
+      {/* Afficher l'état actuel pour le débogage */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-20 right-4 text-xs bg-black/70 text-white p-2 rounded z-50">
+          Mode: {uvMode ? 'UV' : 'Normal'} | 
+          Torche: {isTorchActive ? 'ON' : 'OFF'} | 
+          Vidéo: {currentVideo.split('/').pop()}
+        </div>
+      )}
     </div>
   );
 };
