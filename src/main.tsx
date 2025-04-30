@@ -10,8 +10,7 @@ import './styles/parallax.css'
 // Make sure React is available in the global scope for hooks
 window.React = React;
 
+// Temporarily removed StrictMode to prevent double rendering during development
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <App />
 )
