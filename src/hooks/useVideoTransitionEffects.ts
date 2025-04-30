@@ -33,8 +33,10 @@ export const useVideoTransitionEffects = ({
   const executeTransition = useCallback(() => {
     if (!hasUserInteraction) {
       handleUserInteraction();
+      console.log('Première interaction, préparation de la transition vidéo');
       setTimeout(() => playVideoTransition(), 100);
     } else if (!isTransitioning) {
+      console.log('Exécution de la transition vidéo');
       playVideoTransition();
     }
   }, [hasUserInteraction, isTransitioning, playVideoTransition, handleUserInteraction]);
@@ -57,12 +59,29 @@ export const useVideoTransitionEffects = ({
     // Configuration initiale unique
     if (isFirstLoad) {
       console.log("Premier chargement vidéo");
-      videoElement.load();
+      
+      // S'assurer que les sources sont correctement définies
+      const sources = videoElement.getElementsByTagName('source');
+      if (sources.length === 0) {
+        const mp4Source = document.createElement('source');
+        mp4Source.src = currentVideo;
+        mp4Source.type = 'video/mp4';
+        videoElement.appendChild(mp4Source);
+        
+        const webmSource = document.createElement('source');
+        webmSource.src = currentVideo;
+        webmSource.type = 'video/webm';
+        videoElement.appendChild(webmSource);
+        
+        // Recharger la vidéo après avoir ajouté les sources
+        videoElement.load();
+      }
+      
       videoElement.pause(); // Assure que la vidéo est en pause au début
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
     }
-  }, [isFirstLoad, videoRef, setIsFirstLoad]);
+  }, [isFirstLoad, videoRef, setIsFirstLoad, currentVideo]);
   
   // Ajout des écouteurs pour la première interaction utilisateur
   useEffect(() => {

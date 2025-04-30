@@ -11,10 +11,41 @@
     @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
   }
   
+  body {
+    background-color: #000 !important;
+  }
+  
   /* S'assurer que la vidéo d'arrière-plan est toujours visible */
-  .background-video {
+  video.background-video,
+  .fixed video {
     @apply fixed inset-0 w-full h-full object-cover z-0;
     min-width: 100%;
     min-height: 100%;
+    object-fit: cover;
+    background: black;
+  }
+  
+  /* Animation de fondu pour les transitions de page */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .page-transition-enter {
+    opacity: 0;
+  }
+  
+  .page-transition-enter-active {
+    opacity: 1;
+    transition: opacity 500ms;
+  }
+  
+  .page-transition-exit {
+    opacity: 1;
+  }
+  
+  .page-transition-exit-active {
+    opacity: 0;
+    transition: opacity 500ms;
   }
 }

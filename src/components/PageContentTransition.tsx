@@ -42,7 +42,11 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             duration: 0.5
           }
         }}
-        className="relative z-10 min-h-screen w-full"
+        className="relative z-10 min-h-screen w-full pointer-events-auto"
+        style={{
+          willChange: "opacity, transform",
+          zIndex: 10
+        }}
       >
         {displayChildren}
       </motion.div>

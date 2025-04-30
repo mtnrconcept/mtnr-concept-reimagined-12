@@ -63,23 +63,55 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     try {
       setIsTransitioning(true);
       
-      // S'assurer que la vidéo est correctement chargée
-      if (videoElement.src !== currentVideo) {
+      // Important: Pré-configurer la source manuellement
+      if (!videoElement.src.includes(currentVideo)) {
         console.log("Mise à jour de la source vidéo:", currentVideo);
-        videoElement.src = currentVideo;
-        await new Promise(resolve => {
+        
+        // Méthode alternative pour charger la vidéo
+        const sources = videoElement.getElementsByTagName('source');
+        if (sources.length > 0) {
+          for (let i = 0; i < sources.length; i++) {
+            sources[i].src = currentVideo;
+          }
+        } else {
+          // Si pas de sources, créer des éléments source
+          const mp4Source = document.createElement('source');
+          mp4Source.src = currentVideo;
+          mp4Source.type = 'video/mp4';
+          videoElement.appendChild(mp4Source);
+          
+          const webmSource = document.createElement('source');
+          webmSource.src = currentVideo;
+          webmSource.type = 'video/webm';
+          videoElement.appendChild(webmSource);
+        }
+        
+        // Recharger pour appliquer les nouvelles sources
+        videoElement.load();
+        
+        // Attendre que la vidéo soit chargée
+        await new Promise((resolve) => {
           const loadHandler = () => {
             console.log("Vidéo chargée avec succès");
             resolve(true);
             videoElement.removeEventListener('loadeddata', loadHandler);
           };
+          
+          const errorHandler = (error: ErrorEvent) => {
+            console.error("Erreur de chargement vidéo:", error);
+            resolve(false);
+            videoElement.removeEventListener('error', errorHandler);
+          };
+          
           videoElement.addEventListener('loadeddata', loadHandler, { once: true });
+          videoElement.addEventListener('error', errorHandler, { once: true });
           
           // Timeout en cas de problème de chargement
           setTimeout(() => {
             console.warn("Délai de chargement vidéo dépassé");
             resolve(false);
             videoElement.removeEventListener('loadeddata', loadHandler);
+            videoElement.removeEventListener('error', errorHandler);
           }, 5000);
         });
       }
@@ -100,11 +132,14 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       
       // Lancer la lecture de la vidéo
       console.log("Démarrage de la lecture vidéo");
-      await videoElement.play().catch(error => {
+      try {
+        await videoElement.play();
+        console.log("Vidéo en lecture");
+      } catch (error) {
         console.error("Erreur de lecture vidéo:", error);
         setIsTransitioning(false);
         setVideoError(true);
-      });
+      }
     } catch (error) {
       console.error("Erreur générale lors de la transition vidéo:", error);
       setIsTransitioning(false);
@@ -121,10 +156,10 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         networkState: videoRef.current.networkState,
         src: videoRef.current.src,
         currentSrc: videoRef.current.currentSrc,
-        style: window.getComputedStyle(videoRef.current)
+        error: videoRef.current.error
       });
     }
-  }, [isTransitioning]);
+  }, [isTransitioning, videoRef.current?.error]);
 
   return {
     videoRef,
