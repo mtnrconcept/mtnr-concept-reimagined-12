@@ -1,4 +1,5 @@
 
+/* Style principal pour la transition d'ascenseur */
 .elevator-container {
   position: fixed;
   inset: 0;
@@ -43,36 +44,31 @@
   z-index: 3;
 }
 
-/* Style to vertically reverse the video */
-.video-reversed {
-  transform: scaleY(-1);
-}
-
-/* Animations for vertical transitions - Simplified with ease-out/ease-in */
+/* Animations pour les transitions verticales - Simplifiées avec ease-out/ease-in */
 @keyframes slideOutUp {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-100vh); opacity: 0; }
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100vh); }
 }
 
 @keyframes slideInUp {
-  0% { transform: translateY(100vh); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { transform: translateY(100vh); }
+  100% { transform: translateY(0); }
 }
 
 /* Animations simplifiées avec 2 secondes de durée */
 .animate-slide-out-up {
   animation: slideOutUp 2s cubic-bezier(0.33, 1, 0.68, 1) forwards; /* easy-out timing */
-  will-change: transform, opacity;
+  will-change: transform;
 }
 
 .animate-slide-in-up {
   animation: slideInUp 2s cubic-bezier(0.33, 1, 0.68, 1) forwards; /* easy-out timing */
   animation-delay: 5s; /* Démarre après 5s (2s sortie + 3s vidéo) */
-  will-change: transform, opacity;
-  opacity: 0; /* Commence caché */
+  will-change: transform;
+  transform: translateY(100vh); /* Commence hors écran */
 }
 
-/* Styles for background video */
+/* Styles pour la vidéo de fond */
 .background-video {
   position: fixed;
   inset: 0;

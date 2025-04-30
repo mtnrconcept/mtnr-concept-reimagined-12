@@ -28,7 +28,7 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
     if (!prevTransitionRef.current && isTransitioning) {
       setAnimationStarted(true);
       
-      // Déclencher la fin de l'animation après 7 secondes (vidéo + transitions)
+      // Déclencher la fin de l'animation après 7 secondes (2s sortie + 3s vidéo + 2s entrée)
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
       }
@@ -36,7 +36,7 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
       timeoutRef.current = window.setTimeout(() => {
         setAnimationStarted(false);
         onAnimationComplete();
-      }, 7000); // Durée totale: 7s (2s sortie + 3s vidéo + 2s entrée)
+      }, 7000); // Durée totale: 7s
     }
 
     // Si la transition s'arrête (retour à false), on reset notre flag
@@ -71,14 +71,6 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
       {/* Contenu sortant avec animation de sortie vers le haut */}
       <div 
         className={`elevator-content exit-content ${animationStarted ? 'animate-slide-out-up' : ''}`}
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 5
-        }}
       >
         {exitContent}
       </div>
@@ -87,15 +79,6 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
            démarre après 5 secondes (2s sortie + 3s vidéo) */}
       <div 
         className={`elevator-content enter-content ${animationStarted ? 'animate-slide-in-up' : ''}`}
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 3,
-          animationDelay: '5s'
-        }}
       >
         {enterContent}
       </div>

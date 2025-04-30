@@ -61,7 +61,7 @@ export function useElevatorTransition({
     direction,
     exitContent,
     enterContent,
-    contentEntranceDelay: 5000, // 5s avant l'entrée du nouveau contenu
+    contentEntranceDelay: 5000, // 5s avant l'entrée du nouveau contenu (2s sortie + 3s vidéo)
     isTransitioning
   };
 }
