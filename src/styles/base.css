@@ -30,6 +30,7 @@
   min-height: 100vh !important;
   transition: filter 0.8s ease-in-out;
   will-change: filter, transform;
+  opacity: 1;
 }
 
 /* Animation pour les transitions de page */

@@ -4,8 +4,10 @@ import React, { createContext, useContext, useState, useCallback, useRef } from 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
   registerVideoTransitionListener: (callback: () => void) => () => void;
-  registerVideoRef: (ref: React.RefObject<HTMLVideoElement>) => void;
+  registerVideoRef: (ref: React.RefObject<HTMLVideoElement>, isUVVideo?: boolean) => void;
   isTransitioning: boolean;
+  normalVideoRef: React.RefObject<HTMLVideoElement>;
+  uvVideoRef: React.RefObject<HTMLVideoElement>;
 }
 
 const NavigationContext = createContext<NavigationContextType | null>(null);
@@ -16,11 +18,16 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
   const lastTransitionTimeRef = useRef<number>(0);
-  const videoElementRef = useRef<React.RefObject<HTMLVideoElement> | null>(null);
+  const normalVideoRef = useRef<HTMLVideoElement>(null);
+  const uvVideoRef = useRef<HTMLVideoElement>(null);
 
-  const registerVideoRef = useCallback((ref: React.RefObject<HTMLVideoElement>) => {
-    videoElementRef.current = ref;
-    console.log("Référence vidéo enregistrée");
+  const registerVideoRef = useCallback((ref: React.RefObject<HTMLVideoElement>, isUVVideo = false) => {
+    if (isUVVideo) {
+      uvVideoRef.current = ref.current;
+    } else {
+      normalVideoRef.current = ref.current;
+    }
+    console.log(`Référence vidéo ${isUVVideo ? 'UV' : 'normale'} enregistrée`);
   }, []);
 
   const triggerVideoTransition = useCallback(() => {
@@ -42,8 +49,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Contrôle direct de la vidéo si disponible
-    const videoElement = videoElementRef.current?.current;
+    // Déterminer quelle vidéo jouer (normale par défaut, UV si en mode UV)
+    // Note: La logique pour déterminer le mode UV sera gérée dans le composant vidéo
+    const videoElement = normalVideoRef.current;
     if (videoElement && document.body.contains(videoElement)) {
       console.log("Contrôle direct de la vidéo pour transition");
       videoElement.currentTime = 0;
@@ -94,7 +102,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         triggerVideoTransition, 
         registerVideoTransitionListener,
         registerVideoRef,
-        isTransitioning
+        isTransitioning,
+        normalVideoRef,
+        uvVideoRef
       }}
     >
       {children}

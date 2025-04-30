@@ -16,60 +16,61 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const normalVideoRef = useRef<HTMLVideoElement>(null);
+  const uvVideoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const { registerVideoTransitionListener, registerVideoRef } = useNavigation();
   const { uvMode } = useUVMode();
   
-  // Enregistrer la référence de la vidéo dans le contexte de navigation
+  // Enregistrer les références de vidéo dans le contexte de navigation
   useEffect(() => {
-    if (videoRef.current) {
-      registerVideoRef(videoRef);
-      console.log('Référence vidéo enregistrée dans NavigationContext');
+    if (normalVideoRef.current) {
+      registerVideoRef(normalVideoRef, false);
+      console.log('Référence vidéo normale enregistrée dans NavigationContext');
+    }
+    
+    if (uvVideoRef.current) {
+      registerVideoRef(uvVideoRef, true);
+      console.log('Référence vidéo UV enregistrée dans NavigationContext');
     }
   }, [registerVideoRef]);
   
-  // Configurer la vidéo au chargement initial
+  // Configurer les vidéos au chargement initial
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const normalVideo = normalVideoRef.current;
+    const uvVideo = uvVideoRef.current;
     
-    video.muted = true;
-    video.playsInline = true;
-    video.loop = false; // Important: ne pas mettre en boucle pour les transitions
-    video.preload = "auto";
+    if (normalVideo) {
+      normalVideo.muted = true;
+      normalVideo.playsInline = true;
+      normalVideo.loop = false;
+      normalVideo.preload = "auto";
+    }
     
-    const attemptAutoplay = async () => {
-      try {
-        // Lors du premier chargement, on peut laisser la vidéo en pause
-        console.log('Vidéo configurée au chargement initial');
-      } catch (err) {
-        console.warn('Erreur de configuration initiale:', err);
-      }
-    };
+    if (uvVideo) {
+      uvVideo.muted = true;
+      uvVideo.playsInline = true;
+      uvVideo.loop = false;
+      uvVideo.preload = "auto";
+    }
     
-    attemptAutoplay();
+    console.log('Vidéos configurées au chargement initial');
   }, []);
   
   // S'abonner aux événements de transition
   useEffect(() => {
     const unregister = registerVideoTransitionListener(async () => {
-      const video = videoRef.current;
+      // Choisir la vidéo selon le mode UV
+      const video = uvMode ? uvVideoRef.current : normalVideoRef.current;
+      
       if (!video || !document.body.contains(video)) {
         console.warn("Élément vidéo non disponible pour transition");
         return;
       }
       
       try {
-        console.log("🎬 Démarrage transition vidéo - remise à zéro");
-        
-        // Utiliser la bonne source vidéo selon le mode UV
-        const currentSource = uvMode ? videoUrlUV : videoUrl;
-        if (video.src !== currentSource) {
-          video.src = currentSource;
-          video.load();
-        }
+        console.log(`🎬 Démarrage transition vidéo ${uvMode ? 'UV' : 'normale'} - remise à zéro`);
         
         // Configurer la vidéo pour la transition
         video.loop = false;
@@ -81,11 +82,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         // Lecture avec gestion des erreurs
         try {
           console.log("▶️ Tentative de lecture vidéo");
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            console.log("✅ Vidéo démarrée avec succès pour la transition");
-          }
+          await video.play();
+          console.log("✅ Vidéo démarrée avec succès pour la transition");
         } catch (error) {
           console.error("❌ Erreur lors de la lecture vidéo pour transition:", error);
         }
@@ -95,26 +93,43 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     });
     
     return unregister;
-  }, [registerVideoTransitionListener, uvMode, videoUrl, videoUrlUV]);
+  }, [registerVideoTransitionListener, uvMode]);
   
-  // Gestion de la fin de la vidéo
+  // Gestion de la fin des vidéos
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleEnded = () => {
-      console.log("🏁 Vidéo terminée");
-      video.classList.remove("video-transitioning");
-      
-      // Remettre en boucle pour l'état normal
-      video.loop = true;
-      
-      // Relancer la vidéo en boucle
-      video.play().catch(e => console.warn("Erreur lors de la reprise en boucle:", e));
+    const handleNormalVideoEnded = () => {
+      console.log("🏁 Vidéo normale terminée");
+      if (normalVideoRef.current) {
+        normalVideoRef.current.classList.remove("video-transitioning");
+        normalVideoRef.current.loop = true;
+      }
     };
     
-    video.addEventListener('ended', handleEnded);
-    return () => video.removeEventListener('ended', handleEnded);
+    const handleUVVideoEnded = () => {
+      console.log("🏁 Vidéo UV terminée");
+      if (uvVideoRef.current) {
+        uvVideoRef.current.classList.remove("video-transitioning");
+        uvVideoRef.current.loop = true;
+      }
+    };
+    
+    if (normalVideoRef.current) {
+      normalVideoRef.current.addEventListener('ended', handleNormalVideoEnded);
+    }
+    
+    if (uvVideoRef.current) {
+      uvVideoRef.current.addEventListener('ended', handleUVVideoEnded);
+    }
+    
+    return () => {
+      if (normalVideoRef.current) {
+        normalVideoRef.current.removeEventListener('ended', handleNormalVideoEnded);
+      }
+      
+      if (uvVideoRef.current) {
+        uvVideoRef.current.removeEventListener('ended', handleUVVideoEnded);
+      }
+    };
   }, []);
   
   // Gestion des événements vidéo
@@ -144,9 +159,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
-      {/* Vidéo d'arrière-plan */}
+      {/* Vidéo normale d'arrière-plan */}
       <video
-        ref={videoRef}
+        ref={normalVideoRef}
         className="background-video"
         playsInline
         muted
@@ -154,8 +169,25 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
+        style={{ display: uvMode ? 'none' : 'block' }}
       >
-        <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />
+        <source src={videoUrl} type="video/mp4" />
+        Votre navigateur ne prend pas en charge les vidéos HTML5.
+      </video>
+      
+      {/* Vidéo UV d'arrière-plan */}
+      <video
+        ref={uvVideoRef}
+        className="background-video"
+        playsInline
+        muted
+        autoPlay
+        preload="auto"
+        onLoadedData={handleVideoLoad}
+        onError={handleVideoError}
+        style={{ display: uvMode ? 'block' : 'none' }}
+      >
+        <source src={videoUrlUV} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
