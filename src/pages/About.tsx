@@ -13,11 +13,11 @@ const About = () => (
         <div>
           <h2 className="font-playfair text-2xl font-bold mb-2 text-gray-900">MTNR Concept</h2>
           <p className="font-inter text-gray-700 text-lg mb-4">
-            Passionné par l’humain, la lumière et la créativité, j’ai fondé MTNR Concept afin d’offrir un studio photo accessible et polyvalent à Lyon.
+            Passionné par l'humain, la lumière et la créativité, j'ai fondé MTNR Concept afin d'offrir un studio photo accessible et polyvalent à Lyon.
           </p>
           <p className="font-inter text-gray-700 text-lg">
-            Ici, chaque client est unique : je vous accompagne pour mettre en valeur votre personnalité ou votre projet. <br />
-            <span className="italic text-sm">N’hésitez pas à faire connaissance !</span>
+            Ici, chaque client est unique : je vous accompagne pour mettre en valeur votre personnalité ou votre projet. <br />
+            <span className="italic text-sm">N'hésitez pas à faire connaissance !</span>
           </p>
         </div>
       </div>

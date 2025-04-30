@@ -11,8 +11,8 @@ interface BackgroundVideoProps {
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/Video fond normale.mp4", 
-  videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
+  videoUrl = "/video-fond-normale.mp4", 
+  videoUrlUV = "/video-fond-uv.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   // Utiliser notre hook personnalisé pour gérer la vidéo
@@ -70,7 +70,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
-      {/* Overlays visuels simplifiés */}
+      {/* Overlays visuels */}
       <VideoOverlay />
     </div>
   );

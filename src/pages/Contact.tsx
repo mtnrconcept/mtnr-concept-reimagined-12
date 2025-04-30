@@ -1,8 +1,8 @@
 
-import ParallaxBackground from "@/components/ParallaxBackground";
 import Navbar from "@/components/Navbar";
 import { useState } from "react";
 import { toast } from "sonner";
+import ParallaxBackground from "@/components/ParallaxBackground";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
