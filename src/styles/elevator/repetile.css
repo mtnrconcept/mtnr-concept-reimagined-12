@@ -1,0 +1,79 @@
+
+/**
+ * Animations repetile - Effet avancé avec 8 phases et interpolation fluide
+ * Version optimisée pour transition ultra-fluide
+ */
+
+/* Style pour la barrière qui masque le défilement */
+.slider-barrier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  visibility: hidden;
+  z-index: 2;
+  will-change: transform;
+}
+
+/* Piste de défilement avec slides multiples */
+.slider-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  will-change: transform, filter;
+}
+
+/* Chaque slide individuel */
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+/* Contenu sortant et entrant */
+.elevator-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+.exit-content {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.enter-content {
+  pointer-events: auto;
+  z-index: 3;
+}
+
+/* État de visibilité pour les animations */
+.barrier-visible {
+  visibility: visible;
+}
+
+.content-hidden {
+  visibility: hidden;
+}
+
+/* Utilitaire pour masquer l'élément sans l'enlever du flux */
+.visually-hidden {
+  visibility: hidden;
+}
+
+/* Classes pour les animations de vidéo */
+.video-playing-forward {
+  transform: scaleY(1);
+}
+
+.video-playing-reverse {
+  transform: scaleY(-1);
+}

@@ -1,77 +1,43 @@
 
-import React, { forwardRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { VideoOverlay } from './VideoOverlay';
-import { useVideoTransition } from '@/hooks/useVideoTransition';
-import VideoElement from './VideoElement';
-import ParallaxDecorations from './ParallaxDecorations';
-import { useUVMode } from './UVModeContext';
+import React, { useEffect, useRef } from 'react';
+import { useBackgroundVideoStore } from './BackgroundVideoController';
 
 interface BackgroundVideoProps {
-  videoUrl?: string;
-  videoUrlUV?: string;
+  videoSrc: string;
 }
 
-const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({ 
-  videoUrl = "/lovable-uploads/Videofondnormale.mp4", 
-  videoUrlUV = "/lovable-uploads/VideofondUV.mp4"
-}, ref) => {
-  const { 
-    normalVideoRef, 
-    uvVideoRef, 
-    videoAvailability,
-    handleVideoLoad,
-    handleVideoError
-  } = useVideoTransition();
-  const { uvMode } = useUVMode();
+const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ videoSrc }) => {
+  const { isPlaying } = useBackgroundVideoStore();
+  const videoRef = useRef<HTMLVideoElement>(null);
   
+  // Effect to play/pause video based on isPlaying state
   useEffect(() => {
-    // Log pour le débogage
-    console.log("BackgroundVideo monté, URLs vidéos:", { videoUrl, videoUrlUV });
-    console.log("Mode UV actif:", uvMode);
-  }, [videoUrl, videoUrlUV, uvMode]);
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    if (isPlaying) {
+      videoElement.currentTime = 0; // Reset to beginning
+      videoElement.play().catch(err => {
+        console.error("Error playing video:", err);
+      });
+    } else {
+      videoElement.pause();
+    }
+  }, [isPlaying]);
   
   return (
-    <motion.div 
-      className="fixed inset-0 w-full h-full z-0 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      {/* On utilise des conditions pour n'afficher que la vidéo active */}
-      {/* afin de réduire le nombre d'éléments vidéo dans le DOM */}
-      {!uvMode && (
-        <VideoElement
-          ref={normalVideoRef}
-          className="background-video video-normal absolute inset-0 w-full h-full object-cover"
-          src={videoUrl}
-          onLoadedData={handleVideoLoad}
-          onError={handleVideoError}
-          autoRetry={true}
-        />
-      )}
-      
-      {/* UV mode video - chargé uniquement quand nécessaire */}
-      {uvMode && (
-        <VideoElement
-          ref={uvVideoRef}
-          className="background-video video-uv absolute inset-0 w-full h-full object-cover"
-          src={videoUrlUV}
-          onLoadedData={handleVideoLoad}
-          onError={handleVideoError}
-          autoRetry={true}
-        />
-      )}
-      
-      {/* Video overlay */}
-      <VideoOverlay />
-      
-      {/* Decorative parallax elements */}
-      <ParallaxDecorations />
-    </motion.div>
+    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
+      <video
+        ref={videoRef}
+        className="w-full h-full object-cover"
+        src={videoSrc}
+        muted
+        playsInline
+        preload="auto"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50" />
+    </div>
   );
-});
-
-BackgroundVideo.displayName = 'BackgroundVideo';
+};
 
 export default BackgroundVideo;

@@ -1,9 +1,10 @@
 
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import PageContentTransition from "@/components/PageContentTransition";
-import { useNavigation } from "./effects/NavigationContext";
-import { useVideoPlayabilityCheck } from "@/hooks/useVideoPlayabilityCheck";
+import { useLocation } from "react-router-dom";
+import { createSmokeEffect } from "@/lib/transitions";
+import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
+import { ElevatorTransition } from "@/components/effects/elevator";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -14,86 +15,83 @@ export default function PageTransition({
   children,
   keyId,
 }: PageTransitionProps) {
-  const navigation = useNavigation();
-  const { verifyVideoPlayability } = useVideoPlayabilityCheck();
-  
-  // Déclencher la transition lors du changement de page
-  useEffect(() => {
-    console.log("Changement de page détecté, keyId:", keyId);
-    
-    // S'assurer que le DOM est prêt avant de tenter la transition vidéo
-    const timer = setTimeout(async () => {
-      try {
-        // Vérifier si on a des éléments vidéo disponibles avant de déclencher
-        const normalVideoAvailable = navigation.normalVideoRef.current && 
-          document.body.contains(navigation.normalVideoRef.current);
-        const uvVideoAvailable = navigation.uvVideoRef.current &&
-          document.body.contains(navigation.uvVideoRef.current);
-        
-        if (normalVideoAvailable || uvVideoAvailable) {
-          // Vérifier rapidement si les vidéos sont jouables avant de déclencher
-          const normalVideoSrc = navigation.normalVideoRef.current?.querySelector('source')?.src;
-          const uvVideoSrc = navigation.uvVideoRef.current?.querySelector('source')?.src;
-          
-          // Si au moins une vidéo est disponible, on peut déclencher la transition
-          navigation.triggerVideoTransition();
-          console.log("Transition vidéo déclenchée lors du changement de page");
-        } else {
-          console.warn("Aucune référence vidéo disponible, transition ignorée");
-        }
-      } catch (error) {
-        console.error("Erreur lors du déclenchement de la transition vidéo:", error);
-      }
-    }, 200);
-    
-    return () => clearTimeout(timer);
-  }, [keyId, navigation, verifyVideoPlayability]);
+  const location = useLocation();
+  const prevPathRef = useRef<string>(location.pathname);
+  const isInitialMountRef = useRef<boolean>(true);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [fromPath, setFromPath] = useState(location.pathname);
 
-  // Variants pour l'animation 3D
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-      rotateX: 5,
-      y: 30
-    },
-    animate: {
-      opacity: 1,
-      rotateX: 0,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        delay: 1.2, // Attendre la vidéo avant d'animer
-        ease: "easeOut"
-      }
-    },
-    exit: {
-      opacity: 0,
-      rotateX: -5,
-      y: -30,
-      transition: {
-        duration: 0.5
-      }
+  useEffect(() => {
+    // Ignore first render
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      prevPathRef.current = location.pathname;
+      return;
+    }
+
+    // Detect route changes and enable transition
+    if (location.pathname !== prevPathRef.current) {
+      console.log(`Page change detected: ${prevPathRef.current} -> ${location.pathname}`);
+      setIsTransitioning(true);
+      setFromPath(prevPathRef.current);
+    }
+  }, [location.pathname]);
+
+  const handleDisperseComplete = () => {
+    console.log('Dispersion complete, applying smoke effect');
+    if (contentRef.current) {
+      createSmokeEffect(contentRef.current);
     }
   };
 
+  const handleTransitionComplete = () => {
+    console.log('Elevator transition complete');
+    setIsTransitioning(false);
+    prevPathRef.current = location.pathname;
+  };
+
   return (
-    <PageContentTransition>
-      <motion.div
-        className="page-content-wrapper"
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageVariants}
-        style={{
-          perspective: "1400px",
-          willChange: "transform, opacity",
-          position: "relative",
-          zIndex: 10,
-          transformStyle: "preserve-3d"
-        }}
+    <>
+      <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
+
+      <ElevatorTransition 
+        isActive={isTransitioning}
+        onAnimationComplete={handleTransitionComplete}
       >
-        {children}
-      </motion.div>
-    </PageContentTransition>
+        <motion.div
+          key={keyId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          className="page-content-wrapper"
+          style={{
+            perspective: "1400px",
+            willChange: "transform, opacity",
+            position: "relative",
+            zIndex: 10,
+            transition: "opacity 0.5s ease",
+            width: "100%",
+            height: "100%"
+          }}
+        >
+          <motion.div
+            ref={contentRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{
+              opacity: 0,
+              y: -10,
+              transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
+            }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+            className="smoke-container"
+          >
+            {children}
+            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
+          </motion.div>
+        </motion.div>
+      </ElevatorTransition>
+    </>
   );
 }

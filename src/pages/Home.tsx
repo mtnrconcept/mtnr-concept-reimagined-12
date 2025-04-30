@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
+import Parallax3DScene from "@/components/Parallax3DScene";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -16,8 +17,35 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, []);
 
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-up', 'opacity-100');
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    });
+    
+    document.querySelectorAll('[data-animate]').forEach(el => {
+      el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
+      observerRef.current?.observe(el);
+    });
+    
+    return () => observerRef.current?.disconnect();
+  }, []);
+
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+      {/* Enhanced 3D parallax background */}
+      <Parallax3DScene />
+      
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
         
