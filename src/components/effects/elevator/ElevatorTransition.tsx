@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ElevatorTransitionProps } from './ElevatorTypes';
 import { useElevatorTransition } from './useElevatorTransition';
 
@@ -16,89 +16,139 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     currentPath: children
   });
   
+  // Références pour accéder aux éléments DOM
+  const contentRef = useRef<HTMLDivElement>(null);
   const barrierRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const newContentRef = useRef<HTMLDivElement>(null);
   
   // Effet pour gérer l'animation "repetile" avancée
   useEffect(() => {
-    if (!isTransitioning || !barrierRef.current || !trackRef.current || !newContentRef.current) return;
+    if (!isTransitioning || !barrierRef.current || !trackRef.current || !contentRef.current) return;
     
     const barrier = barrierRef.current;
     const track = trackRef.current;
+    const contentEl = contentRef.current;
     
-    // Créer l'animation "repetile" avec Web Animations API
-    const createLoopAnimation = () => {
-      return track.animate([
-        { offset: 0,   transform: 'translateY(0)',    filter: 'blur(0)',  easing: 'ease-in' },
-        { offset: 0.1, transform: 'translateY(-10%)', filter: 'blur(4px)' },
-        { offset: 0.9, transform: 'translateY(-90%)', filter: 'blur(4px)' },
-        { offset: 1,   transform: 'translateY(-100%)', filter: 'blur(0)',  easing: 'ease-out' }
-      ], {
-        duration: 6000,   // 6s = 4 cycles × 1.5s
-        iterations: 1,
-        fill: 'forwards'
-      });
-    };
+    // Configuration des poids pour l'animation (plus c'est lent au début/fin)
+    const weights = [8, 4, 2, 1, 1, 2, 4, 8];
+    const total = weights.reduce((a, b) => a + b, 0);
     
-    // Lancer l'animation de loop
-    const loopAnim = createLoopAnimation();
+    // Durées en ms (total = 7000ms)
+    const durations = weights.map(w => w * 7000 / total);
     
-    // À la fin de l'animation de loop, déclencher la transition finale
-    loopAnim.onfinish = () => {
-      console.log("Fin des répétitions repetile après 6s, passage à la transition finale");
-      const newContentEl = newContentRef.current;
+    // Offsets normalisés [0, t1, t2, ..., t7, 1]
+    const offsets = [0];
+    let acc = 0;
+    for (let i = 0; i < durations.length - 1; i++) {
+      acc += durations[i];
+      offsets.push(acc / 7000);
+    }
+    offsets.push(1);
+    
+    // Blur à chaque étape (plus c'est rapide, plus c'est flou)
+    const blurMap = [2, 8, 14, 18, 18, 14, 8, 2, 0]; // 9 valeurs (8 phases + fin)
+    
+    // Préparation du contenu pour les slides
+    const oldHTML = exitContent ? 
+      React.isValidElement(exitContent) ? 
+        document.createElement('div').appendChild(
+          document.importNode(
+            document.getElementById('exit-content-wrapper')!, true
+          )
+        ).innerHTML
+        : 'Loading...'
+      : 'Loading...';
+        
+    // Nettoyer le track
+    track.innerHTML = '';
+    
+    // Créer les 7 slides de "vieux contenu"
+    for (let i = 0; i < weights.length; i++) {
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.innerHTML = oldHTML;
+      slide.style.top = (i * 100) + '%';
+      track.appendChild(slide);
+    }
+    
+    // 8ème slide = "nouveau contenu"
+    if (enterContent && document.getElementById('enter-content-wrapper')) {
+      const lastSlide = document.createElement('div');
+      lastSlide.className = 'slide';
+      lastSlide.innerHTML = document.createElement('div').appendChild(
+        document.importNode(
+          document.getElementById('enter-content-wrapper')!, true
+        )
+      ).innerHTML;
+      lastSlide.style.top = (weights.length * 100) + '%';
+      track.appendChild(lastSlide);
+    }
+    
+    // Ajuster la hauteur du track
+    track.style.height = ((weights.length + 1) * 100) + '%';
+    
+    // Afficher la barrière, masquer le contenu d'origine
+    barrier.style.visibility = 'visible';
+    contentEl.style.visibility = 'hidden';
+    
+    // Créer un seul animate() synchronisé sur 7000ms
+    const keyframes = offsets.map((offset, i) => ({
+      offset: offset,
+      transform: `translateY(-${i * 100}%)`,
+      filter: `blur(${blurMap[i]}px)`
+    }));
+    
+    console.log("Démarrage de l'animation avancée Repetile sur 7000ms");
+    const animation = track.animate(keyframes, {
+      duration: 7000,
+      fill: 'forwards'
+    });
+    
+    // À la fin de l'animation
+    animation.onfinish = () => {
+      console.log("Animation Repetile terminée, finalisation");
       
-      if (!newContentEl) return;
+      // Swap du contenu
+      contentEl.style.visibility = 'visible';
+      barrier.style.visibility = 'hidden';
+      track.innerHTML = '';
+      track.style.height = '';
       
-      // Appliquer les classes pour la transition finale
-      barrier.classList.add(direction === 'down' ? 'barrier-slide-out-up' : 'barrier-slide-out-down');
-      newContentEl.classList.add('enter-content-visible');
-      newContentEl.classList.add(direction === 'down' ? 'new-slide-in-down' : 'new-slide-in-up');
-      
-      // Événement de fin d'animation
-      const handleAnimationEnd = () => {
-        onAnimationComplete();
-        newContentEl.removeEventListener('animationend', handleAnimationEnd);
-      };
-      
-      newContentEl.addEventListener('animationend', handleAnimationEnd, { once: true });
+      // Terminer la transition
+      onAnimationComplete();
     };
     
     // Cleanup function
     return () => {
-      if (loopAnim) loopAnim.cancel();
+      if (animation) animation.cancel();
+      barrier.style.visibility = 'hidden';
+      contentEl.style.visibility = 'visible';
     };
-  }, [isTransitioning, direction, onAnimationComplete]);
+  }, [isTransitioning, direction, exitContent, enterContent, onAnimationComplete]);
   
-  // Si transition non active, simplement afficher le contenu
+  // Si transition inactive, afficher simplement le contenu
   if (!isTransitioning) {
-    return <>{children}</>;
+    return <div ref={contentRef} className="elevator-content">{children}</div>;
   }
-
+  
   return (
     <div className="elevator-container">
-      {/* Barrière qui masque le défilement */}
-      <div ref={barrierRef} className="slider-barrier">
-        <div ref={trackRef} className="slider-track">
-          {/* Premier slide - contenu actuel */}
-          <div className="slide">
-            {exitContent}
-          </div>
-          {/* Deuxième slide - copie identique pour le loop */}
-          <div className="slide">
-            {exitContent}
-          </div>
+      <div ref={contentRef} className="elevator-content exit-content">
+        <div id="exit-content-wrapper">
+          {exitContent}
         </div>
       </div>
       
-      {/* Contenu qui entrera avec animation slide-in */}
-      <div 
-        ref={newContentRef} 
-        className="elevator-content enter-content"
-        style={{ animationDelay: `${contentEntranceDelay}ms` }}
-      >
-        {enterContent}
+      {/* Barrière qui masque le défilement */}
+      <div ref={barrierRef} className="slider-barrier">
+        <div ref={trackRef} className="slider-track"></div>
+      </div>
+      
+      {/* Contenu qui entrera à la fin */}
+      <div className="elevator-content enter-content visually-hidden">
+        <div id="enter-content-wrapper">
+          {enterContent}
+        </div>
       </div>
     </div>
   );

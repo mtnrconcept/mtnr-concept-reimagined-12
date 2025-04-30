@@ -7,9 +7,8 @@ import { useBackgroundVideoStore } from '../BackgroundVideoController';
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
-// Configuration des timings comme dans l'exemple fourni
-const REPETILE_DURATION = 6000;     // 6s pour l'animation complète
-const FINAL_SLIDE_DURATION = 1000;  // 1s pour le slide final
+// Configuration des timings pour l'animation avancée
+const ANIMATION_TOTAL_DURATION = 7000;  // 7s pour l'animation complète
 
 export function useElevatorTransition({
   isActive,
@@ -23,7 +22,6 @@ export function useElevatorTransition({
   const [targetPath, setTargetPath] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [prevPath, setPrevPath] = useState(location.pathname);
-  const finalSlideTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Accès au store vidéo
   const { startVideo, pauseVideo } = useBackgroundVideoStore();
@@ -66,6 +64,9 @@ export function useElevatorTransition({
       
       // Démarrer la vidéo en arrière-plan dans la bonne direction
       startVideo(transitionDirection === 'down' ? 'forward' : 'reverse');
+      
+      // Configuration pour une durée totale de 7s
+      console.log(`Animation totale: ${ANIMATION_TOTAL_DURATION}ms`);
     }
     
     // Si isActive devient false, réinitialiser
@@ -76,20 +77,10 @@ export function useElevatorTransition({
       setDirection(null);
       setTargetPath(null);
       
-      // Nettoyer les timers si nécessaire
-      if (finalSlideTimerRef.current) {
-        clearTimeout(finalSlideTimerRef.current);
-        finalSlideTimerRef.current = null;
-      }
+      // Pause de la vidéo si elle joue encore
+      pauseVideo();
     }
-  }, [isActive, location.pathname, currentPath, isTransitioning, prevPath, startVideo]);
-  
-  // Nettoyage des timers lors du démontage
-  useEffect(() => {
-    return () => {
-      if (finalSlideTimerRef.current) clearTimeout(finalSlideTimerRef.current);
-    };
-  }, []);
+  }, [isActive, location.pathname, currentPath, isTransitioning, prevPath, startVideo, pauseVideo]);
 
   return {
     direction,

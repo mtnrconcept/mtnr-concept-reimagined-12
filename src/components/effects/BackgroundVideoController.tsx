@@ -46,19 +46,19 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
     }
   }, []);
   
-  // Fonction manuelle pour lire la vidéo en sens inverse si playbackRate=-1 n'est pas supporté
-  const manualReverseRef = useRef<((v: HTMLVideoElement) => void) | null>(null);
+  // Fonction optimisée pour lire la vidéo en sens inverse avec fallback
+  const manualReverseRef = useRef<(v: HTMLVideoElement) => void>();
   manualReverseRef.current = (v: HTMLVideoElement) => {
     let last = performance.now();
     v.pause();
     v.currentTime = v.currentTime || v.duration;
     
-    function step(now: number) {
+    const step = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
       v.currentTime = Math.max(0, v.currentTime - dt);
       if (v.currentTime > 0) requestAnimationFrame(step);
-    }
+    };
     
     requestAnimationFrame((t) => { 
       last = t; 
@@ -104,14 +104,14 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
         }
       }
       
-      // Mettre en pause automatiquement à la fin de la vidéo
-      const handleEnded = () => {
-        console.log("Vidéo terminée, mise en pause");
+      // Mettre en pause automatiquement à la fin de la vidéo (après 7s)
+      const timeoutId = setTimeout(() => {
+        console.log("Timeout 7s écoulé, mise en pause de la vidéo");
+        videoElement.pause();
         useBackgroundVideoStore.getState().pauseVideo();
-      };
+      }, 7000);
       
-      videoElement.addEventListener('ended', handleEnded);
-      return () => videoElement.removeEventListener('ended', handleEnded);
+      return () => clearTimeout(timeoutId);
     } else {
       console.log("Mise en pause de la vidéo de fond");
       videoElement.pause();
@@ -122,7 +122,7 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
       <video
         ref={videoRef}
-        className="w-full h-full object-cover"
+        className={`w-full h-full object-cover ${playDirection === 'reverse' ? 'video-playing-reverse' : 'video-playing-forward'}`}
         src={videoSrc}
         muted
         playsInline

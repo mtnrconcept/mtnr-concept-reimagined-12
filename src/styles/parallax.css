@@ -1,5 +1,5 @@
 
-/* Parallax 3D Effect Styles - Enhanced based on the CodePen example */
+/* Parallax 3D Effect Styles - Enhanced based on the design reference */
 .parallax-container {
   will-change: transform;
   overflow: hidden;
@@ -24,7 +24,7 @@
   transform-style: preserve-3d;
 }
 
-/* Grid patterns for depth perception - improved with yellow theme */
+/* Grid patterns for depth perception - jaune/noir theme */
 .parallax-grid-pattern {
   background-size: 35px 35px;
   background-image: 
@@ -33,7 +33,7 @@
   transform: translateZ(-50px);
 }
 
-/* Nouveau motif de grille pour plus de profondeur */
+/* Grille de fond plus grande pour impression de profondeur */
 .bg-grid-pattern {
   background-size: 80px 80px;
   background-image: 
@@ -44,13 +44,13 @@
 
 /* Radial gradient background */
 .bg-gradient-radial {
-  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%);
+  background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.5) 100%);
 }
 
-/* Animation légère de surbrillance lente */
+/* Animation subtile de luminosité */
 @keyframes pulse-yellow {
   0% { opacity: 0.2; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.5; }
   100% { opacity: 0.2; }
 }
 
@@ -65,14 +65,14 @@
   transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-/* Effet de profondeur pour les éléments */
+/* Classes de profondeur prédéfinies */
 .depth-1 { transform: translateZ(10px); }
 .depth-2 { transform: translateZ(20px); }
 .depth-3 { transform: translateZ(30px); }
 .depth-4 { transform: translateZ(40px); }
 .depth-5 { transform: translateZ(50px); }
 
-/* Animation subtile pour les éléments en mouvement */
+/* Animation de flottement pour les éléments */
 @keyframes float {
   0% { transform: translateY(0px) translateZ(20px); }
   50% { transform: translateY(-5px) translateZ(20px); }

@@ -1,7 +1,7 @@
 
 /**
- * Animations repetile - Effet de boucle infinie avec téléportation
- * Version améliorée avec barrière et piste de défilement double
+ * Animations repetile - Effet avancé avec 8 phases et interpolation fluide
+ * Version optimisée pour transition ultra-fluide
  */
 
 /* Style pour la barrière qui masque le défilement */
@@ -12,28 +12,33 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  visibility: hidden;
+  z-index: 2;
   will-change: transform;
 }
 
-/* Piste de défilement avec deux blocs identiques */
+/* Piste de défilement avec slides multiples */
 .slider-track {
-  display: flex;
-  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 200%; /* deux fois la hauteur */
+  will-change: transform, filter;
 }
 
-.slider-track .slide {
+/* Chaque slide individuel */
+.slide {
+  position: absolute;
   width: 100%;
-  height: 100%; /* chaque "slide" = 100% de la barrière */
+  height: 100%;
 }
 
 /* Contenu sortant et entrant */
 .elevator-content {
-  position: absolute;
-  inset: 0;
-  height: 100%;
+  position: relative;
+  z-index: 1;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,46 +53,39 @@
 .enter-content {
   pointer-events: auto;
   z-index: 3;
+}
+
+/* État de visibilité pour les animations */
+.barrier-visible {
+  visibility: visible;
+}
+
+.content-hidden {
   visibility: hidden;
 }
 
-/* Animation finale de slide */
-@keyframes slide-out-up {
-  to { transform: translateY(-100%); }
+/* Animation des blurs pour les phases de transition */
+@keyframes blur-transition {
+  0%   { filter: blur(2px); }
+  15%  { filter: blur(8px); }
+  30%  { filter: blur(14px); }
+  45%  { filter: blur(18px); }
+  60%  { filter: blur(18px); }
+  75%  { filter: blur(14px); }
+  90%  { filter: blur(8px); }
+  100% { filter: blur(2px); }
 }
 
-@keyframes slide-out-down {
-  to { transform: translateY(100%); }
+/* Utilitaire pour masquer l'élément sans l'enlever du flux */
+.visually-hidden {
+  visibility: hidden;
 }
 
-@keyframes slide-in-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+/* Classes pour les animations de vidéo */
+.video-playing-forward {
+  transform: scaleY(1);
 }
 
-@keyframes slide-in-down {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
-}
-
-/* Classes pour appliquer les animations finales */
-.barrier-slide-out-up {
-  animation: slide-out-up 1s ease-out forwards;
-}
-
-.barrier-slide-out-down {
-  animation: slide-out-down 1s ease-out forwards;
-}
-
-.new-slide-in-up {
-  animation: slide-in-up 1s ease-out forwards;
-}
-
-.new-slide-in-down {
-  animation: slide-in-down 1s ease-out forwards;
-}
-
-/* Visibilité du nouveau contenu pendant la transition */
-.enter-content-visible {
-  visibility: visible;
+.video-playing-reverse {
+  transform: scaleY(-1);
 }

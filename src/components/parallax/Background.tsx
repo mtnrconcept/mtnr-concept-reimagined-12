@@ -16,20 +16,18 @@ export const Background = ({ depth = 0.08 }: BackgroundProps) => {
       {/* Enhanced 3D Parallax Effect */}
       <Parallax3DEffect depth={depth}>
         <div className="absolute inset-0 pointer-events-none">
-          {/* Grille pour effet profondeur comme dans le design de référence */}
+          {/* Grille profonde pour effet comme dans le design de référence */}
           <div className="absolute inset-0 parallax-grid-pattern"></div>
           
-          {/* Éléments décoratifs avec couleurs adaptées (jaune et noir) */}
+          {/* Éléments décoratifs avec couleurs jaune/noir */}
           <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full bg-gradient-to-r from-yellow-500/10 to-transparent blur-xl"></div>
           <div className="absolute bottom-1/3 left-1/3 w-48 h-24 rounded-full bg-gradient-to-r from-yellow-500/5 to-transparent blur-lg"></div>
           
-          {/* Points lumineux avec effet 3D */}
-          <div className="absolute top-1/6 left-1/5 w-4 h-4 rounded-full bg-yellow-300/30 animate-pulse-yellow" 
-               style={{transform: 'translateZ(20px)'}}></div>
-          <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-yellow-300/20 animate-pulse-yellow"
-               style={{transform: 'translateZ(15px)'}}></div>
+          {/* Points lumineux avec effet 3D avancé */}
+          <div className="absolute top-1/6 left-1/5 w-4 h-4 rounded-full bg-yellow-300/30 animate-pulse-yellow parallax-element depth-2"></div>
+          <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-yellow-300/20 animate-pulse-yellow parallax-element depth-3"></div>
           
-          {/* Effet de ligne de grille en jaune pour plus de profondeur */}
+          {/* Grille de profondeur jaune */}
           <div className="absolute inset-0 bg-grid-pattern"></div>
           
           {/* Vignette pour accentuer l'effet 3D */}
