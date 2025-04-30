@@ -19,3 +19,5 @@ export const ParallaxContainer = ({ children }: ParallaxContainerProps) => {
     </div>
   );
 };
+
+export default ParallaxContainer;

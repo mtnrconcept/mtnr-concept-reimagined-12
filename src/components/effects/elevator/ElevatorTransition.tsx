@@ -43,3 +43,5 @@ export function ElevatorTransition({
     </div>
   );
 }
+
+export default ElevatorTransition;
