@@ -9,7 +9,7 @@ interface BackgroundProps {
 }
 
 export const Background = ({ 
-  imagePath = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png", 
+  imagePath = "/lovable-uploads/Composition 1_1.mp4", 
   useVideo = true,
   depth = 0.08 
 }: BackgroundProps) => {
