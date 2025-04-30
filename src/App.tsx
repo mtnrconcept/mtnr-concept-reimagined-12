@@ -15,7 +15,6 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
-import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
@@ -56,7 +55,6 @@ function AnimatedRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/artists" element={<Artists />} />
-          <Route path="/book" element={<Book />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

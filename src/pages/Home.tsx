@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Parallax3DScene from "@/components/Parallax3DScene";
 import HeroSection from "@/components/home/HeroSection";
@@ -43,8 +43,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden z-10">
-      {/* Enhanced 3D parallax background */}
-      <Parallax3DScene />
+      {/* Pas de fond opaque */}
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />

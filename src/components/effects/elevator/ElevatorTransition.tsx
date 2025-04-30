@@ -27,6 +27,21 @@ export default function ElevatorTransition({
     if (videoRef.current) {
       videoRef.current.load();
       console.log("Vidéo préchargée");
+      
+      // Force le préchargement complet
+      videoRef.current.preload = "auto";
+      
+      // Essayer de mettre en cache la vidéo
+      try {
+        if ('caches' in window) {
+          fetch('/lovable-uploads/ascensceur.mp4')
+            .then(response => {
+              console.log("Vidéo mise en cache");
+            });
+        }
+      } catch (e) {
+        console.error("Erreur lors de la mise en cache:", e);
+      }
     }
     
     // Nettoyage à la destruction du composant
@@ -71,25 +86,46 @@ export default function ElevatorTransition({
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       
-      // Démarrer la vidéo après 1s pour laisser le contenu commencer à sortir
+      // Démarrer la vidéo après 1.2s pour laisser le contenu commencer à sortir
       setTimeout(() => {
         if (videoRef.current) {
-          videoRef.current.play()
-            .then(() => {
-              console.log("Lecture vidéo démarrée");
-              videoRef.current?.classList.add('video-visible');
-              setAnimationState("video-playing");
-            })
-            .catch(err => {
-              console.error("Erreur de lecture vidéo:", err);
-              // Continuer la transition même en cas d'erreur vidéo
-              setAnimationState("video-playing");
-            });
+          // Force play avec promesse pour s'assurer du démarrage
+          const playPromise = videoRef.current.play();
+          
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log("Lecture vidéo démarrée");
+                videoRef.current?.classList.add('video-visible');
+                setAnimationState("video-playing");
+              })
+              .catch(err => {
+                console.error("Erreur de lecture vidéo:", err);
+                // Nouvel essai de lecture après un court délai
+                setTimeout(() => {
+                  videoRef.current?.play()
+                    .then(() => {
+                      console.log("Lecture vidéo démarrée (2ème tentative)");
+                      videoRef.current?.classList.add('video-visible');
+                      setAnimationState("video-playing");
+                    })
+                    .catch(e => {
+                      console.error("Échec de lecture vidéo après 2ème tentative:", e);
+                      // Continuer la transition même en cas d'erreur vidéo
+                      setAnimationState("video-playing");
+                    });
+                }, 500);
+              });
+          } else {
+            // Fallback pour les navigateurs qui ne supportent pas la promesse
+            videoRef.current.classList.add('video-visible');
+            setAnimationState("video-playing");
+          }
         }
-      }, 1000);
+      }, 1200);
     }
     
-    // 2. Schedule enter animation après 5s (durée totale: sortie 2.5s + vidéo centrale 2s)
+    // 2. Schedule enter animation après 5s (durée totale: sortie 2.5s + vidéo centrale 2.5s)
     enterTimerRef.current = setTimeout(() => {
       setAnimationState("entering");
       console.log("Entrée du nouveau contenu");
@@ -98,13 +134,19 @@ export default function ElevatorTransition({
       if (videoRef.current) {
         videoRef.current.classList.remove('video-visible');
       }
-    }, 4500);
+    }, 5000);
     
     // 3. Schedule animation complete après 8s total (plus de temps pour permettre la transition complète)
     completeTimerRef.current = setTimeout(() => {
       setAnimationState("idle");
       onAnimationComplete();
       console.log("Transition complète");
+      
+      // Arrêter la vidéo complètement
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
     }, 8000);
   };
 
