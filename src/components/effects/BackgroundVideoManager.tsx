@@ -1,74 +1,111 @@
 
 import { create } from 'zustand';
 import { useEffect, useRef } from 'react';
+import { useTorch } from './TorchContext';
+import { useUVMode } from './UVModeContext';
 
-// Define the store for managing video state
-export interface VideoStore {
-  activeMode: 'normal' | 'uv';
-  isPlaying: boolean;
-  play: () => void;
-  pause: () => void;
+// Type d'état du magasin pour les vidéos
+type VideoState = {
+  play: (() => void) | null;
+  pause: (() => void) | null;
   setMode: (mode: 'normal' | 'uv') => void;
-}
+  currentMode: 'normal' | 'uv';
+};
 
-// Create the store with initial state and actions
-export const useVideoStore = create<VideoStore>((set) => ({
-  activeMode: 'normal',
-  isPlaying: false,
-  play: () => set({ isPlaying: true }),
-  pause: () => set({ isPlaying: false }),
-  setMode: (mode) => set({ activeMode: mode }),
+// Création du magasin Zustand pour la gestion des vidéos
+export const useVideoStore = create<VideoState>((set) => ({
+  play: null,
+  pause: null,
+  setMode: (mode) => set({ currentMode: mode }),
+  currentMode: 'normal',
 }));
 
-// Component for managing the background videos
 export const BackgroundVideoManager = () => {
+  // Références aux éléments vidéos
   const normalVideoRef = useRef<HTMLVideoElement>(null);
   const uvVideoRef = useRef<HTMLVideoElement>(null);
   
-  const { activeMode, isPlaying } = useVideoStore();
-  const store = useVideoStore();
+  // Récupération du context de la torche et du mode UV
+  const { isTorchActive } = useTorch();
+  const { uvMode } = useUVMode();
+  
+  // Récupération du magasin vidéo
+  const videoStore = useVideoStore();
 
+  // Initialiser les méthodes de contrôle vidéo
   useEffect(() => {
-    // Control video playback based on isPlaying state
-    if (isPlaying) {
-      const activeVideoRef = activeMode === 'normal' ? normalVideoRef : uvVideoRef;
-      if (activeVideoRef.current) {
-        activeVideoRef.current.play().catch(error => {
-          console.error('Error playing video:', error);
-        });
+    // Définir les fonctions de contrôle dans le store
+    useVideoStore.setState({
+      play: () => {
+        const videoToPlay = uvMode ? uvVideoRef.current : normalVideoRef.current;
+        if (videoToPlay) {
+          console.log(`Lecture vidéo ${uvMode ? 'UV' : 'normale'}`);
+          videoToPlay.currentTime = 0; // Réinitialiser la position
+          videoToPlay.play().catch(e => console.error('Erreur de lecture vidéo:', e));
+        }
+      },
+      pause: () => {
+        // Mettre en pause les deux vidéos
+        if (normalVideoRef.current) normalVideoRef.current.pause();
+        if (uvVideoRef.current) uvVideoRef.current.pause();
+      },
+      setMode: (mode) => {
+        useVideoStore.setState({ currentMode: mode });
       }
-    } else {
-      // Pause both videos
-      if (normalVideoRef.current) normalVideoRef.current.pause();
-      if (uvVideoRef.current) uvVideoRef.current.pause();
-    }
-  }, [isPlaying, activeMode]);
+    });
+    
+    // Nettoyage au démontage
+    return () => {
+      useVideoStore.setState({ play: null, pause: null });
+    };
+  }, [uvMode]);
 
-  // Handle video ended event
+  // Gestion du changement de mode (Normal/UV)
+  useEffect(() => {
+    // Mettre à jour le mode dans le store
+    videoStore.setMode(uvMode ? 'uv' : 'normal');
+    
+    // Afficher/masquer la vidéo appropriée
+    if (normalVideoRef.current) {
+      normalVideoRef.current.style.opacity = uvMode ? '0' : '1';
+    }
+    if (uvVideoRef.current) {
+      uvVideoRef.current.style.opacity = uvMode ? '1' : '0';
+    }
+  }, [uvMode, videoStore]);
+
+  // Gestion de la fin de lecture (onEnded)
   const handleVideoEnded = () => {
-    store.pause();
+    console.log('Vidéo terminée');
+    if (videoStore.pause) {
+      videoStore.pause();
+    }
   };
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      {/* Normal Mode Video */}
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Vidéo mode normal */}
       <video
         ref={normalVideoRef}
-        src="/lovable-uploads/Video fond normale.mp4"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${activeMode === 'normal' ? 'opacity-100' : 'opacity-0'}`}
-        muted
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+        preload="auto"
         playsInline
+        muted
+        src="/lovable-uploads/Video fond normale.mp4"
         onEnded={handleVideoEnded}
+        style={{ opacity: uvMode ? 0 : 1 }}
       />
       
-      {/* UV Mode Video */}
+      {/* Vidéo mode UV */}
       <video
         ref={uvVideoRef}
-        src="/lovable-uploads/Video fond UV.mp4"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${activeMode === 'uv' ? 'opacity-100' : 'opacity-0'}`}
-        muted
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+        preload="auto"
         playsInline
+        muted
+        src="/lovable-uploads/Video fond UV.mp4"
         onEnded={handleVideoEnded}
+        style={{ opacity: uvMode ? 1 : 0 }}
       />
     </div>
   );

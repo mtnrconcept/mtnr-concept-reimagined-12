@@ -1,28 +1,82 @@
 
-/* UV-specific styling */
-.uv-text {
+/* Effets spéciaux pour le mode UV (lumière noire) */
+
+/* Texte UV - invisible normalement, visible en mode UV */
+.uv-hidden-text {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.uv-mode .uv-hidden-text {
+  opacity: 1;
+}
+
+/* Bordures fluorescentes en mode UV */
+.uv-border {
+  position: relative;
+  z-index: 1;
+}
+
+.uv-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  z-index: -1;
+}
+
+.uv-mode .uv-border::before {
+  opacity: 1;
+  border-color: #c026d3;
+  box-shadow: 0 0 15px #c026d3;
+}
+
+/* Éléments qui brillent en mode UV */
+.uv-glow {
   position: relative;
 }
 
-.uv-text .visible-text {
-  transition: color 0.3s ease;
-}
-
-.uv-text .hidden-text {
+.uv-glow::after {
+  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  background: radial-gradient(circle, rgba(192, 38, 211, 0.3), transparent 70%);
   opacity: 0;
-  visibility: hidden;
+  transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
-/* When UV mode is active, we can style UV elements specifically */
-body.uv-mode-active .uv-text .visible-text {
-  color: transparent;
+.uv-mode .uv-glow::after {
+  opacity: 1;
 }
 
-body.uv-mode-active .uv-text .hidden-text {
-  opacity: 1;
-  visibility: visible;
+/* Couleurs fluorescentes pour le texte en mode UV */
+.uv-mode .uv-text-yellow {
+  color: #facc15 !important;
+  text-shadow: 0 0 5px #facc15;
+}
+
+.uv-mode .uv-text-purple {
+  color: #a855f7 !important;
+  text-shadow: 0 0 5px #a855f7;
+}
+
+.uv-mode .uv-text-pink {
+  color: #ec4899 !important;
+  text-shadow: 0 0 5px #ec4899;
+}
+
+/* Effet de pulsation en mode UV */
+@keyframes uv-pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.uv-mode .uv-pulse {
+  animation: uv-pulse 2s infinite ease-in-out;
 }

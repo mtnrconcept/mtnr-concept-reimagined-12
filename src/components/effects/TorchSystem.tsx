@@ -1,122 +1,103 @@
 
-import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
-import { Flashlight } from 'lucide-react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { TorchToggle } from './TorchToggle';
 import { useVideoStore } from './BackgroundVideoManager';
 
-// Define the torch context type
-type TorchContextType = {
-  isActive: boolean;
-  mode: 'normal' | 'uv';
-  toggleTorch: () => void;
-  toggleMode: () => void;
-  position: { x: number, y: number };
+// Contexte de la torche
+interface TorchContextType {
+  isTorchActive: boolean;
+  setIsTorchActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const TorchContext = createContext<TorchContextType | undefined>(undefined);
+
+// Hook personnalisé pour utiliser le contexte de la torche
+export const useTorch = (): TorchContextType => {
+  const context = useContext(TorchContext);
+  if (!context) {
+    throw new Error('useTorch doit être utilisé dans un TorchProvider');
+  }
+  return context;
 };
 
-// Create context with default values
-const TorchContext = createContext<TorchContextType>({
-  isActive: false,
-  mode: 'normal',
-  toggleTorch: () => {},
-  toggleMode: () => {},
-  position: { x: 0, y: 0 },
-});
+// Provider pour le contexte de la torche
+interface TorchProviderProps {
+  children: React.ReactNode;
+}
 
-// Hook to use the torch context
-export const useTorch = () => useContext(TorchContext);
-
-// Provider component
-export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState<'normal' | 'uv'>('normal');
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  
-  // Access the video store to control background videos
+export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
+  const [isTorchActive, setIsTorchActive] = useState<boolean>(false);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const videoStore = useVideoStore();
 
-  // Toggle torch on/off
-  const toggleTorch = () => setIsActive(prev => !prev);
-
-  // Toggle between normal and UV modes
-  const toggleMode = () => {
-    const newMode = mode === 'normal' ? 'uv' : 'normal';
-    setMode(newMode);
-    // Update video mode using the setMode function
-    videoStore.setMode(newMode);
-  };
-
-  // Track mouse movement
+  // Effet pour suivre la position de la souris
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isActive) {
-        setPosition({ x: e.clientX, y: e.clientY });
-      }
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isActive]);
-
-  // Update body class based on active mode
-  useEffect(() => {
-    if (mode === 'uv') {
-      document.body.classList.add('uv-mode-active');
+    if (isTorchActive) {
+      window.addEventListener('mousemove', handleMouseMove);
+      document.documentElement.classList.add('torch-active');
+      
+      // Si en mode UV, jouer la vidéo UV
+      if (videoStore.currentMode === 'uv' && videoStore.play) {
+        videoStore.play();
+      }
     } else {
-      document.body.classList.remove('uv-mode-active');
+      document.documentElement.classList.remove('torch-active');
+      document.documentElement.classList.remove('uv-mode');
     }
-  }, [mode]);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isTorchActive, videoStore]);
+
+  // Applique l'effet de torche avec la position de la souris
+  useEffect(() => {
+    if (isTorchActive) {
+      document.documentElement.style.setProperty('--torch-x', `${mousePos.x}px`);
+      document.documentElement.style.setProperty('--torch-y', `${mousePos.y}px`);
+    }
+  }, [mousePos, isTorchActive]);
 
   return (
-    <TorchContext.Provider value={{ isActive, mode, toggleTorch, toggleMode, position }}>
+    <TorchContext.Provider value={{ isTorchActive, setIsTorchActive }}>
       {children}
+      
+      {/* Masque de la torche */}
+      {isTorchActive && (
+        <div 
+          className="fixed inset-0 pointer-events-none z-40 torch-mask" 
+          style={{
+            background: `radial-gradient(circle 300px at var(--torch-x, 50%) var(--torch-y, 50%), 
+              transparent, rgba(0, 0, 0, 0.85))`,
+          }}
+        />
+      )}
     </TorchContext.Provider>
   );
 };
 
-// The torch effect overlay component
-export const TorchEffect: React.FC = () => {
-  const { isActive, mode, position } = useTorch();
-  
-  if (!isActive) return null;
-  
-  const torchRadius = 300; // px
-  
-  return (
-    <div className={`torch-effect ${mode}`}>
-      <div 
-        className="torch-mask"
-        style={{
-          background: mode === 'normal' 
-            ? `radial-gradient(circle ${torchRadius}px at ${position.x}px ${position.y}px, transparent 0%, rgba(0, 0, 0, 0.75) 100%)`
-            : `radial-gradient(circle ${torchRadius}px at ${position.x}px ${position.y}px, transparent 0%, rgba(0, 0, 0, 0.95) 100%)`
-        }}
-      />
-    </div>
-  );
+// Contexte pour le mode UV
+interface UVContextType {
+  uvMode: boolean;
+  toggleUVMode: () => void;
+}
+
+const UVContext = createContext<UVContextType | undefined>(undefined);
+
+// Hook personnalisé pour utiliser le contexte UV
+export const useUV = (): UVContextType => {
+  const context = useContext(UVContext);
+  if (!context) {
+    throw new Error('useUV doit être utilisé dans un UVProvider');
+  }
+  return context;
 };
 
-// Control buttons for the torch
-export const TorchControls: React.FC = () => {
-  const { isActive, mode, toggleTorch, toggleMode } = useTorch();
-  
-  return (
-    <div className="torch-buttons">
-      <button 
-        className={`torch-button torch-button-normal ${isActive && mode === 'normal' ? 'active' : ''}`}
-        onClick={toggleTorch}
-        title="Toggle Torch"
-      >
-        <Flashlight size={20} />
-      </button>
-      
-      {isActive && (
-        <button 
-          className={`torch-button torch-button-uv ${mode === 'uv' ? 'active' : ''}`}
-          onClick={toggleMode}
-          title="Toggle UV Mode"
-        >
-          <Flashlight size={20} />
-        </button>
-      )}
-    </div>
-  );
+// Composant de contrôle de la torche
+export const TorchControls = () => {
+  return <TorchToggle />;
 };
