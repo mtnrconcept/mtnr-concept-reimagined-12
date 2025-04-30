@@ -18,10 +18,25 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const { uvMode } = useUVMode();
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Détermine quelle vidéo utiliser en fonction du mode UV
   const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
   
+  // Gestion du changement de vidéo lorsque le mode UV change
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    // Recharger la vidéo quand le mode UV change
+    videoElement.load();
+    videoElement.pause();
+    videoElement.currentTime = 0;
+    
+    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${currentVideoUrl}`);
+  }, [uvMode, currentVideoUrl]);
+  
+  // Gestion de la lecture/pause de la vidéo
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
@@ -33,14 +48,27 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       setIsFirstLoad(false);
       console.log('Vidéo initialisée en pause');
     } else {
-      // Lors des changements de route, jouer la vidéo
+      // Lors des changements de route, jouer la vidéo pendant quelques secondes
       const playVideo = async () => {
         try {
+          setIsTransitioning(true);
           videoElement.playbackRate = 1.0; // Vitesse réelle
           await videoElement.play();
           console.log('Vidéo lancée au changement de route');
+          
+          // Arrêter la vidéo après la durée de transition (3s fade out + 2s pause + 3s fade in = 8s)
+          const transitionTimer = setTimeout(() => {
+            if (videoElement) {
+              videoElement.pause();
+              setIsTransitioning(false);
+              console.log('Vidéo mise en pause après la transition');
+            }
+          }, 8000);
+          
+          return () => clearTimeout(transitionTimer);
         } catch (error) {
           console.error('Erreur lors de la lecture de la vidéo:', error);
+          setIsTransitioning(false);
         }
       };
       
@@ -51,7 +79,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const handleVisibilityChange = () => {
       if (document.hidden && videoElement) {
         videoElement.pause();
-      } else if (videoElement && !isFirstLoad) {
+      } else if (videoElement && !isFirstLoad && isTransitioning) {
+        // Ne relancer la lecture que si on est en transition
         videoElement.play();
       }
     };
@@ -62,7 +91,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (videoElement) videoElement.pause();
     };
-  }, [location.pathname, currentVideoUrl, isFirstLoad]);
+  }, [location.pathname, isFirstLoad, isTransitioning]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
@@ -73,7 +102,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         poster={fallbackImage}
         playsInline
         muted
-        loop
+        // Suppression de l'attribut "loop" pour empêcher la lecture en boucle
       >
         <source src={currentVideoUrl} type="video/mp4" />
       </video>
