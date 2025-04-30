@@ -50,7 +50,7 @@ function AnimatedRoutes() {
   return (
     <>
       <PageTransitionEffect />
-      <BackgroundVideoController videoSrc="/lovable-uploads/ascensceur.mp4" />
+      <BackgroundVideoController videoSrc="/lovable-uploads/Video fond normale.mp4" />
       <PageTransition keyId={location.pathname}>
         <Routes location={location}>
           <Route path="/" element={<Home />} />
