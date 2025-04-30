@@ -1,5 +1,8 @@
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import { VideoRefProvider, useVideoRef } from './VideoRefContext';
+import { TransitionListenerProvider, useTransitionListener } from './TransitionListenerContext';
+import { TransitionStateProvider, useTransitionState } from './TransitionStateContext';
 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
@@ -12,42 +15,23 @@ interface NavigationContextType {
 
 const NavigationContext = createContext<NavigationContextType | null>(null);
 
-export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const listenersRef = useRef<(() => void)[]>([]);
-  const transitionTimeoutRef = useRef<number | null>(null);
-  const transitionInProgressRef = useRef<boolean>(false);
-  const lastTransitionTimeRef = useRef<number>(0);
-  const normalVideoRef = useRef<HTMLVideoElement>(null);
-  const uvVideoRef = useRef<HTMLVideoElement>(null);
-
-  const registerVideoRef = useCallback((ref: React.RefObject<HTMLVideoElement>, isUVVideo = false) => {
-    if (isUVVideo) {
-      if (ref.current) uvVideoRef.current = ref.current;
-    } else {
-      if (ref.current) normalVideoRef.current = ref.current;
-    }
-    console.log(`Référence vidéo ${isUVVideo ? 'UV' : 'normale'} enregistrée`);
-  }, []);
-
+// Internal component to access all providers
+const NavigationContextInner: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { registerVideoRef, normalVideoRef, uvVideoRef } = useVideoRef();
+  const { registerVideoTransitionListener, notifyTransitionListeners } = useTransitionListener();
+  const { isTransitioning, setTransitionState, transitionInProgress, lastTransitionTime } = useTransitionState();
+  
   const triggerVideoTransition = useCallback(async () => {
     const now = Date.now();
     
     // Éviter les déclenchements trop fréquents (minimum 2 secondes entre transitions)
-    if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < 2000)) {
+    if (transitionInProgress || (now - lastTransitionTime < 2000)) {
       console.log("Transition déjà en cours ou trop récente, ignorée");
       return;
     }
     
     console.log("➡️ Déclenchement transition vidéo");
-    transitionInProgressRef.current = true;
-    lastTransitionTimeRef.current = now;
-    setIsTransitioning(true);
-    
-    // Nettoyer tout timeout existant
-    if (transitionTimeoutRef.current !== null) {
-      window.clearTimeout(transitionTimeoutRef.current);
-    }
+    setTransitionState(true);
     
     // Contrôle direct de la vidéo - méthode plus fiable
     try {
@@ -90,35 +74,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       console.error("Erreur générale lors de la tentative de lecture:", outerError);
     }
     
-    // Notifier tous les écouteurs en parallèle
-    Promise.all(listenersRef.current.map(async (listener) => {
-      try {
-        await Promise.resolve(listener());
-      } catch (error) {
-        console.error('Erreur dans l\'écouteur de transition:', error);
-      }
-    })).then(() => {
-      console.log("Tous les écouteurs de transition ont été appelés");
-    });
-    
-    // Réinitialiser l'état de transition après la durée complète de la vidéo
-    transitionTimeoutRef.current = window.setTimeout(() => {
-      setIsTransitioning(false);
-      transitionInProgressRef.current = false;
-      console.log("✅ État de transition réinitialisé");
-    }, 3000); // Légèrement plus long que la vidéo
-  }, []);
-
-  const registerVideoTransitionListener = useCallback((callback: () => void) => {
-    listenersRef.current.push(callback);
-    console.log("📝 Nouvel écouteur de transition vidéo enregistré");
-    
-    // Fonction de désinscription
-    return () => {
-      listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
-      console.log("🗑️ Écouteur de transition vidéo désenregistré");
-    };
-  }, []);
+    // Notifier tous les écouteurs
+    await notifyTransitionListeners();
+  }, [normalVideoRef, notifyTransitionListeners, lastTransitionTime, transitionInProgress, setTransitionState]);
 
   return (
     <NavigationContext.Provider 
@@ -133,6 +91,18 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     >
       {children}
     </NavigationContext.Provider>
+  );
+};
+
+export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <VideoRefProvider>
+      <TransitionListenerProvider>
+        <TransitionStateProvider>
+          <NavigationContextInner>{children}</NavigationContextInner>
+        </TransitionStateProvider>
+      </TransitionListenerProvider>
+    </VideoRefProvider>
   );
 };
 
