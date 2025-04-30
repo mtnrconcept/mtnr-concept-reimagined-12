@@ -24,4 +24,6 @@ export interface UseElevatorTransitionReturn {
   contentEntranceDelay: number;
   isTransitioning: boolean;
   animationPhase: AnimationPhase;
+  loopCount: number;
+  maxLoops: number;
 }

@@ -1,16 +1,18 @@
 
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn, AnimationPhase } from './ElevatorTypes';
 
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
 // Configuration des timings (en millisecondes)
-const LOOP_ANIMATION_DURATION = 6000; // 6 secondes pour la boucle d'animation
+const LOOP_DURATION_BASE = 2400; // 2.4s pour la première boucle
+const LOOP_DURATION_DECREMENT = 400; // Diminution du temps par boucle
+const LOOP_MIN_DURATION = 1000; // Durée minimale d'une boucle (1s)
 const SLIDE_ANIMATION_DURATION = 1000; // 1 seconde pour l'animation finale de slide
-const TOTAL_ANIMATION_DURATION = LOOP_ANIMATION_DURATION + SLIDE_ANIMATION_DURATION; // 7 secondes au total
 const CONTENT_ENTRANCE_DELAY = 0; // Démarrage immédiat de l'animation d'entrée
+const MAX_LOOPS = 5; // Nombre maximum de boucles avant la transition finale
 
 export function useElevatorTransition({
   isActive,
@@ -19,14 +21,16 @@ export function useElevatorTransition({
   currentPath
 }: UseElevatorTransitionProps): UseElevatorTransitionReturn {
   const location = useLocation();
-  const navigate = useNavigate();
   const [direction, setDirection] = useState<TransitionDirection>(null);
   const [exitContent, setExitContent] = useState<React.ReactNode | null>(null);
   const [enterContent, setEnterContent] = useState<React.ReactNode | null>(null);
-  const [targetPath, setTargetPath] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [prevPath, setPrevPath] = useState(location.pathname);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(null);
+  const [loopCount, setLoopCount] = useState(0);
+  const [maxLoops, setMaxLoops] = useState(MAX_LOOPS);
+  const loopIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const totalTransitionTimeRef = useRef(0);
   
   // Determine content entrance delay
   const contentEntranceDelay = CONTENT_ENTRANCE_DELAY;
@@ -35,8 +39,10 @@ export function useElevatorTransition({
   useEffect(() => {
     // Si l'état isActive change de false à true, c'est une transition
     if (isActive && !isTransitioning) {
+      console.log("Démarrage de la transition avec boucles progressives");
       setIsTransitioning(true);
       setAnimationPhase('loop');
+      setLoopCount(0);
       
       // Déterminer la direction en fonction de l'ordre des pages
       const currentIndex = pageOrder.indexOf(prevPath);
@@ -57,71 +63,126 @@ export function useElevatorTransition({
       setExitContent(currentPath);
       
       // Mettre à jour le contenu d'entrée (le même que le contenu actuel pour l'instant)
-      // Sera mis à jour après la navigation
       setEnterContent(currentPath);
       
-      // Enregistrer le chemin cible pour plus tard
-      setTargetPath(location.pathname);
+      // Enregistrer le chemin actuel
       setPrevPath(location.pathname);
 
-      // Planifier le changement de phase d'animation après la durée de l'animation de boucle
-      setTimeout(() => {
-        setAnimationPhase('slide');
-      }, LOOP_ANIMATION_DURATION);
+      // Planifier les boucles d'intensité croissante
+      startProgressiveLoops();
     }
     
     // Si isActive devient false, réinitialiser
     if (!isActive && isTransitioning) {
-      setIsTransitioning(false);
-      setExitContent(null);
-      setEnterContent(null);
-      setDirection(null);
-      setTargetPath(null);
-      setAnimationPhase(null);
+      cleanupTransition();
     }
   }, [isActive, location.pathname, currentPath, isTransitioning, prevPath]);
   
-  // Gestion de la lecture vidéo
-  useEffect(() => {
-    if (!isTransitioning || !videoRef.current) return;
-    
-    const video = videoRef.current;
-    
-    // Configuration de la vidéo en fonction de la direction
-    if (direction === 'down') {
-      // Pour descendre, on joue la vidéo normalement depuis le début
-      video.currentTime = 0;
-      video.playbackRate = 1;
-    } else if (direction === 'up') {
-      // Pour monter, on inverse la lecture
-      // Note: Certains navigateurs ne supportent pas les playbackRate négatifs
-      // Donc on utilise l'effet CSS pour inverser la vidéo verticalement
-      video.currentTime = 0;
-      video.playbackRate = 1;
+  // Fonction pour démarrer les boucles progressives
+  const startProgressiveLoops = () => {
+    // Arrêter toute boucle en cours
+    if (loopIntervalRef.current) {
+      clearInterval(loopIntervalRef.current);
     }
     
-    // Démarrer la lecture
-    const playPromise = video.play();
+    totalTransitionTimeRef.current = 0;
+    let currentLoopCount = 0;
     
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.error('Erreur de lecture vidéo:', error);
-      });
+    // Mettre la vidéo en pause au début
+    if (videoRef.current) {
+      videoRef.current.pause();
     }
     
-    // Arrêter la vidéo et terminer l'animation après la durée totale
-    const timeoutId = setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
+    // Configurer une boucle pour incrémenter l'intensité
+    loopIntervalRef.current = setInterval(() => {
+      // Incrémenter le compteur de boucles
+      currentLoopCount++;
+      setLoopCount(currentLoopCount);
       
-      // Signaler que l'animation est terminée
-      onAnimationComplete();
-      setIsTransitioning(false);
-    }, TOTAL_ANIMATION_DURATION);
+      // Calculer la durée de cette boucle
+      const loopDuration = Math.max(
+        LOOP_DURATION_BASE - (currentLoopCount * LOOP_DURATION_DECREMENT),
+        LOOP_MIN_DURATION
+      );
+      
+      // Ajouter à la durée totale de transition
+      totalTransitionTimeRef.current += loopDuration;
+      
+      console.log(`Boucle ${currentLoopCount}/${MAX_LOOPS}, durée: ${loopDuration}ms`);
+      
+      // Si on atteint le nombre maximal de boucles, passer à la phase de slide
+      if (currentLoopCount >= MAX_LOOPS) {
+        if (loopIntervalRef.current) {
+          clearInterval(loopIntervalRef.current);
+          loopIntervalRef.current = null;
+        }
+        
+        // Passer à la phase de slide après la dernière boucle
+        console.log("Phase de boucle terminée, passage à la phase de slide");
+        setAnimationPhase('slide');
+        
+        // Démarrer la vidéo pour la transition finale
+        if (videoRef.current) {
+          // Configuration de la vidéo en fonction de la direction
+          if (direction === 'down') {
+            // Pour descendre, on joue la vidéo normalement depuis le début
+            videoRef.current.currentTime = 0;
+            videoRef.current.playbackRate = 1;
+          } else if (direction === 'up') {
+            // Pour monter, on inverse la lecture (via transformation CSS)
+            videoRef.current.currentTime = 0;
+            videoRef.current.playbackRate = 1;
+          }
+          
+          // Démarrer la lecture
+          const playPromise = videoRef.current.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error('Erreur de lecture vidéo:', error);
+            });
+          }
+        }
+        
+        // Terminer la transition après la durée de l'animation de slide
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.pause();
+          }
+          
+          // Signaler que l'animation est terminée
+          onAnimationComplete();
+          cleanupTransition();
+        }, SLIDE_ANIMATION_DURATION);
+      }
+    }, LOOP_DURATION_BASE); // Première boucle à la durée de base
+  };
+  
+  // Nettoyer la transition
+  const cleanupTransition = () => {
+    // Arrêter les boucles
+    if (loopIntervalRef.current) {
+      clearInterval(loopIntervalRef.current);
+      loopIntervalRef.current = null;
+    }
     
-    return () => clearTimeout(timeoutId);
-  }, [isTransitioning, direction, onAnimationComplete, videoRef]);
+    // Réinitialiser les états
+    setIsTransitioning(false);
+    setExitContent(null);
+    setEnterContent(null);
+    setDirection(null);
+    setAnimationPhase(null);
+    setLoopCount(0);
+  };
+  
+  // Nettoyage lors du démontage du composant
+  useEffect(() => {
+    return () => {
+      if (loopIntervalRef.current) {
+        clearInterval(loopIntervalRef.current);
+      }
+    };
+  }, []);
 
   return {
     direction,
@@ -129,6 +190,8 @@ export function useElevatorTransition({
     enterContent,
     contentEntranceDelay,
     isTransitioning,
-    animationPhase
+    animationPhase,
+    loopCount,
+    maxLoops
   };
 }

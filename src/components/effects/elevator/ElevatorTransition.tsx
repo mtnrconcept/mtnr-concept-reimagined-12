@@ -13,7 +13,9 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     enterContent, 
     contentEntranceDelay,
     isTransitioning,
-    animationPhase
+    animationPhase,
+    loopCount,
+    maxLoops
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
@@ -25,6 +27,12 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   if (!isTransitioning) {
     return <>{children}</>;
   }
+
+  // Déterminer la classe de loop en fonction du nombre de loops actuel
+  const getLoopClass = () => {
+    const intensityLevel = Math.min(loopCount + 1, 5); // 5 niveaux maximum d'intensité
+    return direction === 'down' ? `loop-down-${intensityLevel}` : `loop-up-${intensityLevel}`;
+  };
 
   return (
     <div className="elevator-container" ref={containerRef}>
@@ -44,7 +52,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
         <div
           className={`elevator-content exit-content ${
             animationPhase === 'loop' 
-              ? (direction === 'down' ? 'loop-up' : 'loop-down')
+              ? getLoopClass()
               : (direction === 'down' ? 'slide-out-up' : 'slide-out-down')
           }`}
         >
@@ -57,7 +65,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
         <div
           className={`elevator-content enter-content ${
             animationPhase === 'loop' 
-              ? (direction === 'down' ? 'loop-up' : 'loop-down')
+              ? getLoopClass()
               : (direction === 'down' ? 'slide-in-up' : 'slide-in-down')
           }`}
           style={{

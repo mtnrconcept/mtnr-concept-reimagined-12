@@ -47,8 +47,16 @@
   transform: scaleY(-1);
 }
 
-/* Animation de la boucle de flou de mouvement */
-@keyframes blurLoopUp {
+/* Animation de la boucle de flou de mouvement avec 5 niveaux d'intensité */
+@keyframes blurLoopUp-1 {
+  0%   { transform: translateY(0);    filter: blur(0px); }
+  25%  { filter: blur(3px); }
+  50%  { transform: translateY(-100%); filter: blur(5px); }
+  75%  { filter: blur(3px); }
+  100% { transform: translateY(0);     filter: blur(0px); }
+}
+
+@keyframes blurLoopUp-2 {
   0%   { transform: translateY(0);    filter: blur(0px); }
   25%  { filter: blur(5px); }
   50%  { transform: translateY(-100%); filter: blur(10px); }
@@ -56,7 +64,39 @@
   100% { transform: translateY(0);     filter: blur(0px); }
 }
 
-@keyframes blurLoopDown {
+@keyframes blurLoopUp-3 {
+  0%   { transform: translateY(0);    filter: blur(0px); }
+  25%  { filter: blur(8px); }
+  50%  { transform: translateY(-100%); filter: blur(15px); }
+  75%  { filter: blur(8px); }
+  100% { transform: translateY(0);     filter: blur(0px); }
+}
+
+@keyframes blurLoopUp-4 {
+  0%   { transform: translateY(0);    filter: blur(0px); }
+  25%  { filter: blur(12px); }
+  50%  { transform: translateY(-100%); filter: blur(20px); }
+  75%  { filter: blur(12px); }
+  100% { transform: translateY(0);     filter: blur(0px); }
+}
+
+@keyframes blurLoopUp-5 {
+  0%   { transform: translateY(0);    filter: blur(0px); }
+  25%  { filter: blur(15px); }
+  50%  { transform: translateY(-100%); filter: blur(25px); }
+  75%  { filter: blur(15px); }
+  100% { transform: translateY(0);     filter: blur(0px); }
+}
+
+@keyframes blurLoopDown-1 {
+  0%   { transform: translateY(0);     filter: blur(0px); }
+  25%  { filter: blur(3px); }
+  50%  { transform: translateY(100%);   filter: blur(5px); }
+  75%  { filter: blur(3px); }
+  100% { transform: translateY(0);      filter: blur(0px); }
+}
+
+@keyframes blurLoopDown-2 {
   0%   { transform: translateY(0);     filter: blur(0px); }
   25%  { filter: blur(5px); }
   50%  { transform: translateY(100%);   filter: blur(10px); }
@@ -64,33 +104,94 @@
   100% { transform: translateY(0);      filter: blur(0px); }
 }
 
-.loop-up {
-  animation: blurLoopUp 6s ease-in-out infinite;
+@keyframes blurLoopDown-3 {
+  0%   { transform: translateY(0);     filter: blur(0px); }
+  25%  { filter: blur(8px); }
+  50%  { transform: translateY(100%);   filter: blur(15px); }
+  75%  { filter: blur(8px); }
+  100% { transform: translateY(0);      filter: blur(0px); }
 }
 
-.loop-down {
-  animation: blurLoopDown 6s ease-in-out infinite;
+@keyframes blurLoopDown-4 {
+  0%   { transform: translateY(0);     filter: blur(0px); }
+  25%  { filter: blur(12px); }
+  50%  { transform: translateY(100%);   filter: blur(20px); }
+  75%  { filter: blur(12px); }
+  100% { transform: translateY(0);      filter: blur(0px); }
+}
+
+@keyframes blurLoopDown-5 {
+  0%   { transform: translateY(0);     filter: blur(0px); }
+  25%  { filter: blur(15px); }
+  50%  { transform: translateY(100%);   filter: blur(25px); }
+  75%  { filter: blur(15px); }
+  100% { transform: translateY(0);      filter: blur(0px); }
+}
+
+/* Classes pour les différentes intensités de loop */
+.loop-up-1 {
+  animation: blurLoopUp-1 2.4s ease-in-out infinite;
+}
+
+.loop-up-2 {
+  animation: blurLoopUp-2 2.0s ease-in-out infinite;
+}
+
+.loop-up-3 {
+  animation: blurLoopUp-3 1.6s ease-in-out infinite;
+}
+
+.loop-up-4 {
+  animation: blurLoopUp-4 1.2s ease-in-out infinite;
+}
+
+.loop-up-5 {
+  animation: blurLoopUp-5 1.0s ease-in-out infinite;
+}
+
+.loop-down-1 {
+  animation: blurLoopDown-1 2.4s ease-in-out infinite;
+}
+
+.loop-down-2 {
+  animation: blurLoopDown-2 2.0s ease-in-out infinite;
+}
+
+.loop-down-3 {
+  animation: blurLoopDown-3 1.6s ease-in-out infinite;
+}
+
+.loop-down-4 {
+  animation: blurLoopDown-4 1.2s ease-in-out infinite;
+}
+
+.loop-down-5 {
+  animation: blurLoopDown-5 1.0s ease-in-out infinite;
 }
 
 /* Animations pour les transitions verticales finales */
 @keyframes slideOutUp {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-100vh); opacity: 0; }
+  0% { transform: translateY(0); opacity: 1; filter: blur(0px); }
+  60% { opacity: 0.5; filter: blur(8px); }
+  100% { transform: translateY(-100vh); opacity: 0; filter: blur(15px); }
 }
 
 @keyframes slideOutDown {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
+  0% { transform: translateY(0); opacity: 1; filter: blur(0px); }
+  60% { opacity: 0.5; filter: blur(8px); }
+  100% { transform: translateY(100vh); opacity: 0; filter: blur(15px); }
 }
 
 @keyframes slideInUp {
-  0% { transform: translateY(100vh); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { transform: translateY(100vh); opacity: 0; filter: blur(15px); }
+  60% { opacity: 0.7; filter: blur(5px); }
+  100% { transform: translateY(0); opacity: 1; filter: blur(0px); }
 }
 
 @keyframes slideInDown {
-  0% { transform: translateY(-100vh); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { transform: translateY(-100vh); opacity: 0; filter: blur(15px); }
+  60% { opacity: 0.7; filter: blur(5px); }
+  100% { transform: translateY(0); opacity: 1; filter: blur(0px); }
 }
 
 .slide-out-up {

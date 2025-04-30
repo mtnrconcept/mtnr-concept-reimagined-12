@@ -16,22 +16,31 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ videoSrc }) => {
       // Fonction pour mettre en pause la vidéo à la fin
       const handleEnded = () => {
         console.log("Vidéo terminée, pause maintenue");
-        // Ne rien faire, la vidéo reste sur la dernière image
+        // La vidéo reste sur la dernière image
       };
       
       // Fonction pour marquer le chargement
       const handleLoaded = () => {
         setIsLoaded(true);
         console.log("Vidéo de fond chargée");
+        
+        // Précharger la vidéo en la lisant puis en la mettant en pause
+        // pour s'assurer qu'elle est prête pour les transitions
+        videoElement.play()
+          .then(() => {
+            // Attendre une fraction de seconde pour que la vidéo se charge vraiment
+            setTimeout(() => {
+              videoElement.pause();
+              console.log("Vidéo mise en pause après préchargement");
+            }, 100);
+          })
+          .catch(err => {
+            console.error("Erreur de préchargement vidéo:", err);
+          });
       };
       
       videoElement.addEventListener('ended', handleEnded);
       videoElement.addEventListener('loadeddata', handleLoaded);
-      
-      // Démarrer la lecture
-      videoElement.play().catch(err => {
-        console.error("Erreur de lecture automatique:", err);
-      });
       
       return () => {
         videoElement.removeEventListener('ended', handleEnded);
