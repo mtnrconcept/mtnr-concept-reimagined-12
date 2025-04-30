@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useParallaxEffects } from '@/hooks/useParallaxEffects';
 import { Background } from './Background';
 import { parallaxElements } from './config';
@@ -18,6 +18,18 @@ export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContain
   
   useParallaxEffects({ containerRef });
   
+  // S'assurer que le défilement est activé sur le body
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      // Réinitialiser si nécessaire
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+    };
+  }, []);
+  
   return (
     <>
       {/* Fond en position fixe */}
@@ -26,7 +38,7 @@ export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContain
       {/* Conteneur des éléments de parallax avec une plus grande hauteur */}
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-visible pointer-events-none"
+        className="fixed inset-0 w-full h-screen overflow-visible pointer-events-none"
         style={{ 
           perspective: '1000px',
           transformStyle: 'preserve-3d',

@@ -50,7 +50,7 @@ function AnimatedRoutes() {
     <>
       <PageTransitionEffect />
       <PageTransition keyId={location.pathname}>
-        <Routes location={location} key={location.pathname}>
+        <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/artists" element={<Artists />} />

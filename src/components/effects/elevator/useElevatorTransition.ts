@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn } from './ElevatorTypes';
 
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
-// Configuration des timings
-const VIDEO_DURATION = 5000; // 5 secondes pour la vidéo complète
-const EXIT_ANIMATION_DURATION = 4.0; // Durée de sortie en secondes
-const ENTER_ANIMATION_DURATION = 2.5; // Durée d'entrée en secondes
+// Configuration des timings (en millisecondes)
+const VIDEO_DURATION = 7000; // 7 secondes pour la vidéo complète
+const EXIT_ANIMATION_DURATION = 7000; // Durée de sortie en ms
+const ENTER_ANIMATION_DELAY = 0; // Démarrage immédiat de l'animation d'entrée
 
 export function useElevatorTransition({
   isActive,
@@ -18,57 +18,63 @@ export function useElevatorTransition({
   currentPath
 }: UseElevatorTransitionProps): UseElevatorTransitionReturn {
   const location = useLocation();
+  const navigate = useNavigate();
   const [direction, setDirection] = useState<TransitionDirection>(null);
-  const [prevPath, setPrevPath] = useState(location.pathname);
   const [exitContent, setExitContent] = useState<React.ReactNode | null>(null);
   const [enterContent, setEnterContent] = useState<React.ReactNode | null>(null);
+  const [targetPath, setTargetPath] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [prevPath, setPrevPath] = useState(location.pathname);
   
-  // Calculated timing values
-  const contentEntranceDelay = VIDEO_DURATION - (ENTER_ANIMATION_DURATION * 1000);
+  // Determine content entrance delay
+  const contentEntranceDelay = ENTER_ANIMATION_DELAY;
   
-  // Détermine la direction de l'animation basée sur l'ordre des pages
+  // Effet pour détecter les changements de route
   useEffect(() => {
-    if (!isActive) return;
-    
-    const currentIndex = pageOrder.indexOf(location.pathname);
-    const prevIndex = pageOrder.indexOf(prevPath);
-    
-    console.log(`Transition de: ${prevPath} (${prevIndex}) vers ${location.pathname} (${currentIndex})`);
-    
-    if (currentIndex > prevIndex) {
-      console.log('Direction: descente');
-      setDirection('down');
-    } else if (currentIndex < prevIndex) {
-      console.log('Direction: montée');
-      setDirection('up');
-    } else {
-      console.log('Même page, pas de direction spécifique');
-      setDirection(null);
-    }
-  }, [isActive, location.pathname, prevPath]);
-
-  // Mettre à jour le contenu de sortie et d'entrée
-  useEffect(() => {
-    if (isActive) {
-      // Enregistrer le contenu actuel comme contenu de sortie
+    // Si l'état isActive change de false à true, c'est une transition
+    if (isActive && !isTransitioning) {
+      setIsTransitioning(true);
+      
+      // Déterminer la direction en fonction de l'ordre des pages
+      const currentIndex = pageOrder.indexOf(prevPath);
+      const newIndex = pageOrder.indexOf(location.pathname);
+      
+      console.log(`Transition de: ${prevPath} (${currentIndex}) vers ${location.pathname} (${newIndex})`);
+      
+      if (newIndex > currentIndex) {
+        setDirection('down');
+      } else if (newIndex < currentIndex) {
+        setDirection('up');
+      } else {
+        // Même page, pas de direction spécifique
+        setDirection('down'); // Direction par défaut
+      }
+      
+      // Conserver le contenu actuel comme contenu de sortie
       setExitContent(currentPath);
-      setEnterContent(null);
       
-      // Après un court délai, mettre à jour le contenu d'entrée
-      const timeout = setTimeout(() => {
-        setEnterContent(currentPath);
-      }, contentEntranceDelay);
+      // Mettre à jour le contenu d'entrée (le même que le contenu actuel pour l'instant)
+      // Sera mis à jour après la navigation
+      setEnterContent(currentPath);
       
-      return () => clearTimeout(timeout);
-    } else {
+      // Enregistrer le chemin cible pour plus tard
+      setTargetPath(location.pathname);
+      setPrevPath(location.pathname);
+    }
+    
+    // Si isActive devient false, réinitialiser
+    if (!isActive && isTransitioning) {
+      setIsTransitioning(false);
       setExitContent(null);
       setEnterContent(null);
+      setDirection(null);
+      setTargetPath(null);
     }
-  }, [isActive, currentPath, contentEntranceDelay]);
-
+  }, [isActive, location.pathname, currentPath, isTransitioning, prevPath]);
+  
   // Gestion de la lecture vidéo
   useEffect(() => {
-    if (!isActive || !videoRef.current) return;
+    if (!isTransitioning || !videoRef.current) return;
     
     const video = videoRef.current;
     
@@ -76,41 +82,43 @@ export function useElevatorTransition({
     if (direction === 'down') {
       // Pour descendre, on joue la vidéo normalement depuis le début
       video.currentTime = 0;
-      video.classList.remove('video-reversed');
+      video.playbackRate = 1;
     } else if (direction === 'up') {
-      // Pour monter, on utilise l'effet CSS pour inverser la vidéo verticalement
+      // Pour monter, on inverse la lecture
+      // Note: Certains navigateurs ne supportent pas les playbackRate négatifs
+      // Donc on utilise l'effet CSS pour inverser la vidéo verticalement
       video.currentTime = 0;
-      video.classList.add('video-reversed');
+      video.playbackRate = 1;
     }
     
     // Démarrer la lecture
     const playPromise = video.play();
     
-    // Gérer les erreurs potentielles de lecture
     if (playPromise !== undefined) {
       playPromise.catch(error => {
         console.error('Erreur de lecture vidéo:', error);
       });
     }
     
-    // Arrêter la vidéo à la fin de la transition
+    // Arrêter la vidéo et terminer l'animation après la durée fixée
     const timeoutId = setTimeout(() => {
       if (videoRef.current) {
         videoRef.current.pause();
-        videoRef.current.classList.remove('video-reversed');
       }
-      // Signal que l'animation est terminée
-      setPrevPath(location.pathname);
+      
+      // Signaler que l'animation est terminée
       onAnimationComplete();
+      setIsTransitioning(false);
     }, VIDEO_DURATION);
     
     return () => clearTimeout(timeoutId);
-  }, [isActive, direction, onAnimationComplete, location.pathname, videoRef]);
+  }, [isTransitioning, direction, onAnimationComplete, videoRef]);
 
   return {
     direction,
     exitContent,
     enterContent,
     contentEntranceDelay,
+    isTransitioning
   };
 }

@@ -1,6 +1,6 @@
 
 import React, { ReactNode, useRef, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
 import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
@@ -33,10 +33,10 @@ export default function PageTransition({
 
     // Détecter les changements de route et activer la transition
     if (location.pathname !== prevPathRef.current) {
-      console.log(`Changement détecté: ${prevPathRef.current} -> ${location.pathname}`);
+      console.log(`Changement de page détecté: ${prevPathRef.current} -> ${location.pathname}`);
       setIsTransitioning(true);
       setFromPath(prevPathRef.current);
-      prevPathRef.current = location.pathname;
+      // On ne met pas à jour prevPathRef ici pour conserver l'origine de la navigation
     }
   }, [location.pathname]);
 
@@ -53,8 +53,9 @@ export default function PageTransition({
   };
 
   const handleTransitionComplete = () => {
-    setIsTransitioning(false);
     console.log('Transition d\'ascenseur terminée');
+    setIsTransitioning(false);
+    prevPathRef.current = location.pathname;
   };
 
   return (

@@ -11,72 +11,59 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     direction, 
     exitContent, 
     enterContent, 
-    contentEntranceDelay 
+    contentEntranceDelay,
+    isTransitioning
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
     videoRef,
-    currentPath: children  // Nous passons children, qui est un ReactNode
+    currentPath: children
   });
+  
+  // Si la transition n'est pas active, on affiche simplement le contenu
+  if (!isTransitioning) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="elevator-container" ref={containerRef}>
-      {isActive && (
-        <>
-          {/* Video Background */}
-          <div className="elevator-video-container">
-            <video 
-              ref={videoRef} 
-              className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
-              src="/lovable-uploads/ascensceur.mp4"
-              muted
-              playsInline
-            />
-          </div>
-          
-          {/* Animation de sortie du contenu actuel */}
-          {exitContent && (
-            <div
-              className={`elevator-content exit-content ${
-                direction === 'down' ? 'slide-out-up' : 
-                direction === 'up' ? 'slide-out-down' : ''
-              }`}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              {exitContent}
-            </div>
-          )}
-          
-          {/* Animation d'entrée du nouveau contenu */}
-          {enterContent && (
-            <div
-              className={`elevator-content enter-content ${
-                direction === 'down' ? 'slide-in-up' : 
-                direction === 'up' ? 'slide-in-down' : ''
-              }`}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%", 
-                height: "100%",
-                animationDelay: `${contentEntranceDelay / 1000}s`
-              }}
-            >
-              {enterContent}
-            </div>
-          )}
-        </>
+      {/* Conteneur Vidéo */}
+      <div className="elevator-video-container">
+        <video 
+          ref={videoRef} 
+          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
+          src="/lovable-uploads/ascensceur.mp4"
+          muted
+          playsInline
+        />
+      </div>
+      
+      {/* Animation de sortie du contenu actuel */}
+      {exitContent && (
+        <div
+          className={`elevator-content exit-content ${
+            direction === 'down' ? 'slide-out-up' : 
+            direction === 'up' ? 'slide-out-down' : ''
+          }`}
+        >
+          {exitContent}
+        </div>
       )}
       
-      {/* Contenu normal lorsque la transition n'est pas active */}
-      {!isActive && children}
+      {/* Animation d'entrée du nouveau contenu */}
+      {enterContent && (
+        <div
+          className={`elevator-content enter-content ${
+            direction === 'down' ? 'slide-in-up' : 
+            direction === 'up' ? 'slide-in-down' : ''
+          }`}
+          style={{
+            animationDelay: `${contentEntranceDelay}ms`
+          }}
+        >
+          {enterContent}
+        </div>
+      )}
     </div>
   );
 };

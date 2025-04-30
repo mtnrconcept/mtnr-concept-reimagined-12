@@ -22,8 +22,8 @@
 }
 
 .elevator-content {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  inset: 0;
   height: 100%;
   width: 100%;
   display: flex;
@@ -34,10 +34,12 @@
 
 .exit-content {
   pointer-events: none;
+  z-index: 2;
 }
 
 .enter-content {
   pointer-events: auto;
+  z-index: 3;
 }
 
 /* Style pour inverser la vidéo verticalement */
@@ -80,17 +82,17 @@
 }
 
 .slide-out-up {
-  animation: slideOutUp 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideOutUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-out-down {
-  animation: slideOutDown 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideOutDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-in-up {
-  animation: slideInUp 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideInUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-in-down {
-  animation: slideInDown 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideInDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }

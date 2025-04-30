@@ -21,4 +21,5 @@ export interface UseElevatorTransitionReturn {
   exitContent: ReactNode | null;
   enterContent: ReactNode | null;
   contentEntranceDelay: number;
+  isTransitioning: boolean;
 }

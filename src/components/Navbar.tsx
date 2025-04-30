@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
@@ -15,6 +15,7 @@ const navLinks = [
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -81,9 +82,8 @@ export default function Navbar() {
       return;
     }
     
-    // Naviguer à la page via React Router
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    // Naviguer à la nouvelle page via React Router
+    navigate(path);
   };
 
   return (
@@ -124,8 +124,8 @@ export default function Navbar() {
         <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
           {navLinks.map((link, index) => (
             <motion.li key={link.path} variants={itemVariants}>
-              <Link
-                to={link.path}
+              <a
+                href={link.path}
                 onClick={(e) => handleNavigation(link.path, e)}
                 className={cn(
                   "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
@@ -143,18 +143,18 @@ export default function Navbar() {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-              </Link>
+              </a>
             </motion.li>
           ))}
           <motion.li variants={itemVariants}>
-            <Link 
-              to="/book" 
+            <a 
+              href="/book" 
               onClick={(e) => handleNavigation('/book', e)}
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
             >
               <span className="relative z-10">Book Now</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-300 to-yellow-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-            </Link>
+            </a>
           </motion.li>
         </ul>
       </div>
@@ -176,8 +176,8 @@ export default function Navbar() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Link
-                  to={link.path}
+                <a
+                  href={link.path}
                   onClick={(e) => handleNavigation(link.path, e)}
                   className={cn(
                     "block px-6 py-3 font-medium transition-all",
@@ -185,7 +185,7 @@ export default function Navbar() {
                   )}
                 >
                   {link.name}
-                </Link>
+                </a>
               </motion.li>
             ))}
             <motion.li 
@@ -194,13 +194,13 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2, delay: 0.3 }}
             >
-              <Link 
-                to="/book" 
+              <a 
+                href="/book" 
                 onClick={(e) => handleNavigation('/book', e)}
                 className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Book Now
-              </Link>
+              </a>
             </motion.li>
           </motion.ul>
         </div>
