@@ -5,6 +5,10 @@ import ElevatorTransition from '@/components/effects/ElevatorTransition';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
 import { NavigationProvider } from '@/components/effects/NavigationContext';
+import Navbar from '@/components/Navbar';
+import { TorchProvider } from '@/components/effects/TorchContext';
+import { UVModeProvider } from '@/components/effects/UVModeContext';
+import { TorchToggle } from '@/components/effects/TorchToggle';
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
@@ -32,27 +36,34 @@ const AnimatedRoutes: React.FC = () => {
 
   return (
     <>
-      <button onClick={() => handleNavigate('/')}>Accueil</button>
-      <button onClick={() => handleNavigate('/about')}>À propos</button>
-
-      <ElevatorTransition
-        current={<CurrentPage />}
-        next={<NextPage />}
-        isActive={transitioning}
-        onAnimationComplete={onAnimationComplete}
-      />
+      <Navbar />
+      
+      <div className="content-container">
+        <ElevatorTransition
+          current={<CurrentPage />}
+          next={<NextPage />}
+          isActive={transitioning}
+          onAnimationComplete={onAnimationComplete}
+        />
+      </div>
+      
+      <TorchToggle />
     </>
   );
 };
 
 export default function App() {
   return (
-    <NavigationProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/*" element={<AnimatedRoutes />}/>
-        </Routes>
-      </BrowserRouter>
-    </NavigationProvider>
+    <UVModeProvider>
+      <TorchProvider>
+        <NavigationProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/*" element={<AnimatedRoutes />}/>
+            </Routes>
+          </BrowserRouter>
+        </NavigationProvider>
+      </TorchProvider>
+    </UVModeProvider>
   );
 }

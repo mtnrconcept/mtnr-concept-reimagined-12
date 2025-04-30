@@ -5,10 +5,11 @@ import { useUVMode } from './UVModeContext';
 import { useTorch } from './TorchContext';
 
 interface BackgroundVideoProps {
-  // Vous pouvez ajouter d'autres props au besoin
+  // Adding the missing prop that's being used in Background.tsx
+  fallbackImage?: string;
 }
 
-const BackgroundVideo: React.FC<BackgroundVideoProps> = () => {
+const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ fallbackImage }) => {
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
@@ -60,14 +61,22 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = () => {
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden">
-      <video
-        ref={videoRef}
-        src={currentVideo}
-        muted
-        playsInline
-        preload="auto"
-        className={`w-full h-full object-cover ${isTransitioning ? 'opacity-100' : 'opacity-80'}`}
-      />
+      {currentVideo ? (
+        <video
+          ref={videoRef}
+          src={currentVideo}
+          muted
+          playsInline
+          preload="auto"
+          className={`w-full h-full object-cover ${isTransitioning ? 'opacity-100' : 'opacity-80'}`}
+        />
+      ) : fallbackImage ? (
+        <img 
+          src={fallbackImage} 
+          alt="Background" 
+          className="w-full h-full object-cover opacity-80" 
+        />
+      ) : null}
     </div>
   );
 };

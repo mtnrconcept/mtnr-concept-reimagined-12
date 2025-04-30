@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,16 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const navigation = useNavigation();
+  
+  let navigation;
+  try {
+    navigation = useNavigation();
+  } catch (error) {
+    console.error("Navigation context not available:", error);
+    navigation = {
+      triggerVideoTransition: () => console.warn("Navigation context not initialized")
+    };
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,7 +56,9 @@ export default function Navbar() {
     
     // Déclencher l'événement de transition vidéo avant la navigation
     console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
-    navigation.triggerVideoTransition();
+    if (navigation) {
+      navigation.triggerVideoTransition();
+    }
   };
 
   const navVariants = {
