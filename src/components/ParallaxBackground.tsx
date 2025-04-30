@@ -9,9 +9,12 @@ interface ParallaxBackgroundProps {
 const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ children }) => {
   // Force background to black to ensure consistency
   useEffect(() => {
+    document.documentElement.style.backgroundColor = '#000';
     document.body.style.backgroundColor = '#000';
+    
     return () => {
       document.body.style.backgroundColor = '';
+      document.documentElement.style.backgroundColor = '';
     };
   }, []);
 

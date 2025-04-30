@@ -32,14 +32,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 0.5, // Réduit pour une transition plus rapide
+            delay: 0.2,
             duration: 0.5
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 0.5
+            duration: 0.3
           }
         }}
         className="relative z-10 min-h-screen w-full pointer-events-auto"

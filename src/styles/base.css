@@ -8,26 +8,30 @@
  */
 @layer base {
   html, body, #root {
-    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
+    @apply m-0 p-0 min-h-screen overflow-x-hidden;
+    background-color: #000000 !important;
+    color: white;
   }
   
   body {
-    background-color: #000 !important;
+    background-color: #000000 !important;
   }
 }
 
 /* S'assurer que la vidéo d'arrière-plan est toujours visible */
-video.background-video,
-.fixed video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  min-width: 100%;
-  min-height: 100%;
-  background: black;
+.background-video {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 0 !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  background-color: black !important;
 }
 
 /* Animation de fondu pour les transitions de page */

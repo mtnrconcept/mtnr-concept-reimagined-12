@@ -10,15 +10,21 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({ className = '' }) =>
     <>
       {/* Grille subtile avec une très faible opacité */}
       <div 
-        className={`${className}`}
+        className={`absolute inset-0 pointer-events-none ${className}`}
         style={{
-          position: 'absolute',
-          inset: 0,
           opacity: 0.05,
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.12) 1px, transparent 1px)',
           backgroundSize: '35px 35px', 
           mixBlendMode: 'overlay',
-          pointerEvents: 'none' // Pour s'assurer que l'overlay n'intercepte pas les clics
+        }}
+      />
+      
+      {/* Vignette sombre sur les bords pour un effet de profondeur */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 80%, rgba(0,0,0,0.5) 100%)',
+          mixBlendMode: 'multiply',
         }}
       />
     </>

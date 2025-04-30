@@ -51,34 +51,41 @@ export const useVideoTransitionEffects = ({
     return unregister;
   }, [navigation, executeTransition]);
   
-  // Initialisation
+  // Initialisation et démarrage de la vidéo
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
-    // Configuration initiale unique
+    // Configuration initiale
     if (isFirstLoad) {
-      console.log("Premier chargement vidéo");
+      console.log("Premier chargement de la vidéo");
       
-      // S'assurer que les sources sont correctement définies
-      const sources = videoElement.getElementsByTagName('source');
-      if (sources.length === 0) {
-        const mp4Source = document.createElement('source');
-        mp4Source.src = currentVideo;
-        mp4Source.type = 'video/mp4';
-        videoElement.appendChild(mp4Source);
+      const initializeVideo = async () => {
+        // Configurer la vidéo
+        videoElement.playsInline = true;
+        videoElement.muted = true;
+        videoElement.loop = true;
+        videoElement.autoplay = true;
         
-        const webmSource = document.createElement('source');
-        webmSource.src = currentVideo;
-        webmSource.type = 'video/webm';
-        videoElement.appendChild(webmSource);
+        // S'assurer que les sources sont correctement définies
+        if (!videoElement.src && videoElement.getElementsByTagName('source').length === 0) {
+          const source = document.createElement('source');
+          source.src = currentVideo;
+          source.type = 'video/mp4';
+          videoElement.appendChild(source);
+          videoElement.load();
+        }
         
-        // Recharger la vidéo après avoir ajouté les sources
-        videoElement.load();
-      }
+        try {
+          // Tentative de lecture
+          await videoElement.play();
+          console.log("Lecture vidéo démarrée avec succès");
+        } catch (error) {
+          console.warn("Lecture automatique impossible, attente d'interaction:", error);
+        }
+      };
       
-      videoElement.pause(); // Assure que la vidéo est en pause au début
-      videoElement.currentTime = 0;
+      initializeVideo();
       setIsFirstLoad(false);
     }
   }, [isFirstLoad, videoRef, setIsFirstLoad, currentVideo]);
@@ -89,19 +96,42 @@ export const useVideoTransitionEffects = ({
     
     const handleInteraction = () => {
       handleUserInteraction();
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
+      
+      // Tenter de jouer la vidéo après l'interaction
+      if (videoRef.current) {
+        videoRef.current.play().catch(err => 
+          console.warn("Erreur lors de la lecture après interaction:", err)
+        );
+      }
     };
     
-    document.addEventListener('click', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
-    document.addEventListener('touchstart', handleInteraction);
+    // Ajouter les écouteurs d'événements
+    const events = ['click', 'touchstart', 'keydown', 'scroll'];
+    events.forEach(event => {
+      document.addEventListener(event, handleInteraction, { once: true });
+    });
     
     return () => {
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
+      // Nettoyer les écouteurs
+      events.forEach(event => {
+        document.removeEventListener(event, handleInteraction);
+      });
     };
-  }, [handleUserInteraction, hasUserInteraction]);
+  }, [handleUserInteraction, hasUserInteraction, videoRef]);
+  
+  // Tentative de lecture automatique au chargement initial
+  useEffect(() => {
+    if (videoRef.current && isFirstLoad === false) {
+      const autoplayAttempt = async () => {
+        try {
+          await videoRef.current?.play();
+          console.log("Lecture vidéo automatique réussie");
+        } catch (error) {
+          console.warn("Lecture automatique échouée, attente d'interaction:", error);
+        }
+      };
+      
+      autoplayAttempt();
+    }
+  }, [videoRef, isFirstLoad]);
 };

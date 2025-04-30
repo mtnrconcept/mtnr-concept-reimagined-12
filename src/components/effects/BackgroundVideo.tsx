@@ -15,7 +15,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
-  const [directSrc, setDirectSrc] = useState<string>(videoUrl);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   
   // Utiliser notre hook personnalisé pour gérer la vidéo
   const {
@@ -46,66 +46,89 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
-  // Vérifier si les vidéos sont accessibles
+  // S'assurer que la vidéo est visible et qu'elle se charge correctement
   useEffect(() => {
-    const checkVideoFile = async (url: string) => {
+    const checkVideo = async () => {
       try {
-        const response = await fetch(url, { method: 'HEAD' });
-        console.log(`Vidéo ${url} accessible:`, response.ok, "status:", response.status);
-        if (response.ok) {
-          setDirectSrc(url);
+        const response = await fetch(currentVideo, { method: 'HEAD' });
+        console.log(`Vérification de la vidéo ${currentVideo}:`, response.ok);
+        
+        if (!response.ok) {
+          console.error(`La vidéo ${currentVideo} n'est pas accessible. Code: ${response.status}`);
         } else {
-          console.error(`La vidéo ${url} n'est pas accessible. Status: ${response.status}`);
+          console.log(`La vidéo ${currentVideo} est accessible.`);
         }
       } catch (error) {
-        console.error(`Erreur lors de la vérification de la vidéo ${url}:`, error);
+        console.error(`Erreur lors de la vérification de la vidéo:`, error);
       }
     };
     
-    // Vérifier et définir la source directe
-    checkVideoFile(currentVideo);
+    checkVideo();
     
     // S'assurer que le corps du document a un fond noir
     document.body.style.backgroundColor = '#000';
+    document.documentElement.style.backgroundColor = '#000';
     
     return () => {
-      document.body.style.backgroundColor = '';
+      // Nettoyage
     };
   }, [currentVideo]);
 
+  // Gestion de l'événement de chargement de la vidéo
+  const handleVideoLoad = () => {
+    setIsVideoLoaded(true);
+    console.log("Vidéo chargée avec succès");
+  };
+
+  // Gestion des erreurs de vidéo
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    console.error("Erreur de chargement vidéo:", e);
+    const videoElement = e.currentTarget;
+    console.log("Détails vidéo:", {
+      error: videoElement.error,
+      networkState: videoElement.networkState,
+      readyState: videoElement.readyState,
+      currentSrc: videoElement.currentSrc
+    });
+  };
+
   return (
-    <div className="relative w-full h-full overflow-hidden" style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
-      {/* Fallback image pour les cas où la vidéo ne fonctionne pas */}
-      <img 
-        src={fallbackImage} 
-        alt="Studio background fallback" 
-        style={{
-          position: 'absolute',
-          inset: 0,
-          minWidth: '100%',
-          minHeight: '100%',
-          objectFit: 'cover',
-          opacity: 0.3,
-          display: videoError ? 'block' : 'none'
-        }}
-      />
+    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden" style={{ backgroundColor: "#000" }}>
+      {/* Affichage de l'image de fallback si erreur vidéo */}
+      {videoError && (
+        <img 
+          src={fallbackImage} 
+          alt="Background fallback" 
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: 0.7 }}
+        />
+      )}
       
-      {/* Vidéo avec source directement définie */}
+      {/* Vidéo d'arrière-plan */}
       <video
         ref={videoRef}
         className="background-video"
         playsInline
         muted
+        autoPlay
+        loop
         preload="auto"
+        onLoadedData={handleVideoLoad}
+        onError={handleVideoError}
         style={{ 
-          display: videoError ? 'none' : 'block',
+          position: 'fixed',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: 0
         }}
       >
-        <source src={directSrc} type="video/mp4" />
+        <source src={currentVideo} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
-      {/* Overlays visuels */}
+      {/* Overlays et effets visuels */}
       <VideoOverlay />
     </div>
   );
