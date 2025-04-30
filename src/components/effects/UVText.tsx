@@ -24,7 +24,7 @@ export default function UVText({
   position = "default"
 }: UVTextProps) {
   const textRef = useRef<HTMLDivElement>(null);
-  const hiddenTextRef = useRef<HTMLDivElement>(null);
+  const hiddenTextRef = useRef<HTMLParagraphElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
   const [isIlluminated, setIsIlluminated] = useState(false);
@@ -32,115 +32,105 @@ export default function UVText({
   useEffect(() => {
     if (!isTorchActive || !textRef.current || !hiddenTextRef.current) return;
 
-    // Throttle pour éviter trop de recalculs
-    let ticking = false;
-    let rafId: number;
-
     const handleMouseMove = () => {
-      if (!textRef.current || !hiddenTextRef.current || ticking) return;
+      if (!textRef.current || !hiddenTextRef.current) return;
       
-      ticking = true;
-      rafId = requestAnimationFrame(() => {
-        const rect = textRef.current?.getBoundingClientRect();
-        if (!rect) {
-          ticking = false;
-          return;
-        }
-        
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        // Distance from mouse to text center
-        const dx = mousePosition.x - centerX;
-        const dy = mousePosition.y - centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Enhanced threshold and effects for UV mode
-        const threshold = uvMode ? 600 : 300; // Larger detection area in UV mode
-        const newIsIlluminated = distance < threshold;
-        
-        if (newIsIlluminated !== isIlluminated) {
-          setIsIlluminated(newIsIlluminated);
-        }
+      const rect = textRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Distance from mouse to text center
+      const dx = mousePosition.x - centerX;
+      const dy = mousePosition.y - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Enhanced threshold and effects for UV mode
+      const threshold = uvMode ? 600 : 300; // Larger detection area in UV mode
+      const newIsIlluminated = distance < threshold;
+      
+      if (newIsIlluminated !== isIlluminated) {
+        setIsIlluminated(newIsIlluminated);
+      }
 
-        if (newIsIlluminated && hiddenTextRef.current) {
-          // Calculate intensity based on distance (stronger when closer)
-          const intensity = 1 - (distance / threshold);
-          const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
-          
-          // Regrouper les modifications de style
-          const newStyles = {
-            opacity: `${opacityValue}`,
-            textShadow: `
-              0 0 ${uvMode ? 25 * intensity : 15 * intensity}px ${uvMode ? "#D2FF3F" : uvColor}, 
-              0 0 ${uvMode ? 50 * intensity : 30 * intensity}px ${uvMode ? "#4FA9FF" : uvColor}
-            `,
-            transform: uvMode ? 
-              `translate(${Math.sin(Date.now() / 1000 * 2) * 0.8}px, ${Math.cos(Date.now() / 1000 * 1.8) * 0.8}px)` : 
-              '',
-            filter: uvMode ? 'brightness(1.5) contrast(1.2)' : '',
-            letterSpacing: uvMode ? `${0.05 + (intensity * 0.1)}em` : ''
-          };
-          
-          // Appliquer tous les styles en une fois
-          Object.assign(hiddenTextRef.current.style, newStyles);
-        } else if (hiddenTextRef.current) {
-          // Reset styles
-          Object.assign(hiddenTextRef.current.style, {
-            opacity: '0',
-            textShadow: 'none',
-            transform: '',
-            filter: '',
-            letterSpacing: ''
-          });
-        }
+      if (newIsIlluminated) {
+        // Calculate intensity based on distance (stronger when closer)
+        const intensity = 1 - (distance / threshold);
+        const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
+        hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
-        ticking = false;
-      });
+        // Enhanced glow for UV mode with dynamic fluorescent yellow color
+        const glowSize = uvMode ? 25 * intensity : 15 * intensity;
+        const primaryGlow = uvMode ? "#D2FF3F" : uvColor;
+        const secondaryGlow = uvMode ? "#4FA9FF" : uvColor;
+        
+        hiddenTextRef.current.style.textShadow = `
+          0 0 ${glowSize}px ${primaryGlow}, 
+          0 0 ${glowSize * 2}px ${primaryGlow},
+          0 0 ${glowSize * 3}px ${secondaryGlow}
+        `;
+        
+        if (uvMode) {
+          // Dynamic animation effects in UV mode
+          const time = Date.now() / 1000;
+          const vibrationX = Math.sin(time * 2) * 0.8;
+          const vibrationY = Math.cos(time * 1.8) * 0.8;
+          hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
+          hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
+          
+          // Add letter spacing for dramatic effect in UV mode
+          hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
+        } else {
+          hiddenTextRef.current.style.transform = '';
+          hiddenTextRef.current.style.filter = '';
+          hiddenTextRef.current.style.letterSpacing = '';
+        }
+      } else {
+        hiddenTextRef.current.style.opacity = '0';
+        hiddenTextRef.current.style.textShadow = 'none';
+        hiddenTextRef.current.style.transform = '';
+        hiddenTextRef.current.style.filter = '';
+        hiddenTextRef.current.style.letterSpacing = '';
+      }
     };
 
     if (isTorchActive) {
-      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      window.addEventListener('mousemove', handleMouseMove);
       handleMouseMove(); // Initial calculation
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
     };
   }, [isTorchActive, mousePosition, isIlluminated, uvColor, uvMode]);
 
-  // Auto-reveal animation avec requestAnimationFrame
+  // Auto-reveal hidden text if UV mode is active, regardless of mouse position
   useEffect(() => {
-    if (!uvMode || !hiddenTextRef.current) return;
-    
-    let animId: number;
-    
-    const animateGlow = () => {
-      if (!hiddenTextRef.current) return;
-      
-      const time = Date.now() / 1000;
-      const pulseIntensity = (Math.sin(time * 2) + 1) / 2; // 0 to 1 pulsating
-      
-      hiddenTextRef.current.style.textShadow = `
-        0 0 ${5 + (pulseIntensity * 10)}px ${uvColor},
-        0 0 ${10 + (pulseIntensity * 20)}px ${uvColor}
-      `;
-      
+    if (uvMode && hiddenTextRef.current) {
       hiddenTextRef.current.style.opacity = '1';
+      hiddenTextRef.current.style.textShadow = `
+        0 0 10px ${uvColor},
+        0 0 20px ${uvColor},
+        0 0 30px ${uvColor}
+      `;
       hiddenTextRef.current.style.letterSpacing = '0.1em';
       
-      animId = requestAnimationFrame(animateGlow);
-    };
-    
-    animId = requestAnimationFrame(animateGlow);
-    
-    return () => cancelAnimationFrame(animId);
+      // Add subtle animation
+      const animateGlow = () => {
+        if (hiddenTextRef.current) {
+          const time = Date.now() / 1000;
+          const pulseIntensity = (Math.sin(time * 2) + 1) / 2; // 0 to 1 pulsating
+          hiddenTextRef.current.style.textShadow = `
+            0 0 ${5 + (pulseIntensity * 10)}px ${uvColor},
+            0 0 ${10 + (pulseIntensity * 20)}px ${uvColor}
+          `;
+          requestAnimationFrame(animateGlow);
+        }
+      };
+      
+      const animId = requestAnimationFrame(animateGlow);
+      return () => cancelAnimationFrame(animId);
+    }
   }, [uvMode, uvColor]);
-
-  // Correction pour éviter le problème de DOM nesting (p dans p)
-  const isTextString = typeof text === 'string';
-  const hiddenTextContent = hiddenText || (isTextString ? text : null);
 
   return (
     <div className={cn(
@@ -158,7 +148,7 @@ export default function UVText({
         {text}
       </div>
       
-      <div 
+      <p 
         ref={hiddenTextRef}
         className={cn(
           "uv-hidden-text absolute top-0 left-0 w-full pointer-events-none select-none",
@@ -171,8 +161,8 @@ export default function UVText({
           color: uvMode ? "#D2FF3F" : uvColor,
         }}
       >
-        {hiddenTextContent}
-      </div>
+        {hiddenText || (typeof text === 'string' ? text : null)}
+      </p>
     </div>
   );
 }

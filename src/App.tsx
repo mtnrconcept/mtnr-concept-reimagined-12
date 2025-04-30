@@ -15,9 +15,9 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
+import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
-import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 
 // Initialize query client outside of component for stability
@@ -49,12 +49,12 @@ function AnimatedRoutes() {
   return (
     <>
       <PageTransitionEffect />
-      <BackgroundVideoController videoSrc="/lovable-uploads/ascensceur.mp4" />
       <PageTransition keyId={location.pathname}>
-        <Routes location={location}>
+        <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/artists" element={<Artists />} />
+          <Route path="/book" element={<Book />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

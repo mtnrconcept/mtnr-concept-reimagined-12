@@ -1,69 +1,59 @@
 
-/* Style principal pour la transition d'ascenseur */
 .elevator-container {
   position: fixed;
   inset: 0;
   z-index: 100;
+  pointer-events: none;
   overflow: hidden;
 }
 
-.elevator-content {
+.elevator-tile {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  will-change: transform, opacity;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  background-color: black;
+  will-change: transform;
 }
 
-.exit-content {
+.elevator-content {
+  position: relative;
   z-index: 2;
-}
-
-.enter-content {
-  z-index: 3;
-}
-
-/* Animation de sortie vers le haut avec courbe accentuée */
-@keyframes slide-out-up {
-  0% { transform: translateY(0); }
-  10% { transform: translateY(-2%); }
-  30% { transform: translateY(-10%); }
-  100% { transform: translateY(-150%); }
-}
-
-/* Animation d'entrée depuis le bas avec courbe accentuée */
-@keyframes slide-in-down {
-  0% { transform: translateY(150%); }
-  70% { transform: translateY(10%); }
-  90% { transform: translateY(2%); }
-  100% { transform: translateY(0); }
-}
-
-/* Classes d'animation avec courbes de Bézier améliorées */
-.exit-up {
-  animation: slide-out-up 2.5s cubic-bezier(0.19, 0.05, 0.04, 0.99) forwards;
-}
-
-.enter-content {
-  animation: slide-in-down 2.5s cubic-bezier(0.87, 0, 0.13, 1) forwards;
-}
-
-/* Styles pour la vidéo de fond */
-.background-video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, filter;
 }
 
-.video-visible {
-  opacity: 1;
+/* Animation du flou de mouvement */
+@keyframes blurMotion {
+  0% { filter: blur(0px); }
+  20% { filter: blur(8px); }
+  50% { filter: blur(12px); }
+  80% { filter: blur(8px); }
+  100% { filter: blur(0px); }
+}
+
+.blur-motion {
+  animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animation d'entrée et de sortie avec perspective */
+@keyframes elevatorPerspectiveUp {
+  0% { transform: translateY(100%) perspective(1000px) rotateX(5deg); }
+  100% { transform: translateY(0) perspective(1000px) rotateX(0deg); }
+}
+
+@keyframes elevatorPerspectiveDown {
+  0% { transform: translateY(-100%) perspective(1000px) rotateX(-5deg); }
+  100% { transform: translateY(0) perspective(1000px) rotateX(0deg); }
+}
+
+.elevator-enter-up {
+  animation: elevatorPerspectiveUp 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.elevator-enter-down {
+  animation: elevatorPerspectiveDown 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

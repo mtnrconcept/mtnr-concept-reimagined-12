@@ -1,17 +1,14 @@
 
-import React, { ReactNode } from 'react';
 import { ParallaxContainer } from './parallax/ParallaxContainer';
 
 interface ParallaxBackgroundProps {
-  children: ReactNode;
+  children?: React.ReactNode;
 }
 
-const ParallaxBackground = ({ children }: ParallaxBackgroundProps) => {
+export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   return (
-    <ParallaxContainer>
+    <ParallaxContainer backgroundImage="/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png">
       {children}
     </ParallaxContainer>
   );
-};
-
-export default ParallaxBackground;
+}

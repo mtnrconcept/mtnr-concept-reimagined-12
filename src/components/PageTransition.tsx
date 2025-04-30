@@ -1,7 +1,10 @@
 
 import React, { ReactNode, useRef, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { ElevatorTransition } from "@/components/effects/elevator";
+import { createSmokeEffect } from "@/lib/transitions";
+import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
+import ElevatorTransition from "@/components/effects/ElevatorTransition";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -14,54 +17,96 @@ export default function PageTransition({
 }: PageTransitionProps) {
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
-  const prevChildrenRef = useRef<ReactNode>(children);
   const isInitialMountRef = useRef<boolean>(true);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Précharger la vidéo au montage du composant
-  useEffect(() => {
-    const preloadVideo = document.createElement('link');
-    preloadVideo.rel = 'preload';
-    preloadVideo.href = '/lovable-uploads/ascensceur.mp4';
-    preloadVideo.as = 'video';
-    document.head.appendChild(preloadVideo);
-    
-    return () => {
-      document.head.removeChild(preloadVideo);
-    };
-  }, []);
+  // On stocke la route précédente
+  const [fromPath, setFromPath] = useState(location.pathname);
 
-  // Détecter les changements de routes
   useEffect(() => {
-    // Ignorer le premier rendu
+    // Ignorer le tout premier rendu
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       prevPathRef.current = location.pathname;
-      prevChildrenRef.current = children;
       return;
     }
 
-    // Activer la transition lors d'un changement de route
+    // Détecter les changements de route et activer la transition
     if (location.pathname !== prevPathRef.current) {
-      console.log(`Changement de page: ${prevPathRef.current} -> ${location.pathname}`);
       setIsTransitioning(true);
+      setFromPath(prevPathRef.current);
+      prevPathRef.current = location.pathname;
     }
-  }, [location.pathname, children]);
+  }, [location.pathname]);
 
-  // Gestionnaire de fin de transition
+  const handleDisperseComplete = () => {
+    console.log('Dispersion terminée, application de l\'effet de fumée');
+    // OptimizedDisperseLogo a terminé la dispersion et attendu 500ms
+    // Nous pouvons maintenant appliquer l'effet de fumée à la page
+    if (contentRef.current) {
+      createSmokeEffect(contentRef.current);
+    }
+    
+    // Réinitialiser l'état de chargement
+    setIsLoading(false);
+  };
+
   const handleTransitionComplete = () => {
-    console.log('Transition terminée');
     setIsTransitioning(false);
-    prevPathRef.current = location.pathname;
-    prevChildrenRef.current = children;
+    console.log('Transition d\'ascenseur terminée');
   };
 
   return (
-    <ElevatorTransition 
-      current={prevChildrenRef.current}
-      next={isTransitioning ? children : undefined}
-      isActive={isTransitioning}
-      onAnimationComplete={handleTransitionComplete}
-    />
+    <>
+      {/* Logo avec dispersion et callback de fin */}
+      <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
+
+      {/* Effet d'ascenseur */}
+      <ElevatorTransition 
+        isActive={isTransitioning}
+        onAnimationComplete={handleTransitionComplete}
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md flex items-center justify-center">
+          <div className="text-white text-4xl font-bold">
+            Transition en cours...
+          </div>
+        </div>
+      </ElevatorTransition>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={keyId}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
+          className="page-content-wrapper"
+          style={{
+            perspective: "1400px",
+            willChange: "transform, opacity",
+            position: "relative",
+            zIndex: 10,
+            transition: "opacity 0.5s ease"
+          }}
+        >
+          <motion.div
+            ref={contentRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{
+              opacity: 0,
+              y: -10,
+              transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
+            }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+            className="smoke-container"
+          >
+            {children}
+            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    </>
   );
 }

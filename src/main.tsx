@@ -1,13 +1,15 @@
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
-import { disableSentryRequests } from './lib/sentry-disable';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+import './styles/elevator.css'
 
-// Désactiver les requêtes Sentry inutiles qui causent des erreurs 429
-disableSentryRequests();
+// Make sure React is available in the global scope for hooks
+window.React = React;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <App />
-);
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)

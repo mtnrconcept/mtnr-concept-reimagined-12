@@ -42,8 +42,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden z-10">
-      {/* Pas de fond opaque */}
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+      {/* Enhanced 3D parallax background */}
+      <Parallax3DScene />
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
