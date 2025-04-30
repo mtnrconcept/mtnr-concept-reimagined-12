@@ -1,4 +1,3 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -56,10 +55,10 @@ export default function Navbar() {
     console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
     navigation.triggerVideoTransition();
     
-    // Utiliser navigate de React Router après un délai court
+    // Utiliser navigate de React Router après un délai suffisant
     setTimeout(() => {
       navigate(path);
-    }, 300); // Délai court pour permettre le démarrage de la vidéo
+    }, 500); // Délai augmenté pour permettre à la vidéo de bien démarrer
   };
 
   const navVariants = {

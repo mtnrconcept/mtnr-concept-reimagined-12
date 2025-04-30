@@ -42,7 +42,7 @@ export const useVideoTransitionEffects = ({
   // Écouter les événements de navigation
   useEffect(() => {
     const unregister = navigation.registerVideoTransitionListener(() => {
-      console.log("Transition vidéo déclenchée");
+      console.log("Transition vidéo déclenchée par navigation");
       executeTransition();
     });
     
@@ -56,19 +56,13 @@ export const useVideoTransitionEffects = ({
     
     // Configuration initiale unique
     if (isFirstLoad) {
+      console.log("Premier chargement vidéo");
       videoElement.load();
-      videoElement.pause();
+      videoElement.pause(); // Assure que la vidéo est en pause au début
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
-      
-      // Déclencher une première transition pour s'assurer que la vidéo est visible
-      setTimeout(() => {
-        if (hasUserInteraction) {
-          playVideoTransition();
-        }
-      }, 300);
     }
-  }, [isFirstLoad, videoRef, setIsFirstLoad, hasUserInteraction, playVideoTransition]);
+  }, [isFirstLoad, videoRef, setIsFirstLoad]);
   
   // Ajout des écouteurs pour la première interaction utilisateur
   useEffect(() => {

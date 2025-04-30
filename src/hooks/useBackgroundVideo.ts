@@ -36,6 +36,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
     if (!videoElement || videoError) {
+      console.error("Erreur: élément vidéo non disponible ou erreur vidéo");
       return;
     }
     
@@ -45,12 +46,18 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       // S'assurer que la vidéo est correctement chargée
       if (videoElement.src !== currentVideo) {
         videoElement.src = currentVideo;
+        await new Promise(resolve => {
+          videoElement.addEventListener('loadeddata', resolve, { once: true });
+        });
       }
       
+      // Remettre la vidéo au début
       videoElement.currentTime = 0;
       
       // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
       const handleVideoEnded = () => {
+        console.log("Vidéo terminée, mise en pause");
+        videoElement.pause();
         setIsTransitioning(false);
         videoElement.removeEventListener('ended', handleVideoEnded);
       };
@@ -59,13 +66,14 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       videoElement.addEventListener('ended', handleVideoEnded);
       
       // Lancer la lecture de la vidéo
+      console.log("Démarrage de la lecture vidéo");
       await videoElement.play().catch(error => {
         console.error("Erreur de lecture vidéo:", error);
         setIsTransitioning(false);
         setVideoError(true);
       });
     } catch (error) {
-      console.error("Erreur générale:", error);
+      console.error("Erreur générale lors de la transition vidéo:", error);
       setIsTransitioning(false);
       setVideoError(true);
     }

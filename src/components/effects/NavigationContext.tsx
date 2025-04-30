@@ -18,9 +18,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const triggerVideoTransition = useCallback(() => {
     // Éviter les déclenchements multiples rapprochés
     if (transitionInProgressRef.current) {
+      console.log("Transition déjà en cours, ignorée");
       return;
     }
     
+    console.log("Déclenchement transition vidéo");
     transitionInProgressRef.current = true;
     setIsTransitioning(true);
     
@@ -38,19 +40,23 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     });
     
-    // Réinitialiser l'état de transition après un délai court
+    // Réinitialiser l'état de transition après un délai plus long
+    // pour permettre à la vidéo de commencer sa lecture
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
-    }, 500);
+      console.log("État de transition réinitialisé");
+    }, 1000); // Temps suffisant pour laisser la vidéo commencer
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
     listenersRef.current.push(callback);
+    console.log("Écouteur de transition vidéo enregistré");
     
     // Return unsubscribe function
     return () => {
       listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
+      console.log("Écouteur de transition vidéo désenregistré");
     };
   }, []);
 
