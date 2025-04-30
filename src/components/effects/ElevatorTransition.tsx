@@ -1,147 +1,76 @@
-
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
-
-// Définition de l'ordre des pages pour déterminer la direction
-const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
+import React, { useRef, useEffect } from 'react';
+import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
+import './ElevatorTransition.css';
 
 interface ElevatorTransitionProps {
-  children: React.ReactNode;
+  /** Contenu de la page actuelle */
+  current: React.ReactNode;
+  /** Contenu de la page suivante */
+  next: React.ReactNode;
+  /** Passe à true pour démarrer la transition */
   isActive: boolean;
+  /** Callback quand la transition est finie (après 7s) */
   onAnimationComplete: () => void;
 }
 
-const ElevatorTransition = ({ children, isActive, onAnimationComplete }: ElevatorTransitionProps) => {
-  const location = useLocation();
-  const [direction, setDirection] = useState<'up' | 'down' | null>(null);
-  const [prevPath, setPrevPath] = useState(location.pathname);
-  const containerRef = useRef<HTMLDivElement>(null);
+const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
+  current,
+  next,
+  isActive,
+  onAnimationComplete
+}) => {
+  const { videoRef, currentVideo, playVideoTransition } = useBackgroundVideo({
+    videoUrl:   '/ascenseur.mp4',
+    videoUrlUV: '/ascenseur-uv.mp4',
+  });
 
-  // Détermine la direction de l'animation basée sur l'ordre des pages
+  const currentRef = useRef<HTMLDivElement>(null);
+  const nextRef    = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isActive) return;
+    // 1) Lance la vidéo
+    playVideoTransition();
 
-    const currentIndex = pageOrder.indexOf(location.pathname);
-    const prevIndex = pageOrder.indexOf(prevPath);
-    
-    if (currentIndex > prevIndex) {
-      setDirection('down');
-    } else if (currentIndex < prevIndex) {
-      setDirection('up');
-    } else {
-      setDirection(null);
-    }
+    // 2) Easy‐out des 2 premières secondes
+    currentRef.current?.classList.add('exit-up');
 
-    setPrevPath(location.pathname);
-  }, [isActive, location.pathname, prevPath]);
+    // 3) 5s après le début (7 – 2), easy‐in du contenu suivant
+    const enterTimeout = window.setTimeout(() => {
+      nextRef.current?.classList.add('enter-down');
+    }, 5000);
 
-  // Créer les variantes pour l'animation d'ascenseur
-  const elevatorVariants = {
-    initial: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '-100%' : direction === 'up' ? '100%' : 0,
-    }),
-    animate: {
-      y: 0,
-      transition: {
-        duration: 5,
-        ease: [0.16, 1, 0.3, 1], // Ease-out quint - un bon easing pour simulation d'ascenseur
-      },
-    },
-    exit: (direction: 'up' | 'down' | null) => ({
-      y: direction === 'down' ? '100%' : direction === 'up' ? '-100%' : 0,
-      transition: {
-        duration: 5,
-        ease: [0.7, 0, 0.84, 0], // Ease-in quint - départ progressif
-      },
-    }),
-  };
+    // 4) 7s pile -> fin de transition
+    const finishTimeout = window.setTimeout(() => {
+      onAnimationComplete();
+      // reset des classes pour la prochaine fois
+      currentRef.current?.classList.remove('exit-up');
+      nextRef.current?.classList.remove('enter-down');
+      nextRef.current?.classList.add('next-hidden');
+    }, 7000);
 
-  // Composant pour la tuile d'arrière-plan qui se répète infiniment
-  const InfiniteTileBackground = () => {
-    // Référence à 3 éléments de tuile pour créer l'effet de défilement infini
-    const tiles = Array.from({ length: 3 }, (_, i) => (
-      <div 
-        key={`tile-${i}`} 
-        className="absolute inset-x-0 h-screen bg-black"
-        style={{
-          top: `${i * 100}vh`,
-          backgroundImage: 'url("/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          height: '100vh',
-        }}
-      />
-    ));
-
-    return (
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="relative h-[300vh]" // Trois fois la hauteur de l'écran
-          initial={{ y: direction === 'up' ? '-100vh' : 0 }}
-          animate={{
-            y: direction === 'up' ? '-200vh' : '-100vh'
-          }}
-          transition={{
-            duration: 5,
-            ease: [0.16, 1, 0.3, 1],
-            repeat: 0,
-          }}
-        >
-          {tiles}
-        </motion.div>
-      </div>
-    );
-  };
-
-  // Composant pour l'effet de flou de mouvement
-  const BlurMotionEffect = ({ children }: { children: React.ReactNode }) => {
-    return (
-      <motion.div
-        initial={{ filter: "blur(0px)" }}
-        animate={{
-          filter: [
-            "blur(0px)",
-            "blur(8px)",
-            "blur(12px)",
-            "blur(8px)",
-            "blur(0px)"
-          ]
-        }}
-        transition={{
-          duration: 5,
-          times: [0, 0.2, 0.5, 0.8, 1],
-          ease: [0.16, 1, 0.3, 1]
-        }}
-        className="w-full h-full"
-      >
-        {children}
-      </motion.div>
-    );
-  };
+    return () => {
+      window.clearTimeout(enterTimeout);
+      window.clearTimeout(finishTimeout);
+    };
+  }, [isActive, playVideoTransition, onAnimationComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none" ref={containerRef}>
-      {isActive && (
-        <>
-          <InfiniteTileBackground />
-          
-          <motion.div
-            custom={direction}
-            variants={elevatorVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            onAnimationComplete={onAnimationComplete}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <BlurMotionEffect>
-              {children}
-            </BlurMotionEffect>
-          </motion.div>
-        </>
-      )}
+    <div className="elevator-container">
+      <video
+        ref={videoRef}
+        src={currentVideo}
+        muted
+        playsInline
+        preload="auto"
+        className="background-video"
+      />
+      <div ref={currentRef} className="elevator-content">
+        {current}
+      </div>
+      <div ref={nextRef} className="elevator-content next-hidden">
+        {next}
+      </div>
     </div>
   );
 };
