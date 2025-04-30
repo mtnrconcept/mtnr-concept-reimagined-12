@@ -29,6 +29,9 @@ export const Background = ({ depth = 0.08 }: BackgroundProps) => {
           <div className="absolute bottom-1/4 right-1/3 w-3 h-3 rounded-full bg-yellow-300/20 animate-pulse-yellow"
                style={{transform: 'translateZ(15px)'}}></div>
           
+          {/* Effet de ligne de grille en jaune pour plus de profondeur */}
+          <div className="absolute inset-0 bg-grid-pattern"></div>
+          
           {/* Vignette pour accentuer l'effet 3D */}
           <div className="absolute inset-0 bg-gradient-radial from-transparent to-black/30 pointer-events-none"></div>
         </div>

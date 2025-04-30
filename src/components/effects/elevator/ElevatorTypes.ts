@@ -21,8 +21,4 @@ export interface UseElevatorTransitionReturn {
   enterContent: ReactNode | null;
   contentEntranceDelay: number;
   isTransitioning: boolean;
-  repetileActive: boolean;
-  loopCount: number;
-  maxLoops: number;
-  finalSlideActive: boolean;
 }

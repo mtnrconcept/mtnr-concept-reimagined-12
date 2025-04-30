@@ -33,6 +33,15 @@
   transform: translateZ(-50px);
 }
 
+/* Nouveau motif de grille pour plus de profondeur */
+.bg-grid-pattern {
+  background-size: 80px 80px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 221, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 221, 0, 0.02) 1px, transparent 1px);
+  transform: translateZ(-80px) rotateX(10deg);
+}
+
 /* Radial gradient background */
 .bg-gradient-radial {
   background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%);

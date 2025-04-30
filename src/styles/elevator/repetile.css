@@ -1,64 +1,93 @@
 
 /**
  * Animations repetile - Effet de boucle infinie avec téléportation
- * Basé sur l'exemple fourni par l'utilisateur
+ * Version améliorée avec barrière et piste de défilement double
  */
 
-/* Durée de l'animation repetile - 1.5s par cycle, 4 cycles = 6s total */
-@keyframes teleport-up {
-  from { transform: translateY(0);     filter: blur(0); }
-  to   { transform: translateY(-100%); filter: blur(10px); }
+/* Style pour la barrière qui masque le défilement */
+.slider-barrier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  will-change: transform;
 }
 
-@keyframes teleport-down {
-  from { transform: translateY(0);     filter: blur(0); }
-  to   { transform: translateY(100%);  filter: blur(10px); }
+/* Piste de défilement avec deux blocs identiques */
+.slider-track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 200%; /* deux fois la hauteur */
 }
 
-/* Classes pour appliquer les animations répétées 4 fois */
-.repetile-up {
-  animation: teleport-up 1.5s ease-in;
-  animation-iteration-count: 4; /* 6 secondes au total */
+.slider-track .slide {
+  width: 100%;
+  height: 100%; /* chaque "slide" = 100% de la barrière */
 }
 
-.repetile-down {
-  animation: teleport-down 1.5s ease-in;
-  animation-iteration-count: 4; /* 6 secondes au total */
+/* Contenu sortant et entrant */
+.elevator-content {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
 }
 
-/* Animations pour les transitions finales */
+.exit-content {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.enter-content {
+  pointer-events: auto;
+  z-index: 3;
+  visibility: hidden;
+}
+
+/* Animation finale de slide */
 @keyframes slide-out-up {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(-100%); }
 }
 
 @keyframes slide-out-down {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(100%); }
 }
 
 @keyframes slide-in-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
 @keyframes slide-in-down {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
 }
 
-.slide-out-up {
+/* Classes pour appliquer les animations finales */
+.barrier-slide-out-up {
   animation: slide-out-up 1s ease-out forwards;
 }
 
-.slide-out-down {
+.barrier-slide-out-down {
   animation: slide-out-down 1s ease-out forwards;
 }
 
-.slide-in-up {
+.new-slide-in-up {
   animation: slide-in-up 1s ease-out forwards;
 }
 
-.slide-in-down {
+.new-slide-in-down {
   animation: slide-in-down 1s ease-out forwards;
+}
+
+/* Visibilité du nouveau contenu pendant la transition */
+.enter-content-visible {
+  visibility: visible;
 }
