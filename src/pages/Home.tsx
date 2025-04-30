@@ -42,7 +42,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-x-hidden z-10">
       {/* Enhanced 3D parallax background */}
       <Parallax3DScene />
       
