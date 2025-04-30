@@ -14,7 +14,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const { pathname } = useLocation();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -31,8 +31,8 @@ export default function Navbar() {
       });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -76,7 +76,12 @@ export default function Navbar() {
       setMenuOpen(false);
     }
     
-    // Utiliser l'historique pour naviguer en douceur sans recharger la page
+    // Si nous sommes déjà sur la page, ne rien faire
+    if (location.pathname === path) {
+      return;
+    }
+    
+    // Naviguer à la page via React Router
     window.history.pushState({}, '', path);
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
@@ -124,14 +129,14 @@ export default function Navbar() {
                 onClick={(e) => handleNavigation(link.path, e)}
                 className={cn(
                   "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
-                  pathname === link.path 
-                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
-                    : "text-white/80"
+                  location.pathname === link.path 
+                    ? "text-yellow-400 font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
+                    : "text-white/90"
                 )}
               >
                 <span className="relative z-10">{link.name}</span>
                 <span className="absolute inset-0 bg-black/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-                {pathname === link.path && (
+                {location.pathname === link.path && (
                   <motion.span 
                     className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400"
                     layoutId="activeNav"
@@ -176,7 +181,7 @@ export default function Navbar() {
                   onClick={(e) => handleNavigation(link.path, e)}
                   className={cn(
                     "block px-6 py-3 font-medium transition-all",
-                    pathname === link.path ? "text-primary" : "text-white/80"
+                    location.pathname === link.path ? "text-yellow-400 font-bold" : "text-white/80"
                   )}
                 >
                   {link.name}
