@@ -12,7 +12,7 @@ export interface ElevatorTransitionProps {
 export interface UseElevatorTransitionProps {
   isActive: boolean;
   onAnimationComplete: () => void;
-  currentPath: ReactNode;  // Modifié de string à ReactNode pour correspondre au type attendu
+  currentPath: ReactNode;
 }
 
 export interface UseElevatorTransitionReturn {

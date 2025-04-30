@@ -9,10 +9,10 @@ interface BackgroundProps {
 export const Background = ({ depth = 0.08 }: BackgroundProps) => {
   return (
     <>
-      {/* Vidéo de fond */}
+      {/* Video background */}
       <BackgroundVideo videoSrc="/lovable-uploads/ascensceur.mp4" />
       
-      {/* Couche pour les effets de grille et d'overlay */}
+      {/* Layer for grid and overlay effects */}
       <div 
         className="fixed inset-0 w-full h-full z-[1]"
         style={{

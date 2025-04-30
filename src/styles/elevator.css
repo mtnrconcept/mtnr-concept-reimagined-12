@@ -42,12 +42,12 @@
   z-index: 3;
 }
 
-/* Style pour inverser la vidéo verticalement */
+/* Style to vertically reverse the video */
 .video-reversed {
   transform: scaleY(-1);
 }
 
-/* Animation du flou de mouvement */
+/* Motion blur animation */
 @keyframes blurMotion {
   0% { filter: blur(0px); }
   20% { filter: blur(8px); }
@@ -60,7 +60,7 @@
   animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Animations pour les transitions verticales */
+/* Animations for vertical transitions */
 @keyframes slideOutUp {
   0% { transform: translateY(0); opacity: 1; }
   100% { transform: translateY(-100vh); opacity: 0; }
@@ -97,7 +97,7 @@
   animation: slideInDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-/* Styles pour la vidéo de fond en pause */
+/* Styles for paused background video */
 .background-video {
   position: fixed;
   inset: 0;

@@ -19,14 +19,14 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     currentPath: children
   });
   
-  // Si la transition n'est pas active, on affiche simplement le contenu
+  // If transition not active, simply display content
   if (!isTransitioning) {
     return <>{children}</>;
   }
 
   return (
     <div className="elevator-container">
-      {/* Animation de sortie du contenu actuel avec effet repetile */}
+      {/* Exit content animation with repetile effect */}
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
@@ -35,7 +35,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
               : direction === 'down' ? 'slide-out-up' : 'slide-out-down'
           }`}
           style={{
-            // Appliquer un style différent pour la dernière animation
+            // Apply different style for the last animation
             animationIterationCount: repetileActive ? maxLoops : 1
           }}
         >
@@ -43,7 +43,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
         </div>
       )}
       
-      {/* Animation d'entrée du nouveau contenu (seulement après la fin de repetile) */}
+      {/* Enter content animation (only after repetile ends) */}
       {enterContent && !repetileActive && loopCount >= maxLoops && (
         <div
           className={`elevator-content enter-content ${
