@@ -15,8 +15,8 @@ interface BackgroundVideoProps {
 }
 
 const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({ 
-  videoUrl = "/lovable-uploads/Video%20fond%20normale.mp4", 
-  videoUrlUV = "/lovable-uploads/Video%20fond%20UV.mp4",
+  videoUrl = "/lovable-uploads/Videofondnormale.mp4", 
+  videoUrlUV = "/lovable-uploads/VideofondUV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }, ref) => {
   const { normalVideoRef, uvVideoRef, videoAvailability } = useVideoTransition();

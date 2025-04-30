@@ -15,8 +15,8 @@ export const useVideoTransition = () => {
     uv: true
   });
   
-  const normalVideoUrl = '/lovable-uploads/Video%20fond%20normale.mp4';
-  const uvVideoUrl = '/lovable-uploads/Video%20fond%20UV.mp4';
+  const normalVideoUrl = '/lovable-uploads/Videofondnormale.mp4';
+  const uvVideoUrl = '/lovable-uploads/VideofondUV.mp4';
   
   // Précharger les vidéos et vérifier leur disponibilité
   const { preloadStatus } = useVideoPreload({

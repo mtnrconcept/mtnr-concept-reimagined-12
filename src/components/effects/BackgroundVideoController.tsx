@@ -8,8 +8,8 @@ export const BackgroundVideoController = () => {
   // Précharger les vidéos avec la nouvelle logique améliorée
   const { preloadStatus, isPreloading } = useVideoPreload({
     videoUrls: [
-      '/lovable-uploads/Video%20fond%20normale.mp4',
-      '/lovable-uploads/Video%20fond%20UV.mp4'
+      '/lovable-uploads/Videofondnormale.mp4',
+      '/lovable-uploads/VideofondUV.mp4'
     ],
     onPreloadComplete: (results) => {
       console.log('Résultats du préchargement:', results);
