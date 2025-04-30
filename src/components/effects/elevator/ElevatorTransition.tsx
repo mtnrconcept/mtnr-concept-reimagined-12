@@ -1,5 +1,6 @@
 
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ElevatorTransitionProps } from "./ElevatorTypes";
 import { useElevatorTransition } from "./useElevatorTransition";
 import { useVideoStore } from "@/components/effects/BackgroundVideoManager";
@@ -9,13 +10,17 @@ export function ElevatorTransition({
   isActive,
   onAnimationComplete,
 }: ElevatorTransitionProps) {
+  // Get current location for path
+  const location = useLocation();
+  
   // Get video store for controlling background video playback
   const videoStore = useVideoStore();
   
-  // Use the elevator transition hook with simplified props
+  // Use the elevator transition hook with required props
   const elevatorTransition = useElevatorTransition({
     isActive,
     onAnimationComplete,
+    currentPath: location.pathname,
   });
 
   // Play video when transition activates

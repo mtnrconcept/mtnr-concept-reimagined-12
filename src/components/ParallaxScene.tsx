@@ -1,6 +1,6 @@
 
 import { useRef } from 'react';
-import { Background } from './parallax/Background';
+import Background from './parallax/Background';
 import { useParallaxEffect } from '@/hooks/useParallaxEffect';
 import { parallaxElements } from './parallax/config';
 import { PaintSplash } from './parallax/PaintSplash';
