@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ElevatorTransitionProps } from './ElevatorTypes';
 import { useElevatorTransition } from './useElevatorTransition';
 
@@ -19,173 +19,46 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
     currentPath: children
   });
 
-  const barrierRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
   const [animationStarted, setAnimationStarted] = useState(false);
-  const animationRef = useRef<Animation|null>(null);
   const prevTransitionRef = useRef<boolean>(false);
-
-  // Utilisation de useMemo pour les calculs coûteux des phases d'animation
-  const animationConfig = useMemo(() => {
-    // --- Préparer les 8 phases ---
-    const weights = [8, 4, 2, 1, 1, 2, 4, 8];
-    const total = weights.reduce((sum, w) => sum + w, 0);
-    
-    // Durées en ms, offsets et blur
-    const durations = weights.map(w => (w * 7000) / total);
-    const offsets = [0];
-    durations.slice(0, -1).reduce((sum, d) => {
-      sum += d;
-      offsets.push(sum / 7000);
-      return sum;
-    }, 0);
-    offsets.push(1);
-    const blurMap = [0, 2, 6, 10, 10, 6, 2, 0];
-
-    return { weights, durations, offsets, blurMap };
-  }, []);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // On ne démarre l'anim que si isTransitioning *vient* de passer à true
+    // On ne démarre l'animation que si isTransitioning vient de passer à true
     if (!prevTransitionRef.current && isTransitioning) {
       setAnimationStarted(true);
       
-      const barrier = barrierRef.current;
-      const track = trackRef.current;
-      if (!barrier || !track) return;
-      
-      // Annule toute animation précédente
-      if (animationRef.current) {
-        animationRef.current.cancel();
-        animationRef.current = null;
+      // Déclencher la fin de l'animation après 7 secondes (vidéo + transitions)
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
       }
-
-      // Créer les contenus une seule fois plutôt qu'à chaque frame
-      const createDOMContent = (content: React.ReactNode): DocumentFragment => {
-        const template = document.createElement('template');
-        template.innerHTML = (content as React.ReactNode as any).toString();
-        return template.content;
-      };
       
-      const exitFragment = createDOMContent(exitContent);
-      const enterFragment = createDOMContent(enterContent);
-
-      // Supprimer tout contenu précédent avant d'ajouter de nouveaux slides
-      track.textContent = '';
-
-      // Utiliser requestAnimationFrame pour prévenir les forced reflows
-      requestAnimationFrame(() => {
-        // Créer un fragment pour batching DOM updates
-        const fragment = document.createDocumentFragment();
-        
-        // Créer les slides pour le contenu de sortie
-        for (let i = 0; i < 7; i++) {
-          const slide = document.createElement('div');
-          slide.className = 'slide';
-          slide.style.cssText = `
-            position: absolute;
-            top: ${i * 100}%;
-            width: 100%;
-            height: 100%;
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-          `;
-          
-          // Clone du contenu de sortie
-          slide.appendChild(exitFragment.cloneNode(true));
-          fragment.appendChild(slide);
-        }
-        
-        // Créer le dernier slide avec le contenu d'entrée
-        const lastSlide = document.createElement('div');
-        lastSlide.className = 'slide';
-        lastSlide.style.cssText = `
-          position: absolute;
-          top: 700%;
-          width: 100%;
-          height: 100%;
-          will-change: transform;
-          transform: translateZ(0);
-          backface-visibility: hidden;
-        `;
-        lastSlide.appendChild(enterFragment.cloneNode(true));
-        fragment.appendChild(lastSlide);
-        
-        // Ajouter tous les slides en une seule opération DOM
-        track.appendChild(fragment);
-        
-        // Appliquer les styles au track - utiliser CSS transform
-        track.style.cssText = `
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 800%;
-          will-change: transform, filter;
-          transform: translateZ(0);
-          backface-visibility: hidden;
-        `;
-        
-        // Rendre la barrière visible
-        barrier.style.visibility = 'visible';
-        
-        // Créer keyframes pour l'animation avec Web Animations API
-        const { offsets, blurMap } = animationConfig;
-        const keyframes = offsets.map((ofs, i) => ({
-          offset: ofs,
-          transform: `translateY(-${i * 100}%)`,
-          filter: `blur(${blurMap[i]}px)`
-        }));
-        
-        // Utiliser WAAPI pour l'animation
-        animationRef.current = track.animate(keyframes, {
-          duration: 7000,
-          easing: 'linear',
-          fill: 'forwards'
-        });
-        
-        // Gérer la fin de l'animation
-        animationRef.current.onfinish = () => {
-          // Swap du contenu
-          const mainContent = document.getElementById('main-content');
-          if (mainContent) {
-            // Mise à jour du DOM en une seule opération
-            const tempContainer = document.createElement('div');
-            tempContainer.appendChild(enterFragment.cloneNode(true));
-            mainContent.innerHTML = tempContainer.innerHTML;
-          }
-          
-          // Nettoyage
-          barrier.style.visibility = 'hidden';
-          track.textContent = '';
-          track.style.height = '';
-          animationRef.current = null;
-          setAnimationStarted(false);
-          onAnimationComplete();
-        };
-      });
+      timeoutRef.current = window.setTimeout(() => {
+        setAnimationStarted(false);
+        onAnimationComplete();
+      }, 7000); // Durée totale: 7s (2s sortie + 3s vidéo + 2s entrée)
     }
 
-    // si la transition s'arrête (retour à false), on reset notre flag
+    // Si la transition s'arrête (retour à false), on reset notre flag
     if (!isTransitioning && animationStarted) {
       setAnimationStarted(false);
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     }
     
     prevTransitionRef.current = isTransitioning;
     
-    // Cleanup
+    // Nettoyage
     return () => {
-      if (animationRef.current) {
-        animationRef.current.cancel();
-      }
-      if (barrierRef.current) {
-        barrierRef.current.style.visibility = 'hidden';
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
       }
     };
-  }, [isTransitioning, animationStarted, animationConfig]);
+  }, [isTransitioning, animationStarted, onAnimationComplete]);
 
-  if (!isTransitioning) {
+  if (!isTransitioning && !animationStarted) {
     return (
       <div id="main-content" className="elevator-content">
         {children}
@@ -195,29 +68,36 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
 
   return (
     <div className="elevator-container">
-      {/* Contenu principal, caché pendant l'animation */}
-      <div id="main-content" style={{ visibility: animationStarted ? 'hidden' : 'visible' }}>
+      {/* Contenu sortant avec animation de sortie vers le haut */}
+      <div 
+        className={`elevator-content exit-content ${animationStarted ? 'animate-slide-out-up' : ''}`}
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 5
+        }}
+      >
         {exitContent}
       </div>
 
-      {/* Barrière + track pour l'animation */}
+      {/* Contenu entrant avec animation d'entrée par le bas - 
+           démarre après 5 secondes (2s sortie + 3s vidéo) */}
       <div 
-        ref={barrierRef} 
-        className="slider-barrier" 
+        className={`elevator-content enter-content ${animationStarted ? 'animate-slide-in-up' : ''}`}
         style={{ 
-          visibility: 'hidden', 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%', 
-          overflow: 'hidden',
-          willChange: 'transform',
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden'
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 3,
+          animationDelay: '5s'
         }}
       >
-        <div ref={trackRef} id="slider-track"></div>
+        {enterContent}
       </div>
     </div>
   );

@@ -30,11 +30,12 @@
   align-items: center;
   justify-content: center;
   will-change: transform, opacity;
+  pointer-events: auto;
 }
 
 .exit-content {
   pointer-events: none;
-  z-index: 2;
+  z-index: 5;
 }
 
 .enter-content {
@@ -47,28 +48,10 @@
   transform: scaleY(-1);
 }
 
-/* Motion blur animation */
-@keyframes blurMotion {
-  0% { filter: blur(0px); }
-  20% { filter: blur(8px); }
-  50% { filter: blur(12px); }
-  80% { filter: blur(8px); }
-  100% { filter: blur(0px); }
-}
-
-.blur-motion {
-  animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Animations for vertical transitions */
+/* Animations for vertical transitions - Simplified with ease-out/ease-in */
 @keyframes slideOutUp {
   0% { transform: translateY(0); opacity: 1; }
   100% { transform: translateY(-100vh); opacity: 0; }
-}
-
-@keyframes slideOutDown {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
 }
 
 @keyframes slideInUp {
@@ -76,28 +59,20 @@
   100% { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes slideInDown {
-  0% { transform: translateY(-100vh); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+/* Animations simplifiées avec 2 secondes de durée */
+.animate-slide-out-up {
+  animation: slideOutUp 2s cubic-bezier(0.33, 1, 0.68, 1) forwards; /* easy-out timing */
+  will-change: transform, opacity;
 }
 
-.slide-out-up {
-  animation: slideOutUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+.animate-slide-in-up {
+  animation: slideInUp 2s cubic-bezier(0.33, 1, 0.68, 1) forwards; /* easy-out timing */
+  animation-delay: 5s; /* Démarre après 5s (2s sortie + 3s vidéo) */
+  will-change: transform, opacity;
+  opacity: 0; /* Commence caché */
 }
 
-.slide-out-down {
-  animation: slideOutDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-.slide-in-up {
-  animation: slideInUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-.slide-in-down {
-  animation: slideInDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-/* Styles for paused background video */
+/* Styles for background video */
 .background-video {
   position: fixed;
   inset: 0;

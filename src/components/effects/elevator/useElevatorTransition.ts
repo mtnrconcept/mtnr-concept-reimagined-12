@@ -4,11 +4,8 @@ import { useLocation } from 'react-router-dom';
 import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn } from './ElevatorTypes';
 import { useBackgroundVideoStore } from '../BackgroundVideoController';
 
-// Définition de l'ordre des pages pour déterminer la direction
-const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
-
-// Configuration des timings pour l'animation avancée
-const ANIMATION_TOTAL_DURATION = 7000;  // 7s pour l'animation complète avec 8 phases
+// Configuration des timings pour l'animation simplifiée
+const ANIMATION_TOTAL_DURATION = 7000;  // 7s pour l'animation complète (2s sortie + 3s vidéo + 2s entrée)
 
 export function useElevatorTransition({
   isActive,
@@ -19,15 +16,11 @@ export function useElevatorTransition({
   const [direction, setDirection] = useState<TransitionDirection>(null);
   const [exitContent, setExitContent] = useState<React.ReactNode | null>(null);
   const [enterContent, setEnterContent] = useState<React.ReactNode | null>(null);
-  const [targetPath, setTargetPath] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [prevPath, setPrevPath] = useState(location.pathname);
   
   // Accès au store vidéo
   const { startVideo, pauseVideo } = useBackgroundVideoStore();
-  
-  // Determine content entrance delay
-  const contentEntranceDelay = 0;
   
   // Effet pour détecter les changements de route
   useEffect(() => {
@@ -35,37 +28,21 @@ export function useElevatorTransition({
     if (isActive && !isTransitioning) {
       setIsTransitioning(true);
       
-      // Déterminer la direction en fonction de l'ordre des pages
-      const currentIndex = pageOrder.indexOf(prevPath);
-      const newIndex = pageOrder.indexOf(location.pathname);
-      
-      console.log(`Transition de: ${prevPath} (${currentIndex}) vers ${location.pathname} (${newIndex})`);
-      
-      let transitionDirection: TransitionDirection = 'down';
-      
-      if (newIndex > currentIndex) {
-        transitionDirection = 'down';
-      } else if (newIndex < currentIndex) {
-        transitionDirection = 'up';
-      }
-      
-      setDirection(transitionDirection);
+      // Direction toujours vers le bas pour la cohérence
+      setDirection('down');
       
       // Conserver le contenu actuel comme contenu de sortie
       setExitContent(currentPath);
       
       // Mettre à jour le contenu d'entrée (le même que le contenu actuel pour l'instant)
-      // Sera mis à jour après la navigation
       setEnterContent(currentPath);
       
-      // Enregistrer le chemin cible pour plus tard
-      setTargetPath(location.pathname);
       setPrevPath(location.pathname);
       
-      // Démarrer la vidéo en arrière-plan dans la bonne direction
-      startVideo(transitionDirection === 'down' ? 'forward' : 'reverse');
+      // Démarrer la vidéo en arrière-plan
+      startVideo('forward');
       
-      console.log(`Animation Repetile avancée: ${ANIMATION_TOTAL_DURATION}ms avec 8 phases`);
+      console.log(`Animation simplifiée: ${ANIMATION_TOTAL_DURATION}ms (2s sortie + 3s vidéo + 2s entrée)`);
     }
     
     // Si isActive devient false, réinitialiser
@@ -74,7 +51,6 @@ export function useElevatorTransition({
       setExitContent(null);
       setEnterContent(null);
       setDirection(null);
-      setTargetPath(null);
       
       // Pause de la vidéo si elle joue encore
       pauseVideo();
@@ -85,7 +61,7 @@ export function useElevatorTransition({
     direction,
     exitContent,
     enterContent,
-    contentEntranceDelay,
+    contentEntranceDelay: 5000, // 5s avant l'entrée du nouveau contenu
     isTransitioning
   };
 }
