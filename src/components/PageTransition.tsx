@@ -22,10 +22,6 @@ export default function PageTransition({
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
-  // Contenu pour la transition d'ascenseur
-  const [currentContent, setCurrentContent] = useState<React.ReactNode>(children);
-  const [nextContent, setNextContent] = useState<React.ReactNode>(children);
 
   // On stocke la route précédente
   const [fromPath, setFromPath] = useState(location.pathname);
@@ -42,14 +38,9 @@ export default function PageTransition({
     if (location.pathname !== prevPathRef.current) {
       setIsTransitioning(true);
       setFromPath(prevPathRef.current);
-      
-      // Mettre à jour le contenu pour la transition
-      setCurrentContent(children);
-      setNextContent(children);
-      
       prevPathRef.current = location.pathname;
     }
-  }, [location.pathname, children]);
+  }, [location.pathname]);
 
   const handleDisperseComplete = () => {
     console.log('Dispersion terminée, application de l\'effet de fumée');
@@ -75,11 +66,15 @@ export default function PageTransition({
 
       {/* Effet d'ascenseur */}
       <ElevatorTransition 
-        current={currentContent}
-        next={nextContent}
         isActive={isTransitioning}
         onAnimationComplete={handleTransitionComplete}
-      />
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md flex items-center justify-center">
+          <div className="text-white text-4xl font-bold">
+            Transition en cours...
+          </div>
+        </div>
+      </ElevatorTransition>
 
       {/* Utilisation du nouveau composant de transition */}
       <PageContentTransition>

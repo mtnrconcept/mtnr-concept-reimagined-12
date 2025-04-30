@@ -62,9 +62,6 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       removeUVCircle();
     }
     
-    // Signal pour déclencher les transitions vidéo
-    console.log("État torche changé:", isTorchActive, "Mode UV:", uvMode);
-    
     return () => {
       removeUVCircle();
     };

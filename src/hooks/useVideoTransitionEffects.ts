@@ -18,6 +18,7 @@ interface UseVideoTransitionEffectsProps {
 export const useVideoTransitionEffects = ({
   videoRef,
   isFirstLoad,
+  setIsFirstLoad,
   isTransitioning,
   hasUserInteraction,
   currentVideo,
@@ -28,48 +29,65 @@ export const useVideoTransitionEffects = ({
 }: UseVideoTransitionEffectsProps) => {
   const navigation = useNavigation();
 
-  // Effet pour les changements de mode UV et l'activation de la torche
+  // Effet pour les changements de mode UV uniquement
   useEffect(() => {
-    if (!isFirstLoad && isTorchActive && hasUserInteraction && !isTransitioning) {
-      console.log("Torche active:", isTorchActive, "Mode UV:", uvMode);
+    if (!isFirstLoad && isTorchActive && hasUserInteraction) {
+      console.log("Mode UV changé à:", uvMode, "- Lancement de la transition...");
       // Utiliser setTimeout pour éviter les problèmes de timing
-      const timer = setTimeout(() => {
-        console.log("Déclenchement de la transition vidéo");
-        playVideoTransition();
-      }, 100);
+      const timer = setTimeout(() => playVideoTransition(), 100);
       return () => clearTimeout(timer);
     }
-  }, [uvMode, isTorchActive, isFirstLoad, playVideoTransition, hasUserInteraction, isTransitioning]);
+  }, [uvMode, isFirstLoad, playVideoTransition, isTorchActive, hasUserInteraction]);
 
   // Écouter les événements de navigation
   useEffect(() => {
     const handleVideoTransition = () => {
-      if (hasUserInteraction && !isTransitioning) {
+      if (hasUserInteraction) {
         playVideoTransition();
       }
     };
     
     const unregister = navigation.registerVideoTransitionListener(handleVideoTransition);
     return unregister;
-  }, [navigation, playVideoTransition, hasUserInteraction, isTransitioning]);
+  }, [navigation, playVideoTransition, hasUserInteraction]);
   
-  // Gestion des écouteurs d'événements pour la première interaction
+  // Écouter l'activation de la torche
   useEffect(() => {
-    const handleInteraction = () => {
-      handleUserInteraction();
-      // Tenter de lire la vidéo après l'interaction utilisateur
-      if (isTorchActive && !isTransitioning) {
-        setTimeout(() => playVideoTransition(), 100);
+    if (!isFirstLoad && isTorchActive !== undefined && hasUserInteraction) {
+      // Si la torche vient d'être activée, s'assurer que la bonne vidéo est sélectionnée
+      const videoElement = videoRef.current;
+      if (videoElement && videoElement.src !== currentVideo) {
+        console.log("Torche changée, mise à jour de la source vidéo:", currentVideo);
+        videoElement.src = currentVideo;
+        videoElement.load();
       }
-    };
+    }
+  }, [isTorchActive, isFirstLoad, currentVideo, hasUserInteraction, videoRef]);
+  
+  // Initialisation et gestion de la visibilité
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    // S'assurer que la vidéo a la bonne source dès le début
+    if (videoElement.src !== currentVideo) {
+      videoElement.src = currentVideo;
+    }
+    
+    if (isFirstLoad) {
+      videoElement.load();
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      setIsFirstLoad(false);
+      console.log('Vidéo initialisée avec source:', currentVideo);
+    }
     
     // Ajout des écouteurs pour la première interaction utilisateur
-    document.addEventListener('click', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
-      const videoElement = videoRef.current;
       if (!videoElement) return;
       
       if (document.hidden) {
@@ -85,8 +103,12 @@ export const useVideoTransitionEffects = ({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      
+      if (videoElement) {
+        videoElement.pause();
+      }
     };
-  }, [handleUserInteraction, videoRef, isFirstLoad, isTransitioning, hasUserInteraction, isTorchActive, playVideoTransition]);
+  }, [isFirstLoad, isTransitioning, currentVideo, handleUserInteraction, hasUserInteraction, videoRef, setIsFirstLoad]);
 };

@@ -5,31 +5,11 @@ import { useUVMode } from "./UVModeContext";
 import { use3DTorch } from "./Torch3DContext";
 import { Flashlight, Box, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigation } from "./NavigationContext";
 
 export const TorchToggle = () => {
   const { isTorchActive, setIsTorchActive } = useTorch();
   const { uvMode, toggleUVMode } = useUVMode();
   const { is3DModeActive, toggle3DMode } = use3DTorch();
-  const navigation = useNavigation();
-
-  const handleToggleTorch = () => {
-    const newState = !isTorchActive;
-    setIsTorchActive(newState);
-    console.log("Torch toggled:", newState);
-    
-    // Si la torche vient d'être désactivée, désactiver aussi le mode UV
-    if (!newState && uvMode) {
-      toggleUVMode();
-    }
-    
-    // Déclencher une transition vidéo si nécessaire
-    if (newState) {
-      setTimeout(() => {
-        navigation.triggerVideoTransition();
-      }, 100);
-    }
-  };
 
   const handleToggleUV = () => {
     // Add small vibration on mobile if supported
@@ -42,17 +22,12 @@ export const TorchToggle = () => {
     }
     
     toggleUVMode();
-    
-    // Déclencher une transition vidéo
-    setTimeout(() => {
-      navigation.triggerVideoTransition();
-    }, 100);
   };
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex gap-2">
       <Button
-        onClick={handleToggleTorch}
+        onClick={() => setIsTorchActive(!isTorchActive)}
         className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 ${
           isTorchActive 
             ? "bg-yellow-400 text-black shadow-yellow-400/50" 
