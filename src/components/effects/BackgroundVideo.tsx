@@ -22,9 +22,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const location = useLocation();
   const navigation = useNavigation();
   
-  // États locaux optimisés avec valeurs initiales correctes
+  // États locaux avec valeurs initiales correctes
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [hasUserInteraction, setHasUserInteraction] = useState(false);
   
   // Définir le bon chemin de vidéo basé sur le mode UV
   // Si uvMode actif = Composition 1.mp4
@@ -33,29 +34,51 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     return uvMode ? videoUrl : videoUrlUV;
   }, [uvMode, videoUrl, videoUrlUV]);
 
+  // Fonction pour gérer la première interaction utilisateur
+  const handleUserInteraction = useCallback(() => {
+    if (!hasUserInteraction) {
+      setHasUserInteraction(true);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    }
+  }, [hasUserInteraction]);
+
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
     if (!videoElement || isTransitioning) return;
     
     try {
-      console.log('Transition vidéo déclenchée');
+      console.log('Tentative de transition vidéo - Mode UV:', uvMode);
       setIsTransitioning(true);
       
       // S'assurer que la vidéo est chargée avec la bonne source avant de jouer
       if (videoElement.src !== currentVideo) {
+        console.log('Changement de source vidéo vers:', currentVideo);
         videoElement.src = currentVideo;
+        
+        // Attendre que les métadonnées soient chargées avant de continuer
+        if (!videoElement.readyState >= 2) {
+          await new Promise((resolve) => {
+            const handleMetadata = () => {
+              videoElement.removeEventListener('loadedmetadata', handleMetadata);
+              resolve(null);
+            };
+            videoElement.addEventListener('loadedmetadata', handleMetadata);
+          });
+        }
       }
       
-      videoElement.load();
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
       
       // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
       const handleVideoEnded = () => {
         console.log('Vidéo terminée, mise en pause');
-        videoElement.pause();
-        videoElement.currentTime = 0;
+        if (videoElement) {
+          videoElement.pause();
+          videoElement.currentTime = 0;
+        }
         setIsTransitioning(false);
         videoElement.removeEventListener('ended', handleVideoEnded);
       };
@@ -63,40 +86,50 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       videoElement.removeEventListener('ended', handleVideoEnded);
       videoElement.addEventListener('ended', handleVideoEnded);
       
+      console.log('Lecture de la vidéo...');
       await videoElement.play();
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);
-      if (videoElement) {
-        videoElement.removeEventListener('ended', () => {});
-      }
     }
-  }, [isTransitioning, currentVideo]);
+  }, [isTransitioning, currentVideo, uvMode]);
 
-  // Effet pour les changements de mode UV
-  // Déclencher la transition uniquement quand le mode UV change
+  // Effet pour les changements de mode UV uniquement
   useEffect(() => {
-    if (!isFirstLoad) {
-      // Petit délai pour s'assurer que le DOM est prêt
-      const timer = setTimeout(() => playVideoTransition(), 50);
+    if (!isFirstLoad && isTorchActive && hasUserInteraction) {
+      console.log("Mode UV changé à:", uvMode, "- Lancement de la transition...");
+      // Utiliser setTimeout pour éviter les problèmes de timing
+      const timer = setTimeout(() => playVideoTransition(), 100);
       return () => clearTimeout(timer);
     }
-  }, [uvMode, playVideoTransition, isFirstLoad]);
+  }, [uvMode, isFirstLoad, playVideoTransition, isTorchActive, hasUserInteraction]);
 
-  // Ne pas déclencher de transition si seulement la torche est activée/désactivée
-  // sans changement de mode UV
+  // Écouter les événements de navigation
   useEffect(() => {
-    // Ne rien faire si seulement l'état de la torche change
-    // La vidéo reste la même selon le mode UV actuel
-  }, [isTorchActive]);
-
-  // Effet pour écouter les événements de navigation
-  useEffect(() => {
-    const unregister = navigation.registerVideoTransitionListener(playVideoTransition);
+    const handleVideoTransition = () => {
+      if (hasUserInteraction) {
+        playVideoTransition();
+      }
+    };
+    
+    const unregister = navigation.registerVideoTransitionListener(handleVideoTransition);
     return unregister;
-  }, [navigation, playVideoTransition]);
+  }, [navigation, playVideoTransition, hasUserInteraction]);
   
-  // Effet d'initialisation et de gestion des transitions de page
+  // Écouter l'activation de la torche
+  useEffect(() => {
+    if (!isFirstLoad && isTorchActive !== undefined && hasUserInteraction) {
+      // Si la torche vient d'être activée, s'assurer que la bonne vidéo est sélectionnée
+      const videoElement = videoRef.current;
+      if (videoElement && videoElement.src !== currentVideo) {
+        console.log("Torche changée, mise à jour de la source vidéo:", currentVideo);
+        videoElement.src = currentVideo;
+        videoElement.load();
+      }
+    }
+  }, [isTorchActive, isFirstLoad, currentVideo, hasUserInteraction]);
+  
+  // Initialisation et gestion de la visibilité
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
@@ -104,15 +137,19 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     // S'assurer que la vidéo a la bonne source dès le début
     if (videoElement.src !== currentVideo) {
       videoElement.src = currentVideo;
-      videoElement.load();
     }
     
     if (isFirstLoad) {
+      videoElement.load();
       videoElement.pause();
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
-      console.log('Vidéo initialisée en pause avec source:', currentVideo);
+      console.log('Vidéo initialisée avec source:', currentVideo);
     }
+    
+    // Ajout des écouteurs pour la première interaction utilisateur
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
@@ -120,7 +157,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       if (document.hidden) {
         videoElement.pause();
-      } else if (!isFirstLoad && isTransitioning) {
+      } else if (!isFirstLoad && isTransitioning && hasUserInteraction) {
         videoElement.play().catch(err => {
           console.error('Erreur lors de la reprise de lecture:', err);
         });
@@ -131,12 +168,14 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      
       if (videoElement) {
         videoElement.pause();
-        videoElement.removeEventListener('ended', () => {});
       }
     };
-  }, [location.pathname, isFirstLoad, isTransitioning, currentVideo]);
+  }, [isFirstLoad, isTransitioning, currentVideo, handleUserInteraction, hasUserInteraction]);
 
   // Préchargement des vidéos
   useEffect(() => {

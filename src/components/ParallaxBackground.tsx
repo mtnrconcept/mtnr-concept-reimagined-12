@@ -9,7 +9,7 @@ interface ParallaxBackgroundProps {
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   return (
     <>
-      {/* Remplacer l'image de fond par la vidéo */}
+      {/* BackgroundVideo en fond */}
       <BackgroundVideo />
       
       {/* Container pour les éléments parallax */}
