@@ -1,12 +1,12 @@
 
-/* Import base styles */
-@import './styles/base.css';
+/* Import Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Import component styles */
+/* Import component styles - these rely on @layer components */
 @import './styles/components.css';
-
-/* Import flashlight effects */
 @import './styles/flashlight.css';
-
-/* Import UV mode styles */
+@import './styles/elevator.css';
 @import './styles/uv-mode.css';
+@import './styles/video.css';
