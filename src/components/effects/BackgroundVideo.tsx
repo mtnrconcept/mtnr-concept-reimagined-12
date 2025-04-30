@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useUVMode } from './UVModeContext';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from './NavigationContext';
@@ -20,46 +20,26 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   const location = useLocation();
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  // Inversion ici - quand UV est activé, on montre Composition 1.mp4 (videoUrl)
-  // quand UV est désactivé, on montre Composition 1_1.mp4 (videoUrlUV)
-  const [currentVideo, setCurrentVideo] = useState(videoUrlUV);
   const navigation = useNavigation();
   
-  // Gestion du changement de vidéo lorsque le mode UV change
-  useEffect(() => {
-    // Inversion des vidéos selon l'état d'UV
-    const newVideoUrl = uvMode ? videoUrl : videoUrlUV;
-    
-    if (currentVideo !== newVideoUrl) {
-      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
-      setCurrentVideo(newVideoUrl);
-      
-      // Jouer la transition vidéo immédiatement quand le mode UV change
-      if (isTorchActive) {
-        setTimeout(() => playVideoTransition(), 50); // Petit délai pour s'assurer que currentVideo est mis à jour
-      }
-    }
+  // États locaux optimisés avec valeurs initiales correctes
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Utilisation de useMemo pour éviter des recalculs inutiles
+  const currentVideo = useMemo(() => {
+    return uvMode ? videoUrl : videoUrlUV;
   }, [uvMode, videoUrl, videoUrlUV]);
 
-  // Jouer la vidéo quand la torche est activée/désactivée
-  useEffect(() => {
-    if (!isFirstLoad) {
-      // Ne pas changer de vidéo ici, juste jouer la transition
-      playVideoTransition();
-    }
-  }, [isTorchActive]);
-
-  // Fonction pour jouer la vidéo en transition
-  const playVideoTransition = async () => {
+  // Version optimisée de playVideoTransition avec useCallback
+  const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
     if (!videoElement || isTransitioning) return;
     
     try {
-      console.log('Transition vidéo déclenchée (torche ou navigation)');
+      console.log('Transition vidéo déclenchée');
       setIsTransitioning(true);
-      videoElement.load(); // Recharge la vidéo avec la source actuelle
+      videoElement.load();
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
       
@@ -69,13 +49,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.pause();
         videoElement.currentTime = 0;
         setIsTransitioning(false);
-        // Retirer l'écouteur pour éviter des déclenchements multiples
         videoElement.removeEventListener('ended', handleVideoEnded);
       };
       
-      // S'assurer qu'on n'a pas d'écouteurs en double
       videoElement.removeEventListener('ended', handleVideoEnded);
-      // Ajouter l'écouteur d'événement
       videoElement.addEventListener('ended', handleVideoEnded);
       
       await videoElement.play();
@@ -86,43 +63,45 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.removeEventListener('ended', () => {});
       }
     }
-  };
+  }, [isTransitioning]);
 
-  // Écouter les événements de navigation pour jouer la vidéo instantanément
+  // Effet pour les changements de mode UV (avec dépendances optimisées)
   useEffect(() => {
-    const unregister = navigation.registerVideoTransitionListener(() => {
-      // On ne change pas la vidéo lors de la navigation, on joue juste la transition
-      playVideoTransition();
-    });
+    if (!isFirstLoad && isTorchActive) {
+      // Petit délai pour s'assurer que le DOM est prêt
+      const timer = setTimeout(() => playVideoTransition(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [uvMode, isTorchActive, isFirstLoad, playVideoTransition]);
+
+  // Effet pour écouter les événements de navigation
+  useEffect(() => {
+    const unregister = navigation.registerVideoTransitionListener(playVideoTransition);
     return unregister;
-  }, [navigation]);
+  }, [navigation, playVideoTransition]);
   
-  // Gestion de la lecture/pause de la vidéo lors des transitions de page
+  // Effet d'initialisation et de gestion des transitions de page
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
     if (isFirstLoad) {
-      // À la première charge, mettre la vidéo en pause
       videoElement.pause();
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
       console.log('Vidéo initialisée en pause');
-    } else {
-      // Lors des changements de route, jouer la vidéo une seule fois
-      playVideoTransition();
     }
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
-      if (document.hidden && videoElement) {
+      if (!videoElement) return;
+      
+      if (document.hidden) {
         videoElement.pause();
-        console.log('Page non visible, vidéo en pause');
-      } else if (videoElement && !isFirstLoad && isTransitioning) {
+      } else if (!isFirstLoad && isTransitioning) {
         videoElement.play().catch(err => {
           console.error('Erreur lors de la reprise de lecture:', err);
         });
-        console.log('Page à nouveau visible pendant transition, reprise de la lecture');
       }
     };
     
@@ -132,15 +111,30 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (videoElement) {
         videoElement.pause();
-        // Retirer tous les écouteurs d'événements
         videoElement.removeEventListener('ended', () => {});
       }
     };
-  }, [location.pathname, isFirstLoad]);
+  }, [location.pathname, isFirstLoad, isTransitioning]);
+
+  // Préchargement des vidéos
+  useEffect(() => {
+    const preloadVideos = async () => {
+      const videoUrls = [videoUrl, videoUrlUV];
+      for (const url of videoUrls) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = url;
+        link.as = 'video';
+        document.head.appendChild(link);
+      }
+    };
+    
+    preloadVideos();
+  }, [videoUrl, videoUrlUV]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
-      {/* Vidéo en fond */}
+      {/* Vidéo en fond avec optimisation de performance */}
       <video
         ref={videoRef}
         className="absolute inset-0 min-w-full min-h-full object-cover"
@@ -152,14 +146,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         <source src={currentVideo} type="video/mp4" />
       </video>
       
-      {/* Grille */}
+      {/* Grille avec performance optimisée */}
       <div 
         className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
           backgroundSize: '35px 35px', 
           transform: 'translateZ(-50px)',
-          mixBlendMode: 'overlay'
+          mixBlendMode: 'overlay',
+          willChange: 'transform'
         }}
       />
       

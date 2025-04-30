@@ -18,7 +18,7 @@ export const Background = ({
     return <BackgroundVideo fallbackImage={imagePath} />;
   }
   
-  // Sinon, on utilise l'image de fond classique
+  // Sinon, on utilise l'image de fond classique avec performance optimisée
   return (
     <div 
       className="fixed inset-0 w-full h-full"
@@ -59,7 +59,8 @@ export const Background = ({
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
           backgroundSize: '35px 35px', 
           transform: 'translateZ(-50px)',
-          mixBlendMode: 'overlay'
+          mixBlendMode: 'overlay',
+          willChange: 'transform'
         }}
       />
       
