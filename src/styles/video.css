@@ -1,21 +1,50 @@
 
-.background-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  transition: opacity 0.5s ease;
-}
-
-.video-transitioning {
-  opacity: 1;
-  z-index: 1;
-}
-
-.video-hidden {
-  opacity: 0;
-  z-index: 0;
+@layer components {
+  .background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    min-width: 100%;
+    min-height: 100%;
+    transition: opacity 0.5s ease;
+    will-change: opacity;
+  }
+  
+  .video-normal {
+    display: block;
+  }
+  
+  .video-uv {
+    display: none;
+  }
+  
+  .uv-active .video-normal {
+    display: none;
+  }
+  
+  .uv-active .video-uv {
+    display: block;
+  }
+  
+  .video-transitioning {
+    opacity: 1;
+    z-index: 1;
+    animation: videoPulse 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .video-hidden {
+    opacity: 0;
+  }
+  
+  @keyframes videoPulse {
+    0% { filter: brightness(1) saturate(1); }
+    25% { filter: brightness(1.3) saturate(1.1) contrast(1.1); }
+    50% { filter: brightness(1.5) saturate(1.2) contrast(1.2); }
+    75% { filter: brightness(1.3) saturate(1.1) contrast(1.1); }
+    100% { filter: brightness(1) saturate(1) contrast(1); }
+  }
 }

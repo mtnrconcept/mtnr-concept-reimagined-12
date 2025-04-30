@@ -19,12 +19,20 @@ export default function PageTransition({
   useEffect(() => {
     console.log("Changement de page détecté, keyId:", keyId);
     
-    // Utiliser un petit timeout pour s'assurer que les composants sont montés
+    // S'assurer que le DOM est prêt avant de tenter la transition vidéo
     const timer = setTimeout(() => {
-      // Déclencher directement la transition vidéo
-      navigation.triggerVideoTransition();
-      console.log("Transition vidéo déclenchée lors du changement de page");
-    }, 100);
+      try {
+        // Vérifier si on a des éléments vidéo disponibles avant de déclencher
+        if (navigation.normalVideoRef.current || navigation.uvVideoRef.current) {
+          navigation.triggerVideoTransition();
+          console.log("Transition vidéo déclenchée lors du changement de page");
+        } else {
+          console.warn("Aucune référence vidéo disponible, transition ignorée");
+        }
+      } catch (error) {
+        console.error("Erreur lors du déclenchement de la transition vidéo:", error);
+      }
+    }, 200);
     
     return () => clearTimeout(timer);
   }, [keyId, navigation]);

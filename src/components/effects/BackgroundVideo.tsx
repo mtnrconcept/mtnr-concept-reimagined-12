@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useEffect, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
 import { useNavigation } from './NavigationContext';
 import { motion } from 'framer-motion';
@@ -11,17 +11,32 @@ interface BackgroundVideoProps {
   fallbackImage?: string;
 }
 
-export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/Video fond normale.mp4", 
-  videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
+// Use forwardRef to properly handle refs passed from parent components
+const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({ 
+  videoUrl = "/lovable-uploads/Video%20fond%20normale.mp4", 
+  videoUrlUV = "/lovable-uploads/Video%20fond%20UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
-}) => {
+}, ref) => {
   const normalVideoRef = useRef<HTMLVideoElement>(null);
   const uvVideoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const { registerVideoTransitionListener, registerVideoRef } = useNavigation();
   const { uvMode } = useUVMode();
+  
+  // Forward ref to the appropriate video element
+  // This properly assigns the ref from parent component
+  useEffect(() => {
+    if (ref) {
+      // Forward the ref to the currently active video
+      const currentRef = uvMode ? uvVideoRef.current : normalVideoRef.current;
+      if (typeof ref === 'function') {
+        ref(currentRef);
+      } else if (ref) {
+        ref.current = currentRef;
+      }
+    }
+  }, [ref, uvMode]);
   
   // Enregistrer les références de vidéo dans le contexte de navigation
   useEffect(() => {
@@ -154,7 +169,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   };
 
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const target = e.target as HTMLVideoElement;
     console.error("Erreur de chargement vidéo:", e);
+    console.error("Source de la vidéo qui a échoué:", target.src);
     setVideoError(true);
   };
 
@@ -174,15 +191,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
+      {/* Utilisation d'URL encodées pour les espaces dans les noms de fichiers */}
       <video
         ref={normalVideoRef}
-        className="background-video"
+        className="background-video video-normal"
         playsInline
         muted
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
-        style={{ display: uvMode ? 'none' : 'block' }}
       >
         <source src={videoUrl} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
@@ -190,13 +207,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       <video
         ref={uvVideoRef}
-        className="background-video"
+        className="background-video video-uv"
         playsInline
         muted
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
-        style={{ display: uvMode ? 'block' : 'none' }}
       >
         <source src={videoUrlUV} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
@@ -237,6 +253,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       />
     </motion.div>
   );
-};
+});
+
+BackgroundVideo.displayName = 'BackgroundVideo';
 
 export default BackgroundVideo;

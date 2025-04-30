@@ -51,26 +51,40 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     // Contrôle direct de la vidéo - méthode plus fiable
     try {
+      // Utiliser la référence vidéo appropriée
       const videoElement = normalVideoRef.current;
+      
       if (videoElement) {
         console.log("Contrôle direct de la vidéo pour transition");
+        
+        // Réinitialiser la vidéo et s'assurer qu'elle est correctement configurée
         videoElement.currentTime = 0;
+        videoElement.muted = true;
+        videoElement.playsInline = true;
+        videoElement.setAttribute("playsinline", "");
+        videoElement.setAttribute("webkit-playsinline", "");
         videoElement.classList.add("video-transitioning");
         
         try {
-          // S'assurer que muted est défini pour permettre la lecture automatique
-          videoElement.muted = true;
-          videoElement.playsInline = true;
-          videoElement.setAttribute("playsinline", "");
-          videoElement.setAttribute("webkit-playsinline", "");
-          
           await videoElement.play();
           console.log("✅ Vidéo démarrée avec succès via contrôle direct");
         } catch (error) {
           console.error("❌ Erreur lors du démarrage direct de la vidéo:", error);
+          console.error("Source de la vidéo:", videoElement.currentSrc);
+          
+          // Tentative supplémentaire de récupération
+          setTimeout(async () => {
+            try {
+              videoElement.load();
+              await videoElement.play();
+              console.log("✅ Vidéo démarrée avec succès après délai");
+            } catch (retryError) {
+              console.error("❌❌ Deuxième échec de lecture vidéo:", retryError);
+            }
+          }, 100);
         }
       } else {
-        console.warn("Référence vidéo non disponible pour contrôle direct");
+        console.warn("❗ Référence vidéo non disponible pour contrôle direct");
       }
     } catch (outerError) {
       console.error("Erreur générale lors de la tentative de lecture:", outerError);
