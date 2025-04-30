@@ -1,0 +1,57 @@
+
+.elevator-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.background-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.elevator-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, filter;
+  transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), filter 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.next-hidden {
+  opacity: 0;
+}
+
+.exit-up {
+  transform: translateY(-100%);
+  filter: blur(8px);
+}
+
+.enter-down {
+  transform: translateY(0);
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Animation du flou de mouvement */
+@keyframes blurMotion {
+  0% { filter: blur(0px); }
+  20% { filter: blur(8px); }
+  50% { filter: blur(12px); }
+  80% { filter: blur(8px); }
+  100% { filter: blur(0px); }
+}
+
+.blur-motion {
+  animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

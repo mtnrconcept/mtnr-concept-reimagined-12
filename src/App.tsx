@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import ElevatorTransition from '@/components/ElevatorTransition';
+import ElevatorTransition from '@/components/effects/ElevatorTransition';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
 
