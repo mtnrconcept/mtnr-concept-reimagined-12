@@ -1,7 +1,7 @@
 
 /**
- * Animations repetile - Effet avancé avec 8 phases et interpolation ultra-fluide
- * Version optimisée pour performances maximales
+ * Animations repetile - Effet avancé optimisé pour performances
+ * Version optimisée pour minimiser les reflows et maximiser l'utilisation du GPU
  */
 
 /* Style pour la barrière qui masque le défilement */
@@ -17,6 +17,8 @@
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
 }
 
 /* Piste de défilement avec slides multiples */
@@ -28,6 +30,9 @@
   will-change: transform, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 /* Chaque slide individuel */
@@ -37,7 +42,9 @@
   height: 100%;
   transform: translateZ(0);
   backface-visibility: hidden;
-  contain: paint;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  contain: paint layout;
 }
 
 /* Contenu sortant et entrant */
@@ -52,6 +59,8 @@
   will-change: transform, opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
 }
 
 .exit-content {
@@ -73,16 +82,13 @@
   visibility: hidden;
 }
 
-/* Utilitaire pour masquer l'élément sans l'enlever du flux */
-.visually-hidden {
-  visibility: hidden;
-}
-
 /* Classes pour les animations de vidéo */
 .video-playing-forward {
   transform: scaleY(1) translateZ(0);
+  -webkit-transform: scaleY(1) translateZ(0);
 }
 
 .video-playing-reverse {
   transform: scaleY(-1) translateZ(0);
+  -webkit-transform: scaleY(-1) translateZ(0);
 }
