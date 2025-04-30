@@ -26,16 +26,18 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   // Fonction pour gérer la première interaction utilisateur
   const handleUserInteraction = useCallback(() => {
     if (!hasUserInteraction) {
+      console.log('Interaction utilisateur détectée, vidéo prête à jouer');
       setHasUserInteraction(true);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
     }
   }, [hasUserInteraction]);
 
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
-    if (!videoElement || isTransitioning) return;
+    if (!videoElement || isTransitioning) {
+      console.log('Impossible de démarrer la vidéo: vidéo non chargée ou transition déjà en cours');
+      return;
+    }
     
     try {
       console.log('Tentative de transition vidéo - Mode UV:', uvMode);
@@ -48,10 +50,10 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         
         // Attendre que les métadonnées soient chargées avant de continuer
         if (videoElement.readyState < 2) {
-          await new Promise((resolve) => {
+          await new Promise<void>((resolve) => {
             const handleMetadata = () => {
               videoElement.removeEventListener('loadedmetadata', handleMetadata);
-              resolve(null);
+              resolve();
             };
             videoElement.addEventListener('loadedmetadata', handleMetadata);
           });
@@ -66,7 +68,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         console.log('Vidéo terminée, mise en pause');
         if (videoElement) {
           videoElement.pause();
-          videoElement.currentTime = 0;
+          videoElement.currentTime = videoElement.duration - 0.1; // Maintenir la dernière image
         }
         setIsTransitioning(false);
         videoElement.removeEventListener('ended', handleVideoEnded);
@@ -77,11 +79,28 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       
       console.log('Lecture de la vidéo...');
       await videoElement.play();
+      console.log('Vidéo démarrée avec succès');
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);
     }
   }, [isTransitioning, currentVideo, uvMode]);
+
+  // Démarrer automatiquement la vidéo lors du premier chargement
+  useEffect(() => {
+    if (isFirstLoad && videoRef.current) {
+      // Démarrer la transition après le premier rendu complet
+      const timer = setTimeout(() => {
+        handleUserInteraction();
+        if (!isTransitioning) {
+          console.log('Démarrage automatique de la vidéo au chargement initial');
+          playVideoTransition();
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstLoad, isTransitioning, handleUserInteraction, playVideoTransition]);
 
   return {
     videoRef,

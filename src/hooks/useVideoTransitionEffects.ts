@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 
 interface UseVideoTransitionEffectsProps {
@@ -29,6 +29,20 @@ export const useVideoTransitionEffects = ({
 }: UseVideoTransitionEffectsProps) => {
   const navigation = useNavigation();
 
+  // Fonction qui exécute la transition si les conditions sont réunies
+  const executeTransition = useCallback(() => {
+    if (hasUserInteraction && !isTransitioning) {
+      console.log("Démarrage de la transition vidéo suite à un événement de navigation");
+      playVideoTransition();
+    } else if (!hasUserInteraction) {
+      console.log("Interaction utilisateur requise pour jouer la vidéo - mémorisation de l'action");
+      // Simuler une interaction utilisateur pour permettre la lecture automatique
+      handleUserInteraction();
+      // Planifier la transition après un court délai
+      setTimeout(() => playVideoTransition(), 100);
+    }
+  }, [hasUserInteraction, isTransitioning, playVideoTransition, handleUserInteraction]);
+
   // Effet pour les changements de mode UV uniquement
   useEffect(() => {
     if (!isFirstLoad && isTorchActive && hasUserInteraction) {
@@ -41,15 +55,14 @@ export const useVideoTransitionEffects = ({
 
   // Écouter les événements de navigation
   useEffect(() => {
-    const handleVideoTransition = () => {
-      if (hasUserInteraction) {
-        playVideoTransition();
-      }
-    };
+    console.log("Enregistrement du listener de transition vidéo");
+    const unregister = navigation.registerVideoTransitionListener(() => {
+      console.log("Événement de navigation détecté, lancement de la transition vidéo");
+      executeTransition();
+    });
     
-    const unregister = navigation.registerVideoTransitionListener(handleVideoTransition);
     return unregister;
-  }, [navigation, playVideoTransition, hasUserInteraction]);
+  }, [navigation, executeTransition]);
   
   // Écouter l'activation de la torche
   useEffect(() => {
@@ -85,6 +98,7 @@ export const useVideoTransitionEffects = ({
     // Ajout des écouteurs pour la première interaction utilisateur
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
@@ -105,6 +119,7 @@ export const useVideoTransitionEffects = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
       
       if (videoElement) {
         videoElement.pause();

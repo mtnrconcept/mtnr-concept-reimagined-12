@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -44,11 +43,22 @@ export default function Navbar() {
 
   const handleNavClick = (e: React.MouseEvent, path: string) => {
     // Si on clique sur le lien de la page actuelle, ne rien faire
-    if (path === pathname) return;
+    if (path === pathname) {
+      e.preventDefault();
+      return;
+    }
     
     // Déclencher l'événement de transition vidéo avant la navigation
     console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
+    e.preventDefault(); // Empêcher la navigation immédiate
+    
+    // Déclencher la transition vidéo
     navigation.triggerVideoTransition();
+    
+    // Attendre un court instant pour que la vidéo démarre avant de naviguer
+    setTimeout(() => {
+      window.location.href = path; // Navigation après un délai pour permettre le démarrage de la vidéo
+    }, 300); // Délai court pour ne pas trop retarder la navigation
   };
 
   const navVariants = {
