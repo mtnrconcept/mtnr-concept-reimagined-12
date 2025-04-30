@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import Book from './pages/Book';
 import NotFound from './pages/NotFound';
 import { TorchProvider, TorchControls } from './components/effects/TorchSystem';
+import { BackgroundVideoManager } from './components/effects/BackgroundVideoManager';
 import { Toaster } from './components/ui/toaster';
 import './styles/flashlight.css';
 
@@ -19,6 +20,9 @@ function App() {
   return (
     <Router>
       <TorchProvider>
+        {/* Background video manager - handles all video playback */}
+        <BackgroundVideoManager />
+        
         <Routes>
           {[
             { path: '/', element: <Home />, key: 'home' },

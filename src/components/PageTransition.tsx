@@ -22,6 +22,9 @@ export default function PageTransition({
   const contentRef = useRef<HTMLDivElement>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [fromPath, setFromPath] = useState(location.pathname);
+  
+  // Access video store to trigger video on page change
+  const videoStore = useVideoStore();
 
   useEffect(() => {
     // Ignore first render
@@ -36,8 +39,11 @@ export default function PageTransition({
       console.log(`Page change detected: ${prevPathRef.current} -> ${location.pathname}`);
       setIsTransitioning(true);
       setFromPath(prevPathRef.current);
+      
+      // Play video on page change
+      videoStore.play();
     }
-  }, [location.pathname]);
+  }, [location.pathname, videoStore]);
 
   const handleDisperseComplete = () => {
     console.log('Dispersion complete, applying smoke effect');

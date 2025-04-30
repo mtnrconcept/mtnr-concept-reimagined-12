@@ -1,116 +1,75 @@
 
-import { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { create } from 'zustand';
+import { useEffect, useRef } from 'react';
 
-// Define the type of video we can show
-export type VideoType = 'normal' | 'uv';
-
-// Define the store for managing the video state
-interface VideoStore {
-  activeVideo: VideoType;
+// Define the store for managing video state
+export interface VideoStore {
+  activeMode: 'normal' | 'uv';
   isPlaying: boolean;
-  setActiveVideo: (type: VideoType) => void;
-  playVideo: () => void;
-  pauseVideo: () => void;
+  play: () => void;
+  pause: () => void;
+  setMode: (mode: 'normal' | 'uv') => void;
 }
 
-// Create a Zustand store for managing video state
+// Create the store with initial state and actions
 export const useVideoStore = create<VideoStore>((set) => ({
-  activeVideo: 'normal',
+  activeMode: 'normal',
   isPlaying: false,
-  setActiveVideo: (type) => set({ activeVideo: type }),
-  playVideo: () => set({ isPlaying: true }),
-  pauseVideo: () => set({ isPlaying: false })
+  play: () => set({ isPlaying: true }),
+  pause: () => set({ isPlaying: false }),
+  setMode: (mode) => set({ activeMode: mode }),
 }));
 
-// Props for the BackgroundVideoManager component
-interface BackgroundVideoManagerProps {
-  normalVideoSrc: string;
-  uvVideoSrc: string;
-}
-
-const BackgroundVideoManager: React.FC<BackgroundVideoManagerProps> = ({
-  normalVideoSrc,
-  uvVideoSrc
-}) => {
-  // Get state from the store
-  const { activeVideo, isPlaying, setActiveVideo } = useVideoStore();
-  
-  // Refs for the video elements
+// Component for managing the background videos
+export const BackgroundVideoManager = () => {
   const normalVideoRef = useRef<HTMLVideoElement>(null);
   const uvVideoRef = useRef<HTMLVideoElement>(null);
+  
+  const { activeMode, isPlaying } = useVideoStore();
+  const store = useVideoStore();
 
-  // Effect to pause/play videos based on the active state
   useEffect(() => {
-    const normalVideo = normalVideoRef.current;
-    const uvVideo = uvVideoRef.current;
-    
-    if (!normalVideo || !uvVideo) return;
-
+    // Control video playback based on isPlaying state
     if (isPlaying) {
-      if (activeVideo === 'normal') {
-        normalVideo.play().catch(err => console.error('Error playing normal video:', err));
-        uvVideo.pause();
-      } else {
-        uvVideo.play().catch(err => console.error('Error playing UV video:', err));
-        normalVideo.pause();
+      const activeVideoRef = activeMode === 'normal' ? normalVideoRef : uvVideoRef;
+      if (activeVideoRef.current) {
+        activeVideoRef.current.play().catch(error => {
+          console.error('Error playing video:', error);
+        });
       }
     } else {
-      normalVideo.pause();
-      uvVideo.pause();
+      // Pause both videos
+      if (normalVideoRef.current) normalVideoRef.current.pause();
+      if (uvVideoRef.current) uvVideoRef.current.pause();
     }
-  }, [activeVideo, isPlaying]);
+  }, [isPlaying, activeMode]);
 
-  // Effect to handle page changes and start videos
-  useEffect(() => {
-    const triggerVideoOnPathChange = () => {
-      useVideoStore.getState().playVideo();
-    };
-
-    // Listen for route changes (simplified implementation)
-    window.addEventListener('popstate', triggerVideoOnPathChange);
-    
-    // Initial trigger when the component mounts
-    triggerVideoOnPathChange();
-    
-    return () => {
-      window.removeEventListener('popstate', triggerVideoOnPathChange);
-    };
-  }, []);
-
-  const handleVideoEnd = () => {
-    useVideoStore.getState().pauseVideo();
+  // Handle video ended event
+  const handleVideoEnded = () => {
+    store.pause();
   };
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* Normal video */}
+    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+      {/* Normal Mode Video */}
       <video
         ref={normalVideoRef}
-        src={normalVideoSrc}
-        className={`w-full h-full object-cover transition-opacity duration-500 ${
-          activeVideo === 'normal' ? 'opacity-100' : 'opacity-0'
-        }`}
+        src="/lovable-uploads/Video fond normale.mp4"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${activeMode === 'normal' ? 'opacity-100' : 'opacity-0'}`}
         muted
         playsInline
-        loop={false}
-        onEnded={handleVideoEnd}
+        onEnded={handleVideoEnded}
       />
       
-      {/* UV video */}
+      {/* UV Mode Video */}
       <video
         ref={uvVideoRef}
-        src={uvVideoSrc}
-        className={`w-full h-full object-cover transition-opacity duration-500 ${
-          activeVideo === 'uv' ? 'opacity-100' : 'opacity-0'
-        }`}
+        src="/lovable-uploads/Video fond UV.mp4"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${activeMode === 'uv' ? 'opacity-100' : 'opacity-0'}`}
         muted
         playsInline
-        loop={false}
-        onEnded={handleVideoEnd}
+        onEnded={handleVideoEnded}
       />
     </div>
   );
 };
-
-export default BackgroundVideoManager;
