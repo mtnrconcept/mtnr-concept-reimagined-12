@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigation } from "./effects/NavigationContext";
 
 const navLinks = [
   { name: "Accueil", path: "/" },
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const navigation = useNavigation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +41,15 @@ export default function Navbar() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent, path: string) => {
+    // Si on clique sur le lien de la page actuelle, ne rien faire
+    if (path === pathname) return;
+    
+    // Déclencher l'événement de transition vidéo avant la navigation
+    console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
+    navigation.triggerVideoTransition();
+  };
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -111,6 +122,7 @@ export default function Navbar() {
                     ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
                     : "text-white/80"
                 )}
+                onClick={(e) => handleNavClick(e, link.path)}
               >
                 <span className="relative z-10">{link.name}</span>
                 <span className="absolute inset-0 bg-black/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
@@ -128,6 +140,7 @@ export default function Navbar() {
             <Link 
               to="/book" 
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
+              onClick={(e) => handleNavClick(e, "/book")}
             >
               <span className="relative z-10">Book Now</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-300 to-yellow-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
@@ -155,7 +168,10 @@ export default function Navbar() {
               >
                 <Link
                   to={link.path}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => {
+                    handleNavClick(e, link.path);
+                    setMenuOpen(false);
+                  }}
                   className={cn(
                     "block px-6 py-3 font-medium transition-all",
                     pathname === link.path ? "text-primary" : "text-white/80"
@@ -173,7 +189,10 @@ export default function Navbar() {
             >
               <Link 
                 to="/book" 
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  handleNavClick(e, "/book");
+                  setMenuOpen(false);
+                }}
                 className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Book Now

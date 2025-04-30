@@ -10,6 +10,7 @@ import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
 import { Torch3DProvider } from "./components/effects/Torch3DContext";
+import { NavigationProvider } from "./components/effects/NavigationContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
@@ -73,16 +74,18 @@ const App = () => (
       <UVModeProvider>
         <TorchProvider>
           <Torch3DProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={null}>
-                <BackgroundVideoController />
-                <AnimatedRoutes />
-              </Suspense>
-            </BrowserRouter>
-            <ParticleEffect />
-            <TorchToggle />
+            <NavigationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={null}>
+                  <BackgroundVideoController />
+                  <AnimatedRoutes />
+                </Suspense>
+              </BrowserRouter>
+              <ParticleEffect />
+              <TorchToggle />
+            </NavigationProvider>
           </Torch3DProvider>
         </TorchProvider>
       </UVModeProvider>

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useUVMode } from './UVModeContext';
 import { useLocation } from 'react-router-dom';
+import { useNavigation } from './NavigationContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -19,6 +20,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const navigation = useNavigation();
   
   // Composition 1.mp4 pour le mode UV actif
   const currentVideoUrl = uvMode ? videoUrl : videoUrlUV;
@@ -36,6 +38,32 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${currentVideoUrl}`);
   }, [uvMode, currentVideoUrl]);
 
+  // Écouter les événements de navigation pour jouer la vidéo instantanément
+  useEffect(() => {
+    const playVideoTransition = async () => {
+      const videoElement = videoRef.current;
+      if (!videoElement || isTransitioning) return;
+      
+      try {
+        console.log('Événement de navigation capté, lecture immédiate de la vidéo');
+        setIsTransitioning(true);
+        videoElement.currentTime = 0;
+        videoElement.playbackRate = 1.0;
+        await videoElement.play();
+      } catch (error) {
+        console.error('Erreur lors de la lecture de la vidéo:', error);
+        setIsTransitioning(false);
+      }
+    };
+    
+    // Enregistrer l'écouteur d'événements de navigation
+    const unregister = navigation.registerVideoTransitionListener(playVideoTransition);
+    
+    return () => {
+      unregister();
+    };
+  }, [navigation, isTransitioning]);
+  
   // Gestion de la lecture/pause de la vidéo lors des transitions de page
   useEffect(() => {
     const videoElement = videoRef.current;
