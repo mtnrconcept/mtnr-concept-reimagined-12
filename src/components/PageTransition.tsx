@@ -17,13 +17,12 @@ export default function PageTransition({
   
   // Déclencher la transition lors du changement de page
   useEffect(() => {
-    // Petit délai pour éviter les transitions multiples
-    const timer = setTimeout(() => {
-      navigation.triggerVideoTransition();
-      console.log("Transition vidéo déclenchée lors du changement de page");
-    }, 100);
+    console.log("Changement de page détecté, keyId:", keyId);
     
-    return () => clearTimeout(timer);
+    // Déclencher directement la transition vidéo
+    navigation.triggerVideoTransition();
+    console.log("Transition vidéo déclenchée lors du changement de page");
+    
   }, [keyId, navigation]);
 
   // Variants pour l'animation 3D

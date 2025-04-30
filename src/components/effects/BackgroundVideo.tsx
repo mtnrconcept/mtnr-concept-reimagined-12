@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
 import { useNavigation } from './NavigationContext';
 import { motion } from 'framer-motion';
+import { useUVMode } from './UVModeContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -18,7 +19,16 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const { registerVideoTransitionListener } = useNavigation();
+  const { registerVideoTransitionListener, registerVideoRef } = useNavigation();
+  const { uvMode } = useUVMode();
+  
+  // Enregistrer la référence de la vidéo dans le contexte de navigation
+  useEffect(() => {
+    if (videoRef.current) {
+      registerVideoRef(videoRef);
+      console.log('Référence vidéo enregistrée dans NavigationContext');
+    }
+  }, [registerVideoRef]);
   
   // Configurer la vidéo au chargement initial
   useEffect(() => {
@@ -27,15 +37,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     video.muted = true;
     video.playsInline = true;
-    video.loop = true;
-    video.autoplay = true;
+    video.loop = false; // Important: ne pas mettre en boucle pour les transitions
+    video.preload = "auto";
     
     const attemptAutoplay = async () => {
       try {
-        await video.play();
-        console.log('Lecture vidéo réussie au chargement initial');
+        // Lors du premier chargement, on peut laisser la vidéo en pause
+        console.log('Vidéo configurée au chargement initial');
       } catch (err) {
-        console.warn('Erreur de lecture automatique:', err);
+        console.warn('Erreur de configuration initiale:', err);
       }
     };
     
@@ -52,39 +62,60 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       }
       
       try {
-        console.log("Démarrage transition vidéo - remise à zéro et lecture");
+        console.log("🎬 Démarrage transition vidéo - remise à zéro");
+        
+        // Utiliser la bonne source vidéo selon le mode UV
+        const currentSource = uvMode ? videoUrlUV : videoUrl;
+        if (video.src !== currentSource) {
+          video.src = currentSource;
+          video.load();
+        }
+        
+        // Configurer la vidéo pour la transition
+        video.loop = false;
+        video.currentTime = 0;
         
         // Ajouter la classe pour les effets visuels
         video.classList.add("video-transitioning");
         
-        // Remettre la vidéo au début
-        video.currentTime = 0;
-        
         // Lecture avec gestion des erreurs
         try {
+          console.log("▶️ Tentative de lecture vidéo");
           const playPromise = video.play();
           if (playPromise !== undefined) {
             await playPromise;
-            console.log("La vidéo a démarré avec succès pour la transition");
+            console.log("✅ Vidéo démarrée avec succès pour la transition");
           }
         } catch (error) {
-          console.error("Erreur lors de la lecture vidéo pour transition:", error);
+          console.error("❌ Erreur lors de la lecture vidéo pour transition:", error);
         }
-        
-        // Nettoyer après la durée de la transition
-        setTimeout(() => {
-          if (video && document.body.contains(video)) {
-            video.classList.remove("video-transitioning");
-            console.log("Transition vidéo terminée");
-          }
-        }, 2500); // Durée approximative de la vidéo
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);
       }
     });
     
     return unregister;
-  }, [registerVideoTransitionListener]);
+  }, [registerVideoTransitionListener, uvMode, videoUrl, videoUrlUV]);
+  
+  // Gestion de la fin de la vidéo
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnded = () => {
+      console.log("🏁 Vidéo terminée");
+      video.classList.remove("video-transitioning");
+      
+      // Remettre en boucle pour l'état normal
+      video.loop = true;
+      
+      // Relancer la vidéo en boucle
+      video.play().catch(e => console.warn("Erreur lors de la reprise en boucle:", e));
+    };
+    
+    video.addEventListener('ended', handleEnded);
+    return () => video.removeEventListener('ended', handleEnded);
+  }, []);
   
   // Gestion des événements vidéo
   const handleVideoLoad = () => {
@@ -120,12 +151,11 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         playsInline
         muted
         autoPlay
-        loop
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
       >
-        <source src={videoUrl} type="video/mp4" />
+        <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
