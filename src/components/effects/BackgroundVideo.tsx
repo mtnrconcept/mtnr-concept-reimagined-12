@@ -74,7 +74,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       }
       
       try {
-        console.log(`🎬 Démarrage transition vidéo ${uvMode ? 'UV' : 'normale'} - remise à zéro`);
+        console.log(`🎬 Démarrage transition vidéo ${uvMode ? 'UV' : 'normale'}`);
         
         // Configurer la vidéo pour la transition
         video.loop = false;
@@ -174,7 +174,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
-      {/* Vidéo normale d'arrière-plan */}
       <video
         ref={normalVideoRef}
         className="background-video"
@@ -189,7 +188,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
-      {/* Vidéo UV d'arrière-plan */}
       <video
         ref={uvVideoRef}
         className="background-video"

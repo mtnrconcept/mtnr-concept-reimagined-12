@@ -23,9 +23,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const registerVideoRef = useCallback((ref: React.RefObject<HTMLVideoElement>, isUVVideo = false) => {
     if (isUVVideo) {
-      uvVideoRef.current = ref.current;
+      if (ref.current) uvVideoRef.current = ref.current;
     } else {
-      normalVideoRef.current = ref.current;
+      if (ref.current) normalVideoRef.current = ref.current;
     }
     console.log(`Référence vidéo ${isUVVideo ? 'UV' : 'normale'} enregistrée`);
   }, []);
@@ -52,31 +52,25 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Contrôle direct de la vidéo - méthode plus fiable
     try {
       const videoElement = normalVideoRef.current;
-      if (videoElement && document.body.contains(videoElement)) {
+      if (videoElement) {
         console.log("Contrôle direct de la vidéo pour transition");
         videoElement.currentTime = 0;
         videoElement.classList.add("video-transitioning");
         
         try {
+          // S'assurer que muted est défini pour permettre la lecture automatique
+          videoElement.muted = true;
+          videoElement.playsInline = true;
+          videoElement.setAttribute("playsinline", "");
+          videoElement.setAttribute("webkit-playsinline", "");
+          
           await videoElement.play();
           console.log("✅ Vidéo démarrée avec succès via contrôle direct");
         } catch (error) {
           console.error("❌ Erreur lors du démarrage direct de la vidéo:", error);
-          
-          // Tentative de récupération avec attributs forcés
-          videoElement.muted = true;
-          videoElement.playsInline = true;
-          videoElement.setAttribute("playsinline", "");
-          
-          try {
-            await videoElement.play();
-            console.log("✅ Vidéo démarrée avec succès après récupération");
-          } catch (fallbackError) {
-            console.error("❌❌ Échec de la récupération:", fallbackError);
-          }
         }
       } else {
-        console.warn("Référence vidéo non disponible, utilisation des écouteurs");
+        console.warn("Référence vidéo non disponible pour contrôle direct");
       }
     } catch (outerError) {
       console.error("Erreur générale lors de la tentative de lecture:", outerError);
