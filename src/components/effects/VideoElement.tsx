@@ -8,7 +8,6 @@ interface VideoElementProps {
   onError?: (e: React.SyntheticEvent<HTMLVideoElement, Event>) => void;
   onEnded?: () => void;
   autoRetry?: boolean;
-  fallbackImage?: string;
   preload?: 'none' | 'metadata' | 'auto';
 }
 
@@ -19,17 +18,14 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
   onError,
   onEnded,
   autoRetry = true,
-  fallbackImage,
   preload = 'auto'
 }, ref) => {
   const [retryCount, setRetryCount] = useState(0);
-  const [showFallback, setShowFallback] = useState(false);
   const [videoSource, setVideoSource] = useState(src);
   
-  // Reset retry count and fallback state when source changes
+  // Reset retry count when source changes
   useEffect(() => {
     setRetryCount(0);
-    setShowFallback(false);
     setVideoSource(src);
   }, [src]);
   
@@ -56,24 +52,8 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
           setTimeout(() => setVideoSource(src), 10);
         }
       }, retryDelay);
-    } else {
-      // Après 3 tentatives, montrer l'image de fallback si disponible
-      if (fallbackImage) {
-        setShowFallback(true);
-      }
     }
   };
-  
-  // Afficher l'image de fallback si les tentatives échouent
-  if (showFallback && fallbackImage) {
-    return (
-      <img 
-        src={fallbackImage} 
-        alt="Background fallback" 
-        className={className}
-      />
-    );
-  }
   
   // Note: On utilise un key dynamique pour forcer le remontage complet
   // plutôt que d'appeler .load()

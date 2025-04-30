@@ -12,16 +12,14 @@ import { useUVMode } from './UVModeContext';
 interface BackgroundVideoProps {
   videoUrl?: string;
   videoUrlUV?: string;
-  fallbackImage?: string;
 }
 
 const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({ 
   videoUrl = "/lovable-uploads/Videofondnormale.mp4", 
-  videoUrlUV = "/lovable-uploads/VideofondUV.mp4",
-  fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
+  videoUrlUV = "/lovable-uploads/VideofondUV.mp4"
 }, ref) => {
   const { normalVideoRef, uvVideoRef, videoAvailability } = useVideoTransition();
-  const { videoError, handleVideoLoad, handleVideoError } = useVideoLoad({ fallbackImage });
+  const { videoError, handleVideoLoad, handleVideoError } = useVideoLoad();
   const { uvMode } = useUVMode();
   
   return (
@@ -31,15 +29,6 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      {/* Fallback image if video error */}
-      {videoError && (
-        <img 
-          src={fallbackImage} 
-          alt="Background fallback" 
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      )}
-      
       {/* On utilise des conditions pour n'afficher que la vidéo active */}
       {/* afin de réduire le nombre d'éléments vidéo dans le DOM */}
       {!uvMode && (
@@ -49,7 +38,6 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
           src={videoUrl}
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
-          fallbackImage={fallbackImage}
           autoRetry={true}
         />
       )}
@@ -62,7 +50,6 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
           src={videoUrlUV}
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
-          fallbackImage={fallbackImage}
           autoRetry={true}
         />
       )}

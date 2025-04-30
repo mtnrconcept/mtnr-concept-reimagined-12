@@ -2,12 +2,11 @@
 import { useState, useRef, useCallback } from 'react';
 
 interface UseVideoLoadOptions {
-  fallbackImage?: string;
   onVideoError?: (src: string, error: Event | null) => void;
   onVideoLoaded?: (src: string) => void;
 }
 
-export const useVideoLoad = ({ fallbackImage, onVideoError, onVideoLoaded }: UseVideoLoadOptions = {}) => {
+export const useVideoLoad = ({ onVideoError, onVideoLoaded }: UseVideoLoadOptions = {}) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
@@ -74,7 +73,6 @@ export const useVideoLoad = ({ fallbackImage, onVideoError, onVideoLoaded }: Use
     handleVideoError,
     verifyVideoPlayability,
     resetLoadState,
-    fallbackImage,
     videoElementRef
   };
 };
