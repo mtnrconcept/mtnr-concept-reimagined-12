@@ -25,21 +25,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const { 
-    uvMode, 
-    uvCircleRef, 
-    createUVCircle, 
-    removeUVCircle 
-  } = useUVMode();
+  const { uvMode } = useUVMode();
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
-    
-    // Update UV circle position if active
-    if (uvCircleRef.current && uvMode) {
-      uvCircleRef.current.style.left = `${position.x}px`;
-      uvCircleRef.current.style.top = `${position.y}px`;
-    }
   };
 
   // Handle mouse movement
@@ -53,19 +42,6 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
-
-  // Create UV circle when UV mode is activated
-  useEffect(() => {
-    if (isTorchActive && uvMode) {
-      createUVCircle(mousePosition);
-    } else {
-      removeUVCircle();
-    }
-    
-    return () => {
-      removeUVCircle();
-    };
-  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
 
   const contextValue = {
     isTorchActive,

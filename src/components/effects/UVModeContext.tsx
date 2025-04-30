@@ -34,23 +34,18 @@ export const UVModeProvider: React.FC<UVModeProviderProps> = ({ children }) => {
     setUVMode(prev => !prev);
   };
 
-  // Effet pour appliquer les changements CSS au document
+  // Effet pour appliquer les changements CSS au document et gérer les vidéos
   useEffect(() => {
     if (uvMode) {
       document.documentElement.classList.add('uv-mode');
-      // Si le store vidéo est disponible et que le mode UV est activé, jouer la vidéo UV
-      if (videoStore && videoStore.play) {
-        videoStore.setMode('uv');
+      // Jouer la vidéo UV seulement si la fonction play est définie et l'utilisateur est en mode UV
+      if (videoStore.play && videoStore.currentMode !== 'uv') {
         videoStore.play();
       }
     } else {
       document.documentElement.classList.remove('uv-mode');
-      // Si le store vidéo est disponible et que le mode UV est désactivé, revenir à la vidéo normale
-      if (videoStore && videoStore.play) {
-        videoStore.setMode('normal');
-      }
     }
-  }, [uvMode, videoStore]);
+  }, [uvMode, videoStore.play, videoStore.currentMode]);
 
   return (
     <UVModeContext.Provider value={{ uvMode, toggleUVMode }}>
@@ -59,7 +54,7 @@ export const UVModeProvider: React.FC<UVModeProviderProps> = ({ children }) => {
   );
 };
 
-// Ajout du composant de base
+// Composant de base pour fournir le contexte UV
 export const UVModeContextProvider: React.FC<UVModeProviderProps> = ({ children }) => {
   return (
     <UVModeProvider>

@@ -29,8 +29,8 @@ export const BackgroundVideoManager = () => {
   const { isTorchActive } = useTorch();
   const { uvMode } = useUVMode();
   
-  // Récupération du magasin vidéo
-  const videoStore = useVideoStore();
+  // Tracker pour éviter les mises à jour en boucle
+  const modeUpdatedRef = useRef(false);
 
   // Initialiser les méthodes de contrôle vidéo
   useEffect(() => {
@@ -48,9 +48,6 @@ export const BackgroundVideoManager = () => {
         // Mettre en pause les deux vidéos
         if (normalVideoRef.current) normalVideoRef.current.pause();
         if (uvVideoRef.current) uvVideoRef.current.pause();
-      },
-      setMode: (mode) => {
-        useVideoStore.setState({ currentMode: mode });
       }
     });
     
@@ -60,10 +57,14 @@ export const BackgroundVideoManager = () => {
     };
   }, [uvMode]);
 
-  // Gestion du changement de mode (Normal/UV)
+  // Gestion du changement de mode (Normal/UV) - Fix the infinite loop here
   useEffect(() => {
-    // Mettre à jour le mode dans le store
-    videoStore.setMode(uvMode ? 'uv' : 'normal');
+    // On utilise un ref pour éviter les mises à jour en boucle
+    if (!modeUpdatedRef.current) {
+      modeUpdatedRef.current = true;
+      // On met à jour le mode dans le store, mais une seule fois
+      useVideoStore.setState({ currentMode: uvMode ? 'uv' : 'normal' });
+    }
     
     // Afficher/masquer la vidéo appropriée
     if (normalVideoRef.current) {
@@ -72,14 +73,18 @@ export const BackgroundVideoManager = () => {
     if (uvVideoRef.current) {
       uvVideoRef.current.style.opacity = uvMode ? '1' : '0';
     }
-  }, [uvMode, videoStore]);
+    
+    // Réinitialiser le tracker quand uvMode change
+    return () => {
+      modeUpdatedRef.current = false;
+    };
+  }, [uvMode]);
 
   // Gestion de la fin de lecture (onEnded)
   const handleVideoEnded = () => {
     console.log('Vidéo terminée');
-    if (videoStore.pause) {
-      videoStore.pause();
-    }
+    if (normalVideoRef.current) normalVideoRef.current.pause();
+    if (uvVideoRef.current) uvVideoRef.current.pause();
   };
 
   return (
