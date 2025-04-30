@@ -22,12 +22,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [currentVideo, setCurrentVideo] = useState(videoUrl);
+  // Inversion ici - quand UV est activé, on montre Composition 1.mp4 (videoUrl)
+  // quand UV est désactivé, on montre Composition 1_1.mp4 (videoUrlUV)
+  const [currentVideo, setCurrentVideo] = useState(videoUrlUV);
   const navigation = useNavigation();
   
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
-    const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
+    // Inversion des vidéos selon l'état d'UV
+    const newVideoUrl = uvMode ? videoUrl : videoUrlUV;
     
     if (currentVideo !== newVideoUrl) {
       console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
