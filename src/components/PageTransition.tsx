@@ -1,6 +1,5 @@
 
 import React, { ReactNode, useRef, useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ElevatorTransition } from "@/components/effects/elevator";
 
