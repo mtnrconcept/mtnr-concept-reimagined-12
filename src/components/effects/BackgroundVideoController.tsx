@@ -10,11 +10,14 @@ interface BackgroundVideoStore {
   resetVideo: () => void;
 }
 
-// Création d'un store Zustand pour gérer l'état de la vidéo de manière globale
+// Store Zustand pour gérer l'état de la vidéo
 export const useBackgroundVideoStore = create<BackgroundVideoStore>((set) => ({
   isPlaying: false,
   playDirection: 'forward',
-  startVideo: (direction) => set({ isPlaying: true, playDirection: direction }),
+  startVideo: (direction) => {
+    console.log('Démarrage de la vidéo:', direction);
+    set({ isPlaying: true, playDirection: direction });
+  },
   pauseVideo: () => set({ isPlaying: false }),
   resetVideo: () => set({ isPlaying: false, playDirection: 'forward' }),
 }));
@@ -28,62 +31,57 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
   const [isLoaded, setIsLoaded] = useState(false);
   const { isPlaying, playDirection } = useBackgroundVideoStore();
   
-  // Précharger la vidéo dès le début
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    
-    if (videoElement) {
-      // Fonction pour marquer le chargement
-      const handleLoaded = () => {
-        setIsLoaded(true);
-        console.log("Vidéo de fond chargée");
-        
-        // Précharger la vidéo en mémoire en la lisant puis la mettant en pause immédiatement
-        videoElement.play().then(() => {
-          videoElement.pause();
-          videoElement.currentTime = 0;
-        }).catch(err => {
-          console.log("Préchargement vidéo silencieux échoué:", err);
-        });
-      };
-      
-      videoElement.addEventListener('loadeddata', handleLoaded);
-      
-      return () => {
-        videoElement.removeEventListener('loadeddata', handleLoaded);
-      };
-    }
-  }, []);
-  
-  // Effet pour gérer la lecture/pause de la vidéo avec optimisations
+  // Effet pour gérer la lecture/pause de la vidéo
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
+    const handleVideoLoaded = () => {
+      setIsLoaded(true);
+      console.log('Vidéo chargée');
+    };
+    
+    videoElement.addEventListener('loadeddata', handleVideoLoaded);
+    
+    return () => {
+      videoElement.removeEventListener('loadeddata', handleVideoLoaded);
+    };
+  }, []);
+  
+  // Effet pour démarrer/arrêter la vidéo
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || !isLoaded) return;
+    
     if (isPlaying) {
-      console.log("Démarrage de la vidéo en avant (optimisé)");
+      console.log('Lecture vidéo démarrée');
       videoElement.currentTime = 0;
-      videoElement.playbackRate = 1;
       
-      // Utiliser un catch silencieux pour éviter les erreurs dans la console
-      videoElement.play().catch(() => {});
+      // Promesse pour gérer le démarrage de la lecture
+      const playPromise = videoElement.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Vidéo en cours de lecture');
+          })
+          .catch(error => {
+            console.error('Erreur de lecture vidéo:', error);
+          });
+      }
       
-      // Mettre en pause automatiquement à la fin de la vidéo
+      // Pause automatique après 7 secondes (durée totale de la transition)
       const timeoutId = setTimeout(() => {
-        console.log("Animation terminée, mise en pause de la vidéo");
         videoElement.pause();
         useBackgroundVideoStore.getState().pauseVideo();
-      }, 7000); // Durée totale de la transition
+        console.log('Vidéo mise en pause automatiquement');
+      }, 7000);
       
-      return () => {
-        clearTimeout(timeoutId);
-      };
+      return () => clearTimeout(timeoutId);
     } else {
-      // Pause
-      console.log("Mise en pause de la vidéo de fond");
       videoElement.pause();
+      console.log('Vidéo en pause');
     }
-  }, [isPlaying, playDirection]);
+  }, [isPlaying, isLoaded]);
   
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
@@ -100,7 +98,6 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
           <div className="text-yellow-400 text-2xl">Chargement...</div>
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50" />
     </div>
   );
 };

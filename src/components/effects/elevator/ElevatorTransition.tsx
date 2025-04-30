@@ -1,64 +1,55 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { ElevatorTransitionProps } from './ElevatorTypes';
-import { useElevatorTransition } from './useElevatorTransition';
+import { useBackgroundVideoStore } from '../BackgroundVideoController';
 
 const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
   children,
   isActive,
   onAnimationComplete
 }) => {
-  const {
-    direction,
-    exitContent,
-    enterContent,
-    isTransitioning
-  } = useElevatorTransition({
-    isActive,
-    onAnimationComplete,
-    currentPath: children
-  });
-
   const [animationStarted, setAnimationStarted] = useState(false);
-  const prevTransitionRef = useRef<boolean>(false);
-  const timeoutRef = useRef<number | null>(null);
+  const [exitContent, setExitContent] = useState<React.ReactNode>(null);
+  const [enterContent, setEnterContent] = useState<React.ReactNode>(null);
+  const { startVideo } = useBackgroundVideoStore();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Lancer l'animation quand isActive passe à true
   useEffect(() => {
-    // On ne démarre l'animation que si isTransitioning vient de passer à true
-    if (!prevTransitionRef.current && isTransitioning) {
+    if (isActive && !animationStarted) {
+      // Stocker le contenu actuel pour l'animation de sortie
+      setExitContent(children);
+      setEnterContent(children);
       setAnimationStarted(true);
       
-      // Déclencher la fin de l'animation après 7 secondes (2s sortie + 3s vidéo + 2s entrée)
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
+      // 1. Démarrer la vidéo
+      startVideo('forward');
       
-      timeoutRef.current = window.setTimeout(() => {
+      // 2. Animation de sortie terminée après 2s
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      
+      // 3. Animation d'entrée après 5s (2s sortie + 3s vidéo)
+      timeoutRef.current = setTimeout(() => {
+        // Animation d'entrée
+        console.log("Animation d'entrée commence");
+      }, 5000);
+      
+      // 4. Fin de la transition complète après 7s
+      timeoutRef.current = setTimeout(() => {
         setAnimationStarted(false);
         onAnimationComplete();
-      }, 7000); // Durée totale: 7s
-    }
-
-    // Si la transition s'arrête (retour à false), on reset notre flag
-    if (!isTransitioning && animationStarted) {
-      setAnimationStarted(false);
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+        console.log('Transition terminée');
+      }, 7000);
     }
     
-    prevTransitionRef.current = isTransitioning;
-    
-    // Nettoyage
     return () => {
       if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [isTransitioning, animationStarted, onAnimationComplete]);
+  }, [isActive, children, animationStarted, startVideo, onAnimationComplete]);
 
-  if (!isTransitioning && !animationStarted) {
+  if (!isActive && !animationStarted) {
     return (
       <div id="main-content" className="elevator-content">
         {children}
@@ -75,10 +66,10 @@ const ElevatorTransition: React.FC<ElevatorTransitionProps> = ({
         {exitContent}
       </div>
 
-      {/* Contenu entrant avec animation d'entrée par le bas - 
-           démarre après 5 secondes (2s sortie + 3s vidéo) */}
+      {/* Contenu entrant avec animation d'entrée par le bas */}
       <div 
         className={`elevator-content enter-content ${animationStarted ? 'animate-slide-in-up' : ''}`}
+        style={{ animationDelay: '5s' }} // Démarre après 5s
       >
         {enterContent}
       </div>

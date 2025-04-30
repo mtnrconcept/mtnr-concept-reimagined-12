@@ -2,8 +2,6 @@
 import React, { ReactNode, useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { createSmokeEffect } from "@/lib/transitions";
-import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
 import { ElevatorTransition } from "@/components/effects/elevator";
 
 interface PageTransitionProps {
@@ -18,80 +16,49 @@ export default function PageTransition({
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
   const isInitialMountRef = useRef<boolean>(true);
-  const contentRef = useRef<HTMLDivElement>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [fromPath, setFromPath] = useState(location.pathname);
 
+  // Détecter les changements de routes
   useEffect(() => {
-    // Ignore first render
+    // Ignorer le premier rendu
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       prevPathRef.current = location.pathname;
       return;
     }
 
-    // Detect route changes and enable transition
+    // Activer la transition lors d'un changement de route
     if (location.pathname !== prevPathRef.current) {
-      console.log(`Page change detected: ${prevPathRef.current} -> ${location.pathname}`);
+      console.log(`Changement de page: ${prevPathRef.current} -> ${location.pathname}`);
       setIsTransitioning(true);
-      setFromPath(prevPathRef.current);
     }
   }, [location.pathname]);
 
-  const handleDisperseComplete = () => {
-    console.log('Dispersion complete, applying smoke effect');
-    if (contentRef.current) {
-      createSmokeEffect(contentRef.current);
-    }
-  };
-
+  // Gestionnaire de fin de transition
   const handleTransitionComplete = () => {
-    console.log('Elevator transition complete');
+    console.log('Transition terminée');
     setIsTransitioning(false);
     prevPathRef.current = location.pathname;
   };
 
   return (
-    <>
-      <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
-
-      <ElevatorTransition 
-        isActive={isTransitioning}
-        onAnimationComplete={handleTransitionComplete}
+    <ElevatorTransition 
+      isActive={isTransitioning}
+      onAnimationComplete={handleTransitionComplete}
+    >
+      <motion.div
+        key={keyId}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 1 }}
+        className="page-content-wrapper"
+        style={{
+          width: "100%",
+          height: "100%"
+        }}
       >
-        <motion.div
-          key={keyId}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.4 } }}
-          className="page-content-wrapper"
-          style={{
-            perspective: "1400px",
-            willChange: "transform, opacity",
-            position: "relative",
-            zIndex: 10,
-            transition: "opacity 0.5s ease",
-            width: "100%",
-            height: "100%"
-          }}
-        >
-          <motion.div
-            ref={contentRef}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{
-              opacity: 0,
-              y: -10,
-              transition: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
-            }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-            className="smoke-container"
-          >
-            {children}
-            <div className="absolute inset-0 pointer-events-none smoke-enter-layer" />
-          </motion.div>
-        </motion.div>
-      </ElevatorTransition>
-    </>
+        {children}
+      </motion.div>
+    </ElevatorTransition>
   );
 }
