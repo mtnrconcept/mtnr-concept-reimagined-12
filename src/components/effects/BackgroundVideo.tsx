@@ -1,8 +1,7 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
 import { useVideoTransitionEffects } from '@/hooks/useVideoTransitionEffects';
-import { useVideoPreload } from '@/hooks/useVideoPreload';
 import { VideoOverlay } from './VideoOverlay';
 
 interface BackgroundVideoProps {
@@ -45,9 +44,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
-  // Précharger les vidéos pour une expérience plus fluide
-  useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
-
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
       {/* Vidéo avec source dynamique */}
@@ -59,7 +55,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         muted
         preload="auto"
         src={currentVideo}
-        onError={(e) => console.error('Erreur de chargement vidéo:', e, 'URL:', currentVideo)}
       />
       
       {/* Afficher une image de fallback en cas d'erreur de chargement vidéo */}
@@ -75,7 +70,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
-      {/* Overlays visuels */}
+      {/* Overlays visuels simplifiés */}
       <VideoOverlay />
     </div>
   );

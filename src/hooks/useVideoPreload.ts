@@ -21,18 +21,6 @@ export const useVideoPreload = ({ videoUrls }: UseVideoPreloadProps) => {
           link.as = 'video';
           link.type = 'video/mp4';
           document.head.appendChild(link);
-          
-          // Vérifier si la vidéo est accessible
-          try {
-            const response = await fetch(url, { method: 'HEAD' });
-            if (!response.ok) {
-              console.error(`Erreur de préchargement: La vidéo ${url} n'est pas disponible (${response.status})`);
-            } else {
-              console.log(`Préchargement de ${url} réussi`);
-            }
-          } catch (error) {
-            console.error(`Erreur lors de la vérification de la vidéo ${url}:`, error);
-          }
         }
       } catch (error) {
         console.error('Erreur lors du préchargement des vidéos:', error);

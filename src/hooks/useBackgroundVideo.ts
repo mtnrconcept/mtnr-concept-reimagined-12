@@ -13,7 +13,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   
-  // États locaux avec valeurs initiales correctes
+  // États locaux avec valeurs initiales
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
@@ -36,18 +36,14 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
     if (!videoElement || isTransitioning || videoError) {
-      console.log('Impossible de démarrer la vidéo: vidéo non chargée, transition déjà en cours ou erreur vidéo');
       return;
     }
     
     try {
-      console.log('Tentative de transition vidéo - Mode UV:', uvMode);
       setIsTransitioning(true);
       
-      // Vider le cache avant de jouer
-      if (videoElement.src !== currentVideo) {
-        console.log('Changement de source vidéo vers:', currentVideo);
-        
+      // Vider le cache avant de jouer si nécessaire
+      if (videoElement.src !== currentVideo) {        
         // Retirer l'ancienne source et vider le cache
         videoElement.removeAttribute('src');
         videoElement.load();
@@ -78,7 +74,6 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       
       // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
       const handleVideoEnded = () => {
-        console.log('Vidéo terminée, mise en pause');
         if (videoElement) {
           videoElement.pause();
           videoElement.currentTime = videoElement.duration - 0.1; // Maintenir la dernière image
@@ -90,19 +85,15 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       videoElement.removeEventListener('ended', handleVideoEnded);
       videoElement.addEventListener('ended', handleVideoEnded);
       
-      console.log('Lecture de la vidéo...');
       await videoElement.play().catch(error => {
-        console.error('Erreur lors de la lecture:', error);
         setIsTransitioning(false);
         setVideoError(true);
       });
-      console.log('Vidéo démarrée avec succès');
     } catch (error) {
-      console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);
       setVideoError(true);
     }
-  }, [isTransitioning, currentVideo, uvMode, videoError]);
+  }, [isTransitioning, currentVideo, videoError]);
 
   return {
     videoRef,

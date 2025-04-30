@@ -15,15 +15,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
 
-  // Utiliser une référence pour les listeners au lieu d'un état pour éviter les re-rendus
+  // Utiliser une référence pour les listeners au lieu d'un état
   const triggerVideoTransition = useCallback(() => {
     // Éviter les déclenchements multiples rapprochés
     if (transitionInProgressRef.current) {
-      console.log('Transition déjà en cours, ignorée');
       return;
     }
     
-    console.log('Navigation event triggered, notifying listeners');
     transitionInProgressRef.current = true;
     setIsTransitioning(true);
     
@@ -32,7 +30,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Notifier tous les écouteurs en utilisant la référence
+    // Notifier tous les écouteurs
     listenersRef.current.forEach(listener => {
       try {
         listener();
@@ -50,12 +48,10 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
-    console.log('New video transition listener registered');
     listenersRef.current.push(callback);
     
     // Return unsubscribe function
     return () => {
-      console.log('Video transition listener unregistered');
       listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
     };
   }, []);

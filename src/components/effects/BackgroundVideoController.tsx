@@ -21,19 +21,8 @@ export const BackgroundVideoController = () => {
           link.as = 'video';
           link.type = 'video/mp4';
           document.head.appendChild(link);
-          
-          // Vérifier si la vidéo est accessible
-          const response = await fetch(url, { method: 'HEAD' });
-          if (!response.ok) {
-            console.error(`La vidéo ${url} n'est pas disponible (${response.status})`);
-            return false;
-          } else {
-            console.log(`Préchargement link de ${url} ajouté`);
-            return true;
-          }
         } catch (error) {
           console.error(`Erreur lors du préchargement de ${url}:`, error);
-          return false;
         }
       });
       
@@ -41,7 +30,7 @@ export const BackgroundVideoController = () => {
       await Promise.all(preloadPromises);
     };
 
-    // Précharger les vidéos au démarrage avec un léger délai pour éviter les conflits
+    // Précharger les vidéos au démarrage avec un léger délai
     const timerId = setTimeout(() => {
       preloadVideos();
     }, 500);
