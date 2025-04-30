@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
 import { useVideoTransitionEffects } from '@/hooks/useVideoTransitionEffects';
 import { VideoOverlay } from './VideoOverlay';
@@ -44,6 +44,13 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
+  // Ajouter des logs pour déboguer
+  useEffect(() => {
+    console.log('BackgroundVideo rendering with videoUrl:', videoUrl);
+    console.log('Current video path:', currentVideo);
+    console.log('Video element exists:', !!videoRef.current);
+  }, [videoUrl, currentVideo, videoRef]);
+
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
       {/* Vidéo avec source dynamique */}
@@ -54,6 +61,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         muted
         preload="auto"
         src={currentVideo}
+        style={{ display: 'block' }} // S'assurer que la vidéo est visible
       />
       
       {/* Overlays visuels */}

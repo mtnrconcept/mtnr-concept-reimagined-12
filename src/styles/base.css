@@ -10,4 +10,11 @@
   html, body, #root {
     @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
   }
+  
+  /* S'assurer que la vidéo d'arrière-plan est toujours visible */
+  .background-video {
+    @apply fixed inset-0 w-full h-full object-cover z-0;
+    min-width: 100%;
+    min-height: 100%;
+  }
 }

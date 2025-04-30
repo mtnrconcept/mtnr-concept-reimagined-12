@@ -24,6 +24,26 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     return uvMode ? videoUrlUV : videoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
+  // S'assurer que les URL des vidéos sont correctes
+  useEffect(() => {
+    console.log('URL de la vidéo courante:', currentVideo);
+    // Vérifier si les fichiers de vidéo existent
+    fetch(currentVideo)
+      .then(response => {
+        if (!response.ok) {
+          console.error(`La vidéo ${currentVideo} n'a pas pu être chargée:`, response.status);
+          setVideoError(true);
+        } else {
+          console.log(`La vidéo ${currentVideo} existe et est accessible`);
+          setVideoError(false);
+        }
+      })
+      .catch(error => {
+        console.error(`Erreur lors de la vérification de la vidéo ${currentVideo}:`, error);
+        setVideoError(true);
+      });
+  }, [currentVideo]);
+
   // Fonction pour gérer la première interaction utilisateur
   const handleUserInteraction = useCallback(() => {
     if (!hasUserInteraction) {
@@ -45,9 +65,22 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       
       // S'assurer que la vidéo est correctement chargée
       if (videoElement.src !== currentVideo) {
+        console.log("Mise à jour de la source vidéo:", currentVideo);
         videoElement.src = currentVideo;
         await new Promise(resolve => {
-          videoElement.addEventListener('loadeddata', resolve, { once: true });
+          const loadHandler = () => {
+            console.log("Vidéo chargée avec succès");
+            resolve(true);
+            videoElement.removeEventListener('loadeddata', loadHandler);
+          };
+          videoElement.addEventListener('loadeddata', loadHandler, { once: true });
+          
+          // Timeout en cas de problème de chargement
+          setTimeout(() => {
+            console.warn("Délai de chargement vidéo dépassé");
+            resolve(false);
+            videoElement.removeEventListener('loadeddata', loadHandler);
+          }, 5000);
         });
       }
       
@@ -78,6 +111,20 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       setVideoError(true);
     }
   }, [currentVideo, videoError]);
+
+  // Ajouter un logging pour débogage
+  useEffect(() => {
+    if (videoRef.current) {
+      console.log("Statut de l'élément vidéo:", {
+        paused: videoRef.current.paused,
+        readyState: videoRef.current.readyState,
+        networkState: videoRef.current.networkState,
+        src: videoRef.current.src,
+        currentSrc: videoRef.current.currentSrc,
+        style: window.getComputedStyle(videoRef.current)
+      });
+    }
+  }, [isTransitioning]);
 
   return {
     videoRef,
