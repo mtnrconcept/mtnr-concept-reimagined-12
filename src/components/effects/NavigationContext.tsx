@@ -15,7 +15,6 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
 
-  // Utiliser une référence pour les listeners
   const triggerVideoTransition = useCallback(() => {
     // Éviter les déclenchements multiples rapprochés
     if (transitionInProgressRef.current) {
@@ -39,11 +38,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     });
     
-    // Réinitialiser l'état de transition après un délai
+    // Réinitialiser l'état de transition après un délai court
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
-    }, 1000);
+    }, 500);
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {

@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 
 interface UseVideoTransitionEffectsProps {
@@ -28,12 +28,10 @@ export const useVideoTransitionEffects = ({
   isTorchActive
 }: UseVideoTransitionEffectsProps) => {
   const navigation = useNavigation();
-  const initialSetupCompleteRef = useRef(false);
 
   // Fonction qui exécute la transition si les conditions sont réunies
   const executeTransition = useCallback(() => {
     if (!hasUserInteraction) {
-      // Simuler une interaction utilisateur
       handleUserInteraction();
       setTimeout(() => playVideoTransition(), 100);
     } else if (!isTransitioning) {
@@ -44,6 +42,7 @@ export const useVideoTransitionEffects = ({
   // Écouter les événements de navigation
   useEffect(() => {
     const unregister = navigation.registerVideoTransitionListener(() => {
+      console.log("Transition vidéo déclenchée");
       executeTransition();
     });
     
@@ -62,35 +61,18 @@ export const useVideoTransitionEffects = ({
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
       
-      // Marquer l'initialisation comme terminée
+      // Déclencher une première transition pour s'assurer que la vidéo est visible
       setTimeout(() => {
-        initialSetupCompleteRef.current = true;
-      }, 500);
+        if (hasUserInteraction) {
+          playVideoTransition();
+        }
+      }, 300);
     }
-    
-    // Gestion de la visibilité de la page
-    const handleVisibilityChange = () => {
-      if (!videoElement) return;
-      
-      if (document.hidden) {
-        videoElement.pause();
-      } else if (hasUserInteraction && isTransitioning) {
-        videoElement.play().catch(err => {
-          console.error('Erreur lors de la reprise de lecture:', err);
-        });
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isFirstLoad, currentVideo, setIsFirstLoad, hasUserInteraction, isTransitioning, videoRef]);
+  }, [isFirstLoad, videoRef, setIsFirstLoad, hasUserInteraction, playVideoTransition]);
   
   // Ajout des écouteurs pour la première interaction utilisateur
   useEffect(() => {
-    if (hasUserInteraction) return; // Ne rien faire si l'interaction est déjà détectée
+    if (hasUserInteraction) return;
     
     const handleInteraction = () => {
       handleUserInteraction();

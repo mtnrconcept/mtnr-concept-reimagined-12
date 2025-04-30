@@ -35,49 +35,22 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
-    if (!videoElement || isTransitioning || videoError) {
+    if (!videoElement || videoError) {
       return;
     }
     
     try {
       setIsTransitioning(true);
       
-      // Vider le cache avant de jouer si nécessaire
-      if (videoElement.src !== currentVideo) {        
-        // Retirer l'ancienne source et vider le cache
-        videoElement.removeAttribute('src');
-        videoElement.load();
-        
-        // Définir la nouvelle source
+      // S'assurer que la vidéo est correctement chargée
+      if (videoElement.src !== currentVideo) {
         videoElement.src = currentVideo;
-        
-        // Attendre que les métadonnées soient chargées avant de continuer
-        if (videoElement.readyState < 2) {
-          await new Promise<void>((resolve) => {
-            const handleMetadata = () => {
-              videoElement.removeEventListener('loadedmetadata', handleMetadata);
-              resolve();
-            };
-            videoElement.addEventListener('loadedmetadata', handleMetadata);
-            
-            // Timeout si les métadonnées ne se chargent pas
-            setTimeout(() => {
-              videoElement.removeEventListener('loadedmetadata', handleMetadata);
-              resolve();
-            }, 2000);
-          });
-        }
       }
       
       videoElement.currentTime = 0;
-      videoElement.playbackRate = 1.0;
       
       // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
       const handleVideoEnded = () => {
-        if (videoElement) {
-          videoElement.pause();
-          videoElement.currentTime = videoElement.duration - 0.1; // Maintenir la dernière image
-        }
         setIsTransitioning(false);
         videoElement.removeEventListener('ended', handleVideoEnded);
       };
@@ -85,15 +58,18 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       videoElement.removeEventListener('ended', handleVideoEnded);
       videoElement.addEventListener('ended', handleVideoEnded);
       
+      // Lancer la lecture de la vidéo
       await videoElement.play().catch(error => {
+        console.error("Erreur de lecture vidéo:", error);
         setIsTransitioning(false);
         setVideoError(true);
       });
     } catch (error) {
+      console.error("Erreur générale:", error);
       setIsTransitioning(false);
       setVideoError(true);
     }
-  }, [isTransitioning, currentVideo, videoError]);
+  }, [currentVideo, videoError]);
 
   return {
     videoRef,

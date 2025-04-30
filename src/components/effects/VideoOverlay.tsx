@@ -17,15 +17,6 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({ className = '' }) =>
           mixBlendMode: 'overlay'
         }}
       />
-      
-      {/* Vignette */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%)',
-          pointerEvents: 'none'
-        }}
-      />
     </>
   );
 };
