@@ -19,7 +19,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimerRef = useRef<number | null>(null);
   
   // Composition 1.mp4 pour le mode UV actif
   const currentVideoUrl = uvMode ? videoUrl : videoUrlUV;
@@ -37,34 +36,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${currentVideoUrl}`);
   }, [uvMode, currentVideoUrl]);
 
-  // Force pause après la lecture de la vidéo complète
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-    
-    const handleEnded = () => {
-      console.log('Vidéo terminée, mise en pause');
-      videoElement.pause();
-      videoElement.currentTime = 0;
-      setIsTransitioning(false);
-    };
-    
-    videoElement.addEventListener('ended', handleEnded);
-    return () => {
-      videoElement.removeEventListener('ended', handleEnded);
-    };
-  }, []);
-  
   // Gestion de la lecture/pause de la vidéo lors des transitions de page
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
-    
-    // Nettoyer le timer précédent si existant
-    if (transitionTimerRef.current) {
-      clearTimeout(transitionTimerRef.current);
-      transitionTimerRef.current = null;
-    }
     
     if (isFirstLoad) {
       // À la première charge, mettre la vidéo en pause
@@ -73,26 +48,34 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       setIsFirstLoad(false);
       console.log('Vidéo initialisée en pause');
     } else {
-      // Lors des changements de route, jouer la vidéo pendant quelques secondes
+      // Lors des changements de route, jouer la vidéo une seule fois
       const playVideo = async () => {
         try {
           setIsTransitioning(true);
           videoElement.currentTime = 0; // Assurer que la vidéo commence du début
           videoElement.playbackRate = 1.0;
+          
+          // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
+          const handleVideoEnded = () => {
+            console.log('Vidéo terminée, mise en pause');
+            videoElement.pause();
+            videoElement.currentTime = 0;
+            setIsTransitioning(false);
+            // Retirer l'écouteur pour éviter des déclenchements multiples
+            videoElement.removeEventListener('ended', handleVideoEnded);
+          };
+          
+          // S'assurer qu'on n'a pas d'écouteurs en double
+          videoElement.removeEventListener('ended', handleVideoEnded);
+          // Ajouter l'écouteur d'événement
+          videoElement.addEventListener('ended', handleVideoEnded);
+          
           await videoElement.play();
           console.log('Vidéo lancée au changement de route');
-          
-          // Arrêter la vidéo après la durée de transition (8s)
-          transitionTimerRef.current = window.setTimeout(() => {
-            if (videoElement) {
-              console.log('Timer expiré, mise en pause de la vidéo');
-              videoElement.pause();
-              setIsTransitioning(false);
-            }
-          }, 8000);
         } catch (error) {
           console.error('Erreur lors de la lecture de la vidéo:', error);
           setIsTransitioning(false);
+          videoElement.removeEventListener('ended', () => {});
         }
       };
       
@@ -116,11 +99,11 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (transitionTimerRef.current) {
-        clearTimeout(transitionTimerRef.current);
-        transitionTimerRef.current = null;
+      if (videoElement) {
+        videoElement.pause();
+        // Retirer tous les écouteurs d'événements
+        videoElement.removeEventListener('ended', () => {});
       }
-      if (videoElement) videoElement.pause();
     };
   }, [location.pathname, isFirstLoad, isTransitioning]);
 
