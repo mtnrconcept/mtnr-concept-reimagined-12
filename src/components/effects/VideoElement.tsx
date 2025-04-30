@@ -43,20 +43,14 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
       setTimeout(() => {
         setRetryCount(prev => prev + 1);
         
-        // Au lieu d'utiliser .load() directement, on réinitialise la source
-        const videoElement = e.target as HTMLVideoElement;
-        if (videoElement && videoElement.canPlayType) {
-          // Chrome workaround: éviter d'appeler load() directement
-          // Réinitialiser le src via l'état pour forcer React à recréer l'élément
-          setVideoSource('');
-          setTimeout(() => setVideoSource(src), 10);
-        }
+        // Ne pas utiliser load() - simplement réinitialiser la source via React
+        setVideoSource('');
+        setTimeout(() => setVideoSource(src), 10);
       }, retryDelay);
     }
   };
   
   // Note: On utilise un key dynamique pour forcer le remontage complet
-  // plutôt que d'appeler .load()
   return (
     <video
       ref={ref}

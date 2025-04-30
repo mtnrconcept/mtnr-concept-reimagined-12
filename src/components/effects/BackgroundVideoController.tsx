@@ -2,14 +2,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { useVideoPreload } from '@/hooks/useVideoPreload';
 import { toast } from 'sonner';
+import { useNavigation } from './NavigationContext';
 
 export const BackgroundVideoController = () => {
   const [preloadComplete, setPreloadComplete] = useState(false);
   const loadAttemptsMade = useRef(0);
   const maxLoadAttempts = 3;
+  const navigation = useNavigation();
   
   // Précharger les vidéos avec la nouvelle logique améliorée
-  // On limite le nombre d'éléments vidéo créés simultanément
   const { preloadStatus, isPreloading } = useVideoPreload({
     videoUrls: [
       '/lovable-uploads/Videofondnormale.mp4',
@@ -21,16 +22,21 @@ export const BackgroundVideoController = () => {
       console.info('Résultats du préchargement:', results);
       setPreloadComplete(true);
       
-      // Diagnostiquer les problèmes éventuels
-      Object.entries(results).forEach(([url, isAvailable]) => {
-        if (!isAvailable && loadAttemptsMade.current < maxLoadAttempts) {
-          console.warn(`⚠️ La vidéo ${url} n'est pas disponible ou ne peut pas être préchargée.`);
-          
-          // Suggestion de vérification
-          console.info(`Veuillez vérifier que le fichier existe dans le dossier public/lovable-uploads/`);
-          console.info(`et que le nom est exactement correct (sensible à la casse).`);
-        }
-      });
+      // Vérifier disponibilité
+      const isNormalVideoAvailable = results['/lovable-uploads/Videofondnormale.mp4'];
+      const isUVVideoAvailable = results['/lovable-uploads/VideofondUV.mp4'];
+      
+      // Afficher le statut
+      console.log(`Vidéo normale disponible: ${isNormalVideoAvailable ? 'Oui' : 'Non'}`);
+      console.log(`Vidéo UV disponible: ${isUVVideoAvailable ? 'Oui' : 'Non'}`);
+      
+      // Si les vidéos sont disponibles, déclencher une transition
+      if (isNormalVideoAvailable || isUVVideoAvailable) {
+        setTimeout(() => {
+          navigation.triggerVideoTransition();
+          console.log("Transition vidéo déclenchée après préchargement réussi");
+        }, 500);
+      }
     }
   });
   

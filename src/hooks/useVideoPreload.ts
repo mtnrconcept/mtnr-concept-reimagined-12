@@ -21,58 +21,113 @@ export const useVideoPreload = ({
     let completedPreloads = 0;
     setIsPreloading(true);
     
+    // Fonction pour vérifier la disponibilité d'une vidéo par HTTP
+    const checkVideoAvailability = async (url: string): Promise<boolean> => {
+      try {
+        console.log(`Vérification de disponibilité: ${url}`);
+        const response = await fetch(url, { 
+          method: 'HEAD', 
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        return response.ok;
+      } catch (error) {
+        console.error(`Erreur lors de la vérification HTTP: ${url}`, error);
+        return false;
+      }
+    };
+    
+    // Fonction pour précharger une vidéo par lien preload
+    const addPreloadLink = (url: string) => {
+      try {
+        // Vérifier si un lien preload existe déjà pour cette URL
+        const existingLink = document.querySelector(`link[rel="preload"][href="${url}"]`);
+        if (!existingLink) {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.href = url;
+          link.as = 'video';
+          link.type = 'video/mp4';
+          document.head.appendChild(link);
+          console.log(`Lien preload ajouté pour: ${url}`);
+        }
+        return true;
+      } catch (error) {
+        console.error(`Erreur lors de la création du lien preload: ${url}`, error);
+        return false;
+      }
+    };
+    
+    // Fonction pour précharger une seule vidéo
     const preloadVideo = async (url: string): Promise<void> => {
       if (!url || activePreloads.current.has(url)) {
         preloadResults[url] = false;
+        completedPreloads++;
         return Promise.resolve();
       }
       
       try {
-        // Éviter les préchargements simultanés du même URL
         activePreloads.current.add(url);
         
-        // Vérifier d'abord si la vidéo est accessible avec une requête HEAD
-        try {
-          const response = await fetch(url, { method: 'HEAD', cache: 'force-cache' });
-          const isAvailable = response.ok;
-          preloadResults[url] = isAvailable;
+        // Vérifier d'abord la disponibilité par HTTP
+        const isAvailable = await checkVideoAvailability(url);
+        
+        if (isAvailable) {
+          // Si disponible, ajouter le lien preload
+          addPreloadLink(url);
           
-          if (isAvailable) {
-            // Utiliser un lien preload avec le bon type
-            const link = document.createElement('link');
-            link.rel = 'preload';
-            link.href = url;
-            link.as = 'video';
-            link.type = 'video/mp4';
-            document.head.appendChild(link);
+          // Créer également un élément vidéo hors-DOM pour précharger
+          const tempVideo = document.createElement('video');
+          tempVideo.preload = 'auto';
+          tempVideo.muted = true;
+          tempVideo.playsInline = true;
+          tempVideo.src = url;
+          
+          // Attendre le chargement des métadonnées
+          await new Promise<void>((resolve) => {
+            const loaded = () => {
+              resolve();
+              tempVideo.removeEventListener('loadedmetadata', loaded);
+              tempVideo.removeEventListener('error', errorHandler);
+            };
             
-            // Éviter de créer des éléments vidéo pour le préchargement
-            // Chrome a une limite de WebMediaPlayers
-            console.log(`Préchargement ${completedPreloads + 1}/${videoUrls.length} terminé`);
-          } else {
-            console.error(`La vidéo n'est pas accessible: ${url}, status: ${response.status}`);
-          }
-        } catch (error) {
-          console.error(`Erreur lors de la vérification de la vidéo ${url}:`, error);
+            const errorHandler = () => {
+              console.warn(`Erreur lors du préchargement vidéo: ${url}`);
+              resolve(); // Résoudre quand même pour continuer
+              tempVideo.removeEventListener('loadedmetadata', loaded);
+              tempVideo.removeEventListener('error', errorHandler);
+            };
+            
+            tempVideo.addEventListener('loadedmetadata', loaded);
+            tempVideo.addEventListener('error', errorHandler);
+            
+            // Timeout pour éviter d'attendre indéfiniment
+            setTimeout(resolve, 5000);
+          });
+          
+          preloadResults[url] = true;
+          console.log(`Préchargement ${completedPreloads + 1}/${videoUrls.length} terminé`);
+        } else {
+          console.warn(`La vidéo n'est pas accessible: ${url}`);
           preloadResults[url] = false;
-        } finally {
-          activePreloads.current.delete(url);
         }
+        
       } catch (error) {
         console.error(`Erreur lors du préchargement de la vidéo ${url}:`, error);
         preloadResults[url] = false;
+      } finally {
         activePreloads.current.delete(url);
+        completedPreloads++;
       }
-      
-      completedPreloads++;
     };
     
+    // Fonction principale pour précharger toutes les vidéos
     const preloadVideos = async () => {
       try {
         console.info('Préchargement des vidéos:', videoUrls);
         
         if (sequential) {
-          // Mode séquentiel: un préchargement à la fois pour éviter les problèmes Chrome
+          // Mode séquentiel: un préchargement à la fois
           for (const url of videoUrls) {
             await preloadVideo(url);
           }
@@ -97,6 +152,7 @@ export const useVideoPreload = ({
       }
     };
     
+    // Démarrer le préchargement
     preloadVideos();
     
     return () => {

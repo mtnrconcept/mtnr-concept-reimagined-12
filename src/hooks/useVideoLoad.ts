@@ -17,7 +17,14 @@ export const useVideoLoad = ({ onVideoError, onVideoLoaded }: UseVideoLoadOption
     
     setIsVideoLoaded(true);
     setVideoError(false);
-    console.info("Vidéo chargée avec succès:", src);
+    console.info("✓ Vidéo chargée avec succès:", src);
+    
+    // Tenter de démarrer la lecture automatiquement
+    if (target) {
+      target.play().catch(err => {
+        console.warn("Lecture automatique impossible, attente d'interaction utilisateur:", err);
+      });
+    }
     
     if (onVideoLoaded) {
       onVideoLoaded(src);
@@ -39,13 +46,13 @@ export const useVideoLoad = ({ onVideoError, onVideoLoaded }: UseVideoLoadOption
   
   const verifyVideoPlayability = useCallback(async (videoUrl: string): Promise<boolean> => {
     try {
-      // Vérification simplifiée pour éviter trop de requêtes
-      if (!videoUrl) return false;
+      console.log(`Vérification de jouabilité pour: ${videoUrl}`);
       
       // Vérifier uniquement les métadonnées au lieu de l'ensemble du fichier
       const response = await fetch(videoUrl, { 
         method: 'HEAD',
-        cache: 'force-cache'
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
       });
       
       if (!response.ok) {

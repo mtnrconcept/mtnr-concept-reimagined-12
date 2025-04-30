@@ -22,6 +22,21 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
   const { videoError, handleVideoLoad, handleVideoError } = useVideoLoad();
   const { uvMode } = useUVMode();
   
+  // Préchargement des vidéos pour une meilleure performance
+  const { preloadStatus } = useVideoPreload({
+    videoUrls: [videoUrl, videoUrlUV],
+    sequential: true,
+    onPreloadComplete: (results) => {
+      console.log("Préchargement vidéo terminé:", results);
+    }
+  });
+  
+  useEffect(() => {
+    // Log pour le débogage
+    console.log("BackgroundVideo monté, URLs vidéos:", { videoUrl, videoUrlUV });
+    console.log("Mode UV actif:", uvMode);
+  }, [videoUrl, videoUrlUV, uvMode]);
+  
   return (
     <motion.div 
       className="fixed inset-0 w-full h-full z-0 overflow-hidden"
@@ -34,7 +49,7 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
       {!uvMode && (
         <VideoElement
           ref={normalVideoRef}
-          className="background-video video-normal"
+          className="background-video video-normal absolute inset-0 w-full h-full object-cover"
           src={videoUrl}
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
@@ -46,7 +61,7 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
       {uvMode && (
         <VideoElement
           ref={uvVideoRef}
-          className="background-video video-uv"
+          className="background-video video-uv absolute inset-0 w-full h-full object-cover"
           src={videoUrlUV}
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}

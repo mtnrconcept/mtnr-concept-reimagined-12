@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
+import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -38,11 +39,14 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* BackgroundVideo with updated filenames */}
+      {/* BackgroundVideo with correct paths */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/Videofondnormale.mp4"
         videoUrlUV="/lovable-uploads/VideofondUV.mp4"
       />
+      
+      {/* Ajout du contrôleur vidéo pour améliorer la gestion */}
+      <BackgroundVideoController />
       
       <PageTransition keyId={location.pathname}>
         <Routes location={location} key={location.pathname}>

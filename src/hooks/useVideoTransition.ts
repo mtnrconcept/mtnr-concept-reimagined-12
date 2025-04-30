@@ -79,7 +79,15 @@ export const useVideoTransition = () => {
     configureVideo(uvVideoRef.current);
     
     console.log('Vidéos configurées au chargement initial');
-  }, []);
+    
+    // Tenter de jouer la vidéo dès le montage
+    if (uvMode && uvVideoRef.current) {
+      uvVideoRef.current.play().catch(e => console.warn("Lecture auto UV impossible:", e));
+    } 
+    else if (!uvMode && normalVideoRef.current) {
+      normalVideoRef.current.play().catch(e => console.warn("Lecture auto normale impossible:", e));
+    }
+  }, [uvMode]);
   
   // Handle video ended events
   useEffect(() => {
@@ -127,14 +135,14 @@ export const useVideoTransition = () => {
     }
     
     try {
-      // Vérifier si la vidéo est jouable
+      // Vérifier si la vidéo est jouable - simple et efficace
       const isPlayable = await verifyVideoPlayability(videoUrl);
       if (!isPlayable) {
         console.error(`La vidéo ${videoUrl} n'est pas jouable, transition annulée`);
         return false;
       }
       
-      // Préparation de la vidéo - éviter d'appeler .load() directement
+      // Préparation de la vidéo sans appeler load()
       videoRef.currentTime = 0;
       videoRef.loop = false;
       videoRef.muted = true;
@@ -148,11 +156,12 @@ export const useVideoTransition = () => {
     }
   }, [normalVideoUrl, uvVideoUrl, verifyVideoPlayability]);
   
-  // Subscribe to transition events with improved error handling 
-  // and Chrome-friendly implementation
+  // Subscribe to transition events with improved error handling
   useEffect(() => {
     const unregister = registerVideoTransitionListener(async () => {
       try {
+        console.log(`Démarrage de transition vidéo en mode ${uvMode ? 'UV' : 'normal'}`);
+        
         // Vérifier que la vidéo est disponible avant de tenter la transition
         const canTransition = await verifyAndPrepareVideo(uvMode);
         if (!canTransition) {
@@ -160,7 +169,7 @@ export const useVideoTransition = () => {
           return;
         }
         
-        // Choose video based on UV mode
+        // Choisir la vidéo en fonction du mode
         const video = uvMode ? uvVideoRef.current : normalVideoRef.current;
         
         if (!video || !document.body.contains(video)) {
@@ -173,63 +182,29 @@ export const useVideoTransition = () => {
         // Add class for visual effects
         video.classList.add("video-transitioning");
         
-        // Play with error handling - solution compatible Chrome
+        // Reset video and play
         try {
-          console.log("▶️ Tentative de lecture vidéo");
+          video.currentTime = 0;
           
-          // Solution de contournement pour Chrome: pause puis lecture
-          // au lieu de load() + play()
-          if (video.paused) {
-            // Correction pour Chrome: éviter le cycle load+play
-            // Attendre une légère pause avant de lancer la lecture
-            video.currentTime = 0;
-            
-            // Utiliser timeout pour éviter les problèmes de WebMediaPlayer
-            setTimeout(async () => {
-              try {
-                const playPromise = video.play();
-                // Le play() peut retourner undefined sur certains navigateurs
-                if (playPromise !== undefined) {
-                  await playPromise;
-                }
-                console.log("✅ Vidéo démarrée avec succès pour la transition");
-              } catch (innerError) {
-                console.error("Erreur play() après timeout:", innerError);
-              }
-            }, 50);
-          } else {
-            // Si déjà en lecture, faire une courte pause puis relancer
-            video.pause();
-            video.currentTime = 0;
-            
-            setTimeout(async () => {
-              try {
-                await video.play();
-                console.log("✅ Vidéo redémarrée avec succès après pause");
-              } catch (innerError) {
-                console.error("Erreur play() après pause:", innerError);
-              }
-            }, 50);
-          }
-        } catch (error) {
-          console.error("❌ Erreur lors de la lecture vidéo pour transition:", error);
-          
-          // Recovery attempt - force autoplay mode
-          // Éviter de créer de nouveaux MediaPlayers
+          // Solution simple qui fonctionne sur Chrome et autres navigateurs
           setTimeout(async () => {
             try {
-              video.currentTime = 0;
-              video.muted = true;
-              video.playsInline = true;
-              await video.play();
-              console.log("✅ Vidéo démarrée avec succès après récupération");
-            } catch (fallbackError) {
-              console.error("❌❌ Échec de la récupération:", fallbackError);
-              
-              // En cas d'échec total, on simule une fin de vidéo
-              video.dispatchEvent(new Event('ended'));
+              const playPromise = video.play();
+              if (playPromise !== undefined) {
+                await playPromise;
+                console.log("✅ Vidéo démarrée avec succès pour la transition");
+              }
+            } catch (innerError) {
+              console.error("Erreur play():", innerError);
+              // Si échec, tenter la lecture avec interaction utilisateur
+              document.body.addEventListener('click', function playOnClick() {
+                video.play().catch(e => console.warn("Échec de lecture après clic:", e));
+                document.body.removeEventListener('click', playOnClick);
+              }, { once: true });
             }
-          }, 100);
+          }, 50);
+        } catch (error) {
+          console.error("❌ Erreur lors de la lecture vidéo:", error);
         }
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);
