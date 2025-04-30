@@ -1,12 +1,12 @@
 
 import { useCallback } from 'react';
-import { useVideoLoad } from './useVideoLoad';
+import { useVideoPlayabilityCheck } from './useVideoPlayabilityCheck';
 
 /**
  * Hook to handle video verification before transitions
  */
 export const useVideoVerification = () => {
-  const { verifyVideoPlayability } = useVideoLoad();
+  const { verifyVideoPlayability } = useVideoPlayabilityCheck();
   
   // Fonction pour vérifier la jouabilité avant de déclencher une transition
   const verifyAndPrepareVideo = useCallback(async (

@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect } from "react";
 import { motion } from "framer-motion";
 import PageContentTransition from "@/components/PageContentTransition";
 import { useNavigation } from "./effects/NavigationContext";
-import { useVideoLoad } from "@/hooks/useVideoLoad";
+import { useVideoPlayabilityCheck } from "@/hooks/useVideoPlayabilityCheck";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -15,7 +15,7 @@ export default function PageTransition({
   keyId,
 }: PageTransitionProps) {
   const navigation = useNavigation();
-  const { verifyVideoPlayability } = useVideoLoad();
+  const { verifyVideoPlayability } = useVideoPlayabilityCheck();
   
   // Déclencher la transition lors du changement de page
   useEffect(() => {
