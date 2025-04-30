@@ -39,7 +39,7 @@ export function useElevatorTransition({
   useEffect(() => {
     // Si l'état isActive change de false à true, c'est une transition
     if (isActive && !isTransitioning) {
-      console.log("Démarrage de la transition avec boucles progressives");
+      console.log("Démarrage de la transition avec effet repetile");
       setIsTransitioning(true);
       setAnimationPhase('loop');
       setLoopCount(0);
@@ -108,7 +108,7 @@ export function useElevatorTransition({
       // Ajouter à la durée totale de transition
       totalTransitionTimeRef.current += loopDuration;
       
-      console.log(`Boucle ${currentLoopCount}/${MAX_LOOPS}, durée: ${loopDuration}ms`);
+      console.log(`Boucle repetile ${currentLoopCount}/${MAX_LOOPS}, durée: ${loopDuration}ms`);
       
       // Si on atteint le nombre maximal de boucles, passer à la phase de slide
       if (currentLoopCount >= MAX_LOOPS) {

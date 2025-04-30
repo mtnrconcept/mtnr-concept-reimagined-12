@@ -47,7 +47,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
         />
       </div>
       
-      {/* Animation de sortie du contenu actuel */}
+      {/* Animation de sortie du contenu actuel avec effet repetile */}
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
