@@ -3,7 +3,6 @@ import React, { ReactNode, useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { createSmokeEffect } from "@/lib/transitions";
-import { OptimizedDisperseLogo } from "@/components/effects/OptimizedDisperseLogo";
 import ElevatorTransition from "@/components/effects/ElevatorTransition";
 import PageContentTransition from "@/components/PageContentTransition";
 
@@ -41,19 +40,7 @@ export default function PageTransition({
       prevPathRef.current = location.pathname;
     }
   }, [location.pathname]);
-
-  const handleDisperseComplete = () => {
-    console.log('Dispersion terminée, application de l\'effet de fumée');
-    // OptimizedDisperseLogo a terminé la dispersion et attendu 500ms
-    // Nous pouvons maintenant appliquer l'effet de fumée à la page
-    if (contentRef.current) {
-      createSmokeEffect(contentRef.current);
-    }
-    
-    // Réinitialiser l'état de chargement
-    setIsLoading(false);
-  };
-
+  
   const handleTransitionComplete = () => {
     setIsTransitioning(false);
     console.log('Transition d\'ascenseur terminée');
@@ -61,9 +48,6 @@ export default function PageTransition({
 
   return (
     <>
-      {/* Logo avec dispersion et callback de fin */}
-      <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
-
       {/* Effet d'ascenseur */}
       <ElevatorTransition 
         isActive={isTransitioning}
