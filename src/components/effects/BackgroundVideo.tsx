@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useUVMode } from './UVModeContext';
 import { useLocation } from 'react-router-dom';
 
@@ -17,6 +17,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const { uvMode } = useUVMode();
   const location = useLocation();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   
   // Détermine quelle vidéo utiliser en fonction du mode UV
   const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
@@ -25,39 +26,43 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
-    // Mettre la vidéo en pause initialement
-    videoElement.pause();
-    videoElement.currentTime = 0;
-    
-    const playVideo = async () => {
-      try {
-        videoElement.playbackRate = 0.6; // Ralentir légèrement pour un effet plus dramatique
-        await videoElement.play();
-        console.log('Vidéo en lecture');
-      } catch (error) {
-        console.error('Erreur lors de la lecture de la vidéo:', error);
-      }
-    };
+    if (isFirstLoad) {
+      // À la première charge, mettre la vidéo en pause
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      setIsFirstLoad(false);
+      console.log('Vidéo initialisée en pause');
+    } else {
+      // Lors des changements de route, jouer la vidéo
+      const playVideo = async () => {
+        try {
+          videoElement.playbackRate = 1.0; // Vitesse réelle
+          await videoElement.play();
+          console.log('Vidéo lancée au changement de route');
+        } catch (error) {
+          console.error('Erreur lors de la lecture de la vidéo:', error);
+        }
+      };
+      
+      playVideo();
+    }
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
-      if (document.hidden) {
+      if (document.hidden && videoElement) {
         videoElement.pause();
-      } else {
-        playVideo();
+      } else if (videoElement && !isFirstLoad) {
+        videoElement.play();
       }
     };
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
-    // Lancer la vidéo sur changement de route
-    playVideo();
-    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      videoElement.pause();
+      if (videoElement) videoElement.pause();
     };
-  }, [location.pathname, currentVideoUrl]); // Relancer l'effet quand la route ou la vidéo change
+  }, [location.pathname, currentVideoUrl, isFirstLoad]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
@@ -68,12 +73,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         poster={fallbackImage}
         playsInline
         muted
+        loop
       >
         <source src={currentVideoUrl} type="video/mp4" />
       </video>
-      
-      {/* Overlay pour assombrir légèrement la vidéo */}
-      <div className="absolute inset-0 bg-black opacity-40"></div>
       
       {/* Grille */}
       <div 

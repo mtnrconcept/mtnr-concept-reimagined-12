@@ -40,7 +40,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-x-hidden">
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
         
