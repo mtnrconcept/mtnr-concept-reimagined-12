@@ -7,6 +7,7 @@ import { useVideoTransition } from '@/hooks/useVideoTransition';
 import VideoElement from './VideoElement';
 import ParallaxDecorations from './ParallaxDecorations';
 import { useVideoPreload } from '@/hooks/useVideoPreload';
+import { useUVMode } from './UVModeContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -21,27 +22,7 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
 }, ref) => {
   const { normalVideoRef, uvVideoRef, videoAvailability } = useVideoTransition();
   const { videoError, handleVideoLoad, handleVideoError } = useVideoLoad({ fallbackImage });
-  
-  // Précharger les vidéos dès le chargement du composant
-  const { preloadStatus, isPreloading } = useVideoPreload({
-    videoUrls: [videoUrl, videoUrlUV]
-  });
-  
-  // Surveiller l'état de préchargement pour le débogage
-  useEffect(() => {
-    if (!isPreloading) {
-      console.log("État de préchargement des vidéos:", preloadStatus);
-      
-      // Afficher des avertissements si les vidéos ne sont pas disponibles
-      if (preloadStatus[videoUrl] === false) {
-        console.warn(`⚠️ La vidéo normale n'est pas disponible: ${videoUrl}`);
-      }
-      
-      if (preloadStatus[videoUrlUV] === false) {
-        console.warn(`⚠️ La vidéo UV n'est pas disponible: ${videoUrlUV}`);
-      }
-    }
-  }, [isPreloading, preloadStatus, videoUrl, videoUrlUV]);
+  const { uvMode } = useUVMode();
   
   return (
     <motion.div 
@@ -59,27 +40,32 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
         />
       )}
       
-      {/* Normal mode video */}
-      <VideoElement
-        ref={normalVideoRef}
-        className="background-video video-normal"
-        src={videoUrl}
-        onLoadedData={handleVideoLoad}
-        onError={handleVideoError}
-        fallbackImage={fallbackImage}
-        autoRetry={true}
-      />
+      {/* On utilise des conditions pour n'afficher que la vidéo active */}
+      {/* afin de réduire le nombre d'éléments vidéo dans le DOM */}
+      {!uvMode && (
+        <VideoElement
+          ref={normalVideoRef}
+          className="background-video video-normal"
+          src={videoUrl}
+          onLoadedData={handleVideoLoad}
+          onError={handleVideoError}
+          fallbackImage={fallbackImage}
+          autoRetry={true}
+        />
+      )}
       
-      {/* UV mode video */}
-      <VideoElement
-        ref={uvVideoRef}
-        className="background-video video-uv"
-        src={videoUrlUV}
-        onLoadedData={handleVideoLoad}
-        onError={handleVideoError}
-        fallbackImage={fallbackImage}
-        autoRetry={true}
-      />
+      {/* UV mode video - chargé uniquement quand nécessaire */}
+      {uvMode && (
+        <VideoElement
+          ref={uvVideoRef}
+          className="background-video video-uv"
+          src={videoUrlUV}
+          onLoadedData={handleVideoLoad}
+          onError={handleVideoError}
+          fallbackImage={fallbackImage}
+          autoRetry={true}
+        />
+      )}
       
       {/* Video overlay */}
       <VideoOverlay />

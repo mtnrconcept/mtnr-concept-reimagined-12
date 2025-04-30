@@ -134,7 +134,7 @@ export const useVideoTransition = () => {
         return false;
       }
       
-      // Préparation de la vidéo
+      // Préparation de la vidéo - éviter d'appeler .load() directement
       videoRef.currentTime = 0;
       videoRef.loop = false;
       videoRef.muted = true;
@@ -148,7 +148,8 @@ export const useVideoTransition = () => {
     }
   }, [normalVideoUrl, uvVideoUrl, verifyVideoPlayability]);
   
-  // Subscribe to transition events with improved error handling
+  // Subscribe to transition events with improved error handling 
+  // and Chrome-friendly implementation
   useEffect(() => {
     const unregister = registerVideoTransitionListener(async () => {
       try {
@@ -172,29 +173,63 @@ export const useVideoTransition = () => {
         // Add class for visual effects
         video.classList.add("video-transitioning");
         
-        // Play with error handling
+        // Play with error handling - solution compatible Chrome
         try {
           console.log("▶️ Tentative de lecture vidéo");
-          await video.play();
-          console.log("✅ Vidéo démarrée avec succès pour la transition");
+          
+          // Solution de contournement pour Chrome: pause puis lecture
+          // au lieu de load() + play()
+          if (video.paused) {
+            // Correction pour Chrome: éviter le cycle load+play
+            // Attendre une légère pause avant de lancer la lecture
+            video.currentTime = 0;
+            
+            // Utiliser timeout pour éviter les problèmes de WebMediaPlayer
+            setTimeout(async () => {
+              try {
+                const playPromise = video.play();
+                // Le play() peut retourner undefined sur certains navigateurs
+                if (playPromise !== undefined) {
+                  await playPromise;
+                }
+                console.log("✅ Vidéo démarrée avec succès pour la transition");
+              } catch (innerError) {
+                console.error("Erreur play() après timeout:", innerError);
+              }
+            }, 50);
+          } else {
+            // Si déjà en lecture, faire une courte pause puis relancer
+            video.pause();
+            video.currentTime = 0;
+            
+            setTimeout(async () => {
+              try {
+                await video.play();
+                console.log("✅ Vidéo redémarrée avec succès après pause");
+              } catch (innerError) {
+                console.error("Erreur play() après pause:", innerError);
+              }
+            }, 50);
+          }
         } catch (error) {
           console.error("❌ Erreur lors de la lecture vidéo pour transition:", error);
           
           // Recovery attempt - force autoplay mode
-          video.muted = true;
-          video.playsInline = true;
-          video.setAttribute("playsinline", "");
-          video.setAttribute("webkit-playsinline", "");
-          
-          try {
-            await video.play();
-            console.log("✅ Vidéo démarrée avec succès après récupération");
-          } catch (fallbackError) {
-            console.error("❌❌ Échec de la récupération:", fallbackError);
-            
-            // En cas d'échec total, on simule une fin de vidéo
-            video.dispatchEvent(new Event('ended'));
-          }
+          // Éviter de créer de nouveaux MediaPlayers
+          setTimeout(async () => {
+            try {
+              video.currentTime = 0;
+              video.muted = true;
+              video.playsInline = true;
+              await video.play();
+              console.log("✅ Vidéo démarrée avec succès après récupération");
+            } catch (fallbackError) {
+              console.error("❌❌ Échec de la récupération:", fallbackError);
+              
+              // En cas d'échec total, on simule une fin de vidéo
+              video.dispatchEvent(new Event('ended'));
+            }
+          }, 100);
         }
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);

@@ -47,10 +47,13 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
       setTimeout(() => {
         setRetryCount(prev => prev + 1);
         
-        // Rafraîchir le src pour forcer un rechargement
+        // Au lieu d'utiliser .load() directement, on réinitialise la source
         const videoElement = e.target as HTMLVideoElement;
-        if (videoElement) {
-          videoElement.load();
+        if (videoElement && videoElement.canPlayType) {
+          // Chrome workaround: éviter d'appeler load() directement
+          // Réinitialiser le src via l'état pour forcer React à recréer l'élément
+          setVideoSource('');
+          setTimeout(() => setVideoSource(src), 10);
         }
       }, retryDelay);
     } else {
@@ -72,9 +75,12 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
     );
   }
   
+  // Note: On utilise un key dynamique pour forcer le remontage complet
+  // plutôt que d'appeler .load()
   return (
     <video
       ref={ref}
+      key={`video-${retryCount}-${videoSource}`}
       className={className}
       playsInline
       muted
@@ -83,7 +89,7 @@ const VideoElement = forwardRef<HTMLVideoElement, VideoElementProps>(({
       onError={handleError}
       onEnded={onEnded}
     >
-      <source src={videoSource} type="video/mp4" />
+      {videoSource && <source src={videoSource} type="video/mp4" />}
       Votre navigateur ne prend pas en charge les vidéos HTML5.
     </video>
   );
