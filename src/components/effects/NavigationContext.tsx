@@ -19,13 +19,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const triggerVideoTransition = useCallback(() => {
     const now = Date.now();
     
-    // Ne déclencher la transition que si au moins 2 secondes se sont écoulées depuis la dernière
+    // Éviter les déclenchements trop fréquents (minimum 2 secondes entre transitions)
     if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < 2000)) {
       console.log("Transition déjà en cours ou trop récente, ignorée");
       return;
     }
     
-    console.log("Déclenchement transition vidéo");
+    console.log("➡️ Déclenchement transition vidéo");
     transitionInProgressRef.current = true;
     lastTransitionTimeRef.current = now;
     setIsTransitioning(true);
@@ -35,32 +35,33 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Notifier tous les écouteurs
-    listenersRef.current.forEach(listener => {
+    // Notifier tous les écouteurs - ordre séquentiel
+    Promise.all(listenersRef.current.map(async (listener) => {
       try {
-        listener();
+        await Promise.resolve(listener());
       } catch (error) {
         console.error('Erreur dans l\'écouteur de transition:', error);
       }
+    })).then(() => {
+      console.log("Tous les écouteurs de transition ont été appelés");
     });
     
-    // Réinitialiser l'état de transition après la durée de la vidéo
-    // Durée de transition légèrement plus longue pour éviter les chevauchements
+    // Réinitialiser l'état de transition après la durée complète de la vidéo
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
-      console.log("État de transition réinitialisé");
-    }, 3000); // Durée légèrement plus longue que la vidéo pour assurer la fin complète
+      console.log("✅ État de transition réinitialisé");
+    }, 3000); // Légèrement plus long que la vidéo
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
     listenersRef.current.push(callback);
-    console.log("Écouteur de transition vidéo enregistré");
+    console.log("📝 Nouvel écouteur de transition vidéo enregistré");
     
-    // Return unsubscribe function
+    // Fonction de désinscription
     return () => {
       listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
-      console.log("Écouteur de transition vidéo désenregistré");
+      console.log("🗑️ Écouteur de transition vidéo désenregistré");
     };
   }, []);
 
@@ -80,7 +81,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 export const useNavigation = () => {
   const context = useContext(NavigationContext);
   if (!context) {
-    throw new Error('useNavigation must be used within a NavigationProvider');
+    throw new Error('useNavigation doit être utilisé à l\'intérieur d\'un NavigationProvider');
   }
   return context;
 };

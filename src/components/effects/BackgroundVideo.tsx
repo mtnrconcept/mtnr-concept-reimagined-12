@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
 import { useNavigation } from './NavigationContext';
+import { motion } from 'framer-motion';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -14,133 +15,105 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { isTransitioning: navTransitioning, registerVideoTransitionListener } = useNavigation();
+  const { registerVideoTransitionListener } = useNavigation();
   
-  // Gérer les transitions de vidéo lors des événements de navigation
+  // Configurer la vidéo au chargement initial
   useEffect(() => {
-    if (!videoRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
     
-    const handleTransition = async () => {
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.autoplay = true;
+    
+    const attemptAutoplay = async () => {
       try {
-        console.log("Démarrage transition vidéo");
-        setIsTransitioning(true);
+        await video.play();
+        console.log('Lecture vidéo réussie au chargement initial');
+      } catch (err) {
+        console.warn('Erreur de lecture automatique:', err);
+      }
+    };
+    
+    attemptAutoplay();
+  }, []);
+  
+  // S'abonner aux événements de transition
+  useEffect(() => {
+    const unregister = registerVideoTransitionListener(async () => {
+      const video = videoRef.current;
+      if (!video || !document.body.contains(video)) {
+        console.warn("Élément vidéo non disponible pour transition");
+        return;
+      }
+      
+      try {
+        console.log("Démarrage transition vidéo - remise à zéro et lecture");
         
-        const videoElement = videoRef.current;
-        if (!videoElement || !document.body.contains(videoElement)) {
-          console.warn("Élément vidéo non disponible pour transition");
-          return;
-        }
+        // Ajouter la classe pour les effets visuels
+        video.classList.add("video-transitioning");
         
-        // Appliquer les effets visuels pendant la transition
-        videoElement.style.filter = "brightness(1.2)";
-        videoElement.classList.add("video-transitioning");
+        // Remettre la vidéo au début
+        video.currentTime = 0;
         
-        // Réinitialiser la lecture vidéo
-        videoElement.currentTime = 0;
-        
+        // Lecture avec gestion des erreurs
         try {
-          // Tenter de lire la vidéo après s'être assuré qu'elle est prête
-          const playPromise = videoElement.play();
+          const playPromise = video.play();
           if (playPromise !== undefined) {
             await playPromise;
-            console.log("La vidéo a commencé sa lecture pour la transition");
+            console.log("La vidéo a démarré avec succès pour la transition");
           }
         } catch (error) {
-          console.error("Erreur lors de la lecture de la vidéo pour transition:", error);
+          console.error("Erreur lors de la lecture vidéo pour transition:", error);
         }
         
-        // Attendre la fin de la transition (basé sur la durée de la vidéo)
+        // Nettoyer après la durée de la transition
         setTimeout(() => {
-          if (videoElement && document.body.contains(videoElement)) {
-            videoElement.style.filter = "";
-            videoElement.classList.remove("video-transitioning");
-            setIsTransitioning(false);
+          if (video && document.body.contains(video)) {
+            video.classList.remove("video-transitioning");
             console.log("Transition vidéo terminée");
           }
         }, 2500); // Durée approximative de la vidéo
       } catch (error) {
-        console.error("Erreur lors de la transition vidéo:", error);
-        setIsTransitioning(false);
+        console.error("Erreur générale durant la transition:", error);
       }
-    };
+    });
     
-    // S'inscrire pour recevoir les notifications de transition
-    const unregister = registerVideoTransitionListener(handleTransition);
-    
-    return () => {
-      unregister();
-    };
+    return unregister;
   }, [registerVideoTransitionListener]);
   
-  // Configuration initiale et préchargement de la vidéo
-  useEffect(() => {
-    if (!videoRef.current) return;
-    
-    const videoElement = videoRef.current;
-    
-    // Configuration de la vidéo
-    videoElement.muted = true;
-    videoElement.playsInline = true;
-    videoElement.loop = true;
-    videoElement.autoplay = true;
-    
-    // Précharger la vidéo
-    videoElement.preload = "auto";
-    
-    // Ne pas utiliser de link preload en parallèle - peut causer des chargements doubles
-    
-    // Initialiser la lecture quand la vidéo est prête
-    const handleCanPlay = () => {
-      if (!isTransitioning && videoElement && document.body.contains(videoElement)) {
-        videoElement.play().catch(error => {
-          console.warn("Erreur lors de la lecture initiale:", error);
-        });
-      }
-    };
-    
-    videoElement.addEventListener('canplay', handleCanPlay);
-    
-    return () => {
-      videoElement.removeEventListener('canplay', handleCanPlay);
-      
-      // Nettoyage propre
-      if (document.body.contains(videoElement)) {
-        videoElement.pause();
-        videoElement.src = "";
-        videoElement.load();
-      }
-    };
-  }, [videoUrl, isTransitioning]);
-  
-  // Gestion de l'événement de chargement de la vidéo
+  // Gestion des événements vidéo
   const handleVideoLoad = () => {
     setIsVideoLoaded(true);
-    console.log("Vidéo chargée avec succès");
+    console.log("Vidéo fond chargée avec succès");
   };
 
-  // Gestion des erreurs de vidéo
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error("Erreur de chargement vidéo:", e);
     setVideoError(true);
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
-      {/* Fallback si erreur vidéo */}
+    <motion.div 
+      className="fixed inset-0 w-full h-full z-0 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+    >
+      {/* Image de secours si erreur vidéo */}
       {videoError && (
         <img 
           src={fallbackImage} 
           alt="Background fallback" 
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.7 }}
         />
       )}
       
-      {/* Vidéo d'arrière-plan unique */}
+      {/* Vidéo d'arrière-plan */}
       <video
         ref={videoRef}
         className="background-video"
@@ -156,9 +129,40 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
-      {/* Overlays et effets visuels */}
+      {/* Superposition pour effets spéciaux */}
       <VideoOverlay />
-    </div>
+      
+      {/* Éléments décoratifs parallax */}
+      <motion.div 
+        className="absolute top-[10%] right-[10%] w-32 h-32 rounded-full bg-yellow-400 opacity-30 blur-lg"
+        animate={{ 
+          x: [0, 10, -10, 0],
+          y: [0, -10, 10, 0],
+          scale: [1, 1.1, 0.9, 1],
+        }}
+        transition={{ 
+          repeat: Infinity,
+          duration: 20,
+          ease: "easeInOut"
+        }}
+        style={{ zIndex: 1, filter: "blur(40px)" }}
+      />
+      
+      <motion.div 
+        className="absolute bottom-[15%] left-[15%] w-40 h-40 rounded-full bg-yellow-500 opacity-20 blur-xl"
+        animate={{ 
+          x: [0, -15, 15, 0],
+          y: [0, 15, -15, 0],
+          scale: [1, 0.9, 1.1, 1],
+        }}
+        transition={{ 
+          repeat: Infinity,
+          duration: 25,
+          ease: "easeInOut"
+        }}
+        style={{ zIndex: 1, filter: "blur(50px)" }}
+      />
+    </motion.div>
   );
 };
 
