@@ -58,7 +58,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.src = currentVideo;
         
         // Attendre que les métadonnées soient chargées avant de continuer
-        if (!videoElement.readyState >= 2) {
+        if (videoElement.readyState < 2) {
           await new Promise((resolve) => {
             const handleMetadata = () => {
               videoElement.removeEventListener('loadedmetadata', handleMetadata);
