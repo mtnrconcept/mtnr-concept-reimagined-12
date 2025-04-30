@@ -20,7 +20,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   
   // Définir le bon chemin de vidéo basé sur le mode UV
   const currentVideo = useMemo(() => {
-    return uvMode ? videoUrl : videoUrlUV;
+    return uvMode ? videoUrlUV : videoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Fonction pour gérer la première interaction utilisateur
@@ -43,9 +43,15 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       console.log('Tentative de transition vidéo - Mode UV:', uvMode);
       setIsTransitioning(true);
       
-      // S'assurer que la vidéo est chargée avec la bonne source avant de jouer
+      // Vider le cache avant de jouer
       if (videoElement.src !== currentVideo) {
         console.log('Changement de source vidéo vers:', currentVideo);
+        
+        // Retirer l'ancienne source et vider le cache
+        videoElement.removeAttribute('src');
+        videoElement.load();
+        
+        // Définir la nouvelle source
         videoElement.src = currentVideo;
         
         // Attendre que les métadonnées soient chargées avant de continuer
@@ -56,6 +62,12 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
               resolve();
             };
             videoElement.addEventListener('loadedmetadata', handleMetadata);
+            
+            // Timeout si les métadonnées ne se chargent pas
+            setTimeout(() => {
+              videoElement.removeEventListener('loadedmetadata', handleMetadata);
+              resolve();
+            }, 2000);
           });
         }
       }

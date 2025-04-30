@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 
 interface UseVideoTransitionEffectsProps {
@@ -28,18 +28,29 @@ export const useVideoTransitionEffects = ({
   isTorchActive
 }: UseVideoTransitionEffectsProps) => {
   const navigation = useNavigation();
+  const transitionPendingRef = useRef(false);
 
   // Fonction qui exécute la transition si les conditions sont réunies
   const executeTransition = useCallback(() => {
+    if (transitionPendingRef.current) return;
+    
+    transitionPendingRef.current = true;
+    
     if (hasUserInteraction && !isTransitioning) {
       console.log("Démarrage de la transition vidéo suite à un événement de navigation");
-      playVideoTransition();
+      playVideoTransition().finally(() => {
+        transitionPendingRef.current = false;
+      });
     } else if (!hasUserInteraction) {
       console.log("Interaction utilisateur requise pour jouer la vidéo - mémorisation de l'action");
       // Simuler une interaction utilisateur pour permettre la lecture automatique
       handleUserInteraction();
       // Planifier la transition après un court délai
-      setTimeout(() => playVideoTransition(), 100);
+      setTimeout(() => {
+        playVideoTransition().finally(() => {
+          transitionPendingRef.current = false;
+        });
+      }, 100);
     }
   }, [hasUserInteraction, isTransitioning, playVideoTransition, handleUserInteraction]);
 
@@ -82,8 +93,15 @@ export const useVideoTransitionEffects = ({
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
-    // S'assurer que la vidéo a la bonne source dès le début
-    if (videoElement.src !== currentVideo) {
+    // Nettoyage du cache de la vidéo pour éviter les problèmes de lecture
+    if (videoElement.src && videoElement.src !== currentVideo) {
+      // Vider le cache avant de changer la source
+      videoElement.removeAttribute('src');
+      videoElement.load();
+      
+      // Définir la nouvelle source
+      videoElement.src = currentVideo;
+    } else if (!videoElement.src) {
       videoElement.src = currentVideo;
     }
     
@@ -96,9 +114,16 @@ export const useVideoTransitionEffects = ({
     }
     
     // Ajout des écouteurs pour la première interaction utilisateur
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('keydown', handleUserInteraction);
-    document.addEventListener('touchstart', handleUserInteraction);
+    const handleInteraction = () => {
+      handleUserInteraction();
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+    
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
@@ -117,9 +142,9 @@ export const useVideoTransitionEffects = ({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
       
       if (videoElement) {
         videoElement.pause();

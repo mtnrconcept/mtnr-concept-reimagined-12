@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
@@ -15,6 +16,7 @@ const navLinks = [
 
 export default function Navbar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -48,17 +50,16 @@ export default function Navbar() {
       return;
     }
     
-    // Déclencher l'événement de transition vidéo avant la navigation
-    console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
     e.preventDefault(); // Empêcher la navigation immédiate
     
     // Déclencher la transition vidéo
+    console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
     navigation.triggerVideoTransition();
     
-    // Attendre un court instant pour que la vidéo démarre avant de naviguer
+    // Utiliser navigate de React Router après un délai court
     setTimeout(() => {
-      window.location.href = path; // Navigation après un délai pour permettre le démarrage de la vidéo
-    }, 300); // Délai court pour ne pas trop retarder la navigation
+      navigate(path);
+    }, 300); // Délai court pour permettre le démarrage de la vidéo
   };
 
   const navVariants = {
@@ -122,7 +123,7 @@ export default function Navbar() {
         
         {/* Desktop navigation - centered */}
         <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
-          {navLinks.map((link, index) => (
+          {navLinks.map((link) => (
             <motion.li key={link.path} variants={itemVariants}>
               <Link
                 to={link.path}
