@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 export const BackgroundVideoController = () => {
   useEffect(() => {
-    // Préchargement des vidéos
+    // Préchargement des vidéos - Une seule fois au démarrage de l'application
     const preloadVideos = async () => {
       console.info('Préchargement des vidéos de fond');
       
@@ -12,9 +12,8 @@ export const BackgroundVideoController = () => {
         '/lovable-uploads/Video fond UV.mp4'
       ];
       
-      try {
-        // Précharger avec la méthode Link preload pour optimiser les performances
-        for (const url of videoUrls) {
+      const preloadPromises = videoUrls.map(async (url) => {
+        try {
           // Utiliser l'API link preload pour un chargement anticipé
           const link = document.createElement('link');
           link.rel = 'preload';
@@ -24,53 +23,33 @@ export const BackgroundVideoController = () => {
           document.head.appendChild(link);
           
           // Vérifier si la vidéo est accessible
-          try {
-            const response = await fetch(url, { method: 'HEAD' });
-            if (!response.ok) {
-              console.error(`La vidéo ${url} n'est pas disponible (${response.status})`);
-            } else {
-              console.log(`Préchargement link de ${url} ajouté`);
-              
-              // Créer un élément vidéo en arrière-plan pour précharger
-              const video = document.createElement('video');
-              video.preload = 'auto';
-              video.muted = true;
-              video.src = url;
-              video.style.display = 'none';
-              video.load();
-              
-              // Événements de préchargement
-              video.addEventListener('canplaythrough', () => {
-                console.info(`Vidéo ${url} préchargée complètement`);
-                // Supprimer l'élément après préchargement pour libérer de la mémoire
-                setTimeout(() => {
-                  video.remove();
-                }, 1000);
-              });
-              
-              // Gestion des erreurs
-              video.addEventListener('error', (e) => {
-                console.error(`Erreur de préchargement vidéo ${url}:`, e);
-                video.remove();
-              });
-              
-              // Ajouter la vidéo au DOM pour forcer le préchargement
-              document.body.appendChild(video);
-            }
-          } catch (error) {
-            console.error(`Erreur lors de la vérification de la vidéo ${url}:`, error);
+          const response = await fetch(url, { method: 'HEAD' });
+          if (!response.ok) {
+            console.error(`La vidéo ${url} n'est pas disponible (${response.status})`);
+            return false;
+          } else {
+            console.log(`Préchargement link de ${url} ajouté`);
+            return true;
           }
+        } catch (error) {
+          console.error(`Erreur lors du préchargement de ${url}:`, error);
+          return false;
         }
-      } catch (err) {
-        console.error('Erreur de préchargement:', err);
-      }
+      });
+      
+      // Attendre que tous les préchargements soient terminés
+      await Promise.all(preloadPromises);
     };
 
     // Précharger les vidéos au démarrage avec un léger délai pour éviter les conflits
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       preloadVideos();
     }, 500);
-  }, []);
+    
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, []);  // Dépendance vide pour exécuter une seule fois
 
   // Composant invisible qui gère uniquement le préchargement
   return null;

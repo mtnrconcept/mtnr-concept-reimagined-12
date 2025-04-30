@@ -32,26 +32,6 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     }
   }, [hasUserInteraction]);
 
-  // Vérifier si les vidéos existent
-  useEffect(() => {
-    const checkVideoAvailability = async () => {
-      try {
-        const response = await fetch(currentVideo, { method: 'HEAD' });
-        if (!response.ok) {
-          console.error(`La vidéo n'est pas disponible: ${currentVideo}`);
-          setVideoError(true);
-        } else {
-          setVideoError(false);
-        }
-      } catch (error) {
-        console.error(`Erreur lors de la vérification de la vidéo: ${currentVideo}`, error);
-        setVideoError(true);
-      }
-    };
-    
-    checkVideoAvailability();
-  }, [currentVideo]);
-
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
@@ -74,15 +54,6 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         
         // Définir la nouvelle source
         videoElement.src = currentVideo;
-        
-        // Ajouter un gestionnaire d'erreurs
-        const errorHandler = () => {
-          console.error('Erreur lors du chargement de la vidéo:', currentVideo);
-          setVideoError(true);
-          setIsTransitioning(false);
-          videoElement.removeEventListener('error', errorHandler);
-        };
-        videoElement.addEventListener('error', errorHandler);
         
         // Attendre que les métadonnées soient chargées avant de continuer
         if (videoElement.readyState < 2) {
@@ -132,22 +103,6 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       setVideoError(true);
     }
   }, [isTransitioning, currentVideo, uvMode, videoError]);
-
-  // Démarrer automatiquement la vidéo lors du premier chargement
-  useEffect(() => {
-    if (isFirstLoad && videoRef.current && !videoError) {
-      // Démarrer la transition après le premier rendu complet
-      const timer = setTimeout(() => {
-        handleUserInteraction();
-        if (!isTransitioning) {
-          console.log('Démarrage automatique de la vidéo au chargement initial');
-          playVideoTransition();
-        }
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isFirstLoad, isTransitioning, handleUserInteraction, playVideoTransition, videoError]);
 
   return {
     videoRef,

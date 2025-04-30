@@ -45,26 +45,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
-  // Précharger les vidéos pour une expérience plus fluide (avec les bons chemins)
+  // Précharger les vidéos pour une expérience plus fluide
   useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
-  
-  // Nettoyer le cache des vidéos quand les props changent
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      // Forcer le rechargement de la vidéo pour vider le cache
-      const currentSrc = video.src;
-      if (currentSrc && currentSrc !== currentVideo) {
-        video.removeAttribute('src');
-        video.load();
-        video.src = currentVideo;
-        video.load();
-        
-        // Ajouter des logs pour déboguer les problèmes de chargement
-        console.log('Vidéo rechargée avec la source:', currentVideo);
-      }
-    }
-  }, [videoUrl, videoUrlUV, currentVideo, videoRef]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
