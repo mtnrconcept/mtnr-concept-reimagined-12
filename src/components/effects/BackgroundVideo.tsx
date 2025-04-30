@@ -2,11 +2,9 @@
 import React, { forwardRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { VideoOverlay } from './VideoOverlay';
-import { useVideoLoad } from '@/hooks/useVideoLoad';
 import { useVideoTransition } from '@/hooks/useVideoTransition';
 import VideoElement from './VideoElement';
 import ParallaxDecorations from './ParallaxDecorations';
-import { useVideoPreload } from '@/hooks/useVideoPreload';
 import { useUVMode } from './UVModeContext';
 
 interface BackgroundVideoProps {
@@ -18,18 +16,14 @@ const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(({
   videoUrl = "/lovable-uploads/Videofondnormale.mp4", 
   videoUrlUV = "/lovable-uploads/VideofondUV.mp4"
 }, ref) => {
-  const { normalVideoRef, uvVideoRef, videoAvailability } = useVideoTransition();
-  const { videoError, handleVideoLoad, handleVideoError } = useVideoLoad();
+  const { 
+    normalVideoRef, 
+    uvVideoRef, 
+    videoAvailability,
+    handleVideoLoad,
+    handleVideoError
+  } = useVideoTransition();
   const { uvMode } = useUVMode();
-  
-  // Préchargement des vidéos pour une meilleure performance
-  const { preloadStatus } = useVideoPreload({
-    videoUrls: [videoUrl, videoUrlUV],
-    sequential: true,
-    onPreloadComplete: (results) => {
-      console.log("Préchargement vidéo terminé:", results);
-    }
-  });
   
   useEffect(() => {
     // Log pour le débogage

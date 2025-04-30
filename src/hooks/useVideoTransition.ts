@@ -1,8 +1,9 @@
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 import { useUVMode } from '@/components/effects/UVModeContext';
-import { useVideoPreload } from './useVideoPreload';
+import { useVideoAvailability } from './useVideoAvailability';
+import { useVideoVerification } from './useVideoVerification';
 import { useVideoLoad } from './useVideoLoad';
 
 export const useVideoTransition = () => {
@@ -10,43 +11,18 @@ export const useVideoTransition = () => {
   const uvVideoRef = useRef<HTMLVideoElement>(null);
   const { registerVideoRef, registerVideoTransitionListener } = useNavigation();
   const { uvMode } = useUVMode();
-  const [videoAvailability, setVideoAvailability] = useState({
-    normal: true,
-    uv: true
-  });
   
   const normalVideoUrl = '/lovable-uploads/Videofondnormale.mp4';
   const uvVideoUrl = '/lovable-uploads/VideofondUV.mp4';
   
-  // Précharger les vidéos et vérifier leur disponibilité
-  const { preloadStatus } = useVideoPreload({
-    videoUrls: [normalVideoUrl, uvVideoUrl],
-    onPreloadComplete: (results) => {
-      setVideoAvailability({
-        normal: results[normalVideoUrl] ?? false,
-        uv: results[uvVideoUrl] ?? false
-      });
-      
-      console.log('Statut de préchargement des vidéos:', results);
-    }
-  });
+  // Use our new separated hooks
+  const { videoAvailability, updateAvailabilityStatus } = useVideoAvailability(normalVideoUrl, uvVideoUrl);
+  const { verifyAndPrepareVideo } = useVideoVerification();
   
   // Configuration des gestionnaires d'erreur et de chargement
-  const { verifyVideoPlayability } = useVideoLoad({
-    onVideoError: (src) => {
-      if (src.includes('normale')) {
-        setVideoAvailability(prev => ({ ...prev, normal: false }));
-      } else if (src.includes('UV')) {
-        setVideoAvailability(prev => ({ ...prev, uv: false }));
-      }
-    },
-    onVideoLoaded: (src) => {
-      if (src.includes('normale')) {
-        setVideoAvailability(prev => ({ ...prev, normal: true }));
-      } else if (src.includes('UV')) {
-        setVideoAvailability(prev => ({ ...prev, uv: true }));
-      }
-    }
+  const { handleVideoLoad, handleVideoError } = useVideoLoad({
+    onVideoError: (src) => updateAvailabilityStatus(src, false),
+    onVideoLoaded: (src) => updateAvailabilityStatus(src, true)
   });
   
   // Register video refs in NavigationContext
@@ -124,38 +100,6 @@ export const useVideoTransition = () => {
     };
   }, []);
   
-  // Fonction pour vérifier la jouabilité avant de déclencher une transition
-  const verifyAndPrepareVideo = useCallback(async (isUVMode: boolean): Promise<boolean> => {
-    const videoUrl = isUVMode ? uvVideoUrl : normalVideoUrl;
-    const videoRef = isUVMode ? uvVideoRef.current : normalVideoRef.current;
-    
-    if (!videoRef) {
-      console.warn("Référence vidéo non disponible");
-      return false;
-    }
-    
-    try {
-      // Vérifier si la vidéo est jouable - simple et efficace
-      const isPlayable = await verifyVideoPlayability(videoUrl);
-      if (!isPlayable) {
-        console.error(`La vidéo ${videoUrl} n'est pas jouable, transition annulée`);
-        return false;
-      }
-      
-      // Préparation de la vidéo sans appeler load()
-      videoRef.currentTime = 0;
-      videoRef.loop = false;
-      videoRef.muted = true;
-      videoRef.playsInline = true;
-      
-      console.log(`Vidéo ${isUVMode ? 'UV' : 'normale'} vérifiée et prête pour la transition`);
-      return true;
-    } catch (error) {
-      console.error(`Erreur lors de la vérification de la vidéo ${videoUrl}:`, error);
-      return false;
-    }
-  }, [normalVideoUrl, uvVideoUrl, verifyVideoPlayability]);
-  
   // Subscribe to transition events with improved error handling
   useEffect(() => {
     const unregister = registerVideoTransitionListener(async () => {
@@ -163,7 +107,10 @@ export const useVideoTransition = () => {
         console.log(`Démarrage de transition vidéo en mode ${uvMode ? 'UV' : 'normal'}`);
         
         // Vérifier que la vidéo est disponible avant de tenter la transition
-        const canTransition = await verifyAndPrepareVideo(uvMode);
+        const currentVideoUrl = uvMode ? uvVideoUrl : normalVideoUrl;
+        const videoRef = uvMode ? uvVideoRef.current : normalVideoRef.current;
+        
+        const canTransition = await verifyAndPrepareVideo(currentVideoUrl, videoRef);
         if (!canTransition) {
           console.warn("Transition vidéo annulée suite à la vérification");
           return;
@@ -212,13 +159,15 @@ export const useVideoTransition = () => {
     });
     
     return unregister;
-  }, [registerVideoTransitionListener, uvMode, verifyAndPrepareVideo]);
+  }, [registerVideoTransitionListener, uvMode, uvVideoUrl, normalVideoUrl, verifyAndPrepareVideo]);
   
   return { 
     normalVideoRef, 
     uvVideoRef, 
     videoAvailability,
     normalVideoUrl,
-    uvVideoUrl
+    uvVideoUrl,
+    handleVideoLoad,
+    handleVideoError
   };
 };
