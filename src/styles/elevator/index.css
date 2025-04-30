@@ -1,0 +1,42 @@
+
+/**
+ * Fichier principal pour les styles d'ascenseur
+ */
+
+@import './container.css';
+@import './animations-up.css';
+@import './animations-down.css'; 
+@import './slide-transitions.css';
+@import './background.css';
+@import './repetile.css';
+
+/* Styles de base pour le conteneur d'ascenseur */
+.elevator-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Styles pour les contenus */
+.elevator-content {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+.exit-content {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.enter-content {
+  pointer-events: auto;
+  z-index: 3;
+}

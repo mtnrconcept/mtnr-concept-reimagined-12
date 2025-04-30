@@ -1,0 +1,61 @@
+
+/**
+ * Animations repetile - Effet de boucle infinie
+ */
+
+/* Durée de l'animation repetile - 1.5s par cycle */
+@keyframes repetile-up {
+  from { transform: translateY(0);     filter: blur(0px); }
+  to   { transform: translateY(-100%); filter: blur(10px); }
+}
+
+@keyframes repetile-down {
+  from { transform: translateY(0);     filter: blur(0px); }
+  to   { transform: translateY(100%);  filter: blur(10px); }
+}
+
+/* Classes pour appliquer les animations */
+.repetile-up {
+  animation: repetile-up 1.5s ease-in-out infinite;
+}
+
+.repetile-down {
+  animation: repetile-down 1.5s ease-in-out infinite;
+}
+
+/* Animations pour les transitions finales */
+@keyframes slide-out-up {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes slide-out-down {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes slide-in-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-out-up {
+  animation: slide-out-up 1s ease-out forwards;
+}
+
+.slide-out-down {
+  animation: slide-out-down 1s ease-out forwards;
+}
+
+.slide-in-up {
+  animation: slide-in-up 1s ease-out forwards;
+}
+
+.slide-in-down {
+  animation: slide-in-down 1s ease-out forwards;
+}

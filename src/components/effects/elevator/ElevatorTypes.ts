@@ -12,7 +12,6 @@ export interface ElevatorTransitionProps {
 export interface UseElevatorTransitionProps {
   isActive: boolean;
   onAnimationComplete: () => void;
-  videoRef: React.RefObject<HTMLVideoElement>;
   currentPath: ReactNode;  // Modifié de string à ReactNode pour correspondre au type attendu
 }
 
@@ -22,4 +21,7 @@ export interface UseElevatorTransitionReturn {
   enterContent: ReactNode | null;
   contentEntranceDelay: number;
   isTransitioning: boolean;
+  repetileActive: boolean;
+  loopCount: number;
+  maxLoops: number;
 }

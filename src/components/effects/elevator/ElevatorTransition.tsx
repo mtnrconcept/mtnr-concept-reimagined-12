@@ -1,22 +1,21 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { ElevatorTransitionProps } from './ElevatorTypes';
 import { useElevatorTransition } from './useElevatorTransition';
 
 const ElevatorTransition = ({ children, isActive, onAnimationComplete }: ElevatorTransitionProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  
   const { 
     direction, 
     exitContent, 
-    enterContent, 
+    enterContent,
     contentEntranceDelay,
-    isTransitioning
+    isTransitioning,
+    repetileActive,
+    loopCount,
+    maxLoops
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
-    videoRef,
     currentPath: children
   });
   
@@ -26,36 +25,29 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   }
 
   return (
-    <div className="elevator-container" ref={containerRef}>
-      {/* Conteneur Vidéo */}
-      <div className="elevator-video-container">
-        <video 
-          ref={videoRef} 
-          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
-          src="/lovable-uploads/ascensceur.mp4"
-          muted
-          playsInline
-        />
-      </div>
-      
-      {/* Animation de sortie du contenu actuel */}
+    <div className="elevator-container">
+      {/* Animation de sortie du contenu actuel avec effet repetile */}
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
-            direction === 'down' ? 'slide-out-up' : 
-            direction === 'up' ? 'slide-out-down' : ''
+            repetileActive 
+              ? direction === 'down' ? 'repetile-up' : 'repetile-down'
+              : direction === 'down' ? 'slide-out-up' : 'slide-out-down'
           }`}
+          style={{
+            // Appliquer un style différent pour la dernière animation
+            animationIterationCount: repetileActive ? maxLoops : 1
+          }}
         >
           {exitContent}
         </div>
       )}
       
-      {/* Animation d'entrée du nouveau contenu */}
-      {enterContent && (
+      {/* Animation d'entrée du nouveau contenu (seulement après la fin de repetile) */}
+      {enterContent && !repetileActive && loopCount >= maxLoops && (
         <div
           className={`elevator-content enter-content ${
-            direction === 'down' ? 'slide-in-up' : 
-            direction === 'up' ? 'slide-in-down' : ''
+            direction === 'down' ? 'slide-in-up' : 'slide-in-down'
           }`}
           style={{
             animationDelay: `${contentEntranceDelay}ms`
