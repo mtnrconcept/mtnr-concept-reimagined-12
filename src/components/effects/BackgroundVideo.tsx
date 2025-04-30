@@ -26,7 +26,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Utilisation de useMemo pour éviter des recalculs inutiles
+  // Définir le bon chemin de vidéo basé sur le mode UV
+  // Si uvMode actif = Composition 1.mp4
+  // Si uvMode inactif = Composition 1_1.mp4
   const currentVideo = useMemo(() => {
     return uvMode ? videoUrl : videoUrlUV;
   }, [uvMode, videoUrl, videoUrlUV]);
@@ -39,6 +41,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     try {
       console.log('Transition vidéo déclenchée');
       setIsTransitioning(true);
+      
+      // S'assurer que la vidéo est chargée avec la bonne source avant de jouer
+      if (videoElement.src !== currentVideo) {
+        videoElement.src = currentVideo;
+      }
+      
       videoElement.load();
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
@@ -63,16 +71,24 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.removeEventListener('ended', () => {});
       }
     }
-  }, [isTransitioning]);
+  }, [isTransitioning, currentVideo]);
 
-  // Effet pour les changements de mode UV (avec dépendances optimisées)
+  // Effet pour les changements de mode UV
+  // Déclencher la transition uniquement quand le mode UV change
   useEffect(() => {
-    if (!isFirstLoad && isTorchActive) {
+    if (!isFirstLoad) {
       // Petit délai pour s'assurer que le DOM est prêt
       const timer = setTimeout(() => playVideoTransition(), 50);
       return () => clearTimeout(timer);
     }
-  }, [uvMode, isTorchActive, isFirstLoad, playVideoTransition]);
+  }, [uvMode, playVideoTransition, isFirstLoad]);
+
+  // Ne pas déclencher de transition si seulement la torche est activée/désactivée
+  // sans changement de mode UV
+  useEffect(() => {
+    // Ne rien faire si seulement l'état de la torche change
+    // La vidéo reste la même selon le mode UV actuel
+  }, [isTorchActive]);
 
   // Effet pour écouter les événements de navigation
   useEffect(() => {
@@ -85,11 +101,17 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
+    // S'assurer que la vidéo a la bonne source dès le début
+    if (videoElement.src !== currentVideo) {
+      videoElement.src = currentVideo;
+      videoElement.load();
+    }
+    
     if (isFirstLoad) {
       videoElement.pause();
       videoElement.currentTime = 0;
       setIsFirstLoad(false);
-      console.log('Vidéo initialisée en pause');
+      console.log('Vidéo initialisée en pause avec source:', currentVideo);
     }
     
     // Gestion de la visibilité de la page
@@ -114,7 +136,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         videoElement.removeEventListener('ended', () => {});
       }
     };
-  }, [location.pathname, isFirstLoad, isTransitioning]);
+  }, [location.pathname, isFirstLoad, isTransitioning, currentVideo]);
 
   // Préchargement des vidéos
   useEffect(() => {
@@ -134,7 +156,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
-      {/* Vidéo en fond avec optimisation de performance */}
+      {/* Une seule vidéo avec source dynamique au lieu de deux éléments vidéo */}
       <video
         ref={videoRef}
         className="absolute inset-0 min-w-full min-h-full object-cover"
@@ -142,8 +164,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         playsInline
         muted
         preload="auto"
+        src={currentVideo}
       >
-        <source src={currentVideo} type="video/mp4" />
+        {/* Plus besoin de source spécifique ici car on définit src directement sur l'élément vidéo */}
       </video>
       
       {/* Grille avec performance optimisée */}
