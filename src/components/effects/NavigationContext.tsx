@@ -30,7 +30,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     console.log(`Référence vidéo ${isUVVideo ? 'UV' : 'normale'} enregistrée`);
   }, []);
 
-  const triggerVideoTransition = useCallback(() => {
+  const triggerVideoTransition = useCallback(async () => {
     const now = Date.now();
     
     // Éviter les déclenchements trop fréquents (minimum 2 secondes entre transitions)
@@ -49,24 +49,40 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Déterminer quelle vidéo jouer (normale par défaut, UV si en mode UV)
-    // Note: La logique pour déterminer le mode UV sera gérée dans le composant vidéo
-    const videoElement = normalVideoRef.current;
-    if (videoElement && document.body.contains(videoElement)) {
-      console.log("Contrôle direct de la vidéo pour transition");
-      videoElement.currentTime = 0;
-      try {
-        videoElement.play().catch(err => 
-          console.error("Erreur lors du démarrage de la vidéo:", err)
-        );
-      } catch (error) {
-        console.error("Erreur lors de la tentative de lecture:", error);
+    // Contrôle direct de la vidéo - méthode plus fiable
+    try {
+      const videoElement = normalVideoRef.current;
+      if (videoElement && document.body.contains(videoElement)) {
+        console.log("Contrôle direct de la vidéo pour transition");
+        videoElement.currentTime = 0;
+        videoElement.classList.add("video-transitioning");
+        
+        try {
+          await videoElement.play();
+          console.log("✅ Vidéo démarrée avec succès via contrôle direct");
+        } catch (error) {
+          console.error("❌ Erreur lors du démarrage direct de la vidéo:", error);
+          
+          // Tentative de récupération avec attributs forcés
+          videoElement.muted = true;
+          videoElement.playsInline = true;
+          videoElement.setAttribute("playsinline", "");
+          
+          try {
+            await videoElement.play();
+            console.log("✅ Vidéo démarrée avec succès après récupération");
+          } catch (fallbackError) {
+            console.error("❌❌ Échec de la récupération:", fallbackError);
+          }
+        }
+      } else {
+        console.warn("Référence vidéo non disponible, utilisation des écouteurs");
       }
-    } else {
-      console.warn("Référence vidéo non disponible, utilisation des écouteurs");
+    } catch (outerError) {
+      console.error("Erreur générale lors de la tentative de lecture:", outerError);
     }
     
-    // Notifier tous les écouteurs - ordre séquentiel
+    // Notifier tous les écouteurs en parallèle
     Promise.all(listenersRef.current.map(async (listener) => {
       try {
         await Promise.resolve(listener());

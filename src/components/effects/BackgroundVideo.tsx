@@ -46,6 +46,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       normalVideo.playsInline = true;
       normalVideo.loop = false;
       normalVideo.preload = "auto";
+      normalVideo.setAttribute("playsinline", ""); // Double assurance pour iOS
+      normalVideo.setAttribute("webkit-playsinline", ""); // Pour WebKit
     }
     
     if (uvVideo) {
@@ -53,6 +55,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       uvVideo.playsInline = true;
       uvVideo.loop = false;
       uvVideo.preload = "auto";
+      uvVideo.setAttribute("playsinline", ""); // Double assurance pour iOS
+      uvVideo.setAttribute("webkit-playsinline", ""); // Pour WebKit
     }
     
     console.log('Vidéos configurées au chargement initial');
@@ -86,6 +90,19 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
           console.log("✅ Vidéo démarrée avec succès pour la transition");
         } catch (error) {
           console.error("❌ Erreur lors de la lecture vidéo pour transition:", error);
+          
+          // Tentative de récupération - forcer le mode autoplay
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute("playsinline", "");
+          video.setAttribute("webkit-playsinline", "");
+          
+          try {
+            await video.play();
+            console.log("✅ Vidéo démarrée avec succès après récupération");
+          } catch (fallbackError) {
+            console.error("❌❌ Échec de la récupération:", fallbackError);
+          }
         }
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);
@@ -101,7 +118,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       console.log("🏁 Vidéo normale terminée");
       if (normalVideoRef.current) {
         normalVideoRef.current.classList.remove("video-transitioning");
-        normalVideoRef.current.loop = true;
       }
     };
     
@@ -109,7 +125,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       console.log("🏁 Vidéo UV terminée");
       if (uvVideoRef.current) {
         uvVideoRef.current.classList.remove("video-transitioning");
-        uvVideoRef.current.loop = true;
       }
     };
     
@@ -165,7 +180,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         className="background-video"
         playsInline
         muted
-        autoPlay
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
@@ -181,7 +195,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         className="background-video"
         playsInline
         muted
-        autoPlay
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
