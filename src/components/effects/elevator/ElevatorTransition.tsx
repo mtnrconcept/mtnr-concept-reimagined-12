@@ -21,7 +21,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const barrierRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   
-  // Effet pour gérer l'animation "repetile" avancée
+  // Effet pour gérer l'animation "repetile" avancée avec 8 phases
   useEffect(() => {
     if (!isTransitioning || !barrierRef.current || !trackRef.current || !contentRef.current) return;
     
@@ -29,11 +29,11 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     const track = trackRef.current;
     const contentEl = contentRef.current;
     
-    // Configuration des poids pour l'animation (plus c'est lent au début/fin)
-    const weights = [8, 4, 2, 1, 1, 2, 4, 8];
+    // Configuration avancée avec 8 phases et poids spécifiques
+    const weights = [8, 4, 2, 1, 1, 2, 4, 8]; // très lent → rapide → rapide → très lent
     const total = weights.reduce((a, b) => a + b, 0);
     
-    // Durées en ms (total = 7000ms)
+    // Durées en ms pour chaque phase (total = 7000ms)
     const durations = weights.map(w => w * 7000 / total);
     
     // Offsets normalisés [0, t1, t2, ..., t7, 1]
@@ -46,7 +46,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     offsets.push(1);
     
     // Blur à chaque étape (plus c'est rapide, plus c'est flou)
-    const blurMap = [2, 8, 14, 18, 18, 14, 8, 2, 0]; // 9 valeurs (8 phases + fin)
+    const blurMap = [0, 2, 6, 10, 10, 6, 2, 0]; // 8 valeurs pour les 8 phases
     
     // Préparation du contenu pour les slides
     const oldHTML = exitContent ? 
@@ -63,7 +63,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     track.innerHTML = '';
     
     // Créer les 7 slides de "vieux contenu"
-    for (let i = 0; i < weights.length; i++) {
+    for (let i = 0; i < 7; i++) {
       const slide = document.createElement('div');
       slide.className = 'slide';
       slide.innerHTML = oldHTML;
@@ -80,25 +80,25 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
           document.getElementById('enter-content-wrapper')!, true
         )
       ).innerHTML;
-      lastSlide.style.top = (weights.length * 100) + '%';
+      lastSlide.style.top = '700%';
       track.appendChild(lastSlide);
     }
     
-    // Ajuster la hauteur du track
-    track.style.height = ((weights.length + 1) * 100) + '%';
+    // Ajuster la hauteur du track à 800%
+    track.style.height = '800%';
     
     // Afficher la barrière, masquer le contenu d'origine
     barrier.style.visibility = 'visible';
     contentEl.style.visibility = 'hidden';
     
-    // Créer un seul animate() synchronisé sur 7000ms
+    // Créer un seul animate() synchronisé sur 7000ms avec les 8 phases
     const keyframes = offsets.map((offset, i) => ({
       offset: offset,
       transform: `translateY(-${i * 100}%)`,
       filter: `blur(${blurMap[i]}px)`
     }));
     
-    console.log("Démarrage de l'animation avancée Repetile sur 7000ms");
+    console.log("Démarrage de l'animation Repetile avancée sur 7000ms avec 8 phases");
     const animation = track.animate(keyframes, {
       duration: 7000,
       fill: 'forwards'

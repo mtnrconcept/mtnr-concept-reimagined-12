@@ -8,7 +8,7 @@ import { useBackgroundVideoStore } from '../BackgroundVideoController';
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
 // Configuration des timings pour l'animation avancée
-const ANIMATION_TOTAL_DURATION = 7000;  // 7s pour l'animation complète
+const ANIMATION_TOTAL_DURATION = 7000;  // 7s pour l'animation complète avec 8 phases
 
 export function useElevatorTransition({
   isActive,
@@ -65,8 +65,7 @@ export function useElevatorTransition({
       // Démarrer la vidéo en arrière-plan dans la bonne direction
       startVideo(transitionDirection === 'down' ? 'forward' : 'reverse');
       
-      // Configuration pour une durée totale de 7s
-      console.log(`Animation totale: ${ANIMATION_TOTAL_DURATION}ms`);
+      console.log(`Animation Repetile avancée: ${ANIMATION_TOTAL_DURATION}ms avec 8 phases`);
     }
     
     // Si isActive devient false, réinitialiser

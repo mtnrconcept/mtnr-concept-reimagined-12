@@ -64,18 +64,6 @@
   visibility: hidden;
 }
 
-/* Animation des blurs pour les phases de transition */
-@keyframes blur-transition {
-  0%   { filter: blur(2px); }
-  15%  { filter: blur(8px); }
-  30%  { filter: blur(14px); }
-  45%  { filter: blur(18px); }
-  60%  { filter: blur(18px); }
-  75%  { filter: blur(14px); }
-  90%  { filter: blur(8px); }
-  100% { filter: blur(2px); }
-}
-
 /* Utilitaire pour masquer l'élément sans l'enlever du flux */
 .visually-hidden {
   visibility: hidden;
