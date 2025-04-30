@@ -21,13 +21,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   
   // Définir le bon chemin de vidéo basé sur le mode UV
   const currentVideo = useMemo(() => {
-    const selectedUrl = uvMode ? videoUrlUV : videoUrl;
-    // Vérifier si l'URL commence par un slash et ne contient pas déjà lovable-uploads
-    if (!selectedUrl.includes('lovable-uploads') && selectedUrl.startsWith('/')) {
-      // Assurer que le chemin est correct
-      return `/lovable-uploads/${selectedUrl.replace(/^\/+/, '')}`;
-    }
-    return selectedUrl;
+    return uvMode ? videoUrlUV : videoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Fonction pour gérer la première interaction utilisateur

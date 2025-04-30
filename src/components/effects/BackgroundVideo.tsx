@@ -12,8 +12,8 @@ interface BackgroundVideoProps {
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/Composition 1.mp4", 
-  videoUrlUV = "/lovable-uploads/Composition 1_1.mp4",
+  videoUrl = "/lovable-uploads/Video fond normale.mp4", 
+  videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   // Utiliser notre hook personnalisé pour gérer la vidéo

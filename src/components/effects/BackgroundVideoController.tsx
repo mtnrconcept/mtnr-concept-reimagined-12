@@ -8,8 +8,8 @@ export const BackgroundVideoController = () => {
       console.info('Préchargement des vidéos de fond');
       
       const videoUrls = [
-        '/lovable-uploads/Composition 1.mp4',
-        '/lovable-uploads/Composition 1_1.mp4'
+        '/lovable-uploads/Video fond normale.mp4',
+        '/lovable-uploads/Video fond UV.mp4'
       ];
       
       try {
