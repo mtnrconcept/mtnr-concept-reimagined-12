@@ -7,9 +7,9 @@ import { useBackgroundVideoStore } from '../BackgroundVideoController';
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
-// Configuration des timings
+// Configuration des timings exactement comme dans l'exemple fourni
 const REPETILE_DURATION = 1500; // 1.5s par cycle repetile
-const MAX_LOOPS = 4; // Nombre de boucles avant le slide final (comme dans l'exemple)
+const MAX_LOOPS = 4; // Nombre de boucles avant le slide final
 const REPETILE_TOTAL_DURATION = REPETILE_DURATION * MAX_LOOPS; // 6s en tout
 const FINAL_SLIDE_DURATION = 1000; // 1s pour le slide final
 
@@ -77,20 +77,21 @@ export function useElevatorTransition({
       setLoopCount(0);
       
       // Démarrer la vidéo en arrière-plan dans la bonne direction
+      // Comme dans l'exemple fourni: forward = vers le bas, reverse = vers le haut
       startVideo(transitionDirection === 'down' ? 'forward' : 'reverse');
       
-      // Planifier la transition finale après les boucles repetile
+      // Planifier la transition finale après les boucles repetile (6s exactement)
       finalSlideTimerRef.current = setTimeout(() => {
         console.log("Fin des répétitions repetile après 6s, passage à la transition finale");
         setRepetileActive(false);
         setFinalSlideActive(true);
         
-        // Après la durée du slide final, on considère que la transition est terminée
+        // Après la durée du slide final (1s), on considère la transition terminée
         setTimeout(() => {
           onAnimationComplete();
           setIsTransitioning(false);
           setFinalSlideActive(false);
-          pauseVideo(); // Mettre la vidéo en pause à la fin
+          pauseVideo(); // Mettre la vidéo en pause à la fin, comme dans l'exemple
         }, FINAL_SLIDE_DURATION);
       }, REPETILE_TOTAL_DURATION);
     }
@@ -117,7 +118,7 @@ export function useElevatorTransition({
         finalSlideTimerRef.current = null;
       }
     }
-  }, [isActive, location.pathname, currentPath, isTransitioning, prevPath, startVideo]);
+  }, [isActive, location.pathname, currentPath, isTransitioning, prevPath, startVideo, pauseVideo]);
   
   // Simulation de comptage des boucles repetile pour le debugging
   useEffect(() => {

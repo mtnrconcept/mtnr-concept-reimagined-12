@@ -46,6 +46,26 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
     }
   }, []);
   
+  // Fonction manuelle pour lire la vidéo en sens inverse si playbackRate=-1 n'est pas supporté
+  const manualReverseRef = useRef<((v: HTMLVideoElement) => void) | null>(null);
+  manualReverseRef.current = (v: HTMLVideoElement) => {
+    let last = performance.now();
+    v.pause();
+    v.currentTime = v.currentTime || v.duration;
+    
+    function step(now: number) {
+      const dt = (now - last) / 1000;
+      last = now;
+      v.currentTime = Math.max(0, v.currentTime - dt);
+      if (v.currentTime > 0) requestAnimationFrame(step);
+    }
+    
+    requestAnimationFrame((t) => { 
+      last = t; 
+      step(t); 
+    });
+  };
+  
   // Effet pour gérer la lecture/pause de la vidéo
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -56,16 +76,33 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
         console.log("Démarrage de la vidéo en avant");
         videoElement.currentTime = 0;
         videoElement.playbackRate = 1;
+        videoElement.play().catch(err => {
+          console.error("Erreur de lecture vidéo:", err);
+        });
       } else {
         console.log("Démarrage de la vidéo en arrière");
-        // Positionner près de la fin pour lecture inversée
-        videoElement.currentTime = videoElement.duration || 7;
-        videoElement.playbackRate = -1;
+        // Positionner à la fin pour lecture inversée
+        const dur = videoElement.duration || 7;
+        videoElement.currentTime = dur;
+        
+        try {
+          // Essayer d'utiliser playbackRate négatif (peut ne pas être supporté)
+          videoElement.playbackRate = -1;
+          videoElement.play().catch(err => {
+            console.error("Erreur de lecture vidéo inversée:", err);
+            // Fallback: lecture inversée manuelle
+            if (manualReverseRef.current) {
+              manualReverseRef.current(videoElement);
+            }
+          });
+        } catch (err) {
+          console.log("PlaybackRate négatif non supporté, utilisation fallback");
+          // Fallback: lecture inversée manuelle
+          if (manualReverseRef.current) {
+            manualReverseRef.current(videoElement);
+          }
+        }
       }
-      
-      videoElement.play().catch(err => {
-        console.error("Erreur de lecture vidéo:", err);
-      });
       
       // Mettre en pause automatiquement à la fin de la vidéo
       const handleEnded = () => {
