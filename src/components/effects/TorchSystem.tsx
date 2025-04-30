@@ -1,147 +1,122 @@
 
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { Flashlight } from 'lucide-react';
 import { useVideoStore } from './BackgroundVideoManager';
 
-// Torch Mode Types
-export type TorchMode = 'off' | 'normal' | 'uv';
-
-// Context type definition
+// Define the torch context type
 type TorchContextType = {
-  torchMode: TorchMode;
-  torchPosition: { x: number; y: number };
-  toggleTorch: (mode?: TorchMode) => void;
-  setTorchPosition: (position: { x: number; y: number }) => void;
+  isActive: boolean;
+  mode: 'normal' | 'uv';
+  toggleTorch: () => void;
+  toggleMode: () => void;
+  position: { x: number, y: number };
 };
 
-// Create the context with default values
+// Create context with default values
 const TorchContext = createContext<TorchContextType>({
-  torchMode: 'off',
-  torchPosition: { x: 0, y: 0 },
+  isActive: false,
+  mode: 'normal',
   toggleTorch: () => {},
-  setTorchPosition: () => {}
+  toggleMode: () => {},
+  position: { x: 0, y: 0 },
 });
 
+// Hook to use the torch context
 export const useTorch = () => useContext(TorchContext);
 
-interface TorchProviderProps {
-  children: React.ReactNode;
-}
-
-export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
-  // Torch state
-  const [torchMode, setTorchMode] = useState<TorchMode>('off');
-  const [torchPosition, setTorchPosition] = useState({ x: 0, y: 0 });
+// Provider component
+export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isActive, setIsActive] = useState(false);
+  const [mode, setMode] = useState<'normal' | 'uv'>('normal');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   
-  // Get control of the video backgrounds
-  const { setActiveVideo } = useVideoStore();
+  // Access the video store to control background videos
+  const videoStore = useVideoStore();
 
-  // Toggle torch mode
-  const toggleTorch = (mode?: TorchMode) => {
-    if (mode) {
-      setTorchMode(mode);
-    } else {
-      // Cycle through modes: off -> normal -> uv -> off
-      setTorchMode(current => {
-        if (current === 'off') return 'normal';
-        if (current === 'normal') return 'uv';
-        return 'off';
-      });
-    }
+  // Toggle torch on/off
+  const toggleTorch = () => setIsActive(prev => !prev);
+
+  // Toggle between normal and UV modes
+  const toggleMode = () => {
+    const newMode = mode === 'normal' ? 'uv' : 'normal';
+    setMode(newMode);
+    // Update video mode using the setMode function
+    videoStore.setMode(newMode);
   };
 
-  // Effect to update video based on torch mode
-  useEffect(() => {
-    if (torchMode === 'uv') {
-      setActiveVideo('uv');
-    } else {
-      setActiveVideo('normal');
-    }
-  }, [torchMode, setActiveVideo]);
-
-  // Mouse movement handler to update torch position
+  // Track mouse movement
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (torchMode !== 'off') {
-        setTorchPosition({ x: e.clientX, y: e.clientY });
+      if (isActive) {
+        setPosition({ x: e.clientX, y: e.clientY });
       }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [torchMode]);
+  }, [isActive]);
 
-  const value = {
-    torchMode,
-    torchPosition,
-    toggleTorch,
-    setTorchPosition,
-  };
+  // Update body class based on active mode
+  useEffect(() => {
+    if (mode === 'uv') {
+      document.body.classList.add('uv-mode-active');
+    } else {
+      document.body.classList.remove('uv-mode-active');
+    }
+  }, [mode]);
 
   return (
-    <TorchContext.Provider value={value}>
+    <TorchContext.Provider value={{ isActive, mode, toggleTorch, toggleMode, position }}>
       {children}
-      {torchMode !== 'off' && <TorchEffect />}
     </TorchContext.Provider>
   );
 };
 
-const TorchEffect: React.FC = () => {
-  const { torchMode, torchPosition } = useTorch();
+// The torch effect overlay component
+export const TorchEffect: React.FC = () => {
+  const { isActive, mode, position } = useTorch();
   
-  // If the torch is off, don't render anything
-  if (torchMode === 'off') return null;
+  if (!isActive) return null;
+  
+  const torchRadius = 300; // px
   
   return (
-    <div 
-      className="fixed inset-0 pointer-events-none z-50"
-      style={{
-        maskImage: `radial-gradient(circle 300px at ${torchPosition.x}px ${torchPosition.y}px, transparent 0%, black 100%)`,
-        WebkitMaskImage: `radial-gradient(circle 300px at ${torchPosition.x}px ${torchPosition.y}px, transparent 0%, black 100%)`,
-        backgroundColor: torchMode === 'normal' ? 'rgba(0,0,0,0.75)' : 'transparent',
-      }}
-    >
-      {torchMode === 'uv' && (
-        <div 
-          className="absolute inset-0"
-          style={{
-            maskImage: `radial-gradient(circle 300px at ${torchPosition.x}px ${torchPosition.y}px, black 0%, transparent 100%)`,
-            WebkitMaskImage: `radial-gradient(circle 300px at ${torchPosition.x}px ${torchPosition.y}px, black 0%, transparent 100%)`,
-          }}
-        />
-      )}
+    <div className={`torch-effect ${mode}`}>
+      <div 
+        className="torch-mask"
+        style={{
+          background: mode === 'normal' 
+            ? `radial-gradient(circle ${torchRadius}px at ${position.x}px ${position.y}px, transparent 0%, rgba(0, 0, 0, 0.75) 100%)`
+            : `radial-gradient(circle ${torchRadius}px at ${position.x}px ${position.y}px, transparent 0%, rgba(0, 0, 0, 0.95) 100%)`
+        }}
+      />
     </div>
   );
 };
 
-// Torch control buttons component
+// Control buttons for the torch
 export const TorchControls: React.FC = () => {
-  const { torchMode, toggleTorch } = useTorch();
+  const { isActive, mode, toggleTorch, toggleMode } = useTorch();
   
   return (
-    <div className="fixed bottom-4 right-4 flex space-x-3 z-50">
+    <div className="torch-buttons">
       <button 
-        className={`p-3 rounded-full shadow-lg ${
-          torchMode === 'normal' ? 'bg-yellow-500 text-black' : 'bg-black/70 text-yellow-500'
-        }`}
-        onClick={() => toggleTorch('normal')}
-        title="Torch Mode"
+        className={`torch-button torch-button-normal ${isActive && mode === 'normal' ? 'active' : ''}`}
+        onClick={toggleTorch}
+        title="Toggle Torch"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 19V21M10 3H14L13 9H11L10 3ZM13 9V14C13 14.5523 12.5523 15 12 15C11.4477 15 11 14.5523 11 14V9H13Z" />
-        </svg>
+        <Flashlight size={20} />
       </button>
-      <button 
-        className={`p-3 rounded-full shadow-lg ${
-          torchMode === 'uv' ? 'bg-purple-500 text-white' : 'bg-black/70 text-purple-300'
-        }`}
-        onClick={() => toggleTorch('uv')}
-        title="UV Mode"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 19V21M10 3H14L13 9H11L10 3ZM13 9V14C13 14.5523 12.5523 15 12 15C11.4477 15 11 14.5523 11 14V9H13Z" />
-          <path d="M8 6L5 9M16 6L19 9" />
-        </svg>
-      </button>
+      
+      {isActive && (
+        <button 
+          className={`torch-button torch-button-uv ${mode === 'uv' ? 'active' : ''}`}
+          onClick={toggleMode}
+          title="Toggle UV Mode"
+        >
+          <Flashlight size={20} />
+        </button>
+      )}
     </div>
   );
 };

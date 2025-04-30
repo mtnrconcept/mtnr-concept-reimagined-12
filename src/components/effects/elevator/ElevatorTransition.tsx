@@ -8,37 +8,29 @@ export function ElevatorTransition({
   children,
   isActive,
   onAnimationComplete,
-  customDuration,
-  fadeInClass,
-  fadeOutClass,
-  easing = "cubic-bezier(0.65, 0, 0.35, 1)",
 }: ElevatorTransitionProps) {
-  const { containerRef, isVisible, transitionStyles } = useElevatorTransition({
+  // Get video store for controlling background video playback
+  const videoStore = useVideoStore();
+  
+  // Use the elevator transition hook with simplified props
+  const elevatorTransition = useElevatorTransition({
     isActive,
     onAnimationComplete,
-    customDuration,
-    easing,
   });
 
-  // Access the video store to play videos on transition
-  const videoStore = useVideoStore();
-
+  // Play video when transition activates
   useEffect(() => {
-    if (isActive) {
-      // When transition activates, play the appropriate video
-      if (videoStore.play) {
-        videoStore.play();
-      }
+    if (isActive && videoStore.play) {
+      videoStore.play();
     }
   }, [isActive, videoStore]);
 
   return (
     <div
-      ref={containerRef}
       className="relative w-full h-full"
       style={{
-        opacity: isVisible ? 1 : 0,
-        transition: `opacity ${transitionStyles.duration} ${easing}`,
+        opacity: isActive ? 1 : 0,
+        transition: `opacity 0.5s ease-in-out`,
         pointerEvents: isActive ? "none" : "auto",
       }}
     >
