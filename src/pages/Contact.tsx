@@ -2,7 +2,6 @@
 import Navbar from "@/components/Navbar";
 import { useState } from "react";
 import { toast } from "sonner";
-import BackgroundVideo from "@/components/effects/BackgroundVideo";
 import { motion } from "framer-motion";
 
 export default function Contact() {
@@ -22,9 +21,6 @@ export default function Contact() {
 
   return (
     <>
-      {/* Utiliser BackgroundVideo directement à la place du fond noir */}
-      <BackgroundVideo videoUrl="/lovable-uploads/Video fond normale.mp4" />
-      
       <div className="relative z-10 min-h-screen">
         <Navbar />
         <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
@@ -32,7 +28,7 @@ export default function Contact() {
             className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
           >
             Contact
           </motion.h1>
@@ -40,14 +36,14 @@ export default function Contact() {
             className="text-base xs:text-lg text-gray-100 mb-6 text-center font-grunge max-w-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
           >
             Balance un coucou, une question, une collab'.<br />MTNR répond toujours à la vibe.
           </motion.p>
           <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 1.4 }}
             onSubmit={handleSubmit}
             className="w-full max-w-lg bg-black/80 border border-yellow-400/30 rounded-2xl px-4 xs:px-8 py-8 shadow-2xl flex flex-col gap-7"
           >
@@ -80,7 +76,7 @@ export default function Contact() {
             className="mt-10 font-grunge text-center text-gray-200/80 text-base xs:text-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 1.6 }}
           >
             <div className="mb-3">Email : <a href="mailto:contact@mtnrconcept.fr" className="underline text-primary">contact@mtnrconcept.fr</a></div>
             <div className="mb-3">Instagram : <a href="https://www.instagram.com/" target="_blank" className="underline text-yellow-400">@mtnr_concept</a></div>

@@ -40,17 +40,17 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         listener();
       } catch (error) {
-        console.error('Error in transition listener:', error);
+        console.error('Erreur dans l\'écouteur de transition:', error);
       }
     });
     
     // Réinitialiser l'état de transition après la durée de la vidéo
-    // pour permettre à la vidéo de terminer sa lecture
+    // Durée de transition légèrement plus longue pour éviter les chevauchements
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
       console.log("État de transition réinitialisé");
-    }, 2500); // Durée de la vidéo (ajuster selon votre vidéo)
+    }, 3000); // Durée légèrement plus longue que la vidéo pour assurer la fin complète
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {

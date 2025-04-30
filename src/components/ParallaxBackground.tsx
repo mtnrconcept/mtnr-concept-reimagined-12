@@ -16,9 +16,13 @@ const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
 
   // Déclencher la transition vidéo lors des changements de page
   useEffect(() => {
-    // Déclencher la transition vidéo
-    navigation.triggerVideoTransition();
-    console.log("Changement de page détecté dans ParallaxBackground");
+    // Attendre légèrement pour s'assurer que les composants sont montés
+    const timer = setTimeout(() => {
+      navigation.triggerVideoTransition();
+      console.log("Changement de page détecté dans ParallaxBackground, transition déclenchée");
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [location.pathname, navigation]);
 
   return (

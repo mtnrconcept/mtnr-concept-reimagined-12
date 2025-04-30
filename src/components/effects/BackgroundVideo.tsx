@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
 import { useNavigation } from './NavigationContext';
-import { useLocation } from 'react-router-dom';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -19,60 +18,65 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const [videoError, setVideoError] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isTransitioning: navTransitioning } = useNavigation();
-  const location = useLocation();
+  const { isTransitioning: navTransitioning, registerVideoTransitionListener } = useNavigation();
   
-  // Déclencher la transition vidéo lors des changements de page
+  // Gérer les transitions de vidéo lors des événements de navigation
   useEffect(() => {
     if (!videoRef.current) return;
     
-    console.log("Changement de page détecté, démarrage transition vidéo");
-    setIsTransitioning(true);
-    
-    const performTransition = async () => {
+    const handleTransition = async () => {
       try {
-        // Réinitialiser la vidéo pour la transition
-        videoRef.current!.currentTime = 0;
+        console.log("Démarrage transition vidéo");
+        setIsTransitioning(true);
         
-        // Ajuster les effets visuels pendant la transition
-        videoRef.current!.style.filter = "brightness(1.2)";
+        const videoElement = videoRef.current;
+        if (!videoElement || !document.body.contains(videoElement)) {
+          console.warn("Élément vidéo non disponible pour transition");
+          return;
+        }
         
-        // Ajouter la classe de transition
-        videoRef.current!.classList.add("video-transitioning");
+        // Appliquer les effets visuels pendant la transition
+        videoElement.style.filter = "brightness(1.2)";
+        videoElement.classList.add("video-transitioning");
         
-        // Lancer la lecture de la vidéo depuis le début
-        await videoRef.current!.play();
+        // Réinitialiser la lecture vidéo
+        videoElement.currentTime = 0;
         
-        // Attendre que la vidéo se termine (une seule fois pour la transition)
-        const handleVideoEnd = () => {
-          console.log("Transition vidéo terminée");
-          setIsTransitioning(false);
-          
-          // Restaurer l'apparence normale
-          videoRef.current!.style.filter = "";
-          videoRef.current!.classList.remove("video-transitioning");
-          
-          // Supprimer l'écouteur après utilisation
-          videoRef.current!.removeEventListener('ended', handleVideoEnd);
-          
-          // Redémarrer la lecture en boucle
-          videoRef.current!.currentTime = 0;
-          videoRef.current!.play().catch(err => console.error("Erreur lors du redémarrage après transition:", err));
-        };
+        try {
+          // Tenter de lire la vidéo après s'être assuré qu'elle est prête
+          const playPromise = videoElement.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            console.log("La vidéo a commencé sa lecture pour la transition");
+          }
+        } catch (error) {
+          console.error("Erreur lors de la lecture de la vidéo pour transition:", error);
+        }
         
-        // Écouter la fin de la vidéo pour terminer la transition
-        videoRef.current!.addEventListener('ended', handleVideoEnd, { once: true });
-        
+        // Attendre la fin de la transition (basé sur la durée de la vidéo)
+        setTimeout(() => {
+          if (videoElement && document.body.contains(videoElement)) {
+            videoElement.style.filter = "";
+            videoElement.classList.remove("video-transitioning");
+            setIsTransitioning(false);
+            console.log("Transition vidéo terminée");
+          }
+        }, 2500); // Durée approximative de la vidéo
       } catch (error) {
         console.error("Erreur lors de la transition vidéo:", error);
         setIsTransitioning(false);
       }
     };
     
-    performTransition();
-  }, [location.pathname]);
+    // S'inscrire pour recevoir les notifications de transition
+    const unregister = registerVideoTransitionListener(handleTransition);
+    
+    return () => {
+      unregister();
+    };
+  }, [registerVideoTransitionListener]);
   
-  // Configuration initiale de la vidéo
+  // Configuration initiale et préchargement de la vidéo
   useEffect(() => {
     if (!videoRef.current) return;
     
@@ -84,50 +88,33 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     videoElement.loop = true;
     videoElement.autoplay = true;
     
-    // Essayer de jouer la vidéo au chargement initial
-    const playVideo = async () => {
-      try {
-        await videoElement.play();
-        console.log("Lecture initiale de la vidéo réussie");
-      } catch (error) {
-        console.error("Erreur de lecture initiale:", error);
-        
-        // En cas d'échec, essayez à nouveau lors de la première interaction utilisateur
-        const resumePlayback = async () => {
-          try {
-            await videoElement.play();
-            document.removeEventListener('click', resumePlayback);
-          } catch (err) {
-            console.error("Échec de reprise de la lecture:", err);
-          }
-        };
-        
-        document.addEventListener('click', resumePlayback, { once: true });
+    // Précharger la vidéo
+    videoElement.preload = "auto";
+    
+    // Ne pas utiliser de link preload en parallèle - peut causer des chargements doubles
+    
+    // Initialiser la lecture quand la vidéo est prête
+    const handleCanPlay = () => {
+      if (!isTransitioning && videoElement && document.body.contains(videoElement)) {
+        videoElement.play().catch(error => {
+          console.warn("Erreur lors de la lecture initiale:", error);
+        });
       }
     };
     
-    playVideo();
-    
-    // Précharger la vidéo
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = videoUrl;
-    link.as = 'video';
-    link.type = 'video/mp4';
-    document.head.appendChild(link);
+    videoElement.addEventListener('canplay', handleCanPlay);
     
     return () => {
-      if (link.parentNode) {
-        link.parentNode.removeChild(link);
-      }
+      videoElement.removeEventListener('canplay', handleCanPlay);
       
-      if (videoElement) {
+      // Nettoyage propre
+      if (document.body.contains(videoElement)) {
         videoElement.pause();
         videoElement.src = "";
         videoElement.load();
       }
     };
-  }, [videoUrl]);
+  }, [videoUrl, isTransitioning]);
   
   // Gestion de l'événement de chargement de la vidéo
   const handleVideoLoad = () => {
@@ -143,7 +130,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
-      {/* Affichage de l'image de fallback si erreur vidéo */}
+      {/* Fallback si erreur vidéo */}
       {videoError && (
         <img 
           src={fallbackImage} 
@@ -153,7 +140,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         />
       )}
       
-      {/* Vidéo d'arrière-plan */}
+      {/* Vidéo d'arrière-plan unique */}
       <video
         ref={videoRef}
         className="background-video"

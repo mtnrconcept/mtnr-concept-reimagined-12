@@ -46,8 +46,11 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Une seule instance de BackgroundVideo au niveau global */}
-      <BackgroundVideo />
+      {/* UNE SEULE instance de BackgroundVideo au niveau global */}
+      <BackgroundVideo 
+        videoUrl="/lovable-uploads/Video fond normale.mp4"
+        videoUrlUV="/lovable-uploads/Video fond UV.mp4"
+      />
       
       <PageTransition keyId={location.pathname}>
         <Routes location={location} key={location.pathname}>

@@ -1,5 +1,5 @@
 
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { motion } from "framer-motion";
 import PageContentTransition from "@/components/PageContentTransition";
 import { useNavigation } from "./effects/NavigationContext";
@@ -14,32 +14,16 @@ export default function PageTransition({
   keyId,
 }: PageTransitionProps) {
   const navigation = useNavigation();
-  const [isExiting, setIsExiting] = useState(false);
-  const [isEntering, setIsEntering] = useState(false);
   
   // Déclencher la transition lors du changement de page
   useEffect(() => {
-    // Signaler le début de la transition
-    setIsExiting(true);
+    const timer = setTimeout(() => {
+      // Déclencher la transition vidéo avec un léger délai pour éviter les conflits
+      navigation.triggerVideoTransition();
+      console.log("Transition vidéo déclenchée lors du changement de page");
+    }, 150);
     
-    // Déclencher la transition vidéo
-    navigation.triggerVideoTransition();
-    console.log("Transition vidéo déclenchée lors du changement de page");
-    
-    // Simuler la sortie de l'ancien contenu
-    const exitTimer = setTimeout(() => {
-      setIsExiting(false);
-      setIsEntering(true);
-      
-      // Simuler l'entrée du nouveau contenu
-      const enterTimer = setTimeout(() => {
-        setIsEntering(false);
-      }, 500); // Durée de l'animation d'entrée
-      
-      return () => clearTimeout(enterTimer);
-    }, 500); // Durée de l'animation de sortie
-    
-    return () => clearTimeout(exitTimer);
+    return () => clearTimeout(timer);
   }, [keyId, navigation]);
 
   return (
@@ -48,11 +32,12 @@ export default function PageTransition({
         className="page-content-wrapper"
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
-          opacity: isExiting ? 0 : 1,
-          y: isExiting ? -20 : isEntering ? 20 : 0,
+          opacity: 1,
+          y: 0,
           transition: {
-            duration: 0.5,
-            ease: "easeInOut"
+            duration: 0.8,
+            delay: 1.2, // Attendre la vidéo avant d'animer le contenu
+            ease: "easeOut"
           }
         }}
         exit={{ opacity: 0, y: -20 }}

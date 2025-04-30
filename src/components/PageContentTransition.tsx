@@ -11,43 +11,42 @@ interface PageContentTransitionProps {
 const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children }) => {
   const location = useLocation();
   const [displayChildren, setDisplayChildren] = useState(children);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const navigation = useNavigation();
+  const { isTransitioning, triggerVideoTransition } = useNavigation();
 
   useEffect(() => {
     // Lorsque la route change, initialiser la transition
-    setIsTransitioning(true);
+    console.log("Changement de route détecté dans PageContentTransition");
     
-    // Déclencher la transition vidéo
-    navigation.triggerVideoTransition();
-    console.log("Transition vidéo déclenchée par PageContentTransition");
-
-    // Attendre la fin de la vidéo pour afficher le nouveau contenu
-    // La durée doit correspondre à la durée de la vidéo
-    const videoDuration = 2500; // Durée en millisecondes (ajuster selon votre vidéo)
-    
-    // Garder l'ancien contenu pendant la transition de sortie
+    // Attendre un peu avant de déclencher pour s'assurer que tout est prêt
     const timer = setTimeout(() => {
+      triggerVideoTransition();
+      console.log("Transition vidéo déclenchée par PageContentTransition");
+    }, 50);
+    
+    // Définir la durée approximative de la vidéo en millisecondes
+    const videoDuration = 2500;
+    
+    // Garder l'ancien contenu pendant la première moitié de la transition
+    const exitTimer = setTimeout(() => {
       setDisplayChildren(children);
-      
-      // Terminer la transition après que le nouveau contenu soit affiché
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 500);
-    }, videoDuration / 2); // Afficher le nouveau contenu à mi-chemin de la vidéo
-
-    return () => clearTimeout(timer);
-  }, [children, location, navigation]);
+      console.log("Nouveau contenu préparé pour affichage");
+    }, videoDuration / 2);
+    
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(exitTimer);
+    };
+  }, [children, location, triggerVideoTransition]);
 
   return (
-    <AnimatePresence mode="wait" onExitComplete={() => setIsTransitioning(false)}>
+    <AnimatePresence mode="wait">
       <motion.div
         key={location.pathname}
         initial={{ opacity: 0 }}
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 0.5, // Délai avant l'apparition du nouveau contenu
+            delay: 1.2, // Attendre que la vidéo soit bien avancée pour montrer le contenu
             duration: 0.8
           }
         }}
