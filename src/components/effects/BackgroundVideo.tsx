@@ -28,19 +28,22 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
     const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
-    setCurrentVideo(newVideoUrl);
     
-    // Si la torche est active, jouer immédiatement la vidéo
-    if (isTorchActive) {
-      playVideoTransition();
+    if (currentVideo !== newVideoUrl) {
+      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
+      setCurrentVideo(newVideoUrl);
+      
+      // Jouer la transition vidéo immédiatement quand le mode UV change
+      if (isTorchActive) {
+        setTimeout(() => playVideoTransition(), 50); // Petit délai pour s'assurer que currentVideo est mis à jour
+      }
     }
-    
-    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
-  }, [uvMode, videoUrl, videoUrlUV, isTorchActive]);
+  }, [uvMode, videoUrl, videoUrlUV]);
 
   // Jouer la vidéo quand la torche est activée/désactivée
   useEffect(() => {
     if (!isFirstLoad) {
+      // Ne pas changer de vidéo ici, juste jouer la transition
       playVideoTransition();
     }
   }, [isTorchActive]);
@@ -53,7 +56,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     try {
       console.log('Transition vidéo déclenchée (torche ou navigation)');
       setIsTransitioning(true);
-      videoElement.load();
+      videoElement.load(); // Recharge la vidéo avec la source actuelle
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
       
@@ -84,7 +87,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 
   // Écouter les événements de navigation pour jouer la vidéo instantanément
   useEffect(() => {
-    const unregister = navigation.registerVideoTransitionListener(playVideoTransition);
+    const unregister = navigation.registerVideoTransitionListener(() => {
+      // On ne change pas la vidéo lors de la navigation, on joue juste la transition
+      playVideoTransition();
+    });
     return unregister;
   }, [navigation]);
   
