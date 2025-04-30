@@ -27,7 +27,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     handleUserInteraction,
     playVideoTransition,
     uvMode,
-    isTorchActive
+    isTorchActive,
+    videoError
   } = useBackgroundVideo({ videoUrl, videoUrlUV });
 
   // Gérer les effets de transitions et d'initialisation
@@ -44,7 +45,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
-  // Précharger les vidéos pour une expérience plus fluide
+  // Précharger les vidéos pour une expérience plus fluide (avec les bons chemins)
   useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
   
   // Nettoyer le cache des vidéos quand les props changent
@@ -58,6 +59,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         video.load();
         video.src = currentVideo;
         video.load();
+        
+        // Ajouter des logs pour déboguer les problèmes de chargement
+        console.log('Vidéo rechargée avec la source:', currentVideo);
       }
     }
   }, [videoUrl, videoUrlUV, currentVideo, videoRef]);
@@ -73,7 +77,21 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         muted
         preload="auto"
         src={currentVideo}
+        onError={(e) => console.error('Erreur de chargement vidéo:', e, 'URL:', currentVideo)}
       />
+      
+      {/* Afficher une image de fallback en cas d'erreur de chargement vidéo */}
+      {videoError && (
+        <div 
+          className="absolute inset-0 min-w-full min-h-full object-cover"
+          style={{
+            backgroundImage: `url(${fallbackImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1
+          }}
+        />
+      )}
       
       {/* Overlays visuels */}
       <VideoOverlay />

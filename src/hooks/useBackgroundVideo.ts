@@ -17,10 +17,17 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   
   // Définir le bon chemin de vidéo basé sur le mode UV
   const currentVideo = useMemo(() => {
-    return uvMode ? videoUrlUV : videoUrl;
+    const selectedUrl = uvMode ? videoUrlUV : videoUrl;
+    // Vérifier si l'URL commence par un slash et ne contient pas déjà lovable-uploads
+    if (!selectedUrl.includes('lovable-uploads') && selectedUrl.startsWith('/')) {
+      // Assurer que le chemin est correct
+      return `/lovable-uploads/${selectedUrl.replace(/^\/+/, '')}`;
+    }
+    return selectedUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Fonction pour gérer la première interaction utilisateur
@@ -31,11 +38,31 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     }
   }, [hasUserInteraction]);
 
+  // Vérifier si les vidéos existent
+  useEffect(() => {
+    const checkVideoAvailability = async () => {
+      try {
+        const response = await fetch(currentVideo, { method: 'HEAD' });
+        if (!response.ok) {
+          console.error(`La vidéo n'est pas disponible: ${currentVideo}`);
+          setVideoError(true);
+        } else {
+          setVideoError(false);
+        }
+      } catch (error) {
+        console.error(`Erreur lors de la vérification de la vidéo: ${currentVideo}`, error);
+        setVideoError(true);
+      }
+    };
+    
+    checkVideoAvailability();
+  }, [currentVideo]);
+
   // Version optimisée de playVideoTransition avec useCallback
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
-    if (!videoElement || isTransitioning) {
-      console.log('Impossible de démarrer la vidéo: vidéo non chargée ou transition déjà en cours');
+    if (!videoElement || isTransitioning || videoError) {
+      console.log('Impossible de démarrer la vidéo: vidéo non chargée, transition déjà en cours ou erreur vidéo');
       return;
     }
     
@@ -53,6 +80,15 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         
         // Définir la nouvelle source
         videoElement.src = currentVideo;
+        
+        // Ajouter un gestionnaire d'erreurs
+        const errorHandler = () => {
+          console.error('Erreur lors du chargement de la vidéo:', currentVideo);
+          setVideoError(true);
+          setIsTransitioning(false);
+          videoElement.removeEventListener('error', errorHandler);
+        };
+        videoElement.addEventListener('error', errorHandler);
         
         // Attendre que les métadonnées soient chargées avant de continuer
         if (videoElement.readyState < 2) {
@@ -90,17 +126,22 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       videoElement.addEventListener('ended', handleVideoEnded);
       
       console.log('Lecture de la vidéo...');
-      await videoElement.play();
+      await videoElement.play().catch(error => {
+        console.error('Erreur lors de la lecture:', error);
+        setIsTransitioning(false);
+        setVideoError(true);
+      });
       console.log('Vidéo démarrée avec succès');
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);
+      setVideoError(true);
     }
-  }, [isTransitioning, currentVideo, uvMode]);
+  }, [isTransitioning, currentVideo, uvMode, videoError]);
 
   // Démarrer automatiquement la vidéo lors du premier chargement
   useEffect(() => {
-    if (isFirstLoad && videoRef.current) {
+    if (isFirstLoad && videoRef.current && !videoError) {
       // Démarrer la transition après le premier rendu complet
       const timer = setTimeout(() => {
         handleUserInteraction();
@@ -112,7 +153,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       
       return () => clearTimeout(timer);
     }
-  }, [isFirstLoad, isTransitioning, handleUserInteraction, playVideoTransition]);
+  }, [isFirstLoad, isTransitioning, handleUserInteraction, playVideoTransition, videoError]);
 
   return {
     videoRef,
@@ -126,6 +167,7 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     handleUserInteraction,
     playVideoTransition,
     uvMode,
-    isTorchActive
+    isTorchActive,
+    videoError
   };
 };
