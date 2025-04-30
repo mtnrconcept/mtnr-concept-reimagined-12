@@ -9,12 +9,7 @@
 @layer base {
   html, body, #root {
     @apply m-0 p-0 min-h-screen overflow-x-hidden;
-    background-color: #000000 !important;
     color: white;
-  }
-  
-  body {
-    background-color: #000000 !important;
   }
 }
 
@@ -31,7 +26,6 @@
   z-index: 0 !important;
   min-width: 100% !important;
   min-height: 100% !important;
-  background-color: black !important;
 }
 
 /* Animation de fondu pour les transitions de page */

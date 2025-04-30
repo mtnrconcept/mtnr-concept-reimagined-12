@@ -1,35 +1,31 @@
 
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import BackgroundVideo from './effects/BackgroundVideo';
 
 interface ParallaxBackgroundProps {
   children: ReactNode;
+  videoUrl?: string;
 }
 
-const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ children }) => {
-  // Force background to black to ensure consistency
-  useEffect(() => {
-    document.documentElement.style.backgroundColor = '#000';
-    document.body.style.backgroundColor = '#000';
-    
-    return () => {
-      document.body.style.backgroundColor = '';
-      document.documentElement.style.backgroundColor = '';
-    };
-  }, []);
-
+const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ 
+  children, 
+  videoUrl = "/lovable-uploads/Video fond normale.mp4"
+}) => {
   return (
-    <motion.div 
-      className="relative min-h-screen w-full"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      style={{ 
-        perspective: "1000px",
-        backgroundColor: "#000"
-      }}
-    >
-      {children}
-    </motion.div>
+    <>
+      {/* Vidéo d'arrière-plan */}
+      <BackgroundVideo videoUrl={videoUrl} />
+      
+      <motion.div 
+        className="relative min-h-screen w-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{ perspective: "1000px" }}
+      >
+        {children}
+      </motion.div>
+    </>
   );
 };
 

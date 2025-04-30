@@ -1,7 +1,5 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
-import { useVideoTransitionEffects } from '@/hooks/useVideoTransitionEffects';
 import { VideoOverlay } from './VideoOverlay';
 
 interface BackgroundVideoProps {
@@ -16,84 +14,70 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Utiliser notre hook personnalisé pour gérer la vidéo
-  const {
-    videoRef,
-    isFirstLoad,
-    setIsFirstLoad,
-    isTransitioning,
-    hasUserInteraction,
-    currentVideo,
-    handleUserInteraction,
-    playVideoTransition,
-    uvMode,
-    isTorchActive,
-    videoError
-  } = useBackgroundVideo({ videoUrl, videoUrlUV });
-
-  // Gérer les effets de transitions et d'initialisation
-  useVideoTransitionEffects({
-    videoRef,
-    isFirstLoad,
-    setIsFirstLoad,
-    isTransitioning,
-    hasUserInteraction,
-    currentVideo,
-    playVideoTransition,
-    handleUserInteraction,
-    uvMode,
-    isTorchActive
-  });
-
-  // S'assurer que la vidéo est visible et qu'elle se charge correctement
+  // S'assurer que la vidéo est chargée et qu'elle joue correctement
   useEffect(() => {
-    const checkVideo = async () => {
-      try {
-        const response = await fetch(currentVideo, { method: 'HEAD' });
-        console.log(`Vérification de la vidéo ${currentVideo}:`, response.ok);
-        
-        if (!response.ok) {
-          console.error(`La vidéo ${currentVideo} n'est pas accessible. Code: ${response.status}`);
-        } else {
-          console.log(`La vidéo ${currentVideo} est accessible.`);
-        }
-      } catch (error) {
-        console.error(`Erreur lors de la vérification de la vidéo:`, error);
-      }
-    };
+    if (!videoRef.current) return;
     
-    checkVideo();
+    const videoElement = videoRef.current;
     
-    // S'assurer que le corps du document a un fond noir
-    document.body.style.backgroundColor = '#000';
-    document.documentElement.style.backgroundColor = '#000';
+    // Configuration de la vidéo
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+    videoElement.loop = true;
+    videoElement.autoplay = true;
+    
+    // Charger la vidéo
+    videoElement.load();
+    
+    // Tenter de lire la vidéo
+    videoElement.play().catch(error => {
+      console.error("Erreur de lecture vidéo:", error);
+      setVideoError(true);
+    });
+    
+    // Précharger la vidéo via un lien en tête du document
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = videoUrl;
+    link.as = 'video';
+    link.type = 'video/mp4';
+    document.head.appendChild(link);
     
     return () => {
-      // Nettoyage
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+      
+      if (videoElement) {
+        videoElement.pause();
+      }
     };
-  }, [currentVideo]);
-
+  }, [videoUrl]);
+  
   // Gestion de l'événement de chargement de la vidéo
   const handleVideoLoad = () => {
     setIsVideoLoaded(true);
     console.log("Vidéo chargée avec succès");
+    
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.error("Erreur lors de la lecture après chargement:", err);
+        setVideoError(true);
+      });
+    }
   };
 
   // Gestion des erreurs de vidéo
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error("Erreur de chargement vidéo:", e);
-    const videoElement = e.currentTarget;
-    console.log("Détails vidéo:", {
-      error: videoElement.error,
-      networkState: videoElement.networkState,
-      readyState: videoElement.readyState,
-      currentSrc: videoElement.currentSrc
-    });
+    setVideoError(true);
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden" style={{ backgroundColor: "#000" }}>
+    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
       {/* Affichage de l'image de fallback si erreur vidéo */}
       {videoError && (
         <img 
@@ -115,16 +99,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
-        style={{ 
-          position: 'fixed',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          zIndex: 0
-        }}
       >
-        <source src={currentVideo} type="video/mp4" />
+        <source src={videoUrl} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
