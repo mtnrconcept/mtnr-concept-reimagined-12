@@ -20,8 +20,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Détermine quelle vidéo utiliser en fonction du mode UV
-  const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
+  // Inversion des vidéos: Composition 1.mp4 pour le mode UV actif
+  const currentVideoUrl = uvMode ? videoUrl : videoUrlUV;
   
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
@@ -102,7 +102,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         poster={fallbackImage}
         playsInline
         muted
-        // Suppression de l'attribut "loop" pour empêcher la lecture en boucle
+        // Suppression intentionnelle de l'attribut "loop" pour empêcher la lecture en boucle
       >
         <source src={currentVideoUrl} type="video/mp4" />
       </video>
