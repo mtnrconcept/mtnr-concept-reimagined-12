@@ -18,7 +18,6 @@ interface UseVideoTransitionEffectsProps {
 export const useVideoTransitionEffects = ({
   videoRef,
   isFirstLoad,
-  setIsFirstLoad,
   isTransitioning,
   hasUserInteraction,
   currentVideo,
@@ -31,29 +30,29 @@ export const useVideoTransitionEffects = ({
 
   // Effet pour les changements de mode UV uniquement
   useEffect(() => {
-    if (!isFirstLoad && isTorchActive && hasUserInteraction) {
+    if (!isFirstLoad && isTorchActive && hasUserInteraction && !isTransitioning) {
       console.log("Mode UV changé à:", uvMode, "- Lancement de la transition...");
       // Utiliser setTimeout pour éviter les problèmes de timing
       const timer = setTimeout(() => playVideoTransition(), 100);
       return () => clearTimeout(timer);
     }
-  }, [uvMode, isFirstLoad, playVideoTransition, isTorchActive, hasUserInteraction]);
+  }, [uvMode, isFirstLoad, playVideoTransition, isTorchActive, hasUserInteraction, isTransitioning]);
 
   // Écouter les événements de navigation
   useEffect(() => {
     const handleVideoTransition = () => {
-      if (hasUserInteraction) {
+      if (hasUserInteraction && !isTransitioning) {
         playVideoTransition();
       }
     };
     
     const unregister = navigation.registerVideoTransitionListener(handleVideoTransition);
     return unregister;
-  }, [navigation, playVideoTransition, hasUserInteraction]);
+  }, [navigation, playVideoTransition, hasUserInteraction, isTransitioning]);
   
   // Écouter l'activation de la torche
   useEffect(() => {
-    if (!isFirstLoad && isTorchActive !== undefined && hasUserInteraction) {
+    if (!isFirstLoad && isTorchActive !== undefined && hasUserInteraction && !isTransitioning) {
       // Si la torche vient d'être activée, s'assurer que la bonne vidéo est sélectionnée
       const videoElement = videoRef.current;
       if (videoElement && videoElement.src !== currentVideo) {
@@ -62,32 +61,17 @@ export const useVideoTransitionEffects = ({
         videoElement.load();
       }
     }
-  }, [isTorchActive, isFirstLoad, currentVideo, hasUserInteraction, videoRef]);
+  }, [isTorchActive, isFirstLoad, currentVideo, hasUserInteraction, videoRef, isTransitioning]);
   
-  // Initialisation et gestion de la visibilité
+  // Gestion des écouteurs d'événements pour la première interaction
   useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-    
-    // S'assurer que la vidéo a la bonne source dès le début
-    if (videoElement.src !== currentVideo) {
-      videoElement.src = currentVideo;
-    }
-    
-    if (isFirstLoad) {
-      videoElement.load();
-      videoElement.pause();
-      videoElement.currentTime = 0;
-      setIsFirstLoad(false);
-      console.log('Vidéo initialisée avec source:', currentVideo);
-    }
-    
     // Ajout des écouteurs pour la première interaction utilisateur
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
     
     // Gestion de la visibilité de la page
     const handleVisibilityChange = () => {
+      const videoElement = videoRef.current;
       if (!videoElement) return;
       
       if (document.hidden) {
@@ -105,10 +89,6 @@ export const useVideoTransitionEffects = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
-      
-      if (videoElement) {
-        videoElement.pause();
-      }
     };
-  }, [isFirstLoad, isTransitioning, currentVideo, handleUserInteraction, hasUserInteraction, videoRef, setIsFirstLoad]);
+  }, [handleUserInteraction, videoRef, isFirstLoad, isTransitioning, hasUserInteraction]);
 };

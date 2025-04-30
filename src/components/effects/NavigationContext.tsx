@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback } from 'react';
 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
@@ -9,21 +9,23 @@ interface NavigationContextType {
 const NavigationContext = createContext<NavigationContextType | null>(null);
 
 export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [listeners, setListeners] = useState<(() => void)[]>([]);
+  // Utiliser useRef pour stocker les listeners au lieu de useState
+  // afin d'éviter les rendus infinis
+  const listenersRef = useRef<(() => void)[]>([]);
 
-  const triggerVideoTransition = () => {
+  const triggerVideoTransition = useCallback(() => {
     console.log('Navigation event triggered, notifying listeners');
-    listeners.forEach(listener => listener());
-  };
+    listenersRef.current.forEach(listener => listener());
+  }, []);
 
-  const registerVideoTransitionListener = (callback: () => void) => {
-    setListeners(prev => [...prev, callback]);
+  const registerVideoTransitionListener = useCallback((callback: () => void) => {
+    listenersRef.current.push(callback);
     
     // Return unsubscribe function
     return () => {
-      setListeners(prev => prev.filter(listener => listener !== callback));
+      listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
     };
-  };
+  }, []);
 
   return (
     <NavigationContext.Provider 

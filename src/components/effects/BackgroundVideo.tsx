@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
 import { useVideoTransitionEffects } from '@/hooks/useVideoTransitionEffects';
 import { useVideoPreload } from '@/hooks/useVideoPreload';
@@ -30,7 +30,39 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   } = useBackgroundVideo({ videoUrl, videoUrlUV });
 
-  // Gérer les effets de transitions et d'initialisation
+  // Précharger les vidéos
+  useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
+  
+  // Gérer les effets de transitions et d'initialisation dans un effet séparé
+  // pour éviter les renders infinis
+  useEffect(() => {
+    // Utiliser notre hook d'effets, mais déplacer les dépendances ici
+    const videoElement = videoRef.current;
+    
+    if (!videoElement) return;
+    
+    // S'assurer que la vidéo a la bonne source dès le début
+    if (videoElement.src !== currentVideo) {
+      videoElement.src = currentVideo;
+    }
+    
+    if (isFirstLoad) {
+      videoElement.load();
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      setIsFirstLoad(false);
+      console.log('Vidéo initialisée avec source:', currentVideo);
+    }
+    
+    // Nettoyage
+    return () => {
+      if (videoElement) {
+        videoElement.pause();
+      }
+    };
+  }, [videoRef, isFirstLoad, currentVideo, setIsFirstLoad]);
+  
+  // Utiliser notre hook pour gérer les effets de transition
   useVideoTransitionEffects({
     videoRef,
     isFirstLoad,
@@ -43,9 +75,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     uvMode,
     isTorchActive
   });
-
-  // Précharger les vidéos
-  useVideoPreload({ videoUrls: [videoUrl, videoUrlUV] });
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">

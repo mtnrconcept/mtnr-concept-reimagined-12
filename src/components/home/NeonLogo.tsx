@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { DispersingLogo } from './DispersingLogo';
 import { useLocation } from 'react-router-dom';
@@ -8,15 +8,28 @@ export const NeonLogo = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
   const [shouldDisperse, setShouldDisperse] = useState(false);
   const location = useLocation();
+  const intervalRef = useRef<number | null>(null);
   
-  // Effet de scintillement du néon
+  // Effet de scintillement du néon avec useRef pour éviter les rendus infinis
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Nettoyer tout intervalle existant pour éviter les fuites de mémoire
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    
+    // Créer un nouvel intervalle
+    intervalRef.current = window.setInterval(() => {
       setGlowIntensity(Math.random() * 0.4 + 0.8); // Variation entre 0.8 et 1.2
     }, 50); // Scintillement rapide
 
-    return () => clearInterval(interval);
-  }, []);
+    // Nettoyage lors du démontage
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []); // Tableau de dépendances vide - exécution unique au montage
 
   // Déclenchement automatique de l'effet de dispersion après un délai
   useEffect(() => {

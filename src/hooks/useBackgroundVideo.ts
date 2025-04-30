@@ -20,15 +20,13 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   
   // Définir le bon chemin de vidéo basé sur le mode UV
   const currentVideo = useMemo(() => {
-    return uvMode ? videoUrl : videoUrlUV;
+    return uvMode ? videoUrlUV : videoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Fonction pour gérer la première interaction utilisateur
   const handleUserInteraction = useCallback(() => {
     if (!hasUserInteraction) {
       setHasUserInteraction(true);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
     }
   }, [hasUserInteraction]);
 
