@@ -28,6 +28,7 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
   const [isLoaded, setIsLoaded] = useState(false);
   const { isPlaying, playDirection } = useBackgroundVideoStore();
   
+  // Précharger la vidéo dès le début
   useEffect(() => {
     const videoElement = videoRef.current;
     
@@ -36,6 +37,14 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
       const handleLoaded = () => {
         setIsLoaded(true);
         console.log("Vidéo de fond chargée");
+        
+        // Précharger la vidéo en mémoire en la lisant puis la mettant en pause immédiatement
+        videoElement.play().then(() => {
+          videoElement.pause();
+          videoElement.currentTime = 0;
+        }).catch(err => {
+          console.log("Préchargement vidéo silencieux échoué:", err);
+        });
       };
       
       videoElement.addEventListener('loadeddata', handleLoaded);
@@ -46,75 +55,110 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
     }
   }, []);
   
-  // Fonction optimisée pour lire la vidéo en sens inverse avec fallback
-  const manualReverseRef = useRef<(v: HTMLVideoElement) => void>();
-  manualReverseRef.current = (v: HTMLVideoElement) => {
-    let last = performance.now();
-    v.pause();
-    v.currentTime = v.currentTime || v.duration;
+  // Référence pour la lecture en sens inverse avec optimisations
+  const reversePlaybackRef = useRef({
+    rafId: 0,
+    lastTimestamp: 0,
+    isPlaying: false
+  });
+  
+  // Fonction optimisée pour lire la vidéo en sens inverse avec performances améliorées
+  const playInReverse = (videoElement: HTMLVideoElement) => {
+    if (!videoElement) return;
     
-    const step = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      v.currentTime = Math.max(0, v.currentTime - dt);
-      if (v.currentTime > 0) requestAnimationFrame(step);
+    // Annuler l'animation précédente si elle existe
+    if (reversePlaybackRef.current.rafId) {
+      cancelAnimationFrame(reversePlaybackRef.current.rafId);
+    }
+    
+    // Réinitialiser l'état
+    reversePlaybackRef.current = {
+      rafId: 0,
+      lastTimestamp: performance.now(),
+      isPlaying: true
     };
     
-    requestAnimationFrame((t) => { 
-      last = t; 
-      step(t); 
-    });
+    // S'assurer que la vidéo commence par la fin
+    videoElement.currentTime = videoElement.duration || 7;
+    videoElement.pause();
+    
+    const step = (now: number) => {
+      if (!reversePlaybackRef.current.isPlaying) return;
+      
+      const dt = (now - reversePlaybackRef.current.lastTimestamp) / 1000;
+      reversePlaybackRef.current.lastTimestamp = now;
+      
+      // Réduire le temps courant avec un taux de lecture contrôlé
+      videoElement.currentTime = Math.max(0, videoElement.currentTime - dt);
+      
+      // Continuer la lecture si pas à la fin
+      if (videoElement.currentTime > 0 && reversePlaybackRef.current.isPlaying) {
+        reversePlaybackRef.current.rafId = requestAnimationFrame(step);
+      } else {
+        reversePlaybackRef.current.isPlaying = false;
+      }
+    };
+    
+    // Démarrer l'animation
+    reversePlaybackRef.current.rafId = requestAnimationFrame(step);
   };
   
-  // Effet pour gérer la lecture/pause de la vidéo
+  // Effet pour gérer la lecture/pause de la vidéo avec optimisations
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
     if (isPlaying) {
+      // Arrêter toute lecture inversée précédente
+      reversePlaybackRef.current.isPlaying = false;
+      if (reversePlaybackRef.current.rafId) {
+        cancelAnimationFrame(reversePlaybackRef.current.rafId);
+      }
+      
       if (playDirection === 'forward') {
-        console.log("Démarrage de la vidéo en avant");
+        console.log("Démarrage de la vidéo en avant (optimisé)");
         videoElement.currentTime = 0;
         videoElement.playbackRate = 1;
-        videoElement.play().catch(err => {
-          console.error("Erreur de lecture vidéo:", err);
-        });
+        
+        // Utiliser un catch silencieux pour éviter les erreurs dans la console
+        videoElement.play().catch(() => {});
       } else {
-        console.log("Démarrage de la vidéo en arrière");
-        // Positionner à la fin pour lecture inversée
-        const dur = videoElement.duration || 7;
-        videoElement.currentTime = dur;
+        console.log("Démarrage de la vidéo en arrière (optimisé)");
         
         try {
-          // Essayer d'utiliser playbackRate négatif (peut ne pas être supporté)
+          // Essayer d'abord avec playbackRate négatif (meilleure performance)
           videoElement.playbackRate = -1;
-          videoElement.play().catch(err => {
-            console.error("Erreur de lecture vidéo inversée:", err);
-            // Fallback: lecture inversée manuelle
-            if (manualReverseRef.current) {
-              manualReverseRef.current(videoElement);
-            }
+          videoElement.currentTime = videoElement.duration || 7;
+          videoElement.play().catch(() => {
+            // Fallback au mode manuel si l'API ne supporte pas la lecture inversée
+            playInReverse(videoElement);
           });
         } catch (err) {
-          console.log("PlaybackRate négatif non supporté, utilisation fallback");
-          // Fallback: lecture inversée manuelle
-          if (manualReverseRef.current) {
-            manualReverseRef.current(videoElement);
-          }
+          // Fallback au mode manuel si l'API ne supporte pas la lecture inversée
+          playInReverse(videoElement);
         }
       }
       
-      // Mettre en pause automatiquement à la fin de la vidéo (après 7s)
+      // Mettre en pause automatiquement à la fin de la vidéo
       const timeoutId = setTimeout(() => {
-        console.log("Timeout 7s écoulé, mise en pause de la vidéo");
+        console.log("Animation terminée, mise en pause de la vidéo");
         videoElement.pause();
+        reversePlaybackRef.current.isPlaying = false;
         useBackgroundVideoStore.getState().pauseVideo();
       }, 7000);
       
-      return () => clearTimeout(timeoutId);
+      return () => {
+        clearTimeout(timeoutId);
+        reversePlaybackRef.current.isPlaying = false;
+        if (reversePlaybackRef.current.rafId) {
+          cancelAnimationFrame(reversePlaybackRef.current.rafId);
+        }
+      };
     } else {
+      // Pause
       console.log("Mise en pause de la vidéo de fond");
       videoElement.pause();
+      reversePlaybackRef.current.isPlaying = false;
     }
   }, [isPlaying, playDirection]);
   
@@ -127,6 +171,11 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
         muted
         playsInline
         preload="auto"
+        style={{
+          transform: `translateZ(0) ${playDirection === 'reverse' ? 'scaleY(-1)' : 'scaleY(1)'}`,
+          willChange: 'transform',
+          backfaceVisibility: 'hidden'
+        }}
       />
       {!isLoaded && (
         <div className="absolute inset-0 bg-black z-[1] flex items-center justify-center">
