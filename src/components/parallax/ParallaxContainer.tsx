@@ -1,23 +1,18 @@
 
 import { useRef } from 'react';
 import { useParallaxEffects } from '@/hooks/useParallaxEffects';
-import { Background } from './Background';
 
 interface ParallaxContainerProps {
   children: React.ReactNode;
-  backgroundImage: string;
 }
 
-export const ParallaxContainer = ({ children, backgroundImage }: ParallaxContainerProps) => {
+export const ParallaxContainer = ({ children }: ParallaxContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useParallaxEffects({ containerRef });
   
   return (
     <>
-      {/* Fond en position fixe */}
-      <Background imagePath={backgroundImage} />
-      
       {/* Conteneur des éléments de parallax */}
       <div 
         ref={containerRef}

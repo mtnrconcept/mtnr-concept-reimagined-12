@@ -1,7 +1,6 @@
 
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import Parallax3DScene from "@/components/Parallax3DScene";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -9,15 +8,15 @@ import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
+import BackgroundVideo from "@/components/effects/BackgroundVideo";
 
 export default function Home() {
   const { uvMode } = useUVMode();
+  const observerRef = useRef<IntersectionObserver | null>(null);
   
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
   
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
@@ -43,8 +42,8 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-black">
-      {/* Enhanced 3D parallax background */}
-      <Parallax3DScene />
+      {/* Vidéo de fond d'escalier */}
+      <BackgroundVideo />
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />

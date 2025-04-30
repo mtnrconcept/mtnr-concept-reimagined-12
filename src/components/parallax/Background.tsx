@@ -1,15 +1,24 @@
 
 import React from 'react';
+import BackgroundVideo from '../effects/BackgroundVideo';
 
 interface BackgroundProps {
   imagePath?: string;
+  useVideo?: boolean;
   depth?: number;
 }
 
 export const Background = ({ 
   imagePath = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png", 
+  useVideo = true,
   depth = 0.08 
 }: BackgroundProps) => {
+  // Si useVideo est true, on utilise le composant BackgroundVideo
+  if (useVideo) {
+    return <BackgroundVideo fallbackImage={imagePath} />;
+  }
+  
+  // Sinon, on utilise l'image de fond classique
   return (
     <div 
       className="fixed inset-0 w-full h-full"
@@ -36,7 +45,7 @@ export const Background = ({
           transform: `translateZ(${-depth * 800}px) scale(${1 + depth * 1.5})`, 
           opacity: 1, 
           willChange: 'transform',
-          filter: 'brightness(1) contrast(1.2)', // Augmenté la luminosité de 0.8 à 1
+          filter: 'brightness(1) contrast(1.2)',
           transition: 'transform 0.1s ease-out'
         }}
       />

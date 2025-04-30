@@ -15,10 +15,10 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
-import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
+import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -54,7 +54,6 @@ function AnimatedRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/artists" element={<Artists />} />
-          <Route path="/book" element={<Book />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -74,6 +73,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Suspense fallback={null}>
+                <BackgroundVideoController />
                 <AnimatedRoutes />
               </Suspense>
             </BrowserRouter>
