@@ -16,6 +16,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  will-change: transform, opacity;
 }
 
 .exit-content {
@@ -26,24 +27,27 @@
   z-index: 3;
 }
 
-/* Animation de sortie vers le haut */
+/* Animation de sortie vers le haut avec courbe accentuée */
 @keyframes slide-out-up {
-  to { transform: translateY(-100%); }
+  0% { transform: translateY(0); }
+  15% { transform: translateY(-5%); }
+  100% { transform: translateY(-120%); }
 }
 
-/* Animation d'entrée depuis le bas */
+/* Animation d'entrée depuis le bas avec courbe accentuée */
 @keyframes slide-in-down {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  0% { transform: translateY(120%); }
+  85% { transform: translateY(5%); }
+  100% { transform: translateY(0); }
 }
 
-/* Classes d'animation */
+/* Classes d'animation avec courbes de Bézier améliorées */
 .exit-up {
-  animation: slide-out-up 2s ease-out forwards;
+  animation: slide-out-up 2.5s cubic-bezier(0.25, 0.1, 0.13, 1) forwards;
 }
 
 .enter-content {
-  animation: slide-in-down 2s ease-out forwards;
+  animation: slide-in-down 2.5s cubic-bezier(0.87, 0, 0.13, 1) forwards;
 }
 
 /* Styles pour la vidéo de fond */
@@ -54,4 +58,10 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.video-visible {
+  opacity: 1;
 }

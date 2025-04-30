@@ -18,6 +18,19 @@ export default function PageTransition({
   const isInitialMountRef = useRef<boolean>(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // Précharger la vidéo au montage du composant
+  useEffect(() => {
+    const preloadVideo = document.createElement('link');
+    preloadVideo.rel = 'preload';
+    preloadVideo.href = '/lovable-uploads/ascensceur.mp4';
+    preloadVideo.as = 'video';
+    document.head.appendChild(preloadVideo);
+    
+    return () => {
+      document.head.removeChild(preloadVideo);
+    };
+  }, []);
+
   // Détecter les changements de routes
   useEffect(() => {
     // Ignorer le premier rendu
