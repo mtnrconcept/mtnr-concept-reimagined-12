@@ -1,6 +1,7 @@
 
 import React from 'react';
-import BackgroundVideo from '../effects/BackgroundVideo';
+import BackgroundVideoController from '../effects/BackgroundVideoController';
+import Parallax3DEffect from './Parallax3DEffect';
 
 interface BackgroundProps {
   depth?: number;
@@ -10,34 +11,16 @@ export const Background = ({ depth = 0.08 }: BackgroundProps) => {
   return (
     <>
       {/* Video background */}
-      <BackgroundVideo videoSrc="/lovable-uploads/ascensceur.mp4" />
+      <BackgroundVideoController videoSrc="/lovable-uploads/ascensceur.mp4" />
       
-      {/* Layer for grid and overlay effects */}
-      <div 
-        className="fixed inset-0 w-full h-full z-[1]"
-        style={{
-          perspective: '1200px',
-          transformStyle: 'preserve-3d'
-        }}
-      >
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
-            backgroundSize: '35px 35px', 
-            transform: 'translateZ(-50px)',
-            mixBlendMode: 'overlay'
-          }}
-        />
-        
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%)',
-            pointerEvents: 'none'
-          }}
-        />
-      </div>
+      {/* 3D Parallax Effect */}
+      <Parallax3DEffect depth={depth}>
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Additional decorative elements can be added here */}
+          <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full bg-gradient-to-r from-yellow-500/10 to-transparent blur-xl"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-48 h-24 rounded-full bg-gradient-to-r from-yellow-500/5 to-transparent blur-lg"></div>
+        </div>
+      </Parallax3DEffect>
     </>
   );
 };

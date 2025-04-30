@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import ParallaxBackground from "@/components/ParallaxBackground";
@@ -35,6 +34,21 @@ export default function WhatWeDo() {
   // Force scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  // Add mouse move event for interactive particles
+  useEffect(() => {
+    const handleInteractiveParticles = (e: MouseEvent) => {
+      const mouseX = e.clientX / window.innerWidth;
+      const mouseY = e.clientY / window.innerHeight;
+      
+      // Apply subtle transformations based on mouse position
+      document.documentElement.style.setProperty('--mouse-x', mouseX.toString());
+      document.documentElement.style.setProperty('--mouse-y', mouseY.toString());
+    };
+    
+    window.addEventListener('mousemove', handleInteractiveParticles);
+    return () => window.removeEventListener('mousemove', handleInteractiveParticles);
   }, []);
 
   return (
@@ -172,9 +186,13 @@ export default function WhatWeDo() {
             </div>
           </motion.section>
           
-          {/* Call to action */}
+          {/* Call to action with enhanced 3D effect */}
           <motion.div 
-            className="w-full max-w-3xl bg-gradient-to-r from-black via-yellow-950/40 to-black p-6 rounded-xl border border-yellow-500/30 text-center"
+            className="w-full max-w-3xl bg-gradient-to-r from-black via-yellow-950/40 to-black p-6 rounded-xl border border-yellow-500/30 text-center transform-gpu"
+            style={{
+              transform: 'translateZ(20px)',
+              boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)'
+            }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.7 }}
@@ -186,7 +204,7 @@ export default function WhatWeDo() {
             <motion.button 
               whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255,221,0,0.5)" }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-3 bg-yellow-500 text-black font-bold rounded-lg shadow-lg"
+              className="px-8 py-3 bg-yellow-500 text-black font-bold rounded-lg shadow-lg hover:shadow-yellow-400/30"
             >
               Book une session
             </motion.button>
