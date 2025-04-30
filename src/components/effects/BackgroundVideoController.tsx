@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useVideoPreload } from '@/hooks/useVideoPreload';
 import { toast } from 'sonner';
@@ -10,7 +9,7 @@ export const BackgroundVideoController = () => {
   const maxLoadAttempts = 3;
   const navigation = useNavigation();
   
-  // Précharger les vidéos avec la nouvelle logique améliorée
+  // Précharger les vidéos avec la logique refactorisée
   const { preloadStatus, isPreloading } = useVideoPreload({
     videoUrls: [
       '/lovable-uploads/Videofondnormale.mp4',
