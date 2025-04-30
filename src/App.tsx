@@ -19,7 +19,6 @@ import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
-import BackgroundVideo from "./components/effects/BackgroundVideo";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -49,9 +48,6 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Background video as a global element */}
-      <BackgroundVideo videoSrc="/lovable-uploads/ascensceur.mp4" />
-      
       <PageTransitionEffect />
       <PageTransition keyId={location.pathname}>
         <Routes location={location}>

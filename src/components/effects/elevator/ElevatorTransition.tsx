@@ -12,10 +12,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     exitContent, 
     enterContent, 
     contentEntranceDelay,
-    isTransitioning,
-    animationPhase,
-    loopCount,
-    maxLoops
+    isTransitioning
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
@@ -28,32 +25,25 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     return <>{children}</>;
   }
 
-  // Déterminer la classe de loop en fonction du nombre de loops actuel
-  const getLoopClass = () => {
-    const intensityLevel = Math.min(loopCount + 1, 5); // 5 niveaux maximum d'intensité
-    return direction === 'down' ? `loop-down-${intensityLevel}` : `loop-up-${intensityLevel}`;
-  };
-
   return (
     <div className="elevator-container" ref={containerRef}>
       {/* Conteneur Vidéo */}
       <div className="elevator-video-container">
         <video 
           ref={videoRef} 
-          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''}`}
+          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
           src="/lovable-uploads/ascensceur.mp4"
           muted
           playsInline
         />
       </div>
       
-      {/* Animation de sortie du contenu actuel avec effet repetile */}
+      {/* Animation de sortie du contenu actuel */}
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
-            animationPhase === 'loop' 
-              ? getLoopClass()
-              : (direction === 'down' ? 'slide-out-up' : 'slide-out-down')
+            direction === 'down' ? 'slide-out-up' : 
+            direction === 'up' ? 'slide-out-down' : ''
           }`}
         >
           {exitContent}
@@ -64,12 +54,11 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       {enterContent && (
         <div
           className={`elevator-content enter-content ${
-            animationPhase === 'loop' 
-              ? getLoopClass()
-              : (direction === 'down' ? 'slide-in-up' : 'slide-in-down')
+            direction === 'down' ? 'slide-in-up' : 
+            direction === 'up' ? 'slide-in-down' : ''
           }`}
           style={{
-            animationDelay: animationPhase === 'slide' ? `${contentEntranceDelay}ms` : '0ms'
+            animationDelay: `${contentEntranceDelay}ms`
           }}
         >
           {enterContent}

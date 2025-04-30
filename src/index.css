@@ -5,9 +5,6 @@
 /* Import component styles */
 @import './styles/components.css';
 
-/* Import elevator effect styles */
-@import './styles/elevator/index.css';
-
 /* Import flashlight effects */
 @import './styles/flashlight.css';
 

@@ -41,7 +41,13 @@ export default function PageTransition({
   }, [location.pathname]);
 
   const handleDisperseComplete = () => {
-    console.log('Dispersion terminée');
+    console.log('Dispersion terminée, application de l\'effet de fumée');
+    // OptimizedDisperseLogo a terminé la dispersion et attendu 500ms
+    // Nous pouvons maintenant appliquer l'effet de fumée à la page
+    if (contentRef.current) {
+      createSmokeEffect(contentRef.current);
+    }
+    
     // Réinitialiser l'état de chargement
     setIsLoading(false);
   };
@@ -50,13 +56,6 @@ export default function PageTransition({
     console.log('Transition d\'ascenseur terminée');
     setIsTransitioning(false);
     prevPathRef.current = location.pathname;
-    
-    // Applique l'effet de fumée après la transition d'ascenseur
-    if (contentRef.current) {
-      setTimeout(() => {
-        createSmokeEffect(contentRef.current);
-      }, 100);
-    }
   };
 
   return (
@@ -64,7 +63,7 @@ export default function PageTransition({
       {/* Logo avec dispersion et callback de fin */}
       <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
 
-      {/* Effet d'ascenseur avec animation de contenu progressive */}
+      {/* Effet d'ascenseur avec animation de contenu */}
       <ElevatorTransition 
         isActive={isTransitioning}
         onAnimationComplete={handleTransitionComplete}
