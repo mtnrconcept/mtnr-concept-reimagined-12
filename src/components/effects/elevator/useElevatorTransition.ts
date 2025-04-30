@@ -155,7 +155,7 @@ export function useElevatorTransition({
           cleanupTransition();
         }, SLIDE_ANIMATION_DURATION);
       }
-    }, LOOP_DURATION_BASE); // Première boucle à la durée de base
+    }, LOOP_DURATION_BASE - (currentLoopCount * LOOP_DURATION_DECREMENT)); // Durée adaptative pour chaque boucle
   };
   
   // Nettoyer la transition
