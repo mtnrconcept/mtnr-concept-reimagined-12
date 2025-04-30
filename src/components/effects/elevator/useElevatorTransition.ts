@@ -1,15 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn } from './ElevatorTypes';
+import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn, AnimationPhase } from './ElevatorTypes';
 
 // Définition de l'ordre des pages pour déterminer la direction
 const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
 // Configuration des timings (en millisecondes)
-const VIDEO_DURATION = 7000; // 7 secondes pour la vidéo complète
-const EXIT_ANIMATION_DURATION = 7000; // Durée de sortie en ms
-const ENTER_ANIMATION_DELAY = 0; // Démarrage immédiat de l'animation d'entrée
+const LOOP_ANIMATION_DURATION = 6000; // 6 secondes pour la boucle d'animation
+const SLIDE_ANIMATION_DURATION = 1000; // 1 seconde pour l'animation finale de slide
+const TOTAL_ANIMATION_DURATION = LOOP_ANIMATION_DURATION + SLIDE_ANIMATION_DURATION; // 7 secondes au total
+const CONTENT_ENTRANCE_DELAY = 0; // Démarrage immédiat de l'animation d'entrée
 
 export function useElevatorTransition({
   isActive,
@@ -25,15 +26,17 @@ export function useElevatorTransition({
   const [targetPath, setTargetPath] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [prevPath, setPrevPath] = useState(location.pathname);
+  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(null);
   
   // Determine content entrance delay
-  const contentEntranceDelay = ENTER_ANIMATION_DELAY;
+  const contentEntranceDelay = CONTENT_ENTRANCE_DELAY;
   
   // Effet pour détecter les changements de route
   useEffect(() => {
     // Si l'état isActive change de false à true, c'est une transition
     if (isActive && !isTransitioning) {
       setIsTransitioning(true);
+      setAnimationPhase('loop');
       
       // Déterminer la direction en fonction de l'ordre des pages
       const currentIndex = pageOrder.indexOf(prevPath);
@@ -60,6 +63,11 @@ export function useElevatorTransition({
       // Enregistrer le chemin cible pour plus tard
       setTargetPath(location.pathname);
       setPrevPath(location.pathname);
+
+      // Planifier le changement de phase d'animation après la durée de l'animation de boucle
+      setTimeout(() => {
+        setAnimationPhase('slide');
+      }, LOOP_ANIMATION_DURATION);
     }
     
     // Si isActive devient false, réinitialiser
@@ -69,6 +77,7 @@ export function useElevatorTransition({
       setEnterContent(null);
       setDirection(null);
       setTargetPath(null);
+      setAnimationPhase(null);
     }
   }, [isActive, location.pathname, currentPath, isTransitioning, prevPath]);
   
@@ -100,7 +109,7 @@ export function useElevatorTransition({
       });
     }
     
-    // Arrêter la vidéo et terminer l'animation après la durée fixée
+    // Arrêter la vidéo et terminer l'animation après la durée totale
     const timeoutId = setTimeout(() => {
       if (videoRef.current) {
         videoRef.current.pause();
@@ -109,7 +118,7 @@ export function useElevatorTransition({
       // Signaler que l'animation est terminée
       onAnimationComplete();
       setIsTransitioning(false);
-    }, VIDEO_DURATION);
+    }, TOTAL_ANIMATION_DURATION);
     
     return () => clearTimeout(timeoutId);
   }, [isTransitioning, direction, onAnimationComplete, videoRef]);
@@ -119,6 +128,7 @@ export function useElevatorTransition({
     exitContent,
     enterContent,
     contentEntranceDelay,
-    isTransitioning
+    isTransitioning,
+    animationPhase
   };
 }

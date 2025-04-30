@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 
 export type TransitionDirection = 'up' | 'down' | null;
+export type AnimationPhase = 'loop' | 'slide' | null;
 
 export interface ElevatorTransitionProps {
   children: ReactNode;
@@ -13,7 +14,7 @@ export interface UseElevatorTransitionProps {
   isActive: boolean;
   onAnimationComplete: () => void;
   videoRef: React.RefObject<HTMLVideoElement>;
-  currentPath: ReactNode;  // Modifié de string à ReactNode pour correspondre au type attendu
+  currentPath: ReactNode;
 }
 
 export interface UseElevatorTransitionReturn {
@@ -22,4 +23,5 @@ export interface UseElevatorTransitionReturn {
   enterContent: ReactNode | null;
   contentEntranceDelay: number;
   isTransitioning: boolean;
+  animationPhase: AnimationPhase;
 }

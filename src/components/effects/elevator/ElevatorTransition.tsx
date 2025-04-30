@@ -12,7 +12,8 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     exitContent, 
     enterContent, 
     contentEntranceDelay,
-    isTransitioning
+    isTransitioning,
+    animationPhase
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
@@ -31,7 +32,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       <div className="elevator-video-container">
         <video 
           ref={videoRef} 
-          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''} blur-motion`}
+          className={`elevator-video ${direction === 'up' ? 'video-reversed' : ''}`}
           src="/lovable-uploads/ascensceur.mp4"
           muted
           playsInline
@@ -42,8 +43,9 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
-            direction === 'down' ? 'slide-out-up' : 
-            direction === 'up' ? 'slide-out-down' : ''
+            animationPhase === 'loop' 
+              ? (direction === 'down' ? 'loop-up' : 'loop-down')
+              : (direction === 'down' ? 'slide-out-up' : 'slide-out-down')
           }`}
         >
           {exitContent}
@@ -54,11 +56,12 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       {enterContent && (
         <div
           className={`elevator-content enter-content ${
-            direction === 'down' ? 'slide-in-up' : 
-            direction === 'up' ? 'slide-in-down' : ''
+            animationPhase === 'loop' 
+              ? (direction === 'down' ? 'loop-up' : 'loop-down')
+              : (direction === 'down' ? 'slide-in-up' : 'slide-in-down')
           }`}
           style={{
-            animationDelay: `${contentEntranceDelay}ms`
+            animationDelay: animationPhase === 'slide' ? `${contentEntranceDelay}ms` : '0ms'
           }}
         >
           {enterContent}

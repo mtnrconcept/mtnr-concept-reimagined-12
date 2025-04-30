@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform, opacity;
+  will-change: transform, opacity, filter;
 }
 
 .exit-content {
@@ -47,20 +47,32 @@
   transform: scaleY(-1);
 }
 
-/* Animation du flou de mouvement */
-@keyframes blurMotion {
-  0% { filter: blur(0px); }
-  20% { filter: blur(8px); }
-  50% { filter: blur(12px); }
-  80% { filter: blur(8px); }
-  100% { filter: blur(0px); }
+/* Animation de la boucle de flou de mouvement */
+@keyframes blurLoopUp {
+  0%   { transform: translateY(0);    filter: blur(0px); }
+  25%  { filter: blur(5px); }
+  50%  { transform: translateY(-100%); filter: blur(10px); }
+  75%  { filter: blur(5px); }
+  100% { transform: translateY(0);     filter: blur(0px); }
 }
 
-.blur-motion {
-  animation: blurMotion 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes blurLoopDown {
+  0%   { transform: translateY(0);     filter: blur(0px); }
+  25%  { filter: blur(5px); }
+  50%  { transform: translateY(100%);   filter: blur(10px); }
+  75%  { filter: blur(5px); }
+  100% { transform: translateY(0);      filter: blur(0px); }
 }
 
-/* Animations pour les transitions verticales */
+.loop-up {
+  animation: blurLoopUp 6s ease-in-out infinite;
+}
+
+.loop-down {
+  animation: blurLoopDown 6s ease-in-out infinite;
+}
+
+/* Animations pour les transitions verticales finales */
 @keyframes slideOutUp {
   0% { transform: translateY(0); opacity: 1; }
   100% { transform: translateY(-100vh); opacity: 0; }
@@ -82,19 +94,19 @@
 }
 
 .slide-out-up {
-  animation: slideOutUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideOutUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-out-down {
-  animation: slideOutDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideOutDown 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-in-up {
-  animation: slideInUp 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideInUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .slide-in-down {
-  animation: slideInDown 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: slideInDown 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Styles pour la vidéo de fond en pause */
