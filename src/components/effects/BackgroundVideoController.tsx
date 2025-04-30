@@ -57,7 +57,6 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
       console.log('Lecture vidéo démarrée');
       videoElement.currentTime = 0;
       
-      // Promesse pour gérer le démarrage de la lecture
       const playPromise = videoElement.play();
       if (playPromise !== undefined) {
         playPromise
@@ -84,10 +83,10 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
   }, [isPlaying, isLoaded]);
   
   return (
-    <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
+    <div className="fixed inset-0 w-full h-full z-10 overflow-hidden pointer-events-none">
       <video
         ref={videoRef}
-        className="w-full h-full object-cover"
+        className="background-video"
         src={videoSrc}
         muted
         playsInline
