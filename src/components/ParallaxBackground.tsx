@@ -1,6 +1,7 @@
 
 import { ParallaxContainer } from './parallax/ParallaxContainer';
 import BackgroundVideo from './effects/BackgroundVideo';
+import Parallax3DScene from './Parallax3DScene';
 
 interface ParallaxBackgroundProps {
   children?: React.ReactNode;
@@ -12,7 +13,10 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       {/* BackgroundVideo en fond */}
       <BackgroundVideo />
       
-      {/* Container pour les éléments parallax */}
+      {/* Nouvelle scène 3D avec effets de parallaxe améliorés */}
+      <Parallax3DScene />
+      
+      {/* Container pour les éléments à afficher au premier plan */}
       <ParallaxContainer>
         {children}
       </ParallaxContainer>
