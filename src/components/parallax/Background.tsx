@@ -1,6 +1,6 @@
 
 import React from 'react';
-import BackgroundVideoController from '../effects/BackgroundVideoController';
+import BackgroundVideoManager from '../effects/BackgroundVideoManager';
 import Parallax3DEffect from './Parallax3DEffect';
 
 interface BackgroundProps {
@@ -11,7 +11,10 @@ export const Background = ({ depth = 0.08 }: BackgroundProps) => {
   return (
     <>
       {/* Video background with controller */}
-      <BackgroundVideoController videoSrc="/lovable-uploads/ascensceur.mp4" />
+      <BackgroundVideoManager 
+        normalVideoSrc="/lovable-uploads/Video fond normale.mp4"
+        uvVideoSrc="/lovable-uploads/Video fond UV.mp4"
+      />
       
       {/* Enhanced 3D Parallax Effect */}
       <Parallax3DEffect depth={depth}>
