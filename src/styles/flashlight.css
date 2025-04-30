@@ -1,69 +1,57 @@
 
-@layer components {
-  /** Flashlight overlay */
-  .flashlight {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 80%);
-    pointer-events: none;
-    z-index: 50;
-  }
+.torch-effect {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  transition: background-color 0.3s ease;
+}
 
-  .flashlight-3d {
-    position: fixed;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, rgba(0,0,0,0.95) 60%);
-    pointer-events: none;
-    z-index: 50;
-    transform: translate(var(--cursor-x), var(--cursor-y));
-  }
+.torch-effect.normal {
+  background-color: rgba(0, 0, 0, 0.75);
+}
 
-  /** Neon cursor effect */
-  .neon-cursor {
-    position: fixed;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(255,255,0,0.3);
-    box-shadow: 0 0 10px rgba(255,255,0,0.8);
-    pointer-events: none;
-    z-index: 1000;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease-out;
-  }
-  
-  /* UV light circle - effet adouci comme demandé */
-  .uv-light-circle {
-    position: fixed;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 50;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(
-      circle,
-      rgba(70, 28, 252, 0.05) 0%,
-      rgba(15, 4, 48, 0.1) 20%,
-      rgba(10, 0, 60, 0.3) 40%,
-      rgba(0, 0, 0, 0.9) 80%
-    );
-    box-shadow: 0 0 300px 150px rgba(0, 120, 255, 0.1);
-    filter: blur(20px);
-  }
-  
-  /* Effet de vibration pour le mode UV */
-  @keyframes uv-vibration {
-    0% { transform: translate(-50%, -50%) scale(1); }
-    25% { transform: translate(-50.5%, -49.5%) scale(1.01); }
-    50% { transform: translate(-49.5%, -50.5%) scale(0.99); }
-    75% { transform: translate(-50.2%, -49.8%) scale(1.005); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-  }
-  
-  .uv-light-circle.active {
-    animation: uv-vibration 4s infinite;
-  }
+.torch-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: all 0.1s ease-out;
+}
+
+.torch-buttons {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 51;
+}
+
+.torch-button {
+  padding: 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.torch-button-normal {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffdd00;
+}
+
+.torch-button-normal.active {
+  background-color: #ffdd00;
+  color: black;
+}
+
+.torch-button-uv {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #7E69AB;
+}
+
+.torch-button-uv.active {
+  background-color: #7E69AB;
+  color: white;
 }
