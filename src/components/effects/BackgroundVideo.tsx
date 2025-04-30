@@ -19,8 +19,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const location = useLocation();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const transitionTimerRef = useRef<number | null>(null);
   
-  // Inversion des vidéos: Composition 1.mp4 pour le mode UV actif
+  // Composition 1.mp4 pour le mode UV actif
   const currentVideoUrl = uvMode ? videoUrl : videoUrlUV;
   
   // Gestion du changement de vidéo lorsque le mode UV change
@@ -35,11 +36,35 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${currentVideoUrl}`);
   }, [uvMode, currentVideoUrl]);
-  
-  // Gestion de la lecture/pause de la vidéo
+
+  // Force pause après la lecture de la vidéo complète
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
+    
+    const handleEnded = () => {
+      console.log('Vidéo terminée, mise en pause');
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      setIsTransitioning(false);
+    };
+    
+    videoElement.addEventListener('ended', handleEnded);
+    return () => {
+      videoElement.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+  
+  // Gestion de la lecture/pause de la vidéo lors des transitions de page
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    // Nettoyer le timer précédent si existant
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
     
     if (isFirstLoad) {
       // À la première charge, mettre la vidéo en pause
@@ -52,20 +77,19 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       const playVideo = async () => {
         try {
           setIsTransitioning(true);
-          videoElement.playbackRate = 1.0; // Vitesse réelle
+          videoElement.currentTime = 0; // Assurer que la vidéo commence du début
+          videoElement.playbackRate = 1.0;
           await videoElement.play();
           console.log('Vidéo lancée au changement de route');
           
-          // Arrêter la vidéo après la durée de transition (3s fade out + 2s pause + 3s fade in = 8s)
-          const transitionTimer = setTimeout(() => {
+          // Arrêter la vidéo après la durée de transition (8s)
+          transitionTimerRef.current = window.setTimeout(() => {
             if (videoElement) {
+              console.log('Timer expiré, mise en pause de la vidéo');
               videoElement.pause();
               setIsTransitioning(false);
-              console.log('Vidéo mise en pause après la transition');
             }
           }, 8000);
-          
-          return () => clearTimeout(transitionTimer);
         } catch (error) {
           console.error('Erreur lors de la lecture de la vidéo:', error);
           setIsTransitioning(false);
@@ -79,9 +103,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const handleVisibilityChange = () => {
       if (document.hidden && videoElement) {
         videoElement.pause();
+        console.log('Page non visible, vidéo en pause');
       } else if (videoElement && !isFirstLoad && isTransitioning) {
-        // Ne relancer la lecture que si on est en transition
-        videoElement.play();
+        videoElement.play().catch(err => {
+          console.error('Erreur lors de la reprise de lecture:', err);
+        });
+        console.log('Page à nouveau visible pendant transition, reprise de la lecture');
       }
     };
     
@@ -89,6 +116,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+        transitionTimerRef.current = null;
+      }
       if (videoElement) videoElement.pause();
     };
   }, [location.pathname, isFirstLoad, isTransitioning]);
@@ -102,7 +133,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         poster={fallbackImage}
         playsInline
         muted
-        // Suppression intentionnelle de l'attribut "loop" pour empêcher la lecture en boucle
+        preload="auto"
       >
         <source src={currentVideoUrl} type="video/mp4" />
       </video>
