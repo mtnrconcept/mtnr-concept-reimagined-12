@@ -1,55 +1,55 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useUVMode } from '@/components/effects/UVModeContext';
-import { useTorch }  from '@/components/effects/TorchContext';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface UseBackgroundVideoProps {
-  videoUrl:   string;
+  videoUrl: string;
   videoUrlUV: string;
+  uvMode?: boolean;
+  isTorchActive?: boolean;
 }
 
-export const useBackgroundVideo = ({
-  videoUrl,
-  videoUrlUV
-}: UseBackgroundVideoProps) => {
+export const useBackgroundVideo = (props: UseBackgroundVideoProps) => {
+  const { videoUrl, videoUrlUV, uvMode = false, isTorchActive = false } = props;
+  
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { uvMode }       = useUVMode();
-  const { isTorchActive } = useTorch();
-
   const [currentVideo, setCurrentVideo] = useState(videoUrl);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // 1) Swap source une seule fois à chaque changement de uvMode
+  
+  // Mettre à jour la source vidéo en fonction du mode UV
   useEffect(() => {
-    const src = uvMode ? videoUrlUV : videoUrl;
-    if (videoRef.current && src !== currentVideo) {
-      videoRef.current.src = src;
-      setCurrentVideo(src);
-      // pas de load() pour éviter le blackout
+    if (isTorchActive && uvMode) {
+      setCurrentVideo(videoUrlUV);
+    } else {
+      setCurrentVideo(videoUrl);
     }
-  }, [uvMode, videoUrl, videoUrlUV, currentVideo]);
+  }, [isTorchActive, uvMode, videoUrl, videoUrlUV]);
 
-  // 2) Lance la vidéo 7s et la remet à 0
-  const playVideoTransition = useCallback(() => {
-    const v = videoRef.current;
-    if (!v || isTransitioning) return;
+  // Fonction pour jouer la transition vidéo
+  const playVideoTransition = useCallback(async () => {
+    if (isTransitioning) return;
+    
     setIsTransitioning(true);
-
-    v.currentTime  = 0;
-    v.playbackRate = 1;
-    v.play().catch(()=>{}); // mute autoplay fallback géré ailleurs
-
-    // Stoppe après 7s
-    setTimeout(() => {
-      v.pause();
-      v.currentTime = 0;
+    
+    try {
+      if (videoRef.current) {
+        // Réinitialiser la vidéo et démarrer la lecture
+        videoRef.current.currentTime = 0;
+        await videoRef.current.play();
+        
+        // Utiliser l'événement de fin de vidéo pour réinitialiser l'état
+        videoRef.current.onended = () => {
+          setIsTransitioning(false);
+        };
+      }
+    } catch (err) {
+      console.error('Erreur lors de la lecture de la vidéo:', err);
       setIsTransitioning(false);
-    }, 7000);
+    }
   }, [isTransitioning]);
 
-  // 3) Si la torche s'active, on lance auto
-  useEffect(() => {
-    if (isTorchActive) playVideoTransition();
-  }, [isTorchActive, playVideoTransition]);
-
-  return { videoRef, currentVideo, isTransitioning, playVideoTransition };
+  return { 
+    videoRef, 
+    currentVideo, 
+    isTransitioning, 
+    playVideoTransition
+  };
 };

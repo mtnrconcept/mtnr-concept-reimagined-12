@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 import ElevatorTransition from '@/components/effects/ElevatorTransition';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
+import { NavigationProvider } from '@/components/effects/NavigationContext';
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
@@ -46,10 +47,12 @@ const AnimatedRoutes: React.FC = () => {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/*" element={<AnimatedRoutes />}/>
-      </Routes>
-    </BrowserRouter>
+    <NavigationProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/*" element={<AnimatedRoutes />}/>
+        </Routes>
+      </BrowserRouter>
+    </NavigationProvider>
   );
 }
