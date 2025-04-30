@@ -20,7 +20,10 @@ const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ children }) => 
       className="relative min-h-screen w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      style={{ perspective: "1000px" }}
+      style={{ 
+        perspective: "1000px",
+        backgroundColor: "#000"
+      }}
     >
       {children}
     </motion.div>

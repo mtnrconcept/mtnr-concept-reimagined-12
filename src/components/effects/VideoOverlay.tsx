@@ -10,8 +10,11 @@ export const VideoOverlay: React.FC<VideoOverlayProps> = ({ className = '' }) =>
     <>
       {/* Grille subtile avec une très faible opacité */}
       <div 
-        className={`absolute inset-0 opacity-5 ${className}`}
+        className={`${className}`}
         style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.05,
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.12) 1px, transparent 1px)',
           backgroundSize: '35px 35px', 
           mixBlendMode: 'overlay',

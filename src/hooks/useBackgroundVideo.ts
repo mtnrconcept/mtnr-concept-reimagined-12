@@ -27,7 +27,8 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
   // S'assurer que les URL des vidéos sont correctes
   useEffect(() => {
     console.log('URL de la vidéo courante:', currentVideo);
-    // Vérifier si les fichiers de vidéo existent
+    
+    // Vérifier si le fichier vidéo existe
     fetch(currentVideo)
       .then(response => {
         if (!response.ok) {
@@ -63,58 +64,34 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     try {
       setIsTransitioning(true);
       
-      // Important: Pré-configurer la source manuellement
-      if (!videoElement.src.includes(currentVideo)) {
-        console.log("Mise à jour de la source vidéo:", currentVideo);
+      // Important: S'assurer que la vidéo est correctement configurée avant la lecture
+      videoElement.src = currentVideo;
+      videoElement.load();
+      
+      // Attendre que la vidéo soit chargée
+      await new Promise<void>((resolve, reject) => {
+        const onCanPlay = () => {
+          videoElement.removeEventListener('canplay', onCanPlay);
+          videoElement.removeEventListener('error', onError);
+          resolve();
+        };
         
-        // Méthode alternative pour charger la vidéo
-        const sources = videoElement.getElementsByTagName('source');
-        if (sources.length > 0) {
-          for (let i = 0; i < sources.length; i++) {
-            sources[i].src = currentVideo;
-          }
-        } else {
-          // Si pas de sources, créer des éléments source
-          const mp4Source = document.createElement('source');
-          mp4Source.src = currentVideo;
-          mp4Source.type = 'video/mp4';
-          videoElement.appendChild(mp4Source);
-          
-          const webmSource = document.createElement('source');
-          webmSource.src = currentVideo;
-          webmSource.type = 'video/webm';
-          videoElement.appendChild(webmSource);
-        }
+        const onError = () => {
+          videoElement.removeEventListener('canplay', onCanPlay);
+          videoElement.removeEventListener('error', onError);
+          reject(new Error('Erreur de chargement de la vidéo'));
+        };
         
-        // Recharger pour appliquer les nouvelles sources
-        videoElement.load();
+        videoElement.addEventListener('canplay', onCanPlay, { once: true });
+        videoElement.addEventListener('error', onError, { once: true });
         
-        // Attendre que la vidéo soit chargée
-        await new Promise((resolve) => {
-          const loadHandler = () => {
-            console.log("Vidéo chargée avec succès");
-            resolve(true);
-            videoElement.removeEventListener('loadeddata', loadHandler);
-          };
-          
-          const errorHandler = (error: ErrorEvent) => {
-            console.error("Erreur de chargement vidéo:", error);
-            resolve(false);
-            videoElement.removeEventListener('error', errorHandler);
-          };
-          
-          videoElement.addEventListener('loadeddata', loadHandler, { once: true });
-          videoElement.addEventListener('error', errorHandler, { once: true });
-          
-          // Timeout en cas de problème de chargement
-          setTimeout(() => {
-            console.warn("Délai de chargement vidéo dépassé");
-            resolve(false);
-            videoElement.removeEventListener('loadeddata', loadHandler);
-            videoElement.removeEventListener('error', errorHandler);
-          }, 5000);
-        });
-      }
+        // En cas de problème, une timeout
+        setTimeout(() => {
+          videoElement.removeEventListener('canplay', onCanPlay);
+          videoElement.removeEventListener('error', onError);
+          reject(new Error('Délai de chargement dépassé'));
+        }, 5000);
+      });
       
       // Remettre la vidéo au début
       videoElement.currentTime = 0;
@@ -138,12 +115,10 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
       } catch (error) {
         console.error("Erreur de lecture vidéo:", error);
         setIsTransitioning(false);
-        setVideoError(true);
       }
     } catch (error) {
       console.error("Erreur générale lors de la transition vidéo:", error);
       setIsTransitioning(false);
-      setVideoError(true);
     }
   }, [currentVideo, videoError]);
 

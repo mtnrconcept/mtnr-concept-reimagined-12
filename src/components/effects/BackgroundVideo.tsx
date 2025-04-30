@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useBackgroundVideo } from '@/hooks/useBackgroundVideo';
 import { useVideoTransitionEffects } from '@/hooks/useVideoTransitionEffects';
 import { VideoOverlay } from './VideoOverlay';
@@ -15,6 +15,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/Video fond UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
+  const [directSrc, setDirectSrc] = useState<string>(videoUrl);
+  
   // Utiliser notre hook personnalisé pour gérer la vidéo
   const {
     videoRef,
@@ -44,18 +46,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTorchActive
   });
 
+  // Vérifier si les vidéos sont accessibles
   useEffect(() => {
-    // Ajouter des logs détaillés pour déboguer
-    console.log('BackgroundVideo montage avec videoUrl:', videoUrl);
-    console.log('Video actuelle:', currentVideo);
-    console.log('Élément vidéo existe:', !!videoRef.current);
-    
-    // Vérifier si les fichiers vidéo existent
     const checkVideoFile = async (url: string) => {
       try {
         const response = await fetch(url, { method: 'HEAD' });
         console.log(`Vidéo ${url} accessible:`, response.ok, "status:", response.status);
-        if (!response.ok) {
+        if (response.ok) {
+          setDirectSrc(url);
+        } else {
           console.error(`La vidéo ${url} n'est pas accessible. Status: ${response.status}`);
         }
       } catch (error) {
@@ -63,8 +62,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       }
     };
     
-    checkVideoFile(videoUrl);
-    checkVideoFile(videoUrlUV);
+    // Vérifier et définir la source directe
+    checkVideoFile(currentVideo);
     
     // S'assurer que le corps du document a un fond noir
     document.body.style.backgroundColor = '#000';
@@ -72,33 +71,37 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     return () => {
       document.body.style.backgroundColor = '';
     };
-  }, [videoUrl, videoUrlUV, currentVideo, videoRef]);
+  }, [currentVideo]);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
+    <div className="relative w-full h-full overflow-hidden" style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
       {/* Fallback image pour les cas où la vidéo ne fonctionne pas */}
       <img 
         src={fallbackImage} 
         alt="Studio background fallback" 
-        className="absolute inset-0 min-w-full min-h-full object-cover opacity-30"
-        style={{ display: videoError ? 'block' : 'none' }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          minWidth: '100%',
+          minHeight: '100%',
+          objectFit: 'cover',
+          opacity: 0.3,
+          display: videoError ? 'block' : 'none'
+        }}
       />
       
-      {/* Vidéo avec source dynamique */}
+      {/* Vidéo avec source directement définie */}
       <video
         ref={videoRef}
-        className="absolute inset-0 min-w-full min-h-full object-cover"
+        className="background-video"
         playsInline
         muted
         preload="auto"
         style={{ 
           display: videoError ? 'none' : 'block',
-          objectFit: 'cover',
-          objectPosition: 'center center'
         }}
       >
-        <source src={currentVideo} type="video/mp4" />
-        <source src={currentVideo} type="video/webm" />
+        <source src={directSrc} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       
