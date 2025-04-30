@@ -3,29 +3,48 @@
 .parallax-container {
   will-change: transform;
   overflow: hidden;
+  perspective: 1400px;
 }
 
 .parallax-grid-layer {
   will-change: transform;
   backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .parallax-content-layer {
   will-change: transform;
   backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .parallax-middle-layer {
   will-change: transform;
   backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 /* Add grid patterns for depth perception */
 .parallax-grid-pattern {
-  background-size: 20px 20px;
+  background-size: 35px 35px;
   background-image: 
-    linear-gradient(to right, rgba(255,221,0,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,221,0,0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 221, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 221, 0, 0.05) 1px, transparent 1px);
+  transform: translateZ(-50px);
 }
 
-/* Add these styles to your existing index.css import section */
+/* Radial gradient background */
+.bg-gradient-radial {
+  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%);
+}
+
+/* Animation léger de surbrillance lente */
+@keyframes pulse-yellow {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.2; }
+}
+
+.animate-pulse-yellow {
+  animation: pulse-yellow 4s infinite ease-in-out;
+}

@@ -1,9 +1,11 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { create } from 'zustand';
 
 interface BackgroundVideoStore {
   isPlaying: boolean;
-  startVideo: () => void;
+  playDirection: 'forward' | 'reverse';
+  startVideo: (direction: 'forward' | 'reverse') => void;
   pauseVideo: () => void;
   resetVideo: () => void;
 }
@@ -11,9 +13,10 @@ interface BackgroundVideoStore {
 // Création d'un store Zustand pour gérer l'état de la vidéo de manière globale
 export const useBackgroundVideoStore = create<BackgroundVideoStore>((set) => ({
   isPlaying: false,
-  startVideo: () => set({ isPlaying: true }),
+  playDirection: 'forward',
+  startVideo: (direction) => set({ isPlaying: true, playDirection: direction }),
   pauseVideo: () => set({ isPlaying: false }),
-  resetVideo: () => set({ isPlaying: false }),
+  resetVideo: () => set({ isPlaying: false, playDirection: 'forward' }),
 }));
 
 interface BackgroundVideoControllerProps {
@@ -23,7 +26,7 @@ interface BackgroundVideoControllerProps {
 const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ videoSrc }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const { isPlaying } = useBackgroundVideoStore();
+  const { isPlaying, playDirection } = useBackgroundVideoStore();
   
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -49,8 +52,17 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
     if (!videoElement) return;
     
     if (isPlaying) {
-      console.log("Démarrage de la vidéo de fond");
-      videoElement.currentTime = 0;
+      if (playDirection === 'forward') {
+        console.log("Démarrage de la vidéo en avant");
+        videoElement.currentTime = 0;
+        videoElement.playbackRate = 1;
+      } else {
+        console.log("Démarrage de la vidéo en arrière");
+        // Positionner près de la fin pour lecture inversée
+        videoElement.currentTime = videoElement.duration || 7;
+        videoElement.playbackRate = -1;
+      }
+      
       videoElement.play().catch(err => {
         console.error("Erreur de lecture vidéo:", err);
       });
@@ -67,7 +79,7 @@ const BackgroundVideoController: React.FC<BackgroundVideoControllerProps> = ({ v
       console.log("Mise en pause de la vidéo de fond");
       videoElement.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, playDirection]);
   
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">

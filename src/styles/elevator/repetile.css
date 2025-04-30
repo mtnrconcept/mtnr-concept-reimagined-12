@@ -1,26 +1,28 @@
 
 /**
- * Animations repetile - Effet de boucle infinie
+ * Animations repetile - Effet de boucle infinie avec téléportation
  */
 
 /* Durée de l'animation repetile - 1.5s par cycle */
 @keyframes repetile-up {
-  from { transform: translateY(0);     filter: blur(0px); }
+  from { transform: translateY(0);     filter: blur(0); }
   to   { transform: translateY(-100%); filter: blur(10px); }
 }
 
 @keyframes repetile-down {
-  from { transform: translateY(0);     filter: blur(0px); }
+  from { transform: translateY(0);     filter: blur(0); }
   to   { transform: translateY(100%);  filter: blur(10px); }
 }
 
 /* Classes pour appliquer les animations */
 .repetile-up {
-  animation: repetile-up 1.5s ease-in-out infinite;
+  animation: repetile-up 1.5s ease-in;
+  animation-iteration-count: 4; /* 6 secondes au total */
 }
 
 .repetile-down {
-  animation: repetile-down 1.5s ease-in-out infinite;
+  animation: repetile-down 1.5s ease-in;
+  animation-iteration-count: 4; /* 6 secondes au total */
 }
 
 /* Animations pour les transitions finales */

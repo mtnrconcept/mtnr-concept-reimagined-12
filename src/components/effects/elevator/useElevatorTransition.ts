@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TransitionDirection, UseElevatorTransitionProps, UseElevatorTransitionReturn } from './ElevatorTypes';
@@ -8,7 +9,8 @@ const pageOrder = ['/', '/what-we-do', '/artists', '/book', '/contact'];
 
 // Configuration des timings
 const REPETILE_DURATION = 1500; // 1.5s par cycle repetile
-const MAX_LOOPS = 5; // Nombre de boucles avant le slide final
+const MAX_LOOPS = 4; // Nombre de boucles avant le slide final (comme dans l'exemple)
+const REPETILE_TOTAL_DURATION = REPETILE_DURATION * MAX_LOOPS; // 6s en tout
 const FINAL_SLIDE_DURATION = 1000; // 1s pour le slide final
 
 export function useElevatorTransition({
@@ -23,9 +25,11 @@ export function useElevatorTransition({
   const [targetPath, setTargetPath] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [repetileActive, setRepetileActive] = useState<boolean>(false);
+  const [finalSlideActive, setFinalSlideActive] = useState<boolean>(false);
   const [loopCount, setLoopCount] = useState<number>(0);
   const [prevPath, setPrevPath] = useState(location.pathname);
   const loopTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const finalSlideTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Accès au store vidéo
   const { startVideo, pauseVideo } = useBackgroundVideoStore();
@@ -46,14 +50,15 @@ export function useElevatorTransition({
       
       console.log(`Transition de: ${prevPath} (${currentIndex}) vers ${location.pathname} (${newIndex})`);
       
+      let transitionDirection: TransitionDirection = 'down';
+      
       if (newIndex > currentIndex) {
-        setDirection('down');
+        transitionDirection = 'down';
       } else if (newIndex < currentIndex) {
-        setDirection('up');
-      } else {
-        // Même page, pas de direction spécifique
-        setDirection('down'); // Direction par défaut
+        transitionDirection = 'up';
       }
+      
+      setDirection(transitionDirection);
       
       // Conserver le contenu actuel comme contenu de sortie
       setExitContent(currentPath);
@@ -68,10 +73,26 @@ export function useElevatorTransition({
       
       // Activer l'effet repetile
       setRepetileActive(true);
+      setFinalSlideActive(false);
       setLoopCount(0);
       
-      // Démarrer la vidéo en arrière-plan
-      startVideo();
+      // Démarrer la vidéo en arrière-plan dans la bonne direction
+      startVideo(transitionDirection === 'down' ? 'forward' : 'reverse');
+      
+      // Planifier la transition finale après les boucles repetile
+      finalSlideTimerRef.current = setTimeout(() => {
+        console.log("Fin des répétitions repetile après 6s, passage à la transition finale");
+        setRepetileActive(false);
+        setFinalSlideActive(true);
+        
+        // Après la durée du slide final, on considère que la transition est terminée
+        setTimeout(() => {
+          onAnimationComplete();
+          setIsTransitioning(false);
+          setFinalSlideActive(false);
+          pauseVideo(); // Mettre la vidéo en pause à la fin
+        }, FINAL_SLIDE_DURATION);
+      }, REPETILE_TOTAL_DURATION);
     }
     
     // Si isActive devient false, réinitialiser
@@ -82,17 +103,23 @@ export function useElevatorTransition({
       setDirection(null);
       setTargetPath(null);
       setRepetileActive(false);
+      setFinalSlideActive(false);
       setLoopCount(0);
       
-      // Nettoyer le timer si nécessaire
+      // Nettoyer les timers si nécessaire
       if (loopTimerRef.current) {
         clearTimeout(loopTimerRef.current);
         loopTimerRef.current = null;
       }
+      
+      if (finalSlideTimerRef.current) {
+        clearTimeout(finalSlideTimerRef.current);
+        finalSlideTimerRef.current = null;
+      }
     }
   }, [isActive, location.pathname, currentPath, isTransitioning, prevPath, startVideo]);
   
-  // Gestion des boucles repetile
+  // Simulation de comptage des boucles repetile pour le debugging
   useEffect(() => {
     if (!repetileActive) return;
     
@@ -100,21 +127,7 @@ export function useElevatorTransition({
     loopTimerRef.current = setTimeout(() => {
       setLoopCount(prev => {
         const nextCount = prev + 1;
-        console.log(`Répétition ${nextCount}/${MAX_LOOPS}`);
-        
-        // Si on atteint le nombre maximum de boucles, on arrête l'effet repetile
-        if (nextCount >= MAX_LOOPS) {
-          console.log("Fin des répétitions, passage à la transition finale");
-          setRepetileActive(false);
-          
-          // Après la durée du slide final, on considère que la transition est terminée
-          setTimeout(() => {
-            onAnimationComplete();
-            setIsTransitioning(false);
-            pauseVideo(); // Mettre la vidéo en pause à la fin
-          }, FINAL_SLIDE_DURATION);
-        }
-        
+        console.log(`Répétition repetile ${nextCount}/${MAX_LOOPS}`);
         return nextCount;
       });
     }, REPETILE_DURATION);
@@ -125,7 +138,15 @@ export function useElevatorTransition({
         loopTimerRef.current = null;
       }
     };
-  }, [repetileActive, onAnimationComplete, pauseVideo]);
+  }, [repetileActive, loopCount]);
+  
+  // Nettoyage des timers lors du démontage
+  useEffect(() => {
+    return () => {
+      if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
+      if (finalSlideTimerRef.current) clearTimeout(finalSlideTimerRef.current);
+    };
+  }, []);
 
   return {
     direction,
@@ -135,6 +156,7 @@ export function useElevatorTransition({
     isTransitioning,
     repetileActive,
     loopCount,
-    maxLoops
+    maxLoops,
+    finalSlideActive
   };
 }

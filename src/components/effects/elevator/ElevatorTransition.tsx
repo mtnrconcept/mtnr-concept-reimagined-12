@@ -11,6 +11,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     contentEntranceDelay,
     isTransitioning,
     repetileActive,
+    finalSlideActive,
     loopCount,
     maxLoops
   } = useElevatorTransition({
@@ -19,35 +20,33 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     currentPath: children
   });
   
-  // If transition not active, simply display content
+  // Si transition non active, simplement afficher le contenu
   if (!isTransitioning) {
     return <>{children}</>;
   }
 
   return (
     <div className="elevator-container">
-      {/* Exit content animation with repetile effect */}
+      {/* Contenu en sortie avec animation repetile ou slide-out */}
       {exitContent && (
         <div
           className={`elevator-content exit-content ${
             repetileActive 
               ? direction === 'down' ? 'repetile-up' : 'repetile-down'
-              : direction === 'down' ? 'slide-out-up' : 'slide-out-down'
+              : finalSlideActive
+                ? direction === 'down' ? 'slide-out-up' : 'slide-out-down'
+                : ''
           }`}
-          style={{
-            // Apply different style for the last animation
-            animationIterationCount: repetileActive ? maxLoops : 1
-          }}
         >
           {exitContent}
         </div>
       )}
       
-      {/* Enter content animation (only after repetile ends) */}
-      {enterContent && !repetileActive && loopCount >= maxLoops && (
+      {/* Contenu en entrée avec animation slide-in (seulement après repetile) */}
+      {enterContent && finalSlideActive && (
         <div
           className={`elevator-content enter-content ${
-            direction === 'down' ? 'slide-in-up' : 'slide-in-down'
+            direction === 'down' ? 'slide-in-down' : 'slide-in-up'
           }`}
           style={{
             animationDelay: `${contentEntranceDelay}ms`

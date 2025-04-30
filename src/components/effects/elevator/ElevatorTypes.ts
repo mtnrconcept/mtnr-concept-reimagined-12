@@ -24,4 +24,5 @@ export interface UseElevatorTransitionReturn {
   repetileActive: boolean;
   loopCount: number;
   maxLoops: number;
+  finalSlideActive: boolean;
 }
