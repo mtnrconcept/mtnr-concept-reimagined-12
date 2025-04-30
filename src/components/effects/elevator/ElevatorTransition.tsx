@@ -1,15 +1,14 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { ElevatorTransitionProps } from './ElevatorTypes';
 import { useElevatorTransition } from './useElevatorTransition';
+import { useVideoStore } from '../BackgroundVideoManager';
 
 const ElevatorTransition = ({ children, isActive, onAnimationComplete }: ElevatorTransitionProps) => {
   const { 
-    direction, 
     exitContent, 
     enterContent,
-    isTransitioning,
-    contentEntranceDelay
+    isTransitioning
   } = useElevatorTransition({
     isActive,
     onAnimationComplete,
@@ -20,6 +19,9 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const contentRef = useRef<HTMLDivElement>(null);
   const exitContentRef = useRef<HTMLDivElement>(null);
   const enterContentRef = useRef<HTMLDivElement>(null);
+  
+  // Get video control from store
+  const setPlaying = useVideoStore((state) => state.setPlaying);
   
   // Effet pour gérer l'animation simple de fondu
   useEffect(() => {
@@ -38,6 +40,9 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     
     enterEl.style.visibility = 'visible';
     enterEl.style.opacity = '0';
+    
+    // Start video playback
+    setPlaying(true);
     
     // Animation de fondu - 2000ms au total
     console.log("Démarrage de l'animation de fondu (2000ms)");
@@ -78,13 +83,13 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       };
     }, 1000);
     
-    // Fonction de nettoyage
+    // Cleanup function
     return () => {
       exitEl.style.visibility = 'hidden';
       enterEl.style.visibility = 'hidden';
       contentEl.style.visibility = 'visible';
     };
-  }, [isTransitioning, direction, exitContent, enterContent, onAnimationComplete]);
+  }, [isTransitioning, exitContent, enterContent, onAnimationComplete, setPlaying]);
   
   // Si transition inactive, afficher simplement le contenu
   if (!isTransitioning) {
