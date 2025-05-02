@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +14,7 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
-import PageTransition from "./components/PageTransition";
+import PageTransition from "@/components/PageTransition";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 import { BackgroundVideo } from "./components/effects/BackgroundVideo";
 import { useVideoPreloader } from "./hooks/useVideoPreloader";
@@ -68,8 +67,8 @@ function AnimatedRoutes() {
     <>
       {/* Une seule instance de BackgroundVideo au niveau global */}
       <BackgroundVideo 
-        videoUrl="/lovable-uploads/Video fond normale.mp4"
-        videoUrlUV="/lovable-uploads/Video fond UV.mp4"
+        videoUrl="/lovable-uploads/Videofondnormale.mp4"
+        videoUrlUV="/lovable-uploads/VideofondUV.mp4"
       />
       
       <PageTransition keyId={location.pathname}>
