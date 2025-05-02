@@ -20,8 +20,8 @@ import { Toaster } from './components/ui/toaster';
 function App() {
   return (
     <Router>
-      <TorchProvider>
-        <UVModeProvider>
+      <UVModeProvider>
+        <TorchProvider>
           {/* Background video manager - handles all video playback */}
           <BackgroundVideoManager />
           
@@ -56,8 +56,8 @@ function App() {
           
           {/* Toast notifications */}
           <Toaster />
-        </UVModeProvider>
-      </TorchProvider>
+        </TorchProvider>
+      </UVModeProvider>
     </Router>
   );
 }

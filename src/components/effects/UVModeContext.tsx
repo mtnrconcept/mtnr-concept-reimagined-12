@@ -1,6 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useVideoStore } from './BackgroundVideoManager';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 // Type pour le contexte du mode UV
 interface UVModeContextType {
@@ -27,25 +26,27 @@ interface UVModeProviderProps {
 
 export const UVModeProvider: React.FC<UVModeProviderProps> = ({ children }) => {
   const [uvMode, setUVMode] = useState<boolean>(false);
-  const { play } = useVideoStore(state => ({ play: state.play }));
+  const isInitialMount = useRef(true);
 
   // Fonction pour basculer le mode UV
   const toggleUVMode = () => {
     setUVMode(prev => !prev);
   };
 
-  // Effet pour appliquer les changements CSS au document et jouer la vidéo
+  // Effet pour appliquer les changements CSS au document
   useEffect(() => {
+    // Ignorer le premier rendu pour éviter des déclenchements inutiles
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     if (uvMode) {
       document.documentElement.classList.add('uv-mode');
-      // Jouer la vidéo seulement si elle est définie
-      if (play) {
-        play();
-      }
     } else {
       document.documentElement.classList.remove('uv-mode');
     }
-  }, [uvMode, play]);
+  }, [uvMode]);
 
   return (
     <UVModeContext.Provider value={{ uvMode, toggleUVMode }}>

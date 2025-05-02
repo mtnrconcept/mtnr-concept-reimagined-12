@@ -1,89 +1,109 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { TorchToggle } from './TorchToggle';
-import { useVideoStore } from './BackgroundVideoManager';
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { useUVMode } from "./UVModeContext";
 
-// Contexte de la torche
 interface TorchContextType {
   isTorchActive: boolean;
-  setIsTorchActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsTorchActive: (active: boolean) => void;
+  mousePosition: { x: number; y: number };
+  updateMousePosition: (position: { x: number; y: number }) => void;
+  containerRef: React.RefObject<HTMLDivElement>;
 }
 
-const TorchContext = createContext<TorchContextType | undefined>(undefined);
+const TorchContext = createContext<TorchContextType>({
+  isTorchActive: false,
+  setIsTorchActive: () => {},
+  mousePosition: { x: 0, y: 0 },
+  updateMousePosition: () => {},
+  containerRef: { current: null },
+});
 
-// Hook personnalisé pour utiliser le contexte de la torche
-export const useTorch = (): TorchContextType => {
-  const context = useContext(TorchContext);
-  if (!context) {
-    throw new Error('useTorch doit être utilisé dans un TorchProvider');
-  }
-  return context;
-};
+export const useTorch = () => useContext(TorchContext);
 
-// Provider pour le contexte de la torche
-interface TorchProviderProps {
-  children: React.ReactNode;
-}
+export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isTorchActive, setIsTorchActive] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { uvMode } = useUVMode();
+  const mouseMoveHandlerRef = useRef<((e: MouseEvent) => void) | null>(null);
 
-export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
-  const [isTorchActive, setIsTorchActive] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const { play, currentMode } = useVideoStore(state => ({
-    play: state.play,
-    currentMode: state.currentMode
-  }));
+  const updateMousePosition = (position: { x: number; y: number }) => {
+    setMousePosition(position);
+  };
 
-  // Effet pour suivre la position de la souris
+  // Handle mouse movement
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    if (isTorchActive) {
-      window.addEventListener('mousemove', handleMouseMove);
-      document.documentElement.classList.add('torch-active');
-      
-      // Si en mode UV, jouer la vidéo UV
-      if (currentMode === 'uv' && play) {
-        play();
-      }
-    } else {
-      document.documentElement.classList.remove('torch-active');
-      document.documentElement.classList.remove('uv-mode');
+    // Créer un gestionnaire stable de mousemove pour éviter les recreations inutiles
+    if (!mouseMoveHandlerRef.current) {
+      mouseMoveHandlerRef.current = (e: MouseEvent) => {
+        if (isTorchActive) {
+          updateMousePosition({ x: e.clientX, y: e.clientY });
+        }
+      };
     }
 
+    if (isTorchActive) {
+      window.addEventListener("mousemove", mouseMoveHandlerRef.current);
+    }
+    
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      if (mouseMoveHandlerRef.current) {
+        window.removeEventListener("mousemove", mouseMoveHandlerRef.current);
+      }
     };
-  }, [isTorchActive, play, currentMode]);
+  }, [isTorchActive]);
 
-  // Applique l'effet de torche avec la position de la souris
+  // Mettre à jour les propriétés CSS personnalisées
   useEffect(() => {
-    if (isTorchActive) {
-      document.documentElement.style.setProperty('--torch-x', `${mousePos.x}px`);
-      document.documentElement.style.setProperty('--torch-y', `${mousePos.y}px`);
+    if (isTorchActive && mousePosition.x && mousePosition.y) {
+      document.documentElement.style.setProperty('--torch-x', `${mousePosition.x}px`);
+      document.documentElement.style.setProperty('--torch-y', `${mousePosition.y}px`);
     }
-  }, [mousePos, isTorchActive]);
+  }, [mousePosition, isTorchActive]);
+
+  const contextValue = {
+    isTorchActive,
+    setIsTorchActive,
+    mousePosition,
+    updateMousePosition,
+    containerRef,
+  };
 
   return (
-    <TorchContext.Provider value={{ isTorchActive, setIsTorchActive }}>
-      {children}
-      
-      {/* Masque de la torche */}
-      {isTorchActive && (
-        <div 
-          className="fixed inset-0 pointer-events-none z-40 torch-mask" 
-          style={{
-            background: `radial-gradient(circle 300px at var(--torch-x, 50%) var(--torch-y, 50%), 
-              transparent, rgba(0, 0, 0, 0.85))`,
-          }}
-        />
-      )}
+    <TorchContext.Provider value={contextValue}>
+      <div ref={containerRef} className="torch-container relative w-full h-full overflow-hidden">
+        {children}
+        {isTorchActive && !uvMode && (
+          <svg className="fixed top-0 left-0 w-full h-full z-[9999] pointer-events-none">
+            <defs>
+              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="black" stopOpacity="0" />
+                <stop offset="70%" stopColor="black" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="black" stopOpacity="0.95" />
+              </radialGradient>
+              <mask id="torch-mask">
+                <rect width="100%" height="100%" fill="white" />
+                <circle
+                  cx={mousePosition.x}
+                  cy={mousePosition.y}
+                  r={800}
+                  fill="url(#torch-gradient)"
+                />
+              </mask>
+            </defs>
+            <rect
+              width="100%"
+              height="100%"
+              fill="rgba(0, 0, 0, 0.95)"
+              mask="url(#torch-mask)"
+            />
+          </svg>
+        )}
+      </div>
     </TorchContext.Provider>
   );
 };
 
-// Composant de contrôle de la torche
-export const TorchControls = () => {
-  return <TorchToggle />;
-};
+// Re-export only what's needed
+export { useIlluminated } from './useElementIllumination';

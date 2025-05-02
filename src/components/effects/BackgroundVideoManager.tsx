@@ -1,7 +1,6 @@
 
 import { create } from 'zustand';
 import { useEffect, useRef } from 'react';
-import { useTorch } from './TorchContext';
 import { useUVMode } from './UVModeContext';
 
 // Type d'état du magasin pour les vidéos
@@ -9,6 +8,7 @@ type VideoState = {
   play: (() => void) | null;
   pause: (() => void) | null;
   currentMode: 'normal' | 'uv';
+  setMode: (mode: 'normal' | 'uv') => void;
 };
 
 // Création du magasin Zustand pour la gestion des vidéos
@@ -16,6 +16,7 @@ export const useVideoStore = create<VideoState>((set) => ({
   play: null,
   pause: null,
   currentMode: 'normal',
+  setMode: (mode) => set({ currentMode: mode }),
 }));
 
 export const BackgroundVideoManager = () => {
@@ -23,15 +24,17 @@ export const BackgroundVideoManager = () => {
   const normalVideoRef = useRef<HTMLVideoElement>(null);
   const uvVideoRef = useRef<HTMLVideoElement>(null);
   
-  // Récupération du context de la torche et du mode UV
-  const { isTorchActive } = useTorch();
+  // Récupération du context du mode UV
   const { uvMode } = useUVMode();
   
   // Référence pour éviter les mises à jour en boucle
-  const previousUvModeRef = useRef<boolean>(uvMode);
-
-  // Initialiser les méthodes de contrôle vidéo
+  const prevUvModeRef = useRef<boolean>(uvMode);
+  const storeInitializedRef = useRef<boolean>(false);
+  
+  // Initialiser les méthodes de contrôle vidéo une seule fois
   useEffect(() => {
+    if (storeInitializedRef.current) return;
+    
     // Définir les fonctions de contrôle dans le store
     useVideoStore.setState({
       play: () => {
@@ -49,20 +52,20 @@ export const BackgroundVideoManager = () => {
       }
     });
     
-    // Nettoyage au démontage
-    return () => {
-      useVideoStore.setState({ play: null, pause: null });
-    };
-  }, [uvMode]);
+    storeInitializedRef.current = true;
+  }, []);
 
   // Mettre à jour uniquement le mode du store quand uvMode change
   useEffect(() => {
     // Ne mettre à jour le store que si uvMode a changé
-    if (previousUvModeRef.current !== uvMode) {
-      useVideoStore.setState({ currentMode: uvMode ? 'uv' : 'normal' });
-      previousUvModeRef.current = uvMode;
+    if (prevUvModeRef.current !== uvMode) {
+      useVideoStore.getState().setMode(uvMode ? 'uv' : 'normal');
+      prevUvModeRef.current = uvMode;
     }
-    
+  }, [uvMode]);
+
+  // Mise à jour de l'opacité des vidéos
+  useEffect(() => {
     // Afficher/masquer la vidéo appropriée
     if (normalVideoRef.current) {
       normalVideoRef.current.style.opacity = uvMode ? '0' : '1';
