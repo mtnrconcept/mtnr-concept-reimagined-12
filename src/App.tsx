@@ -53,6 +53,7 @@ const VideoPreloader = () => {
   return null;
 };
 
+// This component needs to be inside BrowserRouter
 function AnimatedRoutes() {
   const location = useLocation();
   
@@ -91,17 +92,17 @@ const App = () => (
       <UVModeProvider>
         <TorchProvider>
           <Torch3DProvider>
-            <NavigationProvider>
-              <Toaster />
-              <Sonner />
-              <VideoPreloader />
-              <BrowserRouter>
+            <Toaster />
+            <Sonner />
+            <VideoPreloader />
+            <BrowserRouter>
+              <NavigationProvider>
                 <Suspense fallback={null}>
                   <AnimatedRoutes />
                 </Suspense>
-              </BrowserRouter>
-              <TorchToggle />
-            </NavigationProvider>
+              </NavigationProvider>
+            </BrowserRouter>
+            <TorchToggle />
           </Torch3DProvider>
         </TorchProvider>
       </UVModeProvider>
