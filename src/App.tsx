@@ -41,8 +41,8 @@ const VideoPreloader = () => {
   
   useVideoPreloader({
     videoUrls: [
-      "/lovable-uploads/Video fond normale.mp4",
-      "/lovable-uploads/Video fond UV.mp4"
+      "/lovable-uploads/Videofondnormale.mp4",
+      "/lovable-uploads/VideofondUV.mp4"
     ],
     onPreloaded: (loadedUrls) => {
       console.log("Vidéos préchargées:", loadedUrls);
