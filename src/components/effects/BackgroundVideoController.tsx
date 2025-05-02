@@ -12,25 +12,9 @@ export const BackgroundVideoController = () => {
         '/lovable-uploads/Video fond UV.mp4'
       ];
       
-      for (const url of videoUrls) {
+      const preloadPromises = videoUrls.map(async (url) => {
         try {
-          // Créer un élément vidéo pour précharger
-          const video = document.createElement('video');
-          video.preload = 'auto';
-          video.muted = true;
-          video.src = url;
-          video.load();
-          
-          // Ajouter les écouteurs pour suivre le préchargement
-          video.addEventListener('loadeddata', () => {
-            console.log(`Vidéo ${url} préchargée avec succès`);
-          });
-          
-          video.addEventListener('error', (e) => {
-            console.error(`Erreur lors du préchargement de ${url}:`, e);
-          });
-          
-          // Alternative avec link preload
+          // Utiliser l'API link preload pour un chargement anticipé
           const link = document.createElement('link');
           link.rel = 'preload';
           link.href = url;
@@ -40,16 +24,21 @@ export const BackgroundVideoController = () => {
         } catch (error) {
           console.error(`Erreur lors du préchargement de ${url}:`, error);
         }
-      }
+      });
+      
+      // Attendre que tous les préchargements soient terminés
+      await Promise.all(preloadPromises);
     };
 
-    // Précharger les vidéos au démarrage
-    preloadVideos();
+    // Précharger les vidéos au démarrage avec un léger délai
+    const timerId = setTimeout(() => {
+      preloadVideos();
+    }, 500);
     
     return () => {
-      // Nettoyage si nécessaire
+      clearTimeout(timerId);
     };
-  }, []);
+  }, []);  // Dépendance vide pour exécuter une seule fois
 
   // Composant invisible qui gère uniquement le préchargement
   return null;

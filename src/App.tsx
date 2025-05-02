@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
@@ -15,10 +15,10 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
-import PageTransition from "@/components/PageTransition";
+import PageTransition from "./components/PageTransition";
 import { checkFeatureSupport } from "@/lib/feature-detection";
-import { BackgroundVideo } from "./components/effects/BackgroundVideo";
-import { useVideoPreloader } from "./hooks/useVideoPreloader";
+import BackgroundVideoController from "./components/effects/BackgroundVideoController";
+import BackgroundVideo from "./components/effects/BackgroundVideo";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -35,44 +35,6 @@ const UVCornerLabel = () => {
   );
 };
 
-// Preloader for videos with visual feedback
-const VideoPreloader = () => {
-  const [isPreloaded, setIsPreloaded] = useState(false);
-  const [showMessage, setShowMessage] = useState(true);
-  
-  // Utiliser des noms de fichiers normalisés
-  const { isLoading, progress } = useVideoPreloader({
-    videoUrls: [
-      "/lovable-uploads/video-fond-normale.mp4",
-      "/lovable-uploads/video-fond-UV.mp4"
-    ],
-    onPreloaded: (loadedUrls) => {
-      console.log("Vidéos préchargées:", loadedUrls);
-      setIsPreloaded(true);
-      setTimeout(() => setShowMessage(false), 1000);
-    },
-    showToast: true
-  });
-  
-  if (isPreloaded && !showMessage) return null;
-  
-  return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-500 ${isPreloaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-      <div className="text-center">
-        <div className="mb-4 text-xl font-bold">Chargement des ressources médias...</div>
-        <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-yellow-400 transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="mt-2 text-sm text-gray-300">{Math.round(progress)}%</div>
-      </div>
-    </div>
-  );
-};
-
-// This component needs to be inside BrowserRouter
 function AnimatedRoutes() {
   const location = useLocation();
   
@@ -85,7 +47,7 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Unique instance of BackgroundVideo */}
+      {/* Vidéo de fond qui est maintenant en arrière-plan de toutes les pages */}
       <BackgroundVideo />
       
       <PageTransition keyId={location.pathname}>
@@ -108,17 +70,17 @@ const App = () => (
       <UVModeProvider>
         <TorchProvider>
           <Torch3DProvider>
-            <Toaster />
-            <Sonner />
-            <VideoPreloader />
-            <BrowserRouter>
-              <NavigationProvider>
+            <NavigationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
                 <Suspense fallback={null}>
+                  <BackgroundVideoController />
                   <AnimatedRoutes />
                 </Suspense>
-              </NavigationProvider>
-            </BrowserRouter>
-            <TorchToggle />
+              </BrowserRouter>
+              <TorchToggle />
+            </NavigationProvider>
           </Torch3DProvider>
         </TorchProvider>
       </UVModeProvider>

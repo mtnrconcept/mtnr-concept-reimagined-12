@@ -1,10 +1,5 @@
 
-import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-
-// Constants for transition timings
-const TRANSITION_DURATION = 7000; // 7 seconds total for video transition
-const MIN_TRANSITION_INTERVAL = 2000; // Minimum time between transitions
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
@@ -19,67 +14,49 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const listenersRef = useRef<(() => void)[]>([]);
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
-  const lastTransitionTimeRef = useRef<number>(0);
-  const location = useLocation();
-
-  // Auto-trigger on route change
-  useEffect(() => {
-    // Avoid triggering on initial mount
-    if (lastTransitionTimeRef.current === 0) {
-      lastTransitionTimeRef.current = Date.now();
-      return;
-    }
-  }, [location.pathname]);
 
   const triggerVideoTransition = useCallback(() => {
-    const now = Date.now();
-    
-    // Avoid triggering transitions too frequently
-    if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < MIN_TRANSITION_INTERVAL)) {
-      console.log("Transition already in progress or too recent, ignoring");
+    // Éviter les déclenchements multiples rapprochés
+    if (transitionInProgressRef.current) {
+      console.log("Transition déjà en cours, ignorée");
       return;
     }
     
-    console.log("➡️ Triggering video transition");
+    console.log("Déclenchement transition vidéo");
     transitionInProgressRef.current = true;
-    lastTransitionTimeRef.current = now;
     setIsTransitioning(true);
     
-    // Clear any existing timeout
+    // Nettoyer tout timeout existant
     if (transitionTimeoutRef.current !== null) {
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Create a copy of listeners to avoid mutations during iteration
-    const currentListeners = [...listenersRef.current];
-    
-    // Execute all listeners
-    Promise.all(currentListeners.map(async (listener) => {
+    // Notifier tous les écouteurs
+    listenersRef.current.forEach(listener => {
       try {
-        await Promise.resolve(listener());
+        listener();
       } catch (error) {
         console.error('Error in transition listener:', error);
       }
-    })).then(() => {
-      console.log("All transition listeners have been called");
-      
-      // Reset transition state after transition duration
-      transitionTimeoutRef.current = window.setTimeout(() => {
-        setIsTransitioning(false);
-        transitionInProgressRef.current = false;
-        console.log("✅ Transition state reset");
-      }, TRANSITION_DURATION); // Use our constant for transition duration
     });
+    
+    // Réinitialiser l'état de transition après un délai plus long
+    // pour permettre à la vidéo de commencer sa lecture
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      setIsTransitioning(false);
+      transitionInProgressRef.current = false;
+      console.log("État de transition réinitialisé");
+    }, 1000); // Temps suffisant pour laisser la vidéo commencer
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
     listenersRef.current.push(callback);
-    console.log("📝 New video transition listener registered");
+    console.log("Écouteur de transition vidéo enregistré");
     
-    // Unregister function
+    // Return unsubscribe function
     return () => {
       listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
-      console.log("🗑️ Video transition listener unregistered");
+      console.log("Écouteur de transition vidéo désenregistré");
     };
   }, []);
 

@@ -1,78 +1,179 @@
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useUVMode } from '@/components/effects/UVModeContext';
-import { useVideoInteraction } from './video/useVideoInteraction';
-import { useVideoErrorHandling } from './video/useVideoErrorHandling';
-import { useVideoTransition } from './video/useVideoTransition';
-import { UseBackgroundVideoProps, UseBackgroundVideoReturn } from './video/types';
+import { useTorch } from '@/components/effects/TorchContext';
 
-export const useBackgroundVideo = ({
-  videoUrl,
-  videoUrlUV,
-  fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
-}: UseBackgroundVideoProps): UseBackgroundVideoReturn => {
-  // Références et états
-  const videoRef = useRef<HTMLVideoElement>(null);
+interface UseBackgroundVideoProps {
+  videoUrl: string;
+  videoUrlUV: string;
+}
+
+export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoProps) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
   
-  // États vidéo
-  const [videoError, setVideoError] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  // États locaux avec valeurs initiales
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   
-  // Constantes
-  const maxRetries = 3;
-  
-  // Déterminer l'URL de la vidéo actuelle en fonction du mode UV
-  const currentVideo = uvMode ? videoUrlUV : videoUrl;
+  // Définir le bon chemin de vidéo basé sur le mode UV
+  const currentVideo = useMemo(() => {
+    return uvMode ? videoUrlUV : videoUrl;
+  }, [uvMode, videoUrl, videoUrlUV]);
 
-  // Utiliser les modules spécialisés
-  const { handleUserInteraction } = useVideoInteraction({
-    videoRef,
-    hasUserInteraction,
-    setHasUserInteraction,
-    videoError
-  });
+  // S'assurer que les URL des vidéos sont correctes
+  useEffect(() => {
+    console.log('URL de la vidéo courante:', currentVideo);
+    // Vérifier si les fichiers de vidéo existent
+    fetch(currentVideo)
+      .then(response => {
+        if (!response.ok) {
+          console.error(`La vidéo ${currentVideo} n'a pas pu être chargée:`, response.status);
+          setVideoError(true);
+        } else {
+          console.log(`La vidéo ${currentVideo} existe et est accessible`);
+          setVideoError(false);
+        }
+      })
+      .catch(error => {
+        console.error(`Erreur lors de la vérification de la vidéo ${currentVideo}:`, error);
+        setVideoError(true);
+      });
+  }, [currentVideo]);
 
-  const { handleVideoError, retryVideo } = useVideoErrorHandling({
-    videoRef,
-    videoError,
-    setVideoError,
-    retryCount,
-    setRetryCount,
-    maxRetries,
-    currentVideoUrl: currentVideo
-  });
+  // Fonction pour gérer la première interaction utilisateur
+  const handleUserInteraction = useCallback(() => {
+    if (!hasUserInteraction) {
+      console.log('Interaction utilisateur détectée, vidéo prête à jouer');
+      setHasUserInteraction(true);
+    }
+  }, [hasUserInteraction]);
 
-  const { playVideoTransition } = useVideoTransition({
-    videoRef,
-    isPlaying,
-    setIsPlaying,
-    currentVideoUrl: currentVideo,
-    isFirstLoad,
-    setIsFirstLoad,
-    handleVideoError
-  });
+  // Version optimisée de playVideoTransition avec useCallback
+  const playVideoTransition = useCallback(async () => {
+    const videoElement = videoRef.current;
+    if (!videoElement || videoError) {
+      console.error("Erreur: élément vidéo non disponible ou erreur vidéo");
+      return;
+    }
+    
+    try {
+      setIsTransitioning(true);
+      
+      // Important: Pré-configurer la source manuellement
+      if (!videoElement.src.includes(currentVideo)) {
+        console.log("Mise à jour de la source vidéo:", currentVideo);
+        
+        // Méthode alternative pour charger la vidéo
+        const sources = videoElement.getElementsByTagName('source');
+        if (sources.length > 0) {
+          for (let i = 0; i < sources.length; i++) {
+            sources[i].src = currentVideo;
+          }
+        } else {
+          // Si pas de sources, créer des éléments source
+          const mp4Source = document.createElement('source');
+          mp4Source.src = currentVideo;
+          mp4Source.type = 'video/mp4';
+          videoElement.appendChild(mp4Source);
+          
+          const webmSource = document.createElement('source');
+          webmSource.src = currentVideo;
+          webmSource.type = 'video/webm';
+          videoElement.appendChild(webmSource);
+        }
+        
+        // Recharger pour appliquer les nouvelles sources
+        videoElement.load();
+        
+        // Attendre que la vidéo soit chargée
+        await new Promise((resolve) => {
+          const loadHandler = () => {
+            console.log("Vidéo chargée avec succès");
+            resolve(true);
+            videoElement.removeEventListener('loadeddata', loadHandler);
+          };
+          
+          const errorHandler = (error: ErrorEvent) => {
+            console.error("Erreur de chargement vidéo:", error);
+            resolve(false);
+            videoElement.removeEventListener('error', errorHandler);
+          };
+          
+          videoElement.addEventListener('loadeddata', loadHandler, { once: true });
+          videoElement.addEventListener('error', errorHandler, { once: true });
+          
+          // Timeout en cas de problème de chargement
+          setTimeout(() => {
+            console.warn("Délai de chargement vidéo dépassé");
+            resolve(false);
+            videoElement.removeEventListener('loadeddata', loadHandler);
+            videoElement.removeEventListener('error', errorHandler);
+          }, 5000);
+        });
+      }
+      
+      // Remettre la vidéo au début
+      videoElement.currentTime = 0;
+      
+      // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
+      const handleVideoEnded = () => {
+        console.log("Vidéo terminée, mise en pause");
+        videoElement.pause();
+        setIsTransitioning(false);
+        videoElement.removeEventListener('ended', handleVideoEnded);
+      };
+      
+      videoElement.removeEventListener('ended', handleVideoEnded);
+      videoElement.addEventListener('ended', handleVideoEnded);
+      
+      // Lancer la lecture de la vidéo
+      console.log("Démarrage de la lecture vidéo");
+      try {
+        await videoElement.play();
+        console.log("Vidéo en lecture");
+      } catch (error) {
+        console.error("Erreur de lecture vidéo:", error);
+        setIsTransitioning(false);
+        setVideoError(true);
+      }
+    } catch (error) {
+      console.error("Erreur générale lors de la transition vidéo:", error);
+      setIsTransitioning(false);
+      setVideoError(true);
+    }
+  }, [currentVideo, videoError]);
+
+  // Ajouter un logging pour débogage
+  useEffect(() => {
+    if (videoRef.current) {
+      console.log("Statut de l'élément vidéo:", {
+        paused: videoRef.current.paused,
+        readyState: videoRef.current.readyState,
+        networkState: videoRef.current.networkState,
+        src: videoRef.current.src,
+        currentSrc: videoRef.current.currentSrc,
+        error: videoRef.current.error
+      });
+    }
+  }, [isTransitioning, videoRef.current?.error]);
 
   return {
     videoRef,
-    videoError,
-    setVideoError,
-    isPlaying,
-    isTransitioning: isPlaying, // Pour compatibilité avec l'API existante
     isFirstLoad,
     setIsFirstLoad,
+    isTransitioning,
+    setIsTransitioning,
     hasUserInteraction,
     setHasUserInteraction,
     currentVideo,
-    playVideoTransition,
     handleUserInteraction,
-    retryVideo,
-    retryCount,
-    setRetryCount,
-    fallbackImage,
-    uvMode
+    playVideoTransition,
+    uvMode,
+    isTorchActive,
+    videoError
   };
 };

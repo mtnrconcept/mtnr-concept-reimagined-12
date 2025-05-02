@@ -1,24 +1,32 @@
 
 import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
-import { UseBackgroundVideoReturn } from './video/types';
 
-/**
- * Hook gérant les effets de transition vidéo et les interactions utilisateur
- * Version unifiée qui combine les fonctionnalités des anciennes versions .ts et .tsx
- */
-export const useVideoTransitionEffects = (backgroundVideo: UseBackgroundVideoReturn) => {
-  const {
-    videoRef,
-    isFirstLoad,
-    setIsFirstLoad,
-    isTransitioning,
-    hasUserInteraction,
-    currentVideo,
-    playVideoTransition,
-    handleUserInteraction,
-  } = backgroundVideo;
-  
+interface UseVideoTransitionEffectsProps {
+  videoRef: React.RefObject<HTMLVideoElement>;
+  isFirstLoad: boolean;
+  setIsFirstLoad: (value: boolean) => void;
+  isTransitioning: boolean;
+  hasUserInteraction: boolean;
+  currentVideo: string;
+  playVideoTransition: () => Promise<void>;
+  handleUserInteraction: () => void;
+  uvMode: boolean;
+  isTorchActive: boolean | undefined;
+}
+
+export const useVideoTransitionEffects = ({
+  videoRef,
+  isFirstLoad,
+  setIsFirstLoad,
+  isTransitioning,
+  hasUserInteraction,
+  currentVideo,
+  playVideoTransition,
+  handleUserInteraction,
+  uvMode,
+  isTorchActive
+}: UseVideoTransitionEffectsProps) => {
   const navigation = useNavigation();
 
   // Fonction qui exécute la transition si les conditions sont réunies
@@ -43,57 +51,37 @@ export const useVideoTransitionEffects = (backgroundVideo: UseBackgroundVideoRet
     return unregister;
   }, [navigation, executeTransition]);
   
-  // Initialisation et démarrage de la vidéo
+  // Initialisation
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
-    // Configuration initiale
+    // Configuration initiale unique
     if (isFirstLoad) {
-      console.log("Premier chargement de la vidéo");
+      console.log("Premier chargement vidéo");
       
-      const initializeVideo = async () => {
-        // Configurer la vidéo
-        videoElement.playsInline = true;
-        videoElement.muted = true;
-        videoElement.loop = true;
-        videoElement.autoplay = true;
+      // S'assurer que les sources sont correctement définies
+      const sources = videoElement.getElementsByTagName('source');
+      if (sources.length === 0) {
+        const mp4Source = document.createElement('source');
+        mp4Source.src = currentVideo;
+        mp4Source.type = 'video/mp4';
+        videoElement.appendChild(mp4Source);
         
-        // S'assurer que les sources sont correctement définies
-        if (!videoElement.src && videoElement.getElementsByTagName('source').length === 0) {
-          videoElement.src = currentVideo;
-          videoElement.load();
-        }
+        const webmSource = document.createElement('source');
+        webmSource.src = currentVideo;
+        webmSource.type = 'video/webm';
+        videoElement.appendChild(webmSource);
         
-        // Tentative de lecture immédiate
-        try {
-          await videoElement.play();
-          console.log("Lecture vidéo démarrée avec succès");
-        } catch (error) {
-          console.warn("Lecture automatique impossible, attente d'interaction:", error);
-        }
-      };
+        // Recharger la vidéo après avoir ajouté les sources
+        videoElement.load();
+      }
       
-      initializeVideo();
+      videoElement.pause(); // Assure que la vidéo est en pause au début
+      videoElement.currentTime = 0;
       setIsFirstLoad(false);
     }
   }, [isFirstLoad, videoRef, setIsFirstLoad, currentVideo]);
-  
-  // Force d'autoplay après un délai court (parfois nécessaire pour Safari)
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement || isFirstLoad) return;
-    
-    const delayedPlay = setTimeout(() => {
-      if (videoElement.paused) {
-        videoElement.play().catch(err => 
-          console.warn("Tentative de lecture retardée échouée:", err)
-        );
-      }
-    }, 1000);
-    
-    return () => clearTimeout(delayedPlay);
-  }, [isFirstLoad, videoRef]);
   
   // Ajout des écouteurs pour la première interaction utilisateur
   useEffect(() => {
@@ -101,26 +89,19 @@ export const useVideoTransitionEffects = (backgroundVideo: UseBackgroundVideoRet
     
     const handleInteraction = () => {
       handleUserInteraction();
-      
-      // Tenter de jouer la vidéo après l'interaction
-      if (videoRef.current) {
-        videoRef.current.play().catch(err => 
-          console.warn("Erreur lors de la lecture après interaction:", err)
-        );
-      }
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
     };
     
-    // Ajouter les écouteurs d'événements - plus d'événements pour capter toute interaction
-    const events = ['click', 'touchstart', 'touchend', 'keydown', 'scroll', 'mousemove'];
-    events.forEach(event => {
-      document.addEventListener(event, handleInteraction, { once: true });
-    });
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
     
     return () => {
-      // Nettoyer les écouteurs
-      events.forEach(event => {
-        document.removeEventListener(event, handleInteraction);
-      });
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
     };
-  }, [handleUserInteraction, hasUserInteraction, videoRef]);
+  }, [handleUserInteraction, hasUserInteraction]);
 };
