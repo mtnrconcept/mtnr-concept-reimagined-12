@@ -11,7 +11,8 @@ import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Book from './pages/Book';
 import NotFound from './pages/NotFound';
-import { TorchProvider, TorchControls } from './components/effects/TorchSystem';
+import { TorchProvider } from './components/effects/TorchSystem';
+import { TorchToggle } from './components/effects/TorchToggle';
 import { UVModeProvider } from './components/effects/UVModeContext';
 import { BackgroundVideoManager } from './components/effects/BackgroundVideoManager';
 import { Toaster } from './components/ui/toaster';
@@ -49,7 +50,9 @@ function App() {
           </Routes>
           
           {/* Torch Controls UI */}
-          <TorchControls />
+          <div className="fixed bottom-4 right-4 z-50">
+            <TorchToggle />
+          </div>
           
           {/* Toast notifications */}
           <Toaster />

@@ -27,25 +27,25 @@ interface UVModeProviderProps {
 
 export const UVModeProvider: React.FC<UVModeProviderProps> = ({ children }) => {
   const [uvMode, setUVMode] = useState<boolean>(false);
-  const videoStore = useVideoStore();
+  const { play } = useVideoStore(state => ({ play: state.play }));
 
   // Fonction pour basculer le mode UV
   const toggleUVMode = () => {
     setUVMode(prev => !prev);
   };
 
-  // Effet pour appliquer les changements CSS au document et gérer les vidéos
+  // Effet pour appliquer les changements CSS au document et jouer la vidéo
   useEffect(() => {
     if (uvMode) {
       document.documentElement.classList.add('uv-mode');
-      // Jouer la vidéo UV seulement si la fonction play est définie et l'utilisateur est en mode UV
-      if (videoStore.play && videoStore.currentMode !== 'uv') {
-        videoStore.play();
+      // Jouer la vidéo seulement si elle est définie
+      if (play) {
+        play();
       }
     } else {
       document.documentElement.classList.remove('uv-mode');
     }
-  }, [uvMode, videoStore.play, videoStore.currentMode]);
+  }, [uvMode, play]);
 
   return (
     <UVModeContext.Provider value={{ uvMode, toggleUVMode }}>

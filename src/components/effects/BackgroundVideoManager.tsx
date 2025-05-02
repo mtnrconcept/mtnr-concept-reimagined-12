@@ -8,7 +8,6 @@ import { useUVMode } from './UVModeContext';
 type VideoState = {
   play: (() => void) | null;
   pause: (() => void) | null;
-  setMode: (mode: 'normal' | 'uv') => void;
   currentMode: 'normal' | 'uv';
 };
 
@@ -16,7 +15,6 @@ type VideoState = {
 export const useVideoStore = create<VideoState>((set) => ({
   play: null,
   pause: null,
-  setMode: (mode) => set({ currentMode: mode }),
   currentMode: 'normal',
 }));
 
@@ -29,8 +27,8 @@ export const BackgroundVideoManager = () => {
   const { isTorchActive } = useTorch();
   const { uvMode } = useUVMode();
   
-  // Tracker pour éviter les mises à jour en boucle
-  const modeUpdatedRef = useRef(false);
+  // Référence pour éviter les mises à jour en boucle
+  const previousUvModeRef = useRef<boolean>(uvMode);
 
   // Initialiser les méthodes de contrôle vidéo
   useEffect(() => {
@@ -57,13 +55,12 @@ export const BackgroundVideoManager = () => {
     };
   }, [uvMode]);
 
-  // Gestion du changement de mode (Normal/UV) - Fix the infinite loop here
+  // Mettre à jour uniquement le mode du store quand uvMode change
   useEffect(() => {
-    // On utilise un ref pour éviter les mises à jour en boucle
-    if (!modeUpdatedRef.current) {
-      modeUpdatedRef.current = true;
-      // On met à jour le mode dans le store, mais une seule fois
+    // Ne mettre à jour le store que si uvMode a changé
+    if (previousUvModeRef.current !== uvMode) {
       useVideoStore.setState({ currentMode: uvMode ? 'uv' : 'normal' });
+      previousUvModeRef.current = uvMode;
     }
     
     // Afficher/masquer la vidéo appropriée
@@ -73,11 +70,6 @@ export const BackgroundVideoManager = () => {
     if (uvVideoRef.current) {
       uvVideoRef.current.style.opacity = uvMode ? '1' : '0';
     }
-    
-    // Réinitialiser le tracker quand uvMode change
-    return () => {
-      modeUpdatedRef.current = false;
-    };
   }, [uvMode]);
 
   // Gestion de la fin de lecture (onEnded)

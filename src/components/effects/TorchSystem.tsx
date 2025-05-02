@@ -28,7 +28,10 @@ interface TorchProviderProps {
 export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const videoStore = useVideoStore();
+  const { play, currentMode } = useVideoStore(state => ({
+    play: state.play,
+    currentMode: state.currentMode
+  }));
 
   // Effet pour suivre la position de la souris
   useEffect(() => {
@@ -41,8 +44,8 @@ export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
       document.documentElement.classList.add('torch-active');
       
       // Si en mode UV, jouer la vidéo UV
-      if (videoStore.currentMode === 'uv' && videoStore.play) {
-        videoStore.play();
+      if (currentMode === 'uv' && play) {
+        play();
       }
     } else {
       document.documentElement.classList.remove('torch-active');
@@ -52,7 +55,7 @@ export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, videoStore]);
+  }, [isTorchActive, play, currentMode]);
 
   // Applique l'effet de torche avec la position de la souris
   useEffect(() => {
@@ -78,23 +81,6 @@ export const TorchProvider: React.FC<TorchProviderProps> = ({ children }) => {
       )}
     </TorchContext.Provider>
   );
-};
-
-// Contexte pour le mode UV
-interface UVContextType {
-  uvMode: boolean;
-  toggleUVMode: () => void;
-}
-
-const UVContext = createContext<UVContextType | undefined>(undefined);
-
-// Hook personnalisé pour utiliser le contexte UV
-export const useUV = (): UVContextType => {
-  const context = useContext(UVContext);
-  if (!context) {
-    throw new Error('useUV doit être utilisé dans un UVProvider');
-  }
-  return context;
 };
 
 // Composant de contrôle de la torche
