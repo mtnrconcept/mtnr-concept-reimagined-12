@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
@@ -15,6 +16,19 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const transitionTimeoutRef = useRef<number | null>(null);
   const transitionInProgressRef = useRef<boolean>(false);
   const lastTransitionTimeRef = useRef<number>(0);
+  const location = useLocation();
+
+  // Déclencher automatiquement à chaque changement de route
+  useEffect(() => {
+    // On évite de déclencher lors du montage initial
+    if (transitionInProgressRef.current || lastTransitionTimeRef.current === 0) {
+      lastTransitionTimeRef.current = Date.now();
+      return;
+    }
+    
+    console.log("Changement d'URL détecté, déclenchement automatique de la transition vidéo");
+    triggerVideoTransition();
+  }, [location.pathname]);
 
   const triggerVideoTransition = useCallback(() => {
     const now = Date.now();
@@ -41,13 +55,15 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Exécuter tous les écouteurs de manière séquentielle
     const executeListeners = async () => {
       try {
-        for (const listener of currentListeners) {
+        // Exécuter en parallèle plutôt que séquentiellement pour éviter les blocages
+        await Promise.all(currentListeners.map(async (listener) => {
           try {
             await Promise.resolve(listener());
           } catch (error) {
             console.error('Erreur dans l\'écouteur de transition:', error);
           }
-        }
+        }));
+        
         console.log("Tous les écouteurs de transition ont été appelés");
       } catch (error) {
         console.error('Erreur lors de l\'exécution des écouteurs:', error);

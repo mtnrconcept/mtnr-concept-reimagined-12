@@ -28,8 +28,8 @@
   z-index: -1 !important;
   min-width: 100vw !important;
   min-height: 100vh !important;
-  transition: filter 0.8s ease-in-out;
-  will-change: filter, transform;
+  transition: filter 0.8s ease-in-out, opacity 0.5s ease-in-out;
+  will-change: filter, transform, opacity;
 }
 
 /* Animation pour les transitions de page */

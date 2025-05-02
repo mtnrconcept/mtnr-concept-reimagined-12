@@ -11,7 +11,7 @@ interface PageContentTransitionProps {
 const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children }) => {
   const location = useLocation();
   const [displayChildren, setDisplayChildren] = useState(children);
-  const { isTransitioning, triggerVideoTransition } = useNavigation();
+  const { triggerVideoTransition } = useNavigation();
   const [transitioning, setTransitioning] = useState(false);
   
   // Constantes pour les délais de transition
@@ -22,10 +22,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
 
   // Effet qui gère la transition lors d'un changement de route
   useEffect(() => {
-    console.log("Changement de route détecté dans PageContentTransition");
+    console.log("Changement de route détecté dans PageContentTransition:", location.pathname);
     setTransitioning(true);
     
-    // Déclencher la transition vidéo
+    // Déclencher la transition vidéo explicitement
     triggerVideoTransition();
     
     // Planifier le changement de contenu après la moitié de la transition vidéo
