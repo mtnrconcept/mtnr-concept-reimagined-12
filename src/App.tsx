@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -65,7 +66,7 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Une seule instance de BackgroundVideo au niveau global */}
+      {/* Background video at the global level with higher z-index for visibility */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/Videofondnormale.mp4"
         videoUrlUV="/lovable-uploads/VideofondUV.mp4"

@@ -41,6 +41,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
           onError={() => console.error("Video error occurred")}
           muted
           playsInline
+          autoPlay
+          loop
         />
       ) : (
         <div className="video-fallback-container">
