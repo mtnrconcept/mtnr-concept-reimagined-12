@@ -38,8 +38,8 @@ export default function PageTransition({
       rotateX: 0,
       y: 0,
       transition: {
-        duration: 0.8,
-        delay: 1.2, // Attendre la vidéo avant d'animer
+        duration: 1.2,
+        delay: 3.5, // Attendre la moitié de la vidéo (7s) avant d'animer le nouveau contenu
         ease: "easeOut"
       }
     },
@@ -48,7 +48,7 @@ export default function PageTransition({
       rotateX: -5,
       y: -30,
       transition: {
-        duration: 0.5
+        duration: 1.0
       }
     }
   };

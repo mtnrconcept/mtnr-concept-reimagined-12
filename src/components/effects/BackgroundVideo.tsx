@@ -92,7 +92,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
             video.classList.remove("video-transitioning");
             console.log("Transition vidéo terminée");
           }
-        }, 2500); // Durée approximative de la transition
+        }, 7000); // Durée exacte de la vidéo (7 secondes)
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);
       }

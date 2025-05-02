@@ -22,8 +22,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Déclencher la transition vidéo
     triggerVideoTransition();
     
-    // Durée de la transition vidéo (en ms)
-    const videoDuration = 2500;
+    // Durée de la transition vidéo (7 secondes)
+    const videoDuration = 7000;
     
     // Attendre la moitié de la durée vidéo avant de commencer à afficher le nouveau contenu
     // Cela donne une transition fluide entre l'ancien et le nouveau contenu
@@ -52,14 +52,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 1.2, // Attendre que la vidéo soit bien avancée
-            duration: 0.8
+            delay: 3.5, // Attendre la moitié de la vidéo avant de faire apparaître le contenu
+            duration: 1.2
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 0.4
+            duration: 1.0
           }
         }}
         className="relative z-10 min-h-screen w-full pointer-events-auto"
@@ -76,15 +76,15 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             opacity: 1, 
             rotateX: 0,
             transition: { 
-              delay: transitioning ? 1.2 : 0, 
-              duration: 0.8, 
+              delay: transitioning ? 3.5 : 0, // Attendre la moitié de la vidéo avant d'animer
+              duration: 1.2, 
               ease: "easeOut"
             }
           }}
           exit={{ 
             y: -50, 
             opacity: 0,
-            transition: { duration: 0.5 }
+            transition: { duration: 1.0 }
           }}
           className="h-full w-full"
           style={{

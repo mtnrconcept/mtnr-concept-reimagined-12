@@ -41,13 +41,13 @@
 .page-transition-enter {
   opacity: 0;
   animation: fadeIn 1.5s forwards;
-  animation-delay: 1.0s;
+  animation-delay: 3.5s;  /* Moitié de la vidéo de 7s */
 }
 
 .page-transition-enter-active {
   opacity: 1;
   transition: opacity 1.5s;
-  transition-delay: 1.0s;
+  transition-delay: 3.5s;  /* Moitié de la vidéo de 7s */
 }
 
 .page-transition-exit {
@@ -56,7 +56,7 @@
 
 .page-transition-exit-active {
   opacity: 0;
-  transition: opacity 0.8s;
+  transition: opacity 1.2s;
 }
 
 /* Animation améliorée de la vidéo pendant les transitions */
@@ -69,8 +69,8 @@
 }
 
 .video-transitioning {
-  animation: videoPulse 2.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: videoPulse 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactement 7s pour la durée de la vidéo */
+  transition: transform 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactement 7s pour la durée de la vidéo */
   transform-origin: center center;
 }
 
@@ -88,7 +88,7 @@
   position: absolute;
   width: 100%;
   opacity: 1;
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
   transform-style: preserve-3d;
 }
 
@@ -100,8 +100,8 @@
 .content-enter {
   opacity: 0;
   transform: translateY(30px) rotateX(5deg);
-  transition: opacity 0.8s ease-in, transform 0.8s ease-in;
-  transition-delay: 1.2s;
+  transition: opacity 1.2s ease-in, transform 1.2s ease-in;
+  transition-delay: 3.5s;  /* Moitié de la vidéo de 7s */
   transform-style: preserve-3d;
 }
 
