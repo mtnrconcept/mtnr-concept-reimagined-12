@@ -17,7 +17,7 @@ import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
 import { checkFeatureSupport } from "@/lib/feature-detection";
-import BackgroundVideo from "./components/effects/BackgroundVideo";
+import { BackgroundVideo } from "./components/effects/BackgroundVideo";
 import { useVideoPreloader } from "./hooks/useVideoPreloader";
 
 // Initialize query client outside of component for stability
