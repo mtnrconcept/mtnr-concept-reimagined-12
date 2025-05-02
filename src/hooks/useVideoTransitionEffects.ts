@@ -3,6 +3,10 @@ import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
 import { UseBackgroundVideoReturn } from './video/types';
 
+/**
+ * Hook gérant les effets de transition vidéo et les interactions utilisateur
+ * Version unifiée qui combine les fonctionnalités des anciennes versions .ts et .tsx
+ */
 export const useVideoTransitionEffects = (backgroundVideo: UseBackgroundVideoReturn) => {
   const {
     videoRef,

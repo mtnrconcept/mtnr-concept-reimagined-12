@@ -33,7 +33,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     fallbackImage: fallbackImageFromHook
   } = backgroundVideo;
   
-  // Setup video transition effects
+  // Setup video transition effects using the unified hook
   useVideoTransitionEffects(backgroundVideo);
 
   // Additional error handler with retry logic
