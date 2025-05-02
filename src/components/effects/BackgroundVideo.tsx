@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { VideoOverlay } from './VideoOverlay';
 import { useNavigation } from './NavigationContext';
 import { motion } from 'framer-motion';
+import { useUVMode } from './UVModeContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -19,6 +20,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const { registerVideoTransitionListener } = useNavigation();
+  const { uvMode } = useUVMode();
+  const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
   
   // Configurer la vidéo au chargement initial
   useEffect(() => {
@@ -27,20 +30,21 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     video.muted = true;
     video.playsInline = true;
-    video.loop = true;
-    video.autoplay = true;
+    video.loop = false; // Désactiver la lecture en boucle
+    video.autoplay = false; // Désactiver l'autoplay initial
     
-    const attemptAutoplay = async () => {
-      try {
-        await video.play();
-        console.log('Lecture vidéo réussie au chargement initial');
-      } catch (err) {
-        console.warn('Erreur de lecture automatique:', err);
-      }
-    };
+    // On pause la vidéo initialement
+    video.pause();
+    video.currentTime = 0;
     
-    attemptAutoplay();
-  }, []);
+    // Si la source a changé (UV mode toggle), mettre à jour
+    if (video.src !== currentVideoUrl) {
+      video.src = currentVideoUrl;
+      video.load();
+    }
+    
+    console.log('Configuration vidéo initiale avec la source:', currentVideoUrl);
+  }, [currentVideoUrl]);
   
   // S'abonner aux événements de transition
   useEffect(() => {
@@ -57,8 +61,19 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         // Ajouter la classe pour les effets visuels
         video.classList.add("video-transitioning");
         
-        // Remettre la vidéo au début
+        // Remettre la vidéo au début et la jouer
         video.currentTime = 0;
+        video.loop = false; // S'assurer que la boucle est désactivée
+        
+        // Gérer la fin de la vidéo
+        const handleVideoEnded = () => {
+          console.log("Vidéo terminée, mise en pause");
+          video.pause(); // Mettre en pause à la fin
+          video.removeEventListener('ended', handleVideoEnded);
+        };
+        
+        // Ajouter l'écouteur pour la fin de la vidéo
+        video.addEventListener('ended', handleVideoEnded, { once: true });
         
         // Lecture avec gestion des erreurs
         try {
@@ -77,7 +92,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
             video.classList.remove("video-transitioning");
             console.log("Transition vidéo terminée");
           }
-        }, 2500); // Durée approximative de la vidéo
+        }, 2500); // Durée approximative de la transition
       } catch (error) {
         console.error("Erreur générale durant la transition:", error);
       }
@@ -95,6 +110,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error("Erreur de chargement vidéo:", e);
     setVideoError(true);
+  };
+  
+  // Gestion de la fin de vidéo
+  const handleVideoEnded = () => {
+    const video = videoRef.current;
+    if (video) {
+      console.log("Vidéo terminée naturellement, mise en pause");
+      video.pause();
+    }
   };
 
   return (
@@ -119,13 +143,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         className="background-video"
         playsInline
         muted
-        autoPlay
-        loop
         preload="auto"
         onLoadedData={handleVideoLoad}
         onError={handleVideoError}
+        onEnded={handleVideoEnded}
       >
-        <source src={videoUrl} type="video/mp4" />
+        <source src={currentVideoUrl} type="video/mp4" />
         Votre navigateur ne prend pas en charge les vidéos HTML5.
       </video>
       

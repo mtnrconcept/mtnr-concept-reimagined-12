@@ -47,11 +47,12 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     });
     
     // Réinitialiser l'état de transition après la durée complète de la vidéo
+    // Prolonger légèrement le délai pour s'assurer que la vidéo a bien le temps de se terminer
     transitionTimeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false);
       transitionInProgressRef.current = false;
       console.log("✅ État de transition réinitialisé");
-    }, 3000); // Légèrement plus long que la vidéo
+    }, 3500); // Légèrement plus long que la vidéo pour être sûr
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {

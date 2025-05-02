@@ -19,8 +19,8 @@ export default function PageTransition({
   useEffect(() => {
     // Petit délai pour éviter les transitions multiples
     const timer = setTimeout(() => {
+      console.log("Changement de page détecté, déclenchement transition vidéo");
       navigation.triggerVideoTransition();
-      console.log("Transition vidéo déclenchée lors du changement de page");
     }, 100);
     
     return () => clearTimeout(timer);

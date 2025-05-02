@@ -46,7 +46,7 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* UNE SEULE instance de BackgroundVideo au niveau global */}
+      {/* Une seule instance de BackgroundVideo au niveau global */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/Video fond normale.mp4"
         videoUrlUV="/lovable-uploads/Video fond UV.mp4"
