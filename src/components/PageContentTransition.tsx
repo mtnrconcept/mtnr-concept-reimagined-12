@@ -13,6 +13,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [displayChildren, setDisplayChildren] = useState(children);
   const { isTransitioning, triggerVideoTransition } = useNavigation();
   const [transitioning, setTransitioning] = useState(false);
+  
+  // Constantes pour les délais de transition
+  const VIDEO_DURATION = 7000; // 7 secondes
+  const CONTENT_SWITCH_DELAY = VIDEO_DURATION / 2; // 3.5 secondes
+  const CONTENT_FADE_IN_DELAY = 3.5; // 3.5 secondes
+  const CONTENT_FADE_DURATION = 1.2; // 1.2 secondes
 
   // Effet qui gère la transition lors d'un changement de route
   useEffect(() => {
@@ -22,21 +28,17 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Déclencher la transition vidéo
     triggerVideoTransition();
     
-    // Durée de la transition vidéo (7 secondes)
-    const videoDuration = 7000;
-    
-    // Attendre la moitié de la durée vidéo avant de commencer à afficher le nouveau contenu
-    // Cela donne une transition fluide entre l'ancien et le nouveau contenu
+    // Planifier le changement de contenu après la moitié de la transition vidéo
     const contentSwitchTimer = setTimeout(() => {
       setDisplayChildren(children);
       console.log("Nouveau contenu préparé pour affichage");
-    }, videoDuration / 2);
+    }, CONTENT_SWITCH_DELAY);
     
     // Marquer la fin de la transition après la durée complète
     const transitionEndTimer = setTimeout(() => {
       setTransitioning(false);
       console.log("Transition de contenu terminée");
-    }, videoDuration);
+    }, VIDEO_DURATION);
     
     return () => {
       clearTimeout(contentSwitchTimer);
@@ -52,8 +54,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 3.5, // Attendre la moitié de la vidéo avant de faire apparaître le contenu
-            duration: 1.2
+            delay: CONTENT_FADE_IN_DELAY, 
+            duration: CONTENT_FADE_DURATION
           }
         }}
         exit={{ 
@@ -76,8 +78,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             opacity: 1, 
             rotateX: 0,
             transition: { 
-              delay: transitioning ? 3.5 : 0, // Attendre la moitié de la vidéo avant d'animer
-              duration: 1.2, 
+              delay: transitioning ? CONTENT_FADE_IN_DELAY : 0, 
+              duration: CONTENT_FADE_DURATION, 
               ease: "easeOut"
             }
           }}

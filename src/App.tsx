@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
@@ -18,6 +18,7 @@ import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
+import { useVideoPreloader } from "./hooks/useVideoPreloader";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -32,6 +33,24 @@ const UVCornerLabel = () => {
   return (
     <div className="uv-corner-label">UV</div>
   );
+};
+
+// Preloader for videos
+const VideoPreloader = () => {
+  const [isPreloaded, setIsPreloaded] = useState(false);
+  
+  useVideoPreloader({
+    videoUrls: [
+      "/lovable-uploads/Video fond normale.mp4",
+      "/lovable-uploads/Video fond UV.mp4"
+    ],
+    onPreloaded: (loadedUrls) => {
+      console.log("Vidéos préchargées:", loadedUrls);
+      setIsPreloaded(true);
+    }
+  });
+  
+  return null;
 };
 
 function AnimatedRoutes() {
@@ -75,6 +94,7 @@ const App = () => (
             <NavigationProvider>
               <Toaster />
               <Sonner />
+              <VideoPreloader />
               <BrowserRouter>
                 <Suspense fallback={null}>
                   <AnimatedRoutes />

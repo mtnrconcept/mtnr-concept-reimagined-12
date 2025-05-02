@@ -35,24 +35,34 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Notifier tous les écouteurs - ordre séquentiel
-    Promise.all(listenersRef.current.map(async (listener) => {
-      try {
-        await Promise.resolve(listener());
-      } catch (error) {
-        console.error('Erreur dans l\'écouteur de transition:', error);
-      }
-    })).then(() => {
-      console.log("Tous les écouteurs de transition ont été appelés");
-    });
+    // Créer une copie des écouteurs pour éviter les mutations pendant l'itération
+    const currentListeners = [...listenersRef.current];
     
-    // Réinitialiser l'état de transition après la durée complète de la vidéo (7 secondes)
-    // Prolonger légèrement le délai pour s'assurer que la vidéo a bien le temps de se terminer
-    transitionTimeoutRef.current = window.setTimeout(() => {
-      setIsTransitioning(false);
-      transitionInProgressRef.current = false;
-      console.log("✅ État de transition réinitialisé");
-    }, 7500); // Légèrement plus long que la vidéo pour être sûr
+    // Exécuter tous les écouteurs de manière séquentielle
+    const executeListeners = async () => {
+      try {
+        for (const listener of currentListeners) {
+          try {
+            await Promise.resolve(listener());
+          } catch (error) {
+            console.error('Erreur dans l\'écouteur de transition:', error);
+          }
+        }
+        console.log("Tous les écouteurs de transition ont été appelés");
+      } catch (error) {
+        console.error('Erreur lors de l\'exécution des écouteurs:', error);
+      }
+    };
+    
+    // Exécuter les écouteurs et réinitialiser l'état de transition après la durée complète
+    executeListeners().finally(() => {
+      // Prolonger légèrement le délai pour s'assurer que la vidéo a bien le temps de se terminer
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        setIsTransitioning(false);
+        transitionInProgressRef.current = false;
+        console.log("✅ État de transition réinitialisé");
+      }, 7500); // Légèrement plus long que la vidéo pour être sûr
+    });
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
