@@ -2,6 +2,10 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
+// Constants for transition timings
+const TRANSITION_DURATION = 7000; // 7 seconds total for video transition
+const MIN_TRANSITION_INTERVAL = 2000; // Minimum time between transitions
+
 interface NavigationContextType {
   triggerVideoTransition: () => void;
   registerVideoTransitionListener: (callback: () => void) => () => void;
@@ -18,9 +22,9 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const lastTransitionTimeRef = useRef<number>(0);
   const location = useLocation();
 
-  // Déclencher automatiquement à chaque changement de route
+  // Auto-trigger on route change
   useEffect(() => {
-    // On évite de déclencher lors du montage initial
+    // Avoid triggering on initial mount
     if (lastTransitionTimeRef.current === 0) {
       lastTransitionTimeRef.current = Date.now();
       return;
@@ -30,8 +34,8 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const triggerVideoTransition = useCallback(() => {
     const now = Date.now();
     
-    // Éviter les déclenchements trop fréquents (minimum 2 secondes entre transitions)
-    if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < 2000)) {
+    // Avoid triggering transitions too frequently
+    if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < MIN_TRANSITION_INTERVAL)) {
       console.log("Transition already in progress or too recent, ignoring");
       return;
     }
@@ -41,15 +45,15 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     lastTransitionTimeRef.current = now;
     setIsTransitioning(true);
     
-    // Nettoyer tout timeout existant
+    // Clear any existing timeout
     if (transitionTimeoutRef.current !== null) {
       window.clearTimeout(transitionTimeoutRef.current);
     }
     
-    // Créer une copie des écouteurs pour éviter les mutations pendant l'itération
+    // Create a copy of listeners to avoid mutations during iteration
     const currentListeners = [...listenersRef.current];
     
-    // Exécuter tous les écouteurs
+    // Execute all listeners
     Promise.all(currentListeners.map(async (listener) => {
       try {
         await Promise.resolve(listener());
@@ -59,12 +63,12 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     })).then(() => {
       console.log("All transition listeners have been called");
       
-      // Reset transition state after video duration
+      // Reset transition state after transition duration
       transitionTimeoutRef.current = window.setTimeout(() => {
         setIsTransitioning(false);
         transitionInProgressRef.current = false;
         console.log("✅ Transition state reset");
-      }, 7000); // Video duration
+      }, TRANSITION_DURATION); // Use our constant for transition duration
     });
   }, []);
 

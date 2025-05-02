@@ -13,12 +13,11 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [displayChildren, setDisplayChildren] = useState(children);
   const { triggerVideoTransition, isTransitioning } = useNavigation();
   
-  // Video transition timing constants
-  const VIDEO_DURATION = 7000; // 7 seconds
-  const CONTENT_FADE_OUT_DURATION = 0.7; // seconds
-  const CONTENT_FADE_IN_DELAY = 4.0; // seconds
-  const CONTENT_FADE_IN_DURATION = 1.5; // seconds
-  const CONTENT_SWITCH_DELAY = VIDEO_DURATION / 2; // 3.5 seconds
+  // Custom transition timing constants
+  const CONTENT_FADE_OUT_DURATION = 3; // 3 seconds for content to fade out
+  const PAUSE_DURATION = 2; // 2 seconds pause before new content appears
+  const CONTENT_FADE_IN_DURATION = 2; // 2 seconds for new content to fade in
+  const CONTENT_SWITCH_DELAY = CONTENT_FADE_OUT_DURATION + (PAUSE_DURATION / 2); // Switch content after fade-out + half of pause
   
   // Effect that handles transitions when route changes
   useEffect(() => {
@@ -27,16 +26,16 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Trigger the video transition
     triggerVideoTransition();
     
-    // Schedule the content switch after half the video duration
+    // Schedule the content switch after fade-out + half of pause duration
     const contentSwitchTimer = setTimeout(() => {
       setDisplayChildren(children);
       console.log("New content prepared for display");
-    }, CONTENT_SWITCH_DELAY);
+    }, CONTENT_SWITCH_DELAY * 1000);
     
     return () => {
       clearTimeout(contentSwitchTimer);
     };
-  }, [children, location.pathname, triggerVideoTransition]);
+  }, [children, location.pathname, triggerVideoTransition, CONTENT_SWITCH_DELAY]);
 
   return (
     <AnimatePresence mode="wait">
@@ -46,14 +45,16 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: CONTENT_FADE_IN_DELAY / 1000, 
-            duration: CONTENT_FADE_IN_DURATION
+            delay: CONTENT_FADE_OUT_DURATION + PAUSE_DURATION, 
+            duration: CONTENT_FADE_IN_DURATION,
+            ease: "easeInOut"
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: CONTENT_FADE_OUT_DURATION
+            duration: CONTENT_FADE_OUT_DURATION,
+            ease: "easeInOut"
           }
         }}
         className="relative z-10 min-h-screen w-full pointer-events-auto"
@@ -68,7 +69,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             opacity: 1, 
             rotateX: 0,
             transition: { 
-              delay: isTransitioning ? CONTENT_FADE_IN_DELAY / 1000 : 0, 
+              delay: CONTENT_FADE_OUT_DURATION + PAUSE_DURATION, 
               duration: CONTENT_FADE_IN_DURATION, 
               ease: "easeOut"
             }
@@ -76,7 +77,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           exit={{ 
             y: -40, 
             opacity: 0,
-            transition: { duration: CONTENT_FADE_OUT_DURATION }
+            transition: { 
+              duration: CONTENT_FADE_OUT_DURATION,
+              ease: "easeOut"
+            }
           }}
           className="h-full w-full"
           style={{

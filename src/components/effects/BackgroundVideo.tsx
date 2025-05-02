@@ -37,7 +37,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       {!videoError ? (
         <video
           ref={videoRef}
-          className={`w-full h-full object-cover ${isTransitioning || isPlaying ? 'video-transitioning' : ''}`}
+          className={`w-full h-full object-cover background-video ${isTransitioning || isPlaying ? 'video-transitioning' : ''}`}
           onError={() => console.error("Video error occurred")}
           muted
           playsInline

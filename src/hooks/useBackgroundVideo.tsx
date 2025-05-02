@@ -25,6 +25,8 @@ export const useBackgroundVideo = ({
   const { isTransitioning } = useNavigation();
   const [isPlaying, setIsPlaying] = useState(false);
   const lastLocationRef = useRef(location.pathname);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
   // Handle video errors with retry logic
   const handleVideoError = useCallback(() => {
@@ -90,30 +92,99 @@ export const useBackgroundVideo = ({
         setIsPlaying(false);
         handleVideoError();
       });
-    } else if (!isPlaying) {
-      // Normal background video (non-transition)
+    } else if (!isPlaying && isFirstLoad) {
+      // Initial background video setup
       video.src = currentVideoUrl;
       video.load();
       video.muted = true;
       video.playsInline = true;
       video.loop = true;
+      
+      // Try to autoplay on first load
       video.play().catch(err => {
         console.error("Failed to play background video:", err);
-        handleVideoError();
+        // Don't consider this an error, just wait for user interaction
       });
+      
+      setIsFirstLoad(false);
     }
     
     return () => {
       if (video) {
-        video.pause();
+        // Don't pause during transitions
+        if (!isTransitioning) {
+          video.pause();
+        }
       }
     };
-  }, [currentVideoUrl, location.pathname, isPlaying, handleVideoError]);
+  }, [currentVideoUrl, location.pathname, isPlaying, handleVideoError, isFirstLoad, isTransitioning]);
+
+  // Handle user interaction
+  const handleUserInteraction = useCallback(() => {
+    if (!hasUserInteraction) {
+      console.log('User interaction detected, video ready to play');
+      setHasUserInteraction(true);
+      
+      // Attempt to play video after interaction
+      if (videoRef.current && !videoError) {
+        videoRef.current.play().catch(err => {
+          console.error("Error during playback after interaction:", err);
+        });
+      }
+    }
+  }, [hasUserInteraction, videoError]);
+
+  // Add listeners for first user interaction
+  useEffect(() => {
+    if (hasUserInteraction) return;
+    
+    const handleInteraction = () => {
+      handleUserInteraction();
+    };
+    
+    // Add event listeners
+    const events = ['click', 'touchstart', 'keydown', 'scroll'];
+    events.forEach(event => {
+      document.addEventListener(event, handleInteraction, { once: true });
+    });
+    
+    return () => {
+      // Clean up listeners
+      events.forEach(event => {
+        document.removeEventListener(event, handleInteraction);
+      });
+    };
+  }, [handleUserInteraction, hasUserInteraction]);
 
   // Function to retry video playback
   const retryVideo = useCallback(() => {
     setVideoError(false);
     setRetryCount(0);
+    
+    if (videoRef.current) {
+      videoRef.current.src = currentVideoUrl;
+      videoRef.current.load();
+      videoRef.current.play().catch(err => {
+        console.error("Retry failed:", err);
+        handleVideoError();
+      });
+    }
+  }, [currentVideoUrl, handleVideoError]);
+
+  // Function for playing video transition
+  const playVideoTransition = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    video.currentTime = 0;
+    setIsPlaying(true);
+    
+    try {
+      await video.play();
+    } catch (error) {
+      console.error("Error playing transition video:", error);
+      setIsPlaying(false);
+    }
   }, []);
 
   return {
@@ -121,7 +192,15 @@ export const useBackgroundVideo = ({
     videoError,
     isPlaying,
     isTransitioning,
+    isFirstLoad,
+    setIsFirstLoad,
+    hasUserInteraction,
+    setHasUserInteraction,
+    playVideoTransition,
+    handleUserInteraction,
+    currentVideo: currentVideoUrl,
     retryVideo,
-    fallbackImage
+    fallbackImage,
+    uvMode
   };
 };
