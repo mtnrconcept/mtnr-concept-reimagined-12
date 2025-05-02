@@ -1,21 +1,9 @@
 
 import { useEffect, useCallback } from 'react';
 import { useNavigation } from '@/components/effects/NavigationContext';
+import { UseBackgroundVideoReturn } from './video/types';
 
-interface UseVideoTransitionEffectsProps {
-  videoRef: React.RefObject<HTMLVideoElement>;
-  isFirstLoad: boolean;
-  setIsFirstLoad: (value: boolean) => void;
-  isTransitioning: boolean;
-  hasUserInteraction: boolean;
-  currentVideo: string;
-  playVideoTransition: () => Promise<void>;
-  handleUserInteraction: () => void;
-  uvMode: boolean;
-  isTorchActive: boolean | undefined;
-}
-
-export const useVideoTransitionEffects = (backgroundVideo: UseVideoTransitionEffectsProps) => {
+export const useVideoTransitionEffects = (backgroundVideo: UseBackgroundVideoReturn) => {
   const {
     videoRef,
     isFirstLoad,
