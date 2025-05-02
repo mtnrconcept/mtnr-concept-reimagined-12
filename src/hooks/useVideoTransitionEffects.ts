@@ -15,18 +15,18 @@ interface UseVideoTransitionEffectsProps {
   isTorchActive: boolean | undefined;
 }
 
-export const useVideoTransitionEffects = ({
-  videoRef,
-  isFirstLoad,
-  setIsFirstLoad,
-  isTransitioning,
-  hasUserInteraction,
-  currentVideo,
-  playVideoTransition,
-  handleUserInteraction,
-  uvMode,
-  isTorchActive
-}: UseVideoTransitionEffectsProps) => {
+export const useVideoTransitionEffects = (backgroundVideo: UseVideoTransitionEffectsProps) => {
+  const {
+    videoRef,
+    isFirstLoad,
+    setIsFirstLoad,
+    isTransitioning,
+    hasUserInteraction,
+    currentVideo,
+    playVideoTransition,
+    handleUserInteraction,
+  } = backgroundVideo;
+  
   const navigation = useNavigation();
 
   // Fonction qui exécute la transition si les conditions sont réunies
@@ -69,15 +69,12 @@ export const useVideoTransitionEffects = ({
         
         // S'assurer que les sources sont correctement définies
         if (!videoElement.src && videoElement.getElementsByTagName('source').length === 0) {
-          const source = document.createElement('source');
-          source.src = currentVideo;
-          source.type = 'video/mp4';
-          videoElement.appendChild(source);
+          videoElement.src = currentVideo;
           videoElement.load();
         }
         
+        // Tentative de lecture immédiate
         try {
-          // Tentative de lecture
           await videoElement.play();
           console.log("Lecture vidéo démarrée avec succès");
         } catch (error) {
@@ -89,6 +86,22 @@ export const useVideoTransitionEffects = ({
       setIsFirstLoad(false);
     }
   }, [isFirstLoad, videoRef, setIsFirstLoad, currentVideo]);
+  
+  // Force d'autoplay après un délai court (parfois nécessaire pour Safari)
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || isFirstLoad) return;
+    
+    const delayedPlay = setTimeout(() => {
+      if (videoElement.paused) {
+        videoElement.play().catch(err => 
+          console.warn("Tentative de lecture retardée échouée:", err)
+        );
+      }
+    }, 1000);
+    
+    return () => clearTimeout(delayedPlay);
+  }, [isFirstLoad, videoRef]);
   
   // Ajout des écouteurs pour la première interaction utilisateur
   useEffect(() => {
@@ -105,8 +118,8 @@ export const useVideoTransitionEffects = ({
       }
     };
     
-    // Ajouter les écouteurs d'événements
-    const events = ['click', 'touchstart', 'keydown', 'scroll'];
+    // Ajouter les écouteurs d'événements - plus d'événements pour capter toute interaction
+    const events = ['click', 'touchstart', 'touchend', 'keydown', 'scroll', 'mousemove'];
     events.forEach(event => {
       document.addEventListener(event, handleInteraction, { once: true });
     });
@@ -118,20 +131,4 @@ export const useVideoTransitionEffects = ({
       });
     };
   }, [handleUserInteraction, hasUserInteraction, videoRef]);
-  
-  // Tentative de lecture automatique au chargement initial
-  useEffect(() => {
-    if (videoRef.current && isFirstLoad === false) {
-      const autoplayAttempt = async () => {
-        try {
-          await videoRef.current?.play();
-          console.log("Lecture vidéo automatique réussie");
-        } catch (error) {
-          console.warn("Lecture automatique échouée, attente d'interaction:", error);
-        }
-      };
-      
-      autoplayAttempt();
-    }
-  }, [videoRef, isFirstLoad]);
 };

@@ -1,7 +1,8 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useBackgroundVideo } from "@/hooks/useBackgroundVideo";
 import { useVideoTransitionEffects } from "@/hooks/useVideoTransitionEffects";
+import { useTorch } from "./TorchContext";
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -10,10 +11,12 @@ interface BackgroundVideoProps {
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
-  videoUrl = "/lovable-uploads/Videofondnormale.mp4",
-  videoUrlUV = "/lovable-uploads/VideofondUV.mp4",
+  videoUrl = "/lovable-uploads/video-fond-normale.mp4",
+  videoUrlUV = "/lovable-uploads/video-fond-UV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
 }) => {
+  const { isTorchActive } = useTorch();
+  
   const backgroundVideo = useBackgroundVideo({
     videoUrl,
     videoUrlUV,
@@ -26,11 +29,37 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isPlaying,
     isTransitioning,
     retryVideo,
+    setVideoError,
     fallbackImage: fallbackImageFromHook
   } = backgroundVideo;
   
-  // Set up video transition effects
+  // Setup video transition effects
   useVideoTransitionEffects(backgroundVideo);
+
+  // Additional error handler with retry logic
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    const handleLoadedData = () => {
+      console.log("✅ Vidéo chargée avec succès");
+    };
+    
+    const handleError = (e: Event) => {
+      console.error("❌ Erreur lors du chargement de la vidéo:", e);
+      setVideoError(true);
+    };
+    
+    // Add event listeners
+    videoElement.addEventListener('loadeddata', handleLoadedData);
+    videoElement.addEventListener('error', handleError);
+    
+    return () => {
+      // Cleanup event listeners
+      videoElement.removeEventListener('loadeddata', handleLoadedData);
+      videoElement.removeEventListener('error', handleError);
+    };
+  }, [videoRef, setVideoError]);
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-[-1] overflow-hidden">
@@ -43,6 +72,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
           playsInline
           autoPlay
           loop
+          controlsList="nodownload nofullscreen noremoteplayback"
+          disablePictureInPicture
+          preload="auto"
         />
       ) : (
         <div className="video-fallback-container">
@@ -51,12 +83,17 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
             alt="Fallback Background"
             className="w-full h-full object-cover"
           />
-          <button 
-            onClick={retryVideo}
-            className="absolute bottom-4 right-4 bg-black/50 text-white px-4 py-2 rounded-md text-sm"
-          >
-            Retry Video
-          </button>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <div className="text-center p-4 rounded-lg bg-black/80 max-w-md">
+              <p className="text-white mb-4">Impossible de charger la vidéo</p>
+              <button 
+                onClick={retryVideo}
+                className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black rounded-md transition-colors"
+              >
+                Réessayer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

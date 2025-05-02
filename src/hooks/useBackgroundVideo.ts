@@ -25,13 +25,18 @@ export const useBackgroundVideo = ({
   const [videoError, setVideoError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [loadAttempts, setLoadAttempts] = useState(0);
   
   // Constants
   const maxRetries = 3;
+  const maxLoadAttempts = 5;
   
   // Determine current video URL based on UV mode
   const currentVideo = useMemo(() => {
-    return uvMode ? videoUrlUV : videoUrl;
+    // Utiliser des URL sans espaces
+    const normalizedVideoUrl = videoUrl.replace(/\s+/g, '-');
+    const normalizedVideoUrlUV = videoUrlUV.replace(/\s+/g, '-');
+    return uvMode ? normalizedVideoUrlUV : normalizedVideoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Function to handle user interaction
@@ -43,134 +48,113 @@ export const useBackgroundVideo = ({
       // Attempt to play video after interaction
       if (videoRef.current && !videoError) {
         videoRef.current.play().catch(err => {
-          console.error("Error during initial playback:", err);
+          console.warn("Error during initial playback:", err);
+          // Être moins sévère sur les erreurs de lecture après interaction utilisateur
+          // Ne pas activer setVideoError(true) ici pour donner plus de chances
         });
       }
     }
   }, [hasUserInteraction, videoError]);
 
-  // Handle video errors with retry logic
-  const handleVideoError = useCallback(() => {
-    if (retryCount < maxRetries) {
-      console.log(`Retrying video playback (${retryCount + 1}/${maxRetries})...`);
-      setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-      }, 1000);
-    } else {
-      console.error("Max retries reached, falling back to image");
-      setVideoError(true);
-    }
-  }, [retryCount, maxRetries]);
-
   // Function to retry video playback
   const retryVideo = useCallback(() => {
     setVideoError(false);
     setRetryCount(0);
-  }, []);
+    setLoadAttempts(0);
+    
+    if (videoRef.current) {
+      // Assurer que la vidéo est arrêtée avant de recommencer
+      videoRef.current.pause();
+      videoRef.current.removeAttribute('src');
+      videoRef.current.load();
+      
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.src = currentVideo;
+          videoRef.current.load();
+          videoRef.current.play().catch(err => {
+            console.warn("Retry attempt failed:", err);
+            // Ne pas passer immédiatement à l'image de fallback
+          });
+        }
+      }, 500);
+    }
+  }, [currentVideo]);
 
   // Video transition function
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
-    if (!videoElement || videoError) {
-      console.error("Error: video element not available or video error");
-      return;
-    }
+    if (!videoElement) return;
     
     try {
       setIsTransitioning(true);
       setIsPlaying(true);
       
-      // Update video attributes
-      videoElement.src = currentVideo;
-      videoElement.load();
+      // Réinitialiser la vidéo pour une transition fluide
+      videoElement.currentTime = 0;
       
-      // Configure event handlers
-      const playPromise = new Promise<void>((resolve, reject) => {
-        const onCanPlay = () => {
-          videoElement.removeEventListener('canplay', onCanPlay);
-          videoElement.removeEventListener('error', onError);
-          
-          // Try to play the video
-          videoElement.play()
-            .then(() => {
-              console.log("Video is now playing");
-              resolve();
-            })
-            .catch(error => {
-              console.error("Playback error:", error);
-              reject(error);
-            });
-        };
-        
-        const onError = () => {
-          videoElement.removeEventListener('canplay', onCanPlay);
-          videoElement.removeEventListener('error', onError);
-          reject(new Error("Video loading error"));
-        };
-        
-        videoElement.addEventListener('canplay', onCanPlay, { once: true });
-        videoElement.addEventListener('error', onError, { once: true });
-        
-        // Safety timeout
-        setTimeout(() => {
-          videoElement.removeEventListener('canplay', onCanPlay);
-          videoElement.removeEventListener('error', onError);
-          reject(new Error("Loading timeout exceeded"));
-        }, 5000);
-      });
-      
-      // Wait for playback or catch errors
       try {
-        await playPromise;
+        await videoElement.play();
+        console.log("Transition vidéo démarrée");
         
-        // Add listener for video end
-        const handleVideoEnded = () => {
-          console.log("Video ended");
+        // Après la fin de la transition, réactiver la lecture en boucle
+        const onEnded = () => {
+          videoElement.loop = true;
           setIsTransitioning(false);
           setIsPlaying(false);
-          videoElement.removeEventListener('ended', handleVideoEnded);
-          
-          // Resume looping after transition
-          videoElement.loop = true;
-          videoElement.play().catch(e => console.error("Error resuming loop:", e));
+          videoElement.removeEventListener('ended', onEnded);
         };
         
-        videoElement.removeEventListener('ended', handleVideoEnded);
-        videoElement.addEventListener('ended', handleVideoEnded);
+        videoElement.addEventListener('ended', onEnded, { once: true });
         
       } catch (error) {
-        console.error("Video playback error:", error);
+        console.warn("Erreur de lecture pendant la transition:", error);
         setIsTransitioning(false);
         setIsPlaying(false);
-        handleVideoError();
+        // Tenter à nouveau sans abandonner trop vite
+        if (loadAttempts < maxLoadAttempts) {
+          setLoadAttempts(prev => prev + 1);
+          setTimeout(() => {
+            videoElement.play().catch(() => {
+              // Silencieux ici
+            });
+          }, 500);
+        }
       }
     } catch (error) {
-      console.error("General error during video transition:", error);
+      console.error("Erreur générale pendant la transition vidéo:", error);
       setIsTransitioning(false);
       setIsPlaying(false);
     }
-  }, [currentVideo, videoError, handleVideoError]);
+  }, [loadAttempts, maxLoadAttempts]);
 
   // Reset retry count when video URL changes
   useEffect(() => {
     setRetryCount(0);
+    setLoadAttempts(0);
   }, [currentVideo]);
   
   // Initial video setup
   useEffect(() => {
-    if (videoRef.current && isFirstLoad === false) {
+    if (videoRef.current && !videoError) {
       const autoplayAttempt = async () => {
         try {
-          await videoRef.current?.play();
-          console.log("Autoplay successful");
+          // S'assurer que la source est correctement définie
+          if (videoRef.current) {
+            videoRef.current.src = currentVideo;
+            videoRef.current.load();
+            await videoRef.current.play();
+            console.log("Lecture automatique réussie");
+          }
         } catch (error) {
-          console.warn("Autoplay failed, waiting for interaction:", error);
+          console.warn("Lecture automatique échouée, attente d'interaction:", error);
+          // Ne pas passer directement à l'image de fallback
         }
       };
       
       autoplayAttempt();
     }
-  }, [videoRef, isFirstLoad]);
+  }, [currentVideo, videoError]);
 
   return {
     videoRef,
@@ -186,6 +170,7 @@ export const useBackgroundVideo = ({
     uvMode,
     isTorchActive,
     videoError,
+    setVideoError,
     isPlaying,
     retryVideo,
     fallbackImage

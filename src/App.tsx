@@ -35,22 +35,41 @@ const UVCornerLabel = () => {
   );
 };
 
-// Preloader for videos
+// Preloader for videos with visual feedback
 const VideoPreloader = () => {
   const [isPreloaded, setIsPreloaded] = useState(false);
+  const [showMessage, setShowMessage] = useState(true);
   
-  useVideoPreloader({
+  // Utiliser des noms de fichiers normalisés
+  const { isLoading, progress } = useVideoPreloader({
     videoUrls: [
-      "/lovable-uploads/Videofondnormale.mp4",
-      "/lovable-uploads/VideofondUV.mp4"
+      "/lovable-uploads/video-fond-normale.mp4",
+      "/lovable-uploads/video-fond-UV.mp4"
     ],
     onPreloaded: (loadedUrls) => {
       console.log("Vidéos préchargées:", loadedUrls);
       setIsPreloaded(true);
-    }
+      setTimeout(() => setShowMessage(false), 1000);
+    },
+    showToast: true
   });
   
-  return null;
+  if (isPreloaded && !showMessage) return null;
+  
+  return (
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-500 ${isPreloaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className="text-center">
+        <div className="mb-4 text-xl font-bold">Chargement des ressources médias...</div>
+        <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-yellow-400 transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="mt-2 text-sm text-gray-300">{Math.round(progress)}%</div>
+      </div>
+    </div>
+  );
 };
 
 // This component needs to be inside BrowserRouter
@@ -68,8 +87,8 @@ function AnimatedRoutes() {
     <>
       {/* Background video at the global level with higher z-index for visibility */}
       <BackgroundVideo 
-        videoUrl="/lovable-uploads/Videofondnormale.mp4"
-        videoUrlUV="/lovable-uploads/VideofondUV.mp4"
+        videoUrl="/lovable-uploads/video-fond-normale.mp4"
+        videoUrlUV="/lovable-uploads/video-fond-UV.mp4"
       />
       
       <PageTransition keyId={location.pathname}>
