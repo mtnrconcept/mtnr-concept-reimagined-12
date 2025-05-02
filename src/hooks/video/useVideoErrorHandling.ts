@@ -27,7 +27,7 @@ export const useVideoErrorHandling = ({
     if (retryCount < maxRetries) {
       console.log(`Retrying video playback (${retryCount + 1}/${maxRetries})...`);
       setTimeout(() => {
-        setRetryCount(prev => prev + 1);
+        setRetryCount(retryCount + 1);
       }, 1000);
     } else {
       console.error("Max retries reached, falling back to image");

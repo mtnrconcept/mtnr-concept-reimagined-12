@@ -70,6 +70,8 @@ export const useBackgroundVideo = ({
     playVideoTransition,
     handleUserInteraction,
     retryVideo,
+    retryCount,
+    setRetryCount,
     fallbackImage,
     uvMode
   };

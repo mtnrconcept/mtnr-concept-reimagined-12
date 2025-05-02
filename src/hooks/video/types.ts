@@ -18,6 +18,7 @@ export interface VideoActions {
   playVideoTransition: () => Promise<void>;
   handleUserInteraction: () => void;
   retryVideo: () => void;
+  setRetryCount: (count: number) => void;
 }
 
 export interface UseBackgroundVideoProps {
@@ -32,3 +33,4 @@ export interface UseBackgroundVideoReturn extends VideoState, VideoActions {
   fallbackImage: string;
   uvMode: boolean;
 }
+
