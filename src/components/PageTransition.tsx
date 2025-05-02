@@ -13,27 +13,11 @@ export default function PageTransition({
   children,
   keyId,
 }: PageTransitionProps) {
-  const navigation = useNavigation();
+  const { triggerVideoTransition } = useNavigation();
   
-  // Déclencher la transition lors du changement de page
-  useEffect(() => {
-    let mounted = true;
-    
-    // Petit délai pour éviter les déclenchements multiples
-    const timer = setTimeout(() => {
-      if (mounted) {
-        console.log("Changement de page détecté, déclenchement transition vidéo");
-        navigation.triggerVideoTransition();
-      }
-    }, 100);
-    
-    return () => {
-      mounted = false;
-      clearTimeout(timer);
-    };
-  }, [keyId, navigation]);
-
-  // Variants pour l'animation 3D
+  // No need to call triggerVideoTransition here as it's now handled by the BackgroundVideo component
+  
+  // Variants for the 3D animation
   const pageVariants = {
     initial: {
       opacity: 0,
@@ -46,7 +30,7 @@ export default function PageTransition({
       y: 0,
       transition: {
         duration: 1.2,
-        delay: 3.5, // Attendre la moitié de la vidéo (7s) avant d'animer le nouveau contenu
+        delay: 3.5, // Wait for half the video (7s) before animating the new content
         ease: "easeOut"
       }
     },
