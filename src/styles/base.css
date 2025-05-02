@@ -15,7 +15,7 @@
   }
 }
 
-/* Styles de la vidéo d'arrière-plan */
+/* Styles for background video */
 .background-video {
   position: fixed !important;
   top: 0;
@@ -32,7 +32,7 @@
   will-change: filter, transform, opacity;
 }
 
-/* Animation pour les transitions de page */
+/* Page transition animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -41,13 +41,13 @@
 .page-transition-enter {
   opacity: 0;
   animation: fadeIn 1.5s forwards;
-  animation-delay: 3.5s;  /* Moitié de la vidéo de 7s */
+  animation-delay: 3.5s;  /* Half of the 7s video */
 }
 
 .page-transition-enter-active {
   opacity: 1;
   transition: opacity 1.5s;
-  transition-delay: 3.5s;  /* Moitié de la vidéo de 7s */
+  transition-delay: 3.5s;  /* Half of the 7s video */
 }
 
 .page-transition-exit {
@@ -59,22 +59,22 @@
   transition: opacity 1.2s;
 }
 
-/* Animation améliorée de la vidéo pendant les transitions */
+/* Enhanced video transition animation */
 @keyframes videoPulse {
   0% { filter: brightness(1) saturate(1); }
   25% { filter: brightness(1.3) saturate(1.1) contrast(1.1); }
-  50% { filter: brightness(1.5) saturate(1.2) contrast(1.2); }
+  50% { filter: brightness(1.5) saturate(1.2) contrast(1.2); transform: scale(1.02); }
   75% { filter: brightness(1.3) saturate(1.1) contrast(1.1); }
-  100% { filter: brightness(1) saturate(1) contrast(1); }
+  100% { filter: brightness(1) saturate(1) contrast(1); transform: scale(1); }
 }
 
 .video-transitioning {
-  animation: videoPulse 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactement 7s pour la durée de la vidéo */
-  transition: transform 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactement 7s pour la durée de la vidéo */
+  animation: videoPulse 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactly 7s for video duration */
+  transition: transform 7s cubic-bezier(0.4, 0, 0.2, 1);  /* Exactly 7s for video duration */
   transform-origin: center center;
 }
 
-/* Conteneur pour les transitions de contenu */
+/* Content transition container */
 .content-transition-container {
   position: relative;
   min-height: 100vh;
@@ -83,7 +83,7 @@
   transform-style: preserve-3d;
 }
 
-/* Classes pour les transitions de contenu */
+/* Content transition classes */
 .content-exit {
   position: absolute;
   width: 100%;
@@ -101,7 +101,7 @@
   opacity: 0;
   transform: translateY(30px) rotateX(5deg);
   transition: opacity 1.2s ease-in, transform 1.2s ease-in;
-  transition-delay: 3.5s;  /* Moitié de la vidéo de 7s */
+  transition-delay: 3.5s;  /* Half of the 7s video */
   transform-style: preserve-3d;
 }
 
@@ -110,7 +110,7 @@
   transform: translateY(0) rotateX(0);
 }
 
-/* Effet parallax pour les éléments 3D */
+/* Parallax effects */
 .parallax-layer {
   will-change: transform;
   transform-style: preserve-3d;
@@ -137,7 +137,7 @@
   transform: translateZ(25px) scale(0.9);
 }
 
-/* Éléments de décoration */
+/* Decorative elements */
 .decoration-circle {
   border-radius: 50%;
   background: rgba(255, 215, 0, 0.15);
@@ -160,7 +160,7 @@
   left: 10%;
 }
 
-/* Effet de pulsation sur la vidéo au changement de page */
+/* Video transition pulse effect */
 @keyframes videoTransitionPulse {
   0% { filter: brightness(1) saturate(1); }
   10% { filter: brightness(1.2) saturate(1.1); }

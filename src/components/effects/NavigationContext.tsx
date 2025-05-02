@@ -21,13 +21,10 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   // Déclencher automatiquement à chaque changement de route
   useEffect(() => {
     // On évite de déclencher lors du montage initial
-    if (transitionInProgressRef.current || lastTransitionTimeRef.current === 0) {
+    if (lastTransitionTimeRef.current === 0) {
       lastTransitionTimeRef.current = Date.now();
       return;
     }
-    
-    console.log("Changement d'URL détecté, déclenchement automatique de la transition vidéo");
-    triggerVideoTransition();
   }, [location.pathname]);
 
   const triggerVideoTransition = useCallback(() => {
@@ -35,11 +32,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     // Éviter les déclenchements trop fréquents (minimum 2 secondes entre transitions)
     if (transitionInProgressRef.current || (now - lastTransitionTimeRef.current < 2000)) {
-      console.log("Transition déjà en cours ou trop récente, ignorée");
+      console.log("Transition already in progress or too recent, ignoring");
       return;
     }
     
-    console.log("➡️ Déclenchement transition vidéo");
+    console.log("➡️ Triggering video transition");
     transitionInProgressRef.current = true;
     lastTransitionTimeRef.current = now;
     setIsTransitioning(true);
@@ -52,43 +49,33 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Créer une copie des écouteurs pour éviter les mutations pendant l'itération
     const currentListeners = [...listenersRef.current];
     
-    // Exécuter tous les écouteurs de manière séquentielle
-    const executeListeners = async () => {
+    // Exécuter tous les écouteurs
+    Promise.all(currentListeners.map(async (listener) => {
       try {
-        // Exécuter en parallèle plutôt que séquentiellement pour éviter les blocages
-        await Promise.all(currentListeners.map(async (listener) => {
-          try {
-            await Promise.resolve(listener());
-          } catch (error) {
-            console.error('Erreur dans l\'écouteur de transition:', error);
-          }
-        }));
-        
-        console.log("Tous les écouteurs de transition ont été appelés");
+        await Promise.resolve(listener());
       } catch (error) {
-        console.error('Erreur lors de l\'exécution des écouteurs:', error);
+        console.error('Error in transition listener:', error);
       }
-    };
-    
-    // Exécuter les écouteurs et réinitialiser l'état de transition après la durée complète
-    executeListeners().finally(() => {
-      // Prolonger légèrement le délai pour s'assurer que la vidéo a bien le temps de se terminer
+    })).then(() => {
+      console.log("All transition listeners have been called");
+      
+      // Reset transition state after video duration
       transitionTimeoutRef.current = window.setTimeout(() => {
         setIsTransitioning(false);
         transitionInProgressRef.current = false;
-        console.log("✅ État de transition réinitialisé");
-      }, 7500); // Légèrement plus long que la vidéo pour être sûr
+        console.log("✅ Transition state reset");
+      }, 7000); // Video duration
     });
   }, []);
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
     listenersRef.current.push(callback);
-    console.log("📝 Nouvel écouteur de transition vidéo enregistré");
+    console.log("📝 New video transition listener registered");
     
-    // Fonction de désinscription
+    // Unregister function
     return () => {
       listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
-      console.log("🗑️ Écouteur de transition vidéo désenregistré");
+      console.log("🗑️ Video transition listener unregistered");
     };
   }, []);
 
@@ -108,7 +95,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 export const useNavigation = () => {
   const context = useContext(NavigationContext);
   if (!context) {
-    throw new Error('useNavigation doit être utilisé à l\'intérieur d\'un NavigationProvider');
+    throw new Error('useNavigation must be used within a NavigationProvider');
   }
   return context;
 };

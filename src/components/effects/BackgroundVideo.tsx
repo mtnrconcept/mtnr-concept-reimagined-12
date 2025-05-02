@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useUVMode } from "./UVModeContext";
 import { useLocation } from "react-router-dom";
+import { useNavigation } from "./NavigationContext";
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -21,10 +22,11 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { isTransitioning } = useNavigation();
+  const [isPlaying, setIsPlaying] = useState(false);
   const lastLocationRef = useRef(location.pathname);
 
-  // Effect to handle video playback when URL or UV mode changes
+  // Effect to handle video playback when location changes
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -32,7 +34,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     // Check if location has changed - only then trigger transition
     if (lastLocationRef.current !== location.pathname) {
       console.log("Location changed: triggering video transition");
-      setIsTransitioning(true);
+      
+      // Update the reference
       lastLocationRef.current = location.pathname;
       
       // First pause and reset the video
@@ -46,27 +49,31 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       video.playsInline = true;
       video.loop = false;  // Don't loop during transition
       
-      // Start playback with delay to ensure proper loading
-      setTimeout(() => {
-        video.play().then(() => {
-          console.log("Transition video playback started");
-          
-          // After video duration, return to looping state
-          const transitionEndTimeout = setTimeout(() => {
-            video.loop = true;
-            setIsTransitioning(false);
-            console.log("Video transition completed, returning to loop mode");
-          }, 7000); // 7 seconds - the length of the video
-          
-          return () => clearTimeout(transitionEndTimeout);
-        }).catch(err => {
-          console.error("Failed to play transition video:", err);
-          setIsTransitioning(false);
-          handleVideoError();
-        });
-      }, 100);
-    } else if (!isTransitioning) {
-      // Normal (non-transition) video setup
+      setIsPlaying(true);
+      
+      // Start playback
+      video.play().then(() => {
+        console.log("Transition video playback started");
+        
+        // Listen for video end
+        const handleEnded = () => {
+          console.log("Video transition completed");
+          video.loop = true; // Set back to looping after transition
+          video.play().catch(err => {
+            console.error("Failed to restart loop:", err);
+          });
+          video.removeEventListener('ended', handleEnded);
+          setIsPlaying(false);
+        };
+        
+        video.addEventListener('ended', handleEnded, { once: true });
+      }).catch(err => {
+        console.error("Failed to play transition video:", err);
+        setIsPlaying(false);
+        handleVideoError();
+      });
+    } else if (!isPlaying) {
+      // Normal background video (non-transition)
       video.src = currentVideoUrl;
       video.load();
       video.muted = true;
@@ -83,7 +90,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         video.pause();
       }
     };
-  }, [currentVideoUrl, location.pathname, isTransitioning]);
+  }, [currentVideoUrl, location.pathname, isPlaying]);
 
   // Handle video errors with retry logic
   const handleVideoError = () => {
@@ -108,7 +115,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       {!videoError ? (
         <video
           ref={videoRef}
-          className={`w-full h-full object-cover ${isTransitioning ? 'video-transitioning' : ''}`}
+          className={`w-full h-full object-cover ${isTransitioning || isPlaying ? 'video-transitioning' : ''}`}
           onError={() => handleVideoError()}
           muted
           playsInline

@@ -11,38 +11,30 @@ interface PageContentTransitionProps {
 const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children }) => {
   const location = useLocation();
   const [displayChildren, setDisplayChildren] = useState(children);
-  const { triggerVideoTransition } = useNavigation();
-  const [transitioning, setTransitioning] = useState(false);
+  const { triggerVideoTransition, isTransitioning } = useNavigation();
   
-  // Constantes pour les délais de transition
-  const VIDEO_DURATION = 7000; // 7 secondes
-  const CONTENT_SWITCH_DELAY = VIDEO_DURATION / 2; // 3.5 secondes
-  const CONTENT_FADE_IN_DELAY = 3.5; // 3.5 secondes
-  const CONTENT_FADE_DURATION = 1.2; // 1.2 secondes
-
-  // Effet qui gère la transition lors d'un changement de route
+  // Video transition timing constants
+  const VIDEO_DURATION = 7000; // 7 seconds
+  const CONTENT_FADE_OUT_DURATION = 0.7; // seconds
+  const CONTENT_FADE_IN_DELAY = 4.0; // seconds
+  const CONTENT_FADE_IN_DURATION = 1.5; // seconds
+  const CONTENT_SWITCH_DELAY = VIDEO_DURATION / 2; // 3.5 seconds
+  
+  // Effect that handles transitions when route changes
   useEffect(() => {
-    console.log("Changement de route détecté dans PageContentTransition:", location.pathname);
-    setTransitioning(true);
+    console.log("Page change detected:", location.pathname);
     
-    // Déclencher la transition vidéo explicitement
+    // Trigger the video transition
     triggerVideoTransition();
     
-    // Planifier le changement de contenu après la moitié de la transition vidéo
+    // Schedule the content switch after half the video duration
     const contentSwitchTimer = setTimeout(() => {
       setDisplayChildren(children);
-      console.log("Nouveau contenu préparé pour affichage");
+      console.log("New content prepared for display");
     }, CONTENT_SWITCH_DELAY);
-    
-    // Marquer la fin de la transition après la durée complète
-    const transitionEndTimer = setTimeout(() => {
-      setTransitioning(false);
-      console.log("Transition de contenu terminée");
-    }, VIDEO_DURATION);
     
     return () => {
       clearTimeout(contentSwitchTimer);
-      clearTimeout(transitionEndTimer);
     };
   }, [children, location.pathname, triggerVideoTransition]);
 
@@ -54,39 +46,37 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: CONTENT_FADE_IN_DELAY, 
-            duration: CONTENT_FADE_DURATION
+            delay: CONTENT_FADE_IN_DELAY / 1000, 
+            duration: CONTENT_FADE_IN_DURATION
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 1.0
+            duration: CONTENT_FADE_OUT_DURATION
           }
         }}
         className="relative z-10 min-h-screen w-full pointer-events-auto"
         style={{
           willChange: "opacity, transform",
-          zIndex: 10,
-          perspective: "1200px"
         }}
       >
         <motion.div
-          initial={{ y: 50, opacity: 0, rotateX: 5 }}
+          initial={{ y: 40, opacity: 0, rotateX: 5 }}
           animate={{ 
             y: 0, 
             opacity: 1, 
             rotateX: 0,
             transition: { 
-              delay: transitioning ? CONTENT_FADE_IN_DELAY : 0, 
-              duration: CONTENT_FADE_DURATION, 
+              delay: isTransitioning ? CONTENT_FADE_IN_DELAY / 1000 : 0, 
+              duration: CONTENT_FADE_IN_DURATION, 
               ease: "easeOut"
             }
           }}
           exit={{ 
-            y: -50, 
+            y: -40, 
             opacity: 0,
-            transition: { duration: 1.0 }
+            transition: { duration: CONTENT_FADE_OUT_DURATION }
           }}
           className="h-full w-full"
           style={{

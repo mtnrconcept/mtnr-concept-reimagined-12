@@ -1,8 +1,7 @@
 
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
 import PageContentTransition from "@/components/PageContentTransition";
-import { useNavigation } from "./effects/NavigationContext";
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -13,10 +12,6 @@ export default function PageTransition({
   children,
   keyId,
 }: PageTransitionProps) {
-  const { triggerVideoTransition } = useNavigation();
-  
-  // No need to call triggerVideoTransition here as it's now handled by the BackgroundVideo component
-  
   // Variants for the 3D animation
   const pageVariants = {
     initial: {

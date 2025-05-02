@@ -43,22 +43,22 @@ export default function Navbar() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent, path: string) => {
-    // Si on clique sur le lien de la page actuelle, ne rien faire
+    // Don't navigate if clicking on current page
     if (path === pathname) {
       e.preventDefault();
       return;
     }
     
-    e.preventDefault(); // Empêcher la navigation immédiate
+    e.preventDefault(); // Prevent immediate navigation
     
-    // Déclencher la transition vidéo
-    console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
+    // Trigger video transition and navigation
+    console.log(`Navigation to ${path}, triggering video transition`);
     navigation.triggerVideoTransition();
     
-    // Utiliser navigate de React Router après un délai suffisant
+    // Navigate after a short delay to ensure video starts playing
     setTimeout(() => {
       navigate(path);
-    }, 500); // Délai augmenté pour permettre à la vidéo de bien démarrer
+    }, 100);
   };
 
   const navVariants = {
@@ -124,8 +124,8 @@ export default function Navbar() {
         <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
           {navLinks.map((link) => (
             <motion.li key={link.path} variants={itemVariants}>
-              <Link
-                to={link.path}
+              <a
+                href={link.path}
                 className={cn(
                   "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
                   pathname === link.path 
@@ -143,18 +143,18 @@ export default function Navbar() {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-              </Link>
+              </a>
             </motion.li>
           ))}
           <motion.li variants={itemVariants}>
-            <Link 
-              to="/book" 
+            <a 
+              href="/book" 
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
               onClick={(e) => handleNavClick(e, "/book")}
             >
               <span className="relative z-10">Book Now</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-300 to-yellow-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-            </Link>
+            </a>
           </motion.li>
         </ul>
       </div>
@@ -176,8 +176,8 @@ export default function Navbar() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Link
-                  to={link.path}
+                <a
+                  href={link.path}
                   onClick={(e) => {
                     handleNavClick(e, link.path);
                     setMenuOpen(false);
@@ -188,7 +188,7 @@ export default function Navbar() {
                   )}
                 >
                   {link.name}
-                </Link>
+                </a>
               </motion.li>
             ))}
             <motion.li 
@@ -197,8 +197,8 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2, delay: 0.3 }}
             >
-              <Link 
-                to="/book" 
+              <a 
+                href="/book" 
                 onClick={(e) => {
                   handleNavClick(e, "/book");
                   setMenuOpen(false);
@@ -206,7 +206,7 @@ export default function Navbar() {
                 className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Book Now
-              </Link>
+              </a>
             </motion.li>
           </motion.ul>
         </div>
