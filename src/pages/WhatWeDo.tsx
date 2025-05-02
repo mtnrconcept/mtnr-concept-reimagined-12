@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import ParallaxBackground from "@/components/ParallaxBackground";
@@ -76,15 +77,17 @@ export default function WhatWeDo() {
               variants={itemVariants}
               className="bg-black/80 grunge-border paper-texture px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl"
             >
-              <p className="mb-6">
-                <UVText 
-                  text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
-                  hiddenText="MTNR - CODE SECRET"
-                  uvColor="#7E69AB"
-                />
+              <div className="mb-6">
+                <span>
+                  <UVText 
+                    text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
+                    hiddenText="MTNR - CODE SECRET"
+                    uvColor="#7E69AB"
+                  />
+                </span>
                 , c'est le choix de la marge.<br />
                 On crée sans limite, on enregistre dans la sueur, on partage la ride.
-              </p>
+              </div>
               
               <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400 mb-8">
                 <motion.li variants={itemVariants}>
