@@ -1,71 +1,35 @@
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 interface NavigationContextType {
   triggerVideoTransition: () => void;
   registerVideoTransitionListener: (callback: () => void) => () => void;
-  isTransitioning: boolean;
 }
 
 const NavigationContext = createContext<NavigationContextType | null>(null);
 
 export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const listenersRef = useRef<(() => void)[]>([]);
-  const transitionTimeoutRef = useRef<number | null>(null);
-  const transitionInProgressRef = useRef<boolean>(false);
+  const [listeners, setListeners] = useState<(() => void)[]>([]);
 
-  const triggerVideoTransition = useCallback(() => {
-    // Éviter les déclenchements multiples rapprochés
-    if (transitionInProgressRef.current) {
-      console.log("Transition déjà en cours, ignorée");
-      return;
-    }
-    
-    console.log("Déclenchement transition vidéo");
-    transitionInProgressRef.current = true;
-    setIsTransitioning(true);
-    
-    // Nettoyer tout timeout existant
-    if (transitionTimeoutRef.current !== null) {
-      window.clearTimeout(transitionTimeoutRef.current);
-    }
-    
-    // Notifier tous les écouteurs
-    listenersRef.current.forEach(listener => {
-      try {
-        listener();
-      } catch (error) {
-        console.error('Error in transition listener:', error);
-      }
-    });
-    
-    // Réinitialiser l'état de transition après un délai plus long
-    // pour permettre à la vidéo de commencer sa lecture
-    transitionTimeoutRef.current = window.setTimeout(() => {
-      setIsTransitioning(false);
-      transitionInProgressRef.current = false;
-      console.log("État de transition réinitialisé");
-    }, 1000); // Temps suffisant pour laisser la vidéo commencer
-  }, []);
+  const triggerVideoTransition = () => {
+    console.log('Navigation event triggered, notifying listeners');
+    listeners.forEach(listener => listener());
+  };
 
-  const registerVideoTransitionListener = useCallback((callback: () => void) => {
-    listenersRef.current.push(callback);
-    console.log("Écouteur de transition vidéo enregistré");
+  const registerVideoTransitionListener = (callback: () => void) => {
+    setListeners(prev => [...prev, callback]);
     
     // Return unsubscribe function
     return () => {
-      listenersRef.current = listenersRef.current.filter(listener => listener !== callback);
-      console.log("Écouteur de transition vidéo désenregistré");
+      setListeners(prev => prev.filter(listener => listener !== callback));
     };
-  }, []);
+  };
 
   return (
     <NavigationContext.Provider 
       value={{ 
         triggerVideoTransition, 
-        registerVideoTransitionListener,
-        isTransitioning
+        registerVideoTransitionListener 
       }}
     >
       {children}

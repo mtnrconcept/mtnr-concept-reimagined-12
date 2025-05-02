@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Suspense, useEffect } from "react";
+import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle } from "./components/effects/TorchToggle";
@@ -16,6 +17,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
 import PageTransition from "./components/PageTransition";
+import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
@@ -40,6 +42,7 @@ function AnimatedRoutes() {
   
   // Run feature detection once on component mount
   useEffect(() => {
+    // Pre-check common features to avoid console errors
     checkFeatureSupport('vr');
     checkFeatureSupport('ambient-light-sensor');
     checkFeatureSupport('battery');
@@ -50,6 +53,7 @@ function AnimatedRoutes() {
       {/* Vidéo de fond qui est maintenant en arrière-plan de toutes les pages */}
       <BackgroundVideo />
       
+      <PageTransitionEffect />
       <PageTransition keyId={location.pathname}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
@@ -79,6 +83,7 @@ const App = () => (
                   <AnimatedRoutes />
                 </Suspense>
               </BrowserRouter>
+              <ParticleEffect />
               <TorchToggle />
             </NavigationProvider>
           </Torch3DProvider>

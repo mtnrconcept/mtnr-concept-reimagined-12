@@ -11,9 +11,32 @@ import UVText from "@/components/effects/UVText";
 
 export default function Home() {
   const { uvMode } = useUVMode();
+  const observerRef = useRef<IntersectionObserver | null>(null);
   
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+  
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-up', 'opacity-100');
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    });
+    
+    document.querySelectorAll('[data-animate]').forEach(el => {
+      el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
+      observerRef.current?.observe(el);
+    });
+    
+    return () => observerRef.current?.disconnect();
   }, []);
 
   return (

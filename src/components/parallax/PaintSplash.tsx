@@ -51,4 +51,4 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
       />
     </ParallaxElement>
   );
-}
+};
