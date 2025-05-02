@@ -1,6 +1,4 @@
 
-@tailwind components;
-
 @layer components {
   /** Smoke effect container */
   .smoke-container {

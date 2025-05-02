@@ -43,14 +43,12 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         const x = parseFloat(element.dataset.x || '0');
         const y = parseFloat(element.dataset.y || '0');
         
-        // Ajuste la translation Y pour suivre le défilement de page avec amplification par la profondeur
-        const translateY = depth * scrollY * 0.1; // Réduit l'influence du défilement
-        const translateX = mouseX * (depth * 30);
-        const rotateX = -mouseY * (depth * 3);
-        const rotateY = mouseX * (depth * 3);
-        const translateZ = depth * -500;
+        const translateY = depth * scrollY * 0.5;
+        const translateX = mouseX * (depth * 50);
+        const rotateX = -mouseY * (depth * 5);
+        const rotateY = mouseX * (depth * 5);
+        const translateZ = depth * -800;
         
-        // Applique les transformations pour le parallax
         element.style.transform = `
           translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
           rotateX(${rotateX}deg)
@@ -58,20 +56,17 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         `;
       });
       
-      // Traitement spécial pour l'arrière-plan avec effet de parallax
+      // Traitement spécial pour l'arrière-plan avec effet de parallax encore plus rapide
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.15; // Vitesse réduite
+          const translateY = scrollY * 0.60; // Vitesse augmentée (3x plus rapide)
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
       
       ticking = false;
     };
-
-    // Applique immédiatement une première fois pour positionner correctement les éléments
-    updateParallax();
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });

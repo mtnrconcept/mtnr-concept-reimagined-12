@@ -1,9 +1,9 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigation } from "./effects/NavigationContext";
 
 const navLinks = [
   { name: "Accueil", path: "/" },
@@ -14,11 +14,12 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const location = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const navigation = useNavigation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,14 +33,33 @@ export default function Navbar() {
       });
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent, path: string) => {
+    // Si on clique sur le lien de la page actuelle, ne rien faire
+    if (path === pathname) {
+      e.preventDefault();
+      return;
+    }
+    
+    e.preventDefault(); // Empêcher la navigation immédiate
+    
+    // Déclencher la transition vidéo
+    console.log(`Navigation vers ${path}, déclenchement de la transition vidéo`);
+    navigation.triggerVideoTransition();
+    
+    // Utiliser navigate de React Router après un délai suffisant
+    setTimeout(() => {
+      navigate(path);
+    }, 500); // Délai augmenté pour permettre à la vidéo de bien démarrer
+  };
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -64,26 +84,6 @@ export default function Navbar() {
         damping: 24 
       }
     }
-  };
-
-  // Fonction pour naviguer entre les pages de manière sécurisée
-  const handleNavigation = (path: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    
-    // Fermer le menu mobile si ouvert
-    if (menuOpen) {
-      setMenuOpen(false);
-    }
-    
-    // Si nous sommes déjà sur la page, ne rien faire
-    if (location.pathname === path) {
-      return;
-    }
-    
-    // Naviguer à la nouvelle page via React Router
-    navigate(path);
   };
 
   return (
@@ -122,39 +122,39 @@ export default function Navbar() {
         
         {/* Desktop navigation - centered */}
         <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
-          {navLinks.map((link, index) => (
+          {navLinks.map((link) => (
             <motion.li key={link.path} variants={itemVariants}>
-              <a
-                href={link.path}
-                onClick={(e) => handleNavigation(link.path, e)}
+              <Link
+                to={link.path}
                 className={cn(
                   "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
-                  location.pathname === link.path 
-                    ? "text-yellow-400 font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
-                    : "text-white/90"
+                  pathname === link.path 
+                    ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
+                    : "text-white/80"
                 )}
+                onClick={(e) => handleNavClick(e, link.path)}
               >
                 <span className="relative z-10">{link.name}</span>
                 <span className="absolute inset-0 bg-black/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-                {location.pathname === link.path && (
+                {pathname === link.path && (
                   <motion.span 
                     className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400"
                     layoutId="activeNav"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-              </a>
+              </Link>
             </motion.li>
           ))}
           <motion.li variants={itemVariants}>
-            <a 
-              href="/book" 
-              onClick={(e) => handleNavigation('/book', e)}
+            <Link 
+              to="/book" 
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
+              onClick={(e) => handleNavClick(e, "/book")}
             >
               <span className="relative z-10">Book Now</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-300 to-yellow-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-            </a>
+            </Link>
           </motion.li>
         </ul>
       </div>
@@ -176,16 +176,19 @@ export default function Navbar() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <a
-                  href={link.path}
-                  onClick={(e) => handleNavigation(link.path, e)}
+                <Link
+                  to={link.path}
+                  onClick={(e) => {
+                    handleNavClick(e, link.path);
+                    setMenuOpen(false);
+                  }}
                   className={cn(
                     "block px-6 py-3 font-medium transition-all",
-                    location.pathname === link.path ? "text-yellow-400 font-bold" : "text-white/80"
+                    pathname === link.path ? "text-primary" : "text-white/80"
                   )}
                 >
                   {link.name}
-                </a>
+                </Link>
               </motion.li>
             ))}
             <motion.li 
@@ -194,13 +197,16 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2, delay: 0.3 }}
             >
-              <a 
-                href="/book" 
-                onClick={(e) => handleNavigation('/book', e)}
+              <Link 
+                to="/book" 
+                onClick={(e) => {
+                  handleNavClick(e, "/book");
+                  setMenuOpen(false);
+                }}
                 className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
               >
                 Book Now
-              </a>
+              </Link>
             </motion.li>
           </motion.ul>
         </div>

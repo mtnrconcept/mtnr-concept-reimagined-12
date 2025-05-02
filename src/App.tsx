@@ -1,65 +1,92 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PageTransition from './components/PageTransition';
-import Home from './pages/Home';
-import About from './pages/About';
-import WhatWeDo from './pages/WhatWeDo';
-import Artists from './pages/Artists';
-import Portfolio from './pages/Portfolio';
-import Services from './pages/Services';
-import Contact from './pages/Contact';
-import Book from './pages/Book';
-import NotFound from './pages/NotFound';
-import { TorchProvider } from './components/effects/TorchSystem';
-import { TorchToggle } from './components/effects/TorchToggle';
-import { UVModeProvider } from './components/effects/UVModeContext';
-import { BackgroundVideoManager } from './components/effects/BackgroundVideoManager';
-import { Toaster } from './components/ui/toaster';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Suspense, useEffect } from "react";
+import { TorchProvider, useTorch } from "./components/effects/TorchContext";
+import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
+import { TorchToggle } from "./components/effects/TorchToggle";
+import { Torch3DProvider } from "./components/effects/Torch3DContext";
+import { NavigationProvider } from "./components/effects/NavigationContext";
+import Home from "./pages/Home";
+import Artists from "./pages/Artists";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
+import WhatWeDo from "./pages/WhatWeDo";
+import PageTransition from "./components/PageTransition";
+import { checkFeatureSupport } from "@/lib/feature-detection";
+import BackgroundVideo from "./components/effects/BackgroundVideo";
 
-function App() {
+// Initialize query client outside of component for stability
+const queryClient = new QueryClient();
+
+// Component to display UV label
+const UVCornerLabel = () => {
+  const { uvMode } = useUVMode();
+  const { isTorchActive } = useTorch();
+  
+  if (!isTorchActive || !uvMode) return null;
+  
   return (
-    <Router>
-      <UVModeProvider>
-        <TorchProvider>
-          {/* Background video manager - handles all video playback */}
-          <BackgroundVideoManager />
-          
-          <Routes>
-            {[
-              { path: '/', element: <Home />, key: 'home' },
-              { path: '/about', element: <About />, key: 'about' },
-              { path: '/what-we-do', element: <WhatWeDo />, key: 'what-we-do' },
-              { path: '/artists', element: <Artists />, key: 'artists' },
-              { path: '/portfolio', element: <Portfolio />, key: 'portfolio' },
-              { path: '/services', element: <Services />, key: 'services' },
-              { path: '/contact', element: <Contact />, key: 'contact' },
-              { path: '/book', element: <Book />, key: 'book' },
-              { path: '*', element: <NotFound />, key: 'not-found' },
-            ].map((route) => (
-              <Route
-                key={route.key}
-                path={route.path}
-                element={
-                  <PageTransition keyId={route.key}>
-                    {route.element}
-                  </PageTransition>
-                }
-              />
-            ))}
-          </Routes>
-          
-          {/* Torch Controls UI */}
-          <div className="fixed bottom-4 right-4 z-50">
-            <TorchToggle />
-          </div>
-          
-          {/* Toast notifications */}
-          <Toaster />
-        </TorchProvider>
-      </UVModeProvider>
-    </Router>
+    <div className="uv-corner-label">UV</div>
+  );
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  // Run feature detection once on component mount
+  useEffect(() => {
+    checkFeatureSupport('vr');
+    checkFeatureSupport('ambient-light-sensor');
+    checkFeatureSupport('battery');
+  }, []);
+  
+  return (
+    <>
+      {/* UNE SEULE instance de BackgroundVideo au niveau global */}
+      <BackgroundVideo 
+        videoUrl="/lovable-uploads/Video fond normale.mp4"
+        videoUrlUV="/lovable-uploads/Video fond UV.mp4"
+      />
+      
+      <PageTransition keyId={location.pathname}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/what-we-do" element={<WhatWeDo />} />
+          <Route path="/artists" element={<Artists />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PageTransition>
+      <UVCornerLabel />
+    </>
   );
 }
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <UVModeProvider>
+        <TorchProvider>
+          <Torch3DProvider>
+            <NavigationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={null}>
+                  <AnimatedRoutes />
+                </Suspense>
+              </BrowserRouter>
+              <TorchToggle />
+            </NavigationProvider>
+          </Torch3DProvider>
+        </TorchProvider>
+      </UVModeProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

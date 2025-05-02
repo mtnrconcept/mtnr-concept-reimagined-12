@@ -1,65 +1,128 @@
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { useTorch } from "./TorchContext";
 
-// Type pour le contexte du mode UV
 interface UVModeContextType {
   uvMode: boolean;
   toggleUVMode: () => void;
+  uvCircleRef: React.RefObject<HTMLDivElement>;
+  createUVCircle: (mousePosition: { x: number; y: number }) => void;
+  removeUVCircle: () => void;
 }
 
-// Création du contexte
-const UVModeContext = createContext<UVModeContextType | undefined>(undefined);
+const UVModeContext = createContext<UVModeContextType>({
+  uvMode: false,
+  toggleUVMode: () => {},
+  uvCircleRef: { current: null },
+  createUVCircle: () => {},
+  removeUVCircle: () => {},
+});
 
-// Hook personnalisé pour utiliser le contexte
-export const useUVMode = (): UVModeContextType => {
-  const context = useContext(UVModeContext);
-  if (!context) {
-    throw new Error('useUVMode doit être utilisé dans un UVModeProvider');
-  }
-  return context;
-};
+export const useUVMode = () => useContext(UVModeContext);
 
-// Provider pour le contexte UV
-interface UVModeProviderProps {
-  children: React.ReactNode;
-}
-
-export const UVModeProvider: React.FC<UVModeProviderProps> = ({ children }) => {
-  const [uvMode, setUVMode] = useState<boolean>(false);
-  const isInitialMount = useRef(true);
-
-  // Fonction pour basculer le mode UV
+export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [uvMode, setUVMode] = useState(false);
+  const uvCircleRef = useRef<HTMLDivElement>(null);
+  
   const toggleUVMode = () => {
     setUVMode(prev => !prev);
   };
 
-  // Effet pour appliquer les changements CSS au document
-  useEffect(() => {
-    // Ignorer le premier rendu pour éviter des déclenchements inutiles
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
+  const createUVCircle = (mousePosition: { x: number; y: number }) => {
+    if (!uvCircleRef.current) {
+      const circle = document.createElement('div');
+      circle.className = 'uv-light-circle active';
+      circle.style.left = `${mousePosition.x}px`;
+      circle.style.top = `${mousePosition.y}px`;
+      document.body.appendChild(circle);
+      uvCircleRef.current = circle;
     }
+  };
 
-    if (uvMode) {
-      document.documentElement.classList.add('uv-mode');
-    } else {
-      document.documentElement.classList.remove('uv-mode');
+  const removeUVCircle = () => {
+    if (uvCircleRef.current) {
+      uvCircleRef.current.remove();
+      uvCircleRef.current = null;
     }
+  };
+
+  // Apply global UV mode effects
+  useEffect(() => {
+    const logos = document.querySelectorAll('img[src*="logo"]');
+    const navLinks = document.querySelectorAll('nav a');
+    const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
+    
+    if (uvMode) {
+      // Add UV mode class to body
+      document.body.classList.add('uv-mode-active');
+      
+      // Apply effects to navigation elements
+      navLinks.forEach(link => {
+        link.classList.add('uv-nav-link');
+      });
+      
+      // Apply effects to buttons
+      buttons.forEach(button => {
+        button.classList.add('uv-button');
+      });
+      
+      // Play subtle sound if available
+      try {
+        // Create subtle electronic "click" sound
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(220, audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) {
+        // Ignore errors if Web Audio API is not supported
+        console.log("Audio API not supported", e);
+      }
+    } else {
+      document.body.classList.remove('uv-mode-active');
+      
+      navLinks.forEach(link => {
+        link.classList.remove('uv-nav-link');
+      });
+      
+      buttons.forEach(button => {
+        button.classList.remove('uv-button');
+      });
+    }
+    
+    return () => {
+      document.body.classList.remove('uv-mode-active');
+      
+      navLinks.forEach(link => {
+        link.classList.remove('uv-nav-link');
+      });
+      
+      buttons.forEach(button => {
+        button.classList.remove('uv-button');
+      });
+    };
   }, [uvMode]);
 
   return (
-    <UVModeContext.Provider value={{ uvMode, toggleUVMode }}>
+    <UVModeContext.Provider value={{ 
+      uvMode, 
+      toggleUVMode,
+      uvCircleRef,
+      createUVCircle,
+      removeUVCircle
+    }}>
       {children}
     </UVModeContext.Provider>
-  );
-};
-
-// Composant de base pour fournir le contexte UV
-export const UVModeContextProvider: React.FC<UVModeProviderProps> = ({ children }) => {
-  return (
-    <UVModeProvider>
-      {children}
-    </UVModeProvider>
   );
 };

@@ -1,12 +1,10 @@
 
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DispersingLogo } from './DispersingLogo';
 import { useLocation } from 'react-router-dom';
 
 export const NeonLogo = () => {
   const [glowIntensity, setGlowIntensity] = useState(1);
-  const [shouldDisperse, setShouldDisperse] = useState(false);
   const location = useLocation();
   
   // Effet de scintillement du néon
@@ -17,23 +15,6 @@ export const NeonLogo = () => {
 
     return () => clearInterval(interval);
   }, []);
-
-  // Déclenchement automatique de l'effet de dispersion après un délai
-  useEffect(() => {
-    const disperseTimeout = setTimeout(() => {
-      setShouldDisperse(true);
-    }, 3500); // Attendre 3.5 secondes avant de disperser
-    
-    return () => clearTimeout(disperseTimeout);
-  }, []);
-  
-  // Gérer la fin de l'animation de dispersion
-  const handleDispersionComplete = () => {
-    // Réinitialiser l'effet après un délai
-    setTimeout(() => {
-      setShouldDisperse(false);
-    }, 2000);
-  };
   
   return (
     <div className="w-full flex justify-center items-center py-12 relative z-30">
@@ -48,12 +29,11 @@ export const NeonLogo = () => {
                   drop-shadow(0 0 15px rgba(255, 221, 0, ${glowIntensity * 0.2}))`
         }}
       >
-        <DispersingLogo
-          imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-          triggerDispersion={shouldDisperse}
-          onDispersionComplete={handleDispersionComplete}
-          fromPath={location.pathname}
-          toPath={location.pathname}
+        <img
+          src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+          alt="MTNR Concept"
+          className="w-full h-auto"
+          draggable={false}
         />
       </div>
     </div>

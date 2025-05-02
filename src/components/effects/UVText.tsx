@@ -23,8 +23,8 @@ export default function UVText({
   opacity = 0.05,
   position = "default"
 }: UVTextProps) {
-  const textRef = useRef<HTMLSpanElement>(null);
-  const hiddenTextRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const hiddenTextRef = useRef<HTMLParagraphElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
   const [isIlluminated, setIsIlluminated] = useState(false);
@@ -133,12 +133,12 @@ export default function UVText({
   }, [uvMode, uvColor]);
 
   return (
-    <span className={cn(
-      "uv-text-container relative inline-block", 
+    <div className={cn(
+      "uv-text-container relative", 
       position === "absolute" ? "absolute inset-0" : "",
       className
     )}>
-      <span 
+      <div 
         ref={textRef} 
         className={cn("visible select-none transition-opacity", textSize)}
         style={{
@@ -146,9 +146,9 @@ export default function UVText({
         }}
       >
         {text}
-      </span>
+      </div>
       
-      <span 
+      <p 
         ref={hiddenTextRef}
         className={cn(
           "uv-hidden-text absolute top-0 left-0 w-full pointer-events-none select-none",
@@ -162,7 +162,7 @@ export default function UVText({
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}
-      </span>
-    </span>
+      </p>
+    </div>
   );
 }
