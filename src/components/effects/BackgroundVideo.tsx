@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useBackgroundVideo } from "@/hooks/useBackgroundVideo";
+import { useVideoTransitionEffects } from "@/hooks/useVideoTransitionEffects";
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -13,6 +14,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/VideofondUV.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
 }) => {
+  const backgroundVideo = useBackgroundVideo({
+    videoUrl,
+    videoUrlUV,
+    fallbackImage
+  });
+  
   const {
     videoRef,
     videoError,
@@ -20,11 +27,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     isTransitioning,
     retryVideo,
     fallbackImage: fallbackImageFromHook
-  } = useBackgroundVideo({
-    videoUrl,
-    videoUrlUV,
-    fallbackImage
-  });
+  } = backgroundVideo;
+  
+  // Set up video transition effects
+  useVideoTransitionEffects(backgroundVideo);
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-[-1] overflow-hidden">

@@ -6,109 +6,98 @@ import { useTorch } from '@/components/effects/TorchContext';
 interface UseBackgroundVideoProps {
   videoUrl: string;
   videoUrlUV: string;
+  fallbackImage?: string;
 }
 
-export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoProps) => {
+export const useBackgroundVideo = ({ 
+  videoUrl, 
+  videoUrlUV,
+  fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
+}: UseBackgroundVideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   
-  // États locaux avec valeurs initiales
+  // States
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   
-  // Définir le bon chemin de vidéo basé sur le mode UV
+  // Constants
+  const maxRetries = 3;
+  
+  // Determine current video URL based on UV mode
   const currentVideo = useMemo(() => {
     return uvMode ? videoUrlUV : videoUrl;
   }, [uvMode, videoUrl, videoUrlUV]);
 
-  // Vérifier la disponibilité des vidéos et les précharger
-  useEffect(() => {
-    console.log('URL de la vidéo courante:', currentVideo);
-    
-    const preloadVideo = async () => {
-      try {
-        const response = await fetch(currentVideo);
-        if (!response.ok) {
-          console.error(`La vidéo ${currentVideo} n'a pas pu être chargée:`, response.status);
-          setVideoError(true);
-        } else {
-          console.log(`La vidéo ${currentVideo} existe et est accessible`);
-          setVideoError(false);
-          
-          // Précharger la vidéo via un élément vidéo caché
-          const tempVideo = document.createElement('video');
-          tempVideo.preload = 'auto';
-          tempVideo.src = currentVideo;
-          tempVideo.load();
-          
-          // Éventuellement, nettoyer après préchargement
-          tempVideo.onloadeddata = () => {
-            console.log(`Vidéo ${currentVideo} préchargée avec succès`);
-            tempVideo.remove();
-          };
-        }
-      } catch (error) {
-        console.error(`Erreur lors de la vérification de la vidéo ${currentVideo}:`, error);
-        setVideoError(true);
-      }
-    };
-    
-    preloadVideo();
-    
-    // Configurer l'élément vidéo actuel s'il existe
-    if (videoRef.current) {
-      videoRef.current.src = currentVideo;
-      videoRef.current.load();
-    }
-  }, [currentVideo]);
-
-  // Fonction pour gérer la première interaction utilisateur
+  // Function to handle user interaction
   const handleUserInteraction = useCallback(() => {
     if (!hasUserInteraction) {
-      console.log('Interaction utilisateur détectée, vidéo prête à jouer');
+      console.log('User interaction detected, video ready to play');
       setHasUserInteraction(true);
       
-      // Tentative de lecture automatique après interaction
+      // Attempt to play video after interaction
       if (videoRef.current && !videoError) {
         videoRef.current.play().catch(err => {
-          console.error("Erreur lors de la lecture initiale:", err);
+          console.error("Error during initial playback:", err);
         });
       }
     }
   }, [hasUserInteraction, videoError]);
 
-  // Version optimisée de playVideoTransition
+  // Handle video errors with retry logic
+  const handleVideoError = useCallback(() => {
+    if (retryCount < maxRetries) {
+      console.log(`Retrying video playback (${retryCount + 1}/${maxRetries})...`);
+      setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+      }, 1000);
+    } else {
+      console.error("Max retries reached, falling back to image");
+      setVideoError(true);
+    }
+  }, [retryCount, maxRetries]);
+
+  // Function to retry video playback
+  const retryVideo = useCallback(() => {
+    setVideoError(false);
+    setRetryCount(0);
+  }, []);
+
+  // Video transition function
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
     if (!videoElement || videoError) {
-      console.error("Erreur: élément vidéo non disponible ou erreur vidéo");
+      console.error("Error: video element not available or video error");
       return;
     }
     
     try {
       setIsTransitioning(true);
+      setIsPlaying(true);
       
-      // Mise à jour directe des attributs de la vidéo
+      // Update video attributes
       videoElement.src = currentVideo;
       videoElement.load();
       
-      // Configurer les gestionnaires d'événements
+      // Configure event handlers
       const playPromise = new Promise<void>((resolve, reject) => {
         const onCanPlay = () => {
           videoElement.removeEventListener('canplay', onCanPlay);
           videoElement.removeEventListener('error', onError);
           
-          // Tenter de jouer la vidéo
+          // Try to play the video
           videoElement.play()
             .then(() => {
-              console.log("La vidéo est en cours de lecture");
+              console.log("Video is now playing");
               resolve();
             })
             .catch(error => {
-              console.error("Erreur de lecture:", error);
+              console.error("Playback error:", error);
               reject(error);
             });
         };
@@ -116,61 +105,72 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
         const onError = () => {
           videoElement.removeEventListener('canplay', onCanPlay);
           videoElement.removeEventListener('error', onError);
-          reject(new Error("Erreur de chargement de la vidéo"));
+          reject(new Error("Video loading error"));
         };
         
         videoElement.addEventListener('canplay', onCanPlay, { once: true });
         videoElement.addEventListener('error', onError, { once: true });
         
-        // Timeout de sécurité
+        // Safety timeout
         setTimeout(() => {
           videoElement.removeEventListener('canplay', onCanPlay);
           videoElement.removeEventListener('error', onError);
-          reject(new Error("Délai de chargement dépassé"));
+          reject(new Error("Loading timeout exceeded"));
         }, 5000);
       });
       
-      // Attendre la fin de la lecture ou attraper les erreurs
+      // Wait for playback or catch errors
       try {
         await playPromise;
         
-        // Ajouter l'écouteur pour la fin de la vidéo
+        // Add listener for video end
         const handleVideoEnded = () => {
-          console.log("Vidéo terminée");
+          console.log("Video ended");
           setIsTransitioning(false);
+          setIsPlaying(false);
           videoElement.removeEventListener('ended', handleVideoEnded);
           
-          // Remettre en lecture continue après la transition
+          // Resume looping after transition
           videoElement.loop = true;
-          videoElement.play().catch(e => console.error("Erreur lors de la reprise en boucle:", e));
+          videoElement.play().catch(e => console.error("Error resuming loop:", e));
         };
         
         videoElement.removeEventListener('ended', handleVideoEnded);
         videoElement.addEventListener('ended', handleVideoEnded);
         
       } catch (error) {
-        console.error("Erreur de lecture vidéo:", error);
+        console.error("Video playback error:", error);
         setIsTransitioning(false);
+        setIsPlaying(false);
+        handleVideoError();
       }
     } catch (error) {
-      console.error("Erreur générale lors de la transition vidéo:", error);
+      console.error("General error during video transition:", error);
       setIsTransitioning(false);
+      setIsPlaying(false);
     }
-  }, [currentVideo, videoError]);
+  }, [currentVideo, videoError, handleVideoError]);
 
-  // Loguer l'état de la vidéo pour débogage
+  // Reset retry count when video URL changes
   useEffect(() => {
-    if (videoRef.current) {
-      console.log("Statut de l'élément vidéo:", {
-        paused: videoRef.current.paused,
-        readyState: videoRef.current.readyState,
-        networkState: videoRef.current.networkState,
-        src: videoRef.current.src,
-        currentSrc: videoRef.current.currentSrc,
-        error: videoRef.current.error
-      });
+    setRetryCount(0);
+  }, [currentVideo]);
+  
+  // Initial video setup
+  useEffect(() => {
+    if (videoRef.current && isFirstLoad === false) {
+      const autoplayAttempt = async () => {
+        try {
+          await videoRef.current?.play();
+          console.log("Autoplay successful");
+        } catch (error) {
+          console.warn("Autoplay failed, waiting for interaction:", error);
+        }
+      };
+      
+      autoplayAttempt();
     }
-  }, [isTransitioning, videoRef.current?.error]);
+  }, [videoRef, isFirstLoad]);
 
   return {
     videoRef,
@@ -185,6 +185,9 @@ export const useBackgroundVideo = ({ videoUrl, videoUrlUV }: UseBackgroundVideoP
     playVideoTransition,
     uvMode,
     isTorchActive,
-    videoError
+    videoError,
+    isPlaying,
+    retryVideo,
+    fallbackImage
   };
 };
