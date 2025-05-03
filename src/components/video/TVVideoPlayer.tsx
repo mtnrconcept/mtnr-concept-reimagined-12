@@ -45,15 +45,14 @@ export default function TVVideoPlayer() {
 
   return (
     <div className="relative max-w-4xl mx-auto my-16">
-      {/* TV Frame */}
+      {/* TV Frame with actual image */}
       <div className="relative w-full aspect-video">
-        {/* TV Border */}
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-700 to-black rounded-xl border-8 border-zinc-800 shadow-2xl overflow-hidden">
-          {/* TV Screen with static effect */}
-          <div className="absolute inset-4 bg-black rounded overflow-hidden">
+        {/* Video Player in the background */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <div className="w-[85%] h-[76%] absolute top-[12%] left-[7.5%] overflow-hidden rounded-lg z-10">
             {/* Loading static */}
             {isLoading && (
-              <div className="absolute inset-0 bg-black flex items-center justify-center">
+              <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
                 <div className="w-full h-full opacity-30" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
                   animation: 'noise 0.2s infinite'
@@ -65,33 +64,22 @@ export default function TVVideoPlayer() {
               </div>
             )}
             
-            {/* Video Player */}
-            <div className="relative w-full h-full overflow-hidden">
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
-                title={currentVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            {/* YouTube Video */}
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
+              title={currentVideo.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
           
-          {/* TV Controls (buttons on bottom) */}
-          <div className="absolute bottom-[-20px] left-1/2 transform -translate-x-1/2 flex items-center gap-3 bg-zinc-800 px-4 py-2 rounded-full border-2 border-zinc-700">
-            <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse"></div>
-            <div className="w-4 h-4 rounded-full bg-zinc-600"></div>
-            <div className="w-2 h-7 rounded-full bg-zinc-600"></div>
-          </div>
-
-          {/* TV Antenna */}
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-1 h-10 bg-zinc-500 flex items-start justify-center">
-            <div className="w-8 h-1 bg-zinc-500 rotate-45"></div>
-            <div className="w-8 h-1 bg-zinc-500 -rotate-45"></div>
-          </div>
-          
-          {/* TV Glow Effect */}
-          <div className="absolute -inset-4 bg-yellow-500/10 blur-xl opacity-50 pointer-events-none"></div>
+          {/* TV Overlay Image */}
+          <img 
+            src="/lovable-uploads/ed3157a2-e211-4f4e-87c4-f3976efe1025.png" 
+            alt="TV Frame" 
+            className="absolute inset-0 w-full h-full z-20 pointer-events-none"
+          />
         </div>
       </div>
 
