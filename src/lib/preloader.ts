@@ -78,9 +78,25 @@ const preloadVideo = (url: string): Promise<void> => {
       return;
     }
     
+    // Vérifier également le cache de session
+    if (typeof window !== 'undefined' && window.sessionStorage.getItem(`video-cache-${url}`) === 'loaded') {
+      console.log(`Vidéo ${url} déjà préchargée selon sessionStorage`);
+      
+      // Créer un élément vidéo rapide pour le cache même si déjà préchargé
+      const quickVideo = document.createElement('video');
+      quickVideo.src = url;
+      quickVideo.preload = 'auto';
+      quickVideo.muted = true;
+      resourceCache.videos.set(url, quickVideo);
+      
+      resolve();
+      return;
+    }
+    
     const video = document.createElement('video');
     video.preload = 'auto';
     video.muted = true;
+    video.playsInline = true;
     
     let loaded = false;
     
@@ -89,6 +105,13 @@ const preloadVideo = (url: string): Promise<void> => {
       if (!loaded) {
         loaded = true;
         resourceCache.videos.set(url, video);
+        
+        // Marquer comme chargé dans sessionStorage pour persistance entre navigations
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(`video-cache-${url}`, 'loaded');
+        }
+        
+        console.log(`Vidéo ${url} préchargée avec succès et mise en cache`);
         resolve();
       }
     };
@@ -109,8 +132,53 @@ const preloadVideo = (url: string): Promise<void> => {
     
     video.src = url;
     video.load();
+    
+    // Essayer de précharger également via l'API Cache si disponible
+    if ('caches' in window) {
+      caches.open('video-cache').then(cache => {
+        fetch(url, { mode: 'no-cors' })
+          .then(response => {
+            cache.put(url, response);
+          })
+          .catch(error => {
+            console.warn('Erreur lors de la mise en cache avec Cache API:', error);
+          });
+      });
+    }
   });
 };
+
+// Fonction spéciale pour forcer le préchargement des vidéos
+export const forcePrecacheVideos = (): Promise<void> => {
+  console.log('Forçage du préchargement des vidéos...');
+  
+  return new Promise((resolve, reject) => {
+    // Précharger les vidéos en parallèle
+    const videoPromises = resources.videos.map(videoUrl => {
+      // Si déjà en cache, on crée quand même un nouvel élément pour rafraîchir
+      if (resourceCache.videos.has(videoUrl)) {
+        resourceCache.videos.delete(videoUrl);
+      }
+      
+      return preloadVideo(videoUrl);
+    });
+    
+    Promise.all(videoPromises)
+      .then(() => {
+        console.log('Préchargement forcé des vidéos terminé');
+        resolve();
+      })
+      .catch(error => {
+        console.error('Erreur lors du préchargement forcé des vidéos:', error);
+        reject(error);
+      });
+  });
+};
+
+// Exposer la fonction au niveau global
+if (typeof window !== 'undefined') {
+  window.__forcePrecacheVideos = forcePrecacheVideos;
+}
 
 // Fonction principale pour précharger toutes les ressources
 export const preloadAllResources = async (): Promise<void> => {
@@ -145,9 +213,6 @@ export const preloadRoutes = async (): Promise<void> => {
       import('../pages/Book'),
       import('../pages/NotFound')
     ]);
-    
-    // Note: On ne peut pas accéder à `getAssets` directement car ce n'est pas une propriété standard
-    // Au lieu de cela, nous préchargeons simplement les composants de page
     
     console.log("Composants de route préchargés");
   } catch (error) {
@@ -189,20 +254,20 @@ export const initializePreloader = async (): Promise<void> => {
   try {
     console.log("Initialisation du préchargeur...");
     
+    // Précharger en priorité les vidéos pour prévenir les saccades
+    await preloadAllResources();
+    
     // Précharger les routes et l'UI en parallèle
     await Promise.all([
       preloadRoutes(),
       preloadUI()
     ]);
     
-    // Précharger ensuite les ressources média (peut prendre plus de temps)
-    await preloadAllResources();
-    
     // Créer et attacher un gestionnaire d'événements pour précharger
     // les pages lors des hover sur les liens de navigation
-    document.addEventListener('DOMContentLoaded', () => {
+    if (typeof document !== 'undefined') {
       attachNavigationPreloading();
-    });
+    }
     
     console.log("Préchargement initial terminé");
   } catch (error) {
@@ -251,7 +316,8 @@ export const isResourceCached = (type: 'image' | 'video', url: string): boolean 
   if (type === 'image') {
     return resourceCache.images.has(url);
   } else if (type === 'video') {
-    return resourceCache.videos.has(url);
+    return resourceCache.videos.has(url) || 
+           (typeof window !== 'undefined' && window.sessionStorage.getItem(`video-cache-${url}`) === 'loaded');
   }
   return false;
 };
