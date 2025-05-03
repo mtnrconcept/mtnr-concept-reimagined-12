@@ -122,8 +122,9 @@ export default function UVHiddenCode({
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
         top: typeof position.y === 'number' ? `${position.y}%` : position.y,
         transform: `rotate(${rotation}deg)`,
-        opacity: 0,
-        zIndex: 20
+        opacity: 0, // Start with opacity 0
+        zIndex: 20,
+        backgroundColor: 'transparent', // Remove background
       }}
     >
       <pre
@@ -137,7 +138,7 @@ export default function UVHiddenCode({
           lineHeight: 1.2,
           letterSpacing: '0.05em',
           padding: '8px',
-          backgroundColor: 'transparent'
+          backgroundColor: 'transparent' // No background
         }}
       >
         {code}

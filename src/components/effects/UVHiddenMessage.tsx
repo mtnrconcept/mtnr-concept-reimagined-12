@@ -68,7 +68,6 @@ export default function UVHiddenMessage({
             // Distance du caractère au curseur
             const charDx = mousePosition.x - charX;
             const charDy = mousePosition.y - rect.top - rect.height / 2;
-            const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
             
             // Visibilité basée sur la distance au curseur (effet masque elliptique inversé)
             // Plus le caractère est proche du curseur, plus il est visible
@@ -119,11 +118,12 @@ export default function UVHiddenMessage({
       style={{
         color,
         fontSize,
-        opacity: 0,
+        opacity: 0, // Always start with opacity 0 until mouse is in perimeter
         transform: `translate(${offsetX}px, ${offsetY}px)`,
         textShadow: `0 0 5px ${color}`,
         letterSpacing: '0.07em',
         fontWeight: 'bold',
+        backgroundColor: 'transparent', // Remove any background
       }}
     >
       {message}

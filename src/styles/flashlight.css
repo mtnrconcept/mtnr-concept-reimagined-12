@@ -84,4 +84,21 @@
     isolation: isolate;
     z-index: 200;
   }
+
+  /* Ensure hidden UV elements start with opacity 0 */
+  .uv-hidden-code, 
+  .uv-hidden-message, 
+  .uv-hidden-text {
+    opacity: 0 !important;
+    background-color: transparent !important;
+    border: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Only visible within UV perimeter */
+  .uv-hidden-code.visible, 
+  .uv-hidden-message.visible, 
+  .uv-hidden-text.visible {
+    opacity: 1 !important;
+  }
 }

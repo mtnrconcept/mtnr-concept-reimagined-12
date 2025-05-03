@@ -139,6 +139,9 @@ export default function UVText({
       if (textRef.current) {
         textRef.current.style.opacity = '1';
       }
+      if (hiddenTextRef.current) {
+        hiddenTextRef.current.style.opacity = '0';
+      }
     }
   }, [uvMode, isTorchActive]);
 
@@ -162,8 +165,9 @@ export default function UVText({
           textSize
         )}
         style={{
-          opacity: 0,
+          opacity: 0, // Always start with opacity 0
           color: uvMode ? "#D2FF3F" : uvColor,
+          backgroundColor: 'transparent', // Remove background
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}
