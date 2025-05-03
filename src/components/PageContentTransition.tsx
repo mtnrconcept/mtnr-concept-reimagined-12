@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { safeBlur } from "@/lib/animation-utils";
 
 interface PageContentTransitionProps {
   children: React.ReactNode;
@@ -25,17 +26,6 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       // Afficher le contenu après un délai
       setTimeout(() => {
         setContentVisible(true);
-        
-        // S'assurer que le scroll est possible
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
-        
-        // Débloquer tous les conteneurs potentiels
-        const scrollableElements = document.querySelectorAll('.content-container, #main-content, .page-content-wrapper');
-        scrollableElements.forEach(el => {
-          (el as HTMLElement).style.overflowY = 'auto';
-          (el as HTMLElement).style.height = 'auto';
-        });
       }, 0);
       
     }, 3000); // Conserver la durée originale de 3000ms
@@ -47,7 +37,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const contentVariants = {
     initial: {
       opacity: 0,
-      y: "10vh", 
+      y: "10vh", // Conserver le déplacement original
       filter: "blur(8px)"
     },
     animate: {
@@ -55,14 +45,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] },
+        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Conserver les durées originales
         y: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] },
         filter: { duration: 3.0, ease: [0.1, 0.4, 0.2, 1.0] }
       }
     },
     exit: {
       opacity: 0,
-      y: "-10vh",
+      y: "-10vh", // Conserver le déplacement original
       filter: "blur(8px)",
       transition: {
         opacity: { duration: 3.0, ease: [0.33, 1, 0.68, 1] },
@@ -83,16 +73,17 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         initial="initial"
         animate={contentVisible ? "animate" : "initial"}
         exit="exit"
-        className="scrollable-section w-full" 
+        className="relative w-full overflow-visible" 
         style={{
-          // Forcer le comportement de défilement correct
-          overflowY: 'auto',
-          minHeight: '100vh',
-          height: 'auto',
+          // Ajouter un padding-top pour le contenu afin qu'il ne soit pas sous la navbar
           paddingTop: "64px", // Hauteur de la navbar
-          position: "relative",
+          minHeight: "100vh",
+          height: "auto", // Permettre au contenu de s'étendre
+          // Garantir que l'animation reste sous la navbar
           zIndex: 10,
-          display: "block"
+          // Assurer que le contenu est bien scrollable
+          position: "relative",
+          display: "block" // Assurer que le div se comporte comme un bloc
         }}
       >
         {displayChildren}

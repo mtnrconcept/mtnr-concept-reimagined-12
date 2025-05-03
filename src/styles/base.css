@@ -9,51 +9,29 @@
 @layer base {
   html, body, #root {
     @apply m-0 p-0 min-h-screen bg-black text-white;
-    overflow-x: hidden !important;
-    overflow-y: auto !important; /* Forcer l'activation du scroll vertical */
-    height: auto !important; /* Ne pas fixer la hauteur pour permettre le scroll */
-    position: relative;
-    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: visible !important; /* Forcer l'activation du scroll vertical */
+    height: auto; /* Ne pas fixer la hauteur pour permettre le scroll */
   }
   
-  /* Correction spécifique pour les conteneurs principaux */
-  body, #root, .app-container, .content-container {
-    display: block !important;
-    position: relative !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh;
+  /* S'assurer qu'aucun élément racine ne bloque le défilement */
+  body, #root {
+    position: relative;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-height: none !important;
   }
   
   /* Fix spécifique pour toutes les pages */
-  [data-route] #main-content,
-  .page-content-wrapper,
-  main,
-  .relative.w-full.min-h-screen,
-  .content-container {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
+  [data-route] #main-content {
+    overflow-y: visible !important;
+  }
+  
+  /* Garantir que le contenu de la page peut défiler */
+  .content-container, 
+  .page-content-wrapper {
+    overflow-y: visible !important;
     min-height: 100vh;
-    position: relative !important;
-    z-index: 10;
-  }
-  
-  /* Reset pour tous les conteneurs qui pourraient bloquer le défilement */
-  .overflow-visible,
-  [class*="overflow-"],
-  [style*="overflow"] {
-    overflow-y: auto !important;
-  }
-  
-  /* Style spécifique pour les sections scrollables */
-  .scrollable-section {
     position: relative;
-    display: block;
-    overflow-y: auto !important;
-    min-height: 50vh;
   }
 }

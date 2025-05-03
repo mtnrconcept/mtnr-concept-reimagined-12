@@ -28,7 +28,6 @@ import UVPageSecrets from "./components/effects/UVPageSecrets";
 import LoadingScreen from "./components/LoadingScreen";
 import { initializePreloader } from "./lib/preloader";
 import { Progress } from "./components/ui/progress";
-import { ScrollArea } from "./components/ui/scroll-area";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -49,42 +48,27 @@ const UVCornerLabel = () => {
 function AppContent() {
   const location = useLocation();
   
-  // Fix global du défilement
+  // Run feature detection once on component mount
   useEffect(() => {
+    // Pre-check common features to avoid console errors
+    checkFeatureSupport('vr');
+    checkFeatureSupport('ambient-light-sensor');
+    checkFeatureSupport('battery');
+    
     // S'assurer que le document peut défiler
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
     document.documentElement.style.height = 'auto';
     document.body.style.height = 'auto';
     
-    // Run feature detection once on component mount
-    checkFeatureSupport('vr');
-    checkFeatureSupport('ambient-light-sensor');
-    checkFeatureSupport('battery');
-    
     // Débloquer tous les conteneurs potentiels
-    const unlockScrolling = () => {
-      const scrollableElements = document.querySelectorAll(
-        '.content-container, #main-content, .page-content-wrapper, .app-container'
-      );
+    setTimeout(() => {
+      const scrollableElements = document.querySelectorAll('.content-container, #main-content, .page-content-wrapper');
       scrollableElements.forEach(el => {
-        if (el instanceof HTMLElement) {
-          el.style.overflowY = 'auto';
-          el.style.height = 'auto';
-          el.style.minHeight = '100vh';
-          el.style.position = 'relative';
-        }
+        (el as HTMLElement).style.overflowY = 'visible';
+        (el as HTMLElement).style.height = 'auto';
       });
-    };
-    
-    // Appliquer immédiatement et réessayer après un délai
-    unlockScrolling();
-    setTimeout(unlockScrolling, 1000);
-    
-    // Vérification continue du défilement 
-    const scrollCheckInterval = setInterval(unlockScrolling, 3000);
-    
-    return () => clearInterval(scrollCheckInterval);
+    }, 500);
   }, []);
   
   // Ajouter un attribut data-route pour les styles CSS spécifiques à chaque route
@@ -93,11 +77,11 @@ function AppContent() {
   }, [location.pathname]);
   
   return (
-    <div className="app-container min-h-screen scrollable-section">
+    <div className="app-container min-h-screen overflow-visible">
       {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
       
-      <div className="content-container scrollable-section">
+      <div className="content-container overflow-visible">
         {/* Une seule vidéo de fond au niveau de l'application */}
         <BackgroundVideo 
           videoUrl="/lovable-uploads/videonormale.mp4"

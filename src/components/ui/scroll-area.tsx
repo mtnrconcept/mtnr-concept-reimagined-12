@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
@@ -11,17 +10,9 @@ const ScrollArea = React.forwardRef<
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
-    style={{ overflowY: 'auto' }} // Force le défilement vertical
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport 
-      className="h-full w-full rounded-[inherit]"
-      style={{ 
-        overflowY: 'auto',
-        height: 'auto',
-        minHeight: '100%'
-      }}
-    >
+    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
       {children}
     </ScrollAreaPrimitive.Viewport>
     <ScrollBar />
