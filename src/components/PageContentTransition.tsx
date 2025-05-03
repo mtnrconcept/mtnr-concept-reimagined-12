@@ -29,7 +29,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         setContentVisible(true);
       }, 0); // Pas d'attente supplémentaire
       
-    }, 5000); // Réduit à 5000ms au lieu de 7000ms pour faire entrer le contenu 2s plus tôt
+    }, 5000); // Maintenu à 5000ms pour faire entrer le contenu 2s plus tôt
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -46,9 +46,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Garde la même décélération
-        y: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Garde la même décélération fluide
-        filter: { duration: 3.0, ease: [0.33, 1, 0.68, 1] } // Garde la même durée
+        opacity: { duration: 4.5, ease: [0.12, 0, 0.39, 0] }, // Ralenti à 4.5s avec une courbe d'accélération plus douce
+        y: { duration: 4.5, ease: [0.12, 0, 0.39, 0] }, // Ralenti à 4.5s avec la même courbe
+        filter: { duration: 4.0, ease: [0.16, 1, 0.3, 1] } // Ralenti à 4.0s
       }
     },
     exit: {
