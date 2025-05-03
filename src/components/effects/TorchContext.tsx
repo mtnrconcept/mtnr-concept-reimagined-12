@@ -81,24 +81,34 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {children}
         {isTorchActive && !uvMode && (
           <svg className="fixed top-0 left-0 w-full h-full z-[99] pointer-events-none">
-            <defs>
-              <mask id="torch-mask">
-                <rect width="100%" height="100%" fill="black" />
-                <circle
-                  cx={mousePosition.x}
-                  cy={mousePosition.y}
-                  r={600}
-                  fill="white"
-                />
-              </mask>
-            </defs>
-            <rect
-              width="100%"
-              height="100%"
-              fill="rgba(0, 0, 0, 0.95)"
-              mask="url(#torch-mask)"
-            />
-          </svg>
+  <defs>
+    <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stopColor="white" stopOpacity="1" />
+      <stop offset="70%" stopColor="white" stopOpacity="0.4" />
+      <stop offset="100%" stopColor="white" stopOpacity="0" />
+    </radialGradient>
+
+    <mask id="torch-mask">
+      <rect width="100%" height="100%" fill="black" />
+      <circle
+        cx={mousePosition.x}
+        cy={mousePosition.y}
+        r={300}
+        fill="url(#torch-gradient)"
+      />
+    </mask>
+  </defs>
+
+  <rect
+    width="100%"
+    height="100%"
+    fill="black"
+    fillOpacity="0.9"
+    mask="url(#torch-mask)"
+    style={{ transition: "all 0.3s ease-out" }}
+  />
+</svg>
+
         )}
       </div>
     </TorchContext.Provider>
