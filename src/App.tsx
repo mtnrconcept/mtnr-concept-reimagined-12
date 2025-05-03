@@ -20,6 +20,7 @@ import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
+import Navbar from "./components/Navbar";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -36,7 +37,8 @@ const UVCornerLabel = () => {
   );
 };
 
-function AnimatedRoutes() {
+// Séparation de la structure pour isoler la Navbar des animations
+function AppContent() {
   const location = useLocation();
   
   // Run feature detection once on component mount
@@ -48,25 +50,30 @@ function AnimatedRoutes() {
   }, []);
   
   return (
-    <>
-      {/* Une seule vidéo de fond au niveau de l'application */}
-      <BackgroundVideo 
-        videoUrl="/lovable-uploads/videonormale.mp4"
-        videoUrlUV="/lovable-uploads/videouv.mp4"
-      />
+    <div className="app-container">
+      {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
+      <Navbar />
       
-      <PageTransitionEffect />
-      <PageTransition keyId={location.pathname}>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/what-we-do" element={<WhatWeDo />} />
-          <Route path="/artists" element={<Artists />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </PageTransition>
-      <UVCornerLabel />
-    </>
+      <div className="content-container">
+        {/* Une seule vidéo de fond au niveau de l'application */}
+        <BackgroundVideo 
+          videoUrl="/lovable-uploads/videonormale.mp4"
+          videoUrlUV="/lovable-uploads/videouv.mp4"
+        />
+        
+        <PageTransitionEffect />
+        <PageTransition keyId={location.pathname}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/what-we-do" element={<WhatWeDo />} />
+            <Route path="/artists" element={<Artists />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </PageTransition>
+        <UVCornerLabel />
+      </div>
+    </div>
   );
 }
 
@@ -81,7 +88,7 @@ const App = () => (
             <BrowserRouter>
               <Suspense fallback={null}>
                 <BackgroundVideoController />
-                <AnimatedRoutes />
+                <AppContent />
               </Suspense>
             </BrowserRouter>
             <ParticleEffect />

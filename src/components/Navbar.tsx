@@ -21,12 +21,17 @@ export default function Navbar() {
   
   return (
     <nav 
-      className="w-full fixed top-0 left-0 z-[99999] bg-black/85 backdrop-blur-lg shadow-lg"
+      className="w-full fixed top-0 left-0 bg-black/85 backdrop-blur-lg shadow-lg"
       style={{ 
         position: 'fixed',
         isolation: 'isolate',
-        // Assure que la navbar reste au-dessus de TOUTES les animations de transition
-        zIndex: 99999
+        zIndex: 100000, // Nombre encore plus élevé pour garantir qu'il est vraiment au-dessus
+        width: '100%',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '64px',
+        pointerEvents: 'all', // Important pour que la navbar reste interactive
       }}
     >
       <div className="container mx-auto flex justify-center h-16 px-4 sm:px-6">

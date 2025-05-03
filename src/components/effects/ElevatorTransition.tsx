@@ -126,10 +126,15 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       className="fixed inset-0 pointer-events-none" 
       ref={containerRef}
       style={{
-        // Z-index ajusté pour être en dessous de la navbar (qui est à 99999)
+        // Z-index absolument inférieur à la navbar
         zIndex: 50,
-        // Ajouter un padding-top pour ne pas chevaucher la navbar
-        paddingTop: '64px' // 16px de hauteur de la navbar
+        // Respecter la hauteur de la navbar
+        top: '64px',
+        height: 'calc(100vh - 64px)',
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
       }}
     >
       {isActive && (
