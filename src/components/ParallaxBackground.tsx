@@ -7,7 +7,6 @@ interface ParallaxBackgroundProps {
 
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   const parallaxRef = useRef<HTMLDivElement>(null);
-  // Réduit le nombre de splashes à 4 (au lieu de 6) et réduit leur taille
   const paintSplashes = [
     { src: '/lovable-uploads/paint-splatter-hi.png', x: 80, y: 15, depth: 0.3, scale: 1.6, rotation: -15 },
     { src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', x: 10, y: 25, depth: 0.4, scale: 1.4, rotation: 20 },
@@ -16,69 +15,59 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
   ];
 
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+    let lastKnownScrollPosition = 0;
+    let lastKnownMouseX = 0;
+    let lastKnownMouseY = 0;
+
+    const updateElements = () => {
       if (!parallaxRef.current) return;
       
-      const scrollY = window.scrollY;
+      const scrollY = lastKnownScrollPosition;
+      const mouseX = lastKnownMouseX;
+      const mouseY = lastKnownMouseY;
       
-      // Appliquer l'effet de parallaxe pour les éclaboussures
-      // Tous les éléments se déplacent dans la même direction mais à des vitesses différentes
+      // Mettre à jour les éclaboussures de peinture avec un effet parallaxe
       document.querySelectorAll('.paint-splash').forEach((splash) => {
         const depth = parseFloat(splash.getAttribute('data-depth') || '1');
         // Vitesse proportionnelle à la profondeur (plus profond = plus lent)
-        // Le facteur 0.3 détermine l'ampleur de l'effet de parallaxe
-        const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
-        (splash as HTMLElement).style.transform = `translateY(${translateY}px) 
-          translateZ(${depth * 500}px)
+        // Mouvement dans la MÊME direction que le défilement
+        const translateY = scrollY * (depth * 0.15); // Coefficient réduit pour un effet subtil
+        
+        // Effet de souris également plus subtil
+        const offsetX = mouseX * 15 * depth;
+        const offsetY = mouseY * 15 * depth;
+        
+        (splash as HTMLElement).style.transform = `
+          translate3d(${offsetX}px, ${translateY}px, ${depth * 100}px) 
           rotate(${splash.getAttribute('data-rotation')}deg) 
-          scale(${splash.getAttribute('data-scale')})`;
+          scale(${splash.getAttribute('data-scale')})
+        `;
       });
+    };
+
+    const handleScroll = () => {
+      lastKnownScrollPosition = window.scrollY;
       
-      // Effet parallax pour la vidéo d'arrière-plan
-      // La vidéo se déplace plus lentement pour créer l'effet de profondeur
-      const videoBackground = document.querySelector('video');
-      if (videoBackground) {
-        // Facteur de vitesse proche de 1 pour un mouvement presque synchrone avec le défilement
-        videoBackground.style.transform = `translateY(${scrollY * 2}px)`;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateElements();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
     
-    // Effet parallaxe pour les mouvements de souris
     const handleMouseMove = (e: MouseEvent) => {
-      if (!parallaxRef.current) return;
+      lastKnownMouseX = (e.clientX / window.innerWidth - 0.5);
+      lastKnownMouseY = (e.clientY / window.innerHeight - 0.5);
       
-      const mouseX = (e.clientX / window.innerWidth - 0.5);
-      const mouseY = (e.clientY / window.innerHeight - 0.5);
-      
-      document.querySelectorAll('.paint-splash').forEach((splash) => {
-        const depth = parseFloat(splash.getAttribute('data-depth') || '0');
-        const offsetX = mouseX * 25 * depth;
-        const offsetY = mouseY * 25 * depth;
-        
-        const element = splash as HTMLElement;
-        const currentTransform = element.style.transform;
-        
-        // Combiner l'effet de défilement et de mouvement de souris
-        if (currentTransform.includes('translateY')) {
-          element.style.transform = currentTransform.replace(
-            'translateY',
-            `translate3d(${offsetX}px, `
-          ).replace(
-            'px)',
-            'px, 0px)'
-          );
-        } else {
-          element.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0) 
-            rotate(${splash.getAttribute('data-rotation')}deg) 
-            scale(${splash.getAttribute('data-scale')})`;
-        }
-      });
-      
-      // Effet parallax de la souris sur la vidéo (léger pour la profondeur)
-      const videoBackground = document.querySelector('video');
-      if (videoBackground) {
-        const scrollY = window.scrollY;
-        videoBackground.style.transform = `translate3d(${mouseX * -5}px, ${mouseY * -5 + scrollY * 0.85}px, 0)`;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateElements();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
     
@@ -109,12 +98,13 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         {paintSplashes.map((splash, index) => (
           <div 
             key={`splash-${index}`}
-            className={`paint-splash absolute pointer-events-none transition-transform duration-300 ease-out`}
+            className={`paint-splash absolute pointer-events-none`}
             style={{
               left: `${splash.x}%`,
               top: `${splash.y}%`,
-              zIndex: splash.depth < 0 ? 50 : 0, // Les éclaboussures avec depth négative sont au-dessus du contenu
-              opacity: splash.opacity || 0.25 // Opacité réduite
+              zIndex: splash.depth < 0 ? 50 : 0,
+              opacity: splash.opacity || 0.25,
+              willChange: 'transform'
             }}
             data-depth={splash.depth}
             data-rotation={splash.rotation}
@@ -123,7 +113,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             <img 
               src={splash.src}
               alt="Paint splash"
-              className="w-auto h-auto max-w-[250px] max-h-[250px] object-contain" // Taille réduite
+              className="w-auto h-auto max-w-[250px] max-h-[250px] object-contain"
               style={{
                 filter: 'contrast(1.5) brightness(1.2)',
                 mixBlendMode: 'screen',

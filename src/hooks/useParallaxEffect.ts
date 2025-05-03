@@ -12,6 +12,39 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     let ticking = false;
     let rafId: number;
 
+    const updateParallax = () => {
+      // Traitement des éléments avec effet 3D prononcé
+      const elements = container.querySelectorAll<HTMLElement>('.parallax-element');
+      elements.forEach((element) => {
+        const depth = parseFloat(element.dataset.depth || '0');
+        
+        // Déplacement dans la MÊME direction que le scroll (coefficient positif)
+        // mais à une vitesse réduite pour donner l'impression de profondeur
+        const translateY = depth * scrollY * 0.15;
+        const translateX = mouseX * (depth * 20);
+        const rotateX = -mouseY * (depth * 5);
+        const rotateY = mouseX * (depth * 5);
+        const translateZ = depth * -400; // Réduction de la profondeur Z pour effet plus subtil
+        
+        element.style.transform = `
+          translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+        `;
+      });
+      
+      // Traitement spécial pour l'arrière-plan avec effet de parallax encore plus subtil
+      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
+      bgElements.forEach((el) => {
+        if (!el.classList.contains('parallax-element')) {
+          const translateY = scrollY * 0.10; // Coefficient positif et réduit (10%)
+          el.style.transform = `translateY(${translateY}px) scale(1.1)`;
+        }
+      });
+      
+      ticking = false;
+    };
+
     const handleScroll = () => {
       scrollY = window.scrollY;
       requestAnimationUpdate();
@@ -24,10 +57,6 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       requestAnimationUpdate();
     };
 
-    const handleResize = () => {
-      requestAnimationUpdate();
-    };
-
     const requestAnimationUpdate = () => {
       if (!ticking) {
         rafId = requestAnimationFrame(updateParallax);
@@ -35,51 +64,15 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       }
     };
 
-    const updateParallax = () => {
-      // Traitement des éléments avec effet 3D prononcé
-      const elements = container.querySelectorAll<HTMLElement>('.parallax-element');
-      elements.forEach((element) => {
-        const depth = parseFloat(element.dataset.depth || '0');
-        const x = parseFloat(element.dataset.x || '0');
-        const y = parseFloat(element.dataset.y || '0');
-        
-        // Déplacement vers le HAUT lors du défilement vers le bas (inverse du scroll)
-        const translateY = -depth * scrollY * 0.5;
-        const translateX = mouseX * (depth * 50);
-        const rotateX = -mouseY * (depth * 5);
-        const rotateY = mouseX * (depth * 5);
-        const translateZ = depth * -800;
-        
-        element.style.transform = `
-          translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
-          rotateX(${rotateX}deg)
-          rotateY(${rotateY}deg)
-        `;
-      });
-      
-      // Traitement spécial pour l'arrière-plan avec effet de parallax encore plus rapide
-      const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
-      bgElements.forEach((el) => {
-        if (!el.classList.contains('parallax-element')) {
-          // Signe négatif pour que l'élément se déplace vers le haut lors du défilement vers le bas
-          const translateY = -scrollY * 0.60; 
-          el.style.transform = `translateY(${translateY}px) scale(1.1)`;
-        }
-      });
-      
-      ticking = false;
-    };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('resize', handleResize, { passive: true });
     
+    // Initialisation immédiate pour éviter les sauts
     requestAnimationUpdate();
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(rafId);
     };
   }, [containerRef]);
