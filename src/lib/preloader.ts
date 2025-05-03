@@ -120,7 +120,7 @@ const preloadVideo = (url: string): Promise<void> => {
     video.oncanplaythrough = markAsLoaded;
     video.onloadeddata = () => {
       // Si nous avons au moins les premières frames, c'est probablement suffisant
-      setTimeout(markAsLoaded, 500);
+      setTimeout(markAsLoaded, 300); // Réduit à 300ms pour accélérer
     };
     
     video.onerror = () => {
@@ -145,7 +145,7 @@ const preloadVideo = (url: string): Promise<void> => {
         }
         resolve();
       }
-    }, 5000); // 5 secondes maximum par vidéo (réduit de 8 à 5 secondes)
+    }, 3000); // 3 secondes maximum par vidéo (réduit de 5 à 3 secondes)
     
     video.src = url;
     video.load();
@@ -153,7 +153,11 @@ const preloadVideo = (url: string): Promise<void> => {
     // Essayer de précharger également via l'API Cache si disponible
     if ('caches' in window) {
       caches.open('video-cache').then(cache => {
-        fetch(url, { mode: 'no-cors' })
+        fetch(url, { 
+          mode: 'no-cors', 
+          cache: 'force-cache',
+          credentials: 'same-origin'
+        })
           .then(response => {
             cache.put(url, response);
           })
@@ -170,6 +174,27 @@ export const forcePrecacheVideos = (): Promise<void> => {
   console.log('Forçage du préchargement des vidéos...');
   
   return new Promise((resolve) => {
+    // Créer des éléments vidéo directs pour chaque vidéo
+    resources.videos.forEach(url => {
+      const videoEl = document.createElement('video');
+      videoEl.muted = true;
+      videoEl.playsInline = true;
+      videoEl.preload = 'auto';
+      videoEl.src = url;
+      videoEl.load();
+      
+      // Essayer de lire un peu de la vidéo pour la mettre en cache
+      videoEl.play().then(() => {
+        // Lire juste un peu puis pause
+        setTimeout(() => {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+        }, 100);
+      }).catch(e => {
+        console.log("Erreur lors de la lecture de préchargement:", e);
+      });
+    });
+    
     // Précharger les vidéos en parallèle
     const videoPromises = resources.videos.map(videoUrl => {
       // Si déjà en cache, on crée quand même un nouvel élément pour rafraîchir

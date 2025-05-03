@@ -53,7 +53,7 @@ export const BackgroundVideoController = () => {
         
         // Plusieurs événements qui peuvent indiquer une vidéo chargée
         preloadEl.oncanplaythrough = markAsLoaded;
-        preloadEl.onloadeddata = () => setTimeout(markAsLoaded, 500);
+        preloadEl.onloadeddata = () => setTimeout(markAsLoaded, 300); // Réduit de 500 à 300ms
         
         preloadEl.onerror = (err) => {
           console.error(`Erreur lors du préchargement de ${url}:`, err);
@@ -61,23 +61,32 @@ export const BackgroundVideoController = () => {
           resolve(url); // On résout quand même
         };
         
-        // Timeout de sécurité (5 secondes)
+        // Timeout de sécurité (3 secondes au lieu de 5)
         setTimeout(() => {
           if (!loaded) {
             console.warn(`Timeout du préchargement pour ${url}, mais on continue`);
             window.sessionStorage.setItem(`video-cache-${url}`, 'partial');
             resolve(url); // On résout quand même pour ne pas bloquer
           }
-        }, 5000);
+        }, 3000);
 
         // Essai de préchargement alternatif via l'API Fetch
-        fetch(url, { method: 'HEAD' })
+        fetch(url, { method: 'HEAD', cache: 'force-cache' })
           .then(() => {
             console.log(`Vérification d'en-tête pour ${url} réussie`);
           })
           .catch(err => {
             console.warn(`Échec de la vérification d'en-tête pour ${url}:`, err);
           });
+          
+        // Utiliser l'API Cache si disponible
+        if ('caches' in window) {
+          caches.open('video-cache').then(cache => {
+            cache.add(url).catch(e => console.warn("Erreur de mise en cache:", e));
+          }).catch(err => {
+            console.warn("Cache API non disponible:", err);
+          });
+        }
       });
     };
     
