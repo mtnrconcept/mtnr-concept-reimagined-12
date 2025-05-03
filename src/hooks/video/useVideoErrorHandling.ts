@@ -1,19 +1,17 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { VideoState, VideoActions } from "./types";
 
 interface UseVideoErrorHandlingProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   videoState: Pick<VideoState, "videoError" | "retryCount">;
   videoActions: Pick<VideoActions, "setVideoError" | "setRetryCount">;
-  fallbackImage: string;
 }
 
 export function useVideoErrorHandling({
   videoRef,
   videoState,
   videoActions,
-  fallbackImage,
 }: UseVideoErrorHandlingProps) {
   const { videoError, retryCount } = videoState;
   const { setVideoError, setRetryCount } = videoActions;
@@ -53,11 +51,10 @@ export function useVideoErrorHandling({
     };
   }, [videoRef, retryCount, setRetryCount, setVideoError]);
 
-  // Gestion de l'affichage du fallback lorsqu'une erreur se produit
+  // Affichage d'un message d'erreur en cas d'échec, mais sans fallback image
   useEffect(() => {
     if (videoError && videoRef.current) {
-      console.log("Erreur vidéo détectée, affichage du fallback");
-      videoRef.current.poster = fallbackImage;
+      console.log("Erreur vidéo détectée, sans image de fallback");
     }
-  }, [videoError, fallbackImage, videoRef]);
+  }, [videoError, videoRef]);
 }

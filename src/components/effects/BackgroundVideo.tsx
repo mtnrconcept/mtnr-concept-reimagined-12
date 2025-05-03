@@ -7,13 +7,11 @@ import { useNavigation } from './NavigationContext';
 interface BackgroundVideoProps {
   videoUrl?: string;
   videoUrlUV?: string;
-  fallbackImage?: string;
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
   videoUrl = "/lovable-uploads/videonormale.mp4", 
-  videoUrlUV = "/lovable-uploads/videouv.mp4", 
-  fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
+  videoUrlUV = "/lovable-uploads/videouv.mp4"
 }) => {
   // Références pour les éléments vidéo
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -182,7 +180,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       )}
       {videoError && (
         <div className="absolute top-0 left-0 bg-red-500 text-xs text-white px-2 py-0.5 opacity-70 z-50">
-          Erreur vidéo - Mode fallback
+          Erreur vidéo
         </div>
       )}
       {isTransitioning && (
@@ -195,7 +193,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-        poster={fallbackImage}
         playsInline
         muted
         preload="auto"

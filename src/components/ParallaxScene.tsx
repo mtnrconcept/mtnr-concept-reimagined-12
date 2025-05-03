@@ -12,8 +12,8 @@ export default function ParallaxScene() {
   
   return (
     <>
-      {/* Background avec l'image d'escalier */}
-      <Background imagePath="/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png" />
+      {/* Background avec la vidéo */}
+      <Background />
 
       <div 
         ref={containerRef}

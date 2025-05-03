@@ -11,7 +11,6 @@ import { UseBackgroundVideoProps, UseBackgroundVideoReturn } from './video/types
 export function useBackgroundVideo({
   videoUrl = "/lovable-uploads/videonormale.mp4",
   videoUrlUV = "/lovable-uploads/videouv.mp4",
-  fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
   autoPlay = false
 }: UseBackgroundVideoProps = {}): UseBackgroundVideoReturn {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,12 +68,11 @@ export function useBackgroundVideo({
     videoActions
   });
   
-  // Hook pour gérer les erreurs vidéo
+  // Hook pour gérer les erreurs vidéo (sans l'image de fallback)
   useVideoErrorHandling({
     videoRef,
     videoState,
-    videoActions,
-    fallbackImage
+    videoActions
   });
   
   // Hook pour gérer la navigation (avec lecture de la vidéo)
@@ -106,7 +104,6 @@ export function useBackgroundVideo({
     currentVideo,
     videoError,
     retryCount,
-    fallbackImage,
     uvMode,
     isTorchActive,
     setIsFirstLoad,
