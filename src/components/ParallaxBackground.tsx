@@ -31,8 +31,8 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       document.querySelectorAll('.paint-splash').forEach((splash) => {
         const depth = parseFloat(splash.getAttribute('data-depth') || '1');
         // Vitesse proportionnelle à la profondeur (plus profond = plus lent)
-        // Mouvement dans la MÊME direction que le défilement
-        const translateY = scrollY * (depth * 0.15); // Coefficient réduit pour un effet subtil
+        // Mouvement dans la MÊME direction que le défilement (vers le HAUT quand on scroll vers le BAS)
+        const translateY = -scrollY * depth * 0.15; // Négatif pour aller vers le haut
         
         // Effet de souris également plus subtil
         const offsetX = mouseX * 15 * depth;

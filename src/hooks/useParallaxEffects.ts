@@ -20,9 +20,9 @@ export const useParallaxEffects = ({ containerRef }: ParallaxHookProps) => {
       elements?.forEach(el => {
         const depth = parseFloat(el.dataset.depth || '0');
         
-        // Direction du déplacement cohérente pour tous les éléments
-        // Utilisation d'un coefficient qui ralentit proportionnellement à la profondeur
-        const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
+        // Direction du déplacement cohérente pour tous les éléments (vers le HAUT quand on scroll vers le BAS)
+        // Plus la profondeur est grande, plus l'élément bouge lentement
+        const translateY = -scrollY * depth * 0.15; // Négatif pour inverser le déplacement
         const translateX = mouseX * (depth * 15);
         const translateZ = depth * -1000;
         

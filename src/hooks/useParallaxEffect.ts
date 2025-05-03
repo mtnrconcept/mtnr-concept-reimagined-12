@@ -18,9 +18,9 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       elements.forEach((element) => {
         const depth = parseFloat(element.dataset.depth || '0');
         
-        // Coefficient positif pour que tous les éléments se déplacent dans le MÊME sens
+        // Coefficient négatif pour que tous les éléments se déplacent dans le MÊME sens
         // La vitesse est proportionnelle à la profondeur (plus profond = plus lent)
-        const translateY = scrollY * (1 - Math.abs(depth) * 0.7); // 30% de variation maximum
+        const translateY = -scrollY * depth * 0.2; // Négatif pour que les éléments montent quand on scrolle vers le bas
         
         // Effets de souris plus subtils pour plus de réalisme
         const translateX = mouseX * (depth * 15);
@@ -43,7 +43,8 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
           // Déplacement très léger pour le fond (5% de la vitesse de défilement)
-          const translateY = scrollY * 0.95; 
+          // Mais dans la même direction que le contenu (vers le haut quand on scrolle vers le bas)
+          const translateY = -scrollY * 0.05; 
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });

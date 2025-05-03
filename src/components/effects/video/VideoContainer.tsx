@@ -37,16 +37,17 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
     const updateVideoPosition = () => {
       if (!videoRef.current) return;
       
-      // La vidéo se déplace dans la même direction que le contenu mais plus lentement
-      // Le coefficient 0.95 crée un effet de profondeur subtil (vidéo à 95% de la vitesse de défilement)
+      // La vidéo se déplace dans la MÊME direction que le contenu mais plus lentement
+      // Le coefficient 0.15 crée un effet de profondeur (vidéo à 15% de la vitesse de défilement)
+      // IMPORTANT: Utiliser un nombre positif pour déplacer dans la même direction
       const scrollY = lastKnownScrollPosition;
-      const translateY = scrollY * 0.95;
+      const translateY = scrollY * -0.15; // Négatif pour inverser la direction et aller vers le HAUT en scrollant vers le bas
       
-      // Ajout d'un léger effet de parallaxe pour les mouvements de souris
-      const mouseX = lastKnownMouseX * 8; // Effet plus prononcé
-      const mouseY = lastKnownMouseY * 8;
+      // Ajout d'un léger effet de parallaxe pour les mouvements de souris (réduit)
+      const mouseX = lastKnownMouseX * 3; // Effet plus subtil
+      const mouseY = lastKnownMouseY * 3;
       
-      videoRef.current.style.transform = `translate3d(${mouseX}px, ${translateY + mouseY}px, 0)`;
+      videoRef.current.style.transform = `translate3d(${mouseX}px, ${translateY}px, 0) scale(1.1)`;
       
       ticking = false;
     };
