@@ -1,5 +1,5 @@
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { VideoState, VideoActions } from "./types";
 
 interface UseVideoTransitionProps {
@@ -15,10 +15,15 @@ export function useVideoTransition({
 }: UseVideoTransitionProps) {
   const { isTransitioning } = videoState;
   const { setIsTransitioning } = videoActions;
+  const transitionInProgressRef = useRef(false);
 
   const playVideoTransition = useCallback(async () => {
     const videoElement = videoRef.current;
-    if (!videoElement || isTransitioning) return;
+    // Vérifier si une transition est déjà en cours pour éviter les appels multiples
+    if (!videoElement || isTransitioning || transitionInProgressRef.current) return;
+    
+    // Marquer le début de la transition
+    transitionInProgressRef.current = true;
     
     try {
       console.log('Transition vidéo déclenchée (torche ou navigation)');
@@ -29,17 +34,22 @@ export function useVideoTransition({
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
       
-      // Ajout d'un petit délai pour donner le temps à la vidéo de se charger
+      // Ajouter un petit délai pour donner le temps à la vidéo de se charger
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
+      // Créer une seule fonction de gestion de fin qui sera nettoyée correctement
       const handleVideoEnded = () => {
         console.log('Vidéo terminée, mise en pause');
-        videoElement.pause();
-        videoElement.currentTime = 0;
+        if (videoElement) {
+          videoElement.pause();
+          videoElement.currentTime = 0;
+        }
         setIsTransitioning(false);
+        transitionInProgressRef.current = false;
         // Retirer l'écouteur pour éviter des déclenchements multiples
-        videoElement.removeEventListener('ended', handleVideoEnded);
+        if (videoElement) {
+          videoElement.removeEventListener('ended', handleVideoEnded);
+        }
       };
       
       // S'assurer qu'on n'a pas d'écouteurs en double
@@ -56,16 +66,15 @@ export function useVideoTransition({
         }
       } catch (playError) {
         console.error('Erreur lors de la lecture de la vidéo:', playError);
-        // Gérer les erreurs de lecture spécifiques
-        if (playError.name === 'AbortError') {
-          console.warn('Lecture vidéo interrompue par une autre action');
-        }
+        // Gérer les erreurs de lecture et nettoyer
+        transitionInProgressRef.current = false;
         setIsTransitioning(false);
         videoElement.removeEventListener('ended', handleVideoEnded);
       }
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);
+      transitionInProgressRef.current = false;
       if (videoElement) {
         videoElement.removeEventListener('ended', () => {});
       }

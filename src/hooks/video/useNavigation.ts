@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigation } from "../../components/effects/NavigationContext";
 import { VideoState, VideoActions } from "./types";
@@ -19,12 +19,24 @@ export function useNavigationHandler({
   const navigation = useNavigation();
   const { isFirstLoad } = videoState;
   const { setIsFirstLoad, playVideoTransition } = videoActions;
+  const prevPathRef = useRef(location.pathname);
+  const transitionRequestedRef = useRef(false);
 
   // Écouter les événements de navigation pour jouer la vidéo instantanément
   useEffect(() => {
     const unregister = navigation.registerVideoTransitionListener(() => {
-      // On ne change pas la vidéo lors de la navigation, on joue juste la transition
-      playVideoTransition();
+      // Éviter les déclenchements multiples
+      if (!transitionRequestedRef.current) {
+        transitionRequestedRef.current = true;
+        // On ne change pas la vidéo lors de la navigation, on joue juste la transition
+        setTimeout(() => {
+          playVideoTransition();
+          // Réinitialisation après un délai pour permettre d'autres transitions
+          setTimeout(() => {
+            transitionRequestedRef.current = false;
+          }, 1000);
+        }, 50);
+      }
     });
     return unregister;
   }, [navigation, playVideoTransition]);
@@ -34,15 +46,27 @@ export function useNavigationHandler({
     const videoElement = videoRef.current;
     if (!videoElement) return;
     
-    if (isFirstLoad) {
-      // À la première charge, mettre la vidéo en pause
-      videoElement.pause();
-      videoElement.currentTime = 0;
-      setIsFirstLoad(false);
-      console.log('Vidéo initialisée en pause');
-    } else {
-      // Lors des changements de route, jouer la vidéo une seule fois
-      playVideoTransition();
+    // Vérifier si le chemin a vraiment changé
+    if (prevPathRef.current !== location.pathname) {
+      prevPathRef.current = location.pathname;
+      
+      if (isFirstLoad) {
+        // À la première charge, mettre la vidéo en pause
+        videoElement.pause();
+        videoElement.currentTime = 0;
+        setIsFirstLoad(false);
+        console.log('Vidéo initialisée en pause');
+      } else if (!transitionRequestedRef.current) {
+        // Éviter les déclenchements multiples de transition
+        transitionRequestedRef.current = true;
+        setTimeout(() => {
+          playVideoTransition();
+          // Réinitialisation après un délai
+          setTimeout(() => {
+            transitionRequestedRef.current = false;
+          }, 1000);
+        }, 50);
+      }
     }
     
     // Gestion de la visibilité de la page
@@ -50,11 +74,6 @@ export function useNavigationHandler({
       if (document.hidden && videoElement) {
         videoElement.pause();
         console.log('Page non visible, vidéo en pause');
-      } else if (videoElement && !isFirstLoad) {
-        videoElement.play().catch(err => {
-          console.error('Erreur lors de la reprise de lecture:', err);
-        });
-        console.log('Page à nouveau visible, reprise de la lecture');
       }
     };
     
@@ -64,8 +83,6 @@ export function useNavigationHandler({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (videoElement) {
         videoElement.pause();
-        // Retirer tous les écouteurs d'événements
-        videoElement.removeEventListener('ended', () => {});
       }
     };
   }, [location.pathname, isFirstLoad, videoRef, setIsFirstLoad, playVideoTransition]);

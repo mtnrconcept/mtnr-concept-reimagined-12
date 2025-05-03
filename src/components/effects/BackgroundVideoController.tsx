@@ -6,72 +6,43 @@ export const BackgroundVideoController = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Préchargement des vidéos
-    const preloadVideos = async () => {
-      console.info('Préchargement des vidéos');
-      
-      const videoUrls = [
-        '/lovable-uploads/Composition_1.mp4',  // Remplacé les espaces par des underscores
-        '/lovable-uploads/Composition_1_1.mp4' // Remplacé les espaces par des underscores
-      ];
-      
+    // Initialiser le préchargement une seule fois
+    const videoUrls = [
+      '/lovable-uploads/Composition_1.mp4',
+      '/lovable-uploads/Composition_1_1.mp4'
+    ];
+    
+    console.info('Initialisation du préchargement des vidéos');
+    
+    // Utiliser fetch pour précharger plutôt que des éléments vidéo
+    // pour éviter les erreurs d'interruption de lecture
+    const preloadVideo = async (url) => {
       try {
-        // Précharger les deux vidéos
-        for (const url of videoUrls) {
-          console.info(`Tentative de préchargement de la vidéo ${url}`);
-          
-          // Tenter de mettre en cache les vidéos
-          if ('caches' in window) {
-            try {
-              const cache = await caches.open('video-cache');
-              const response = await fetch(url, { method: 'HEAD' });
-              
-              if (response.ok) {
-                await cache.add(url);
-                console.info(`Vidéo ${url} mise en cache avec succès`);
-              } else {
-                console.error(`Échec de mise en cache: ${url} - statut: ${response.status}`);
-              }
-            } catch (err) {
-              console.error(`Erreur lors de la mise en cache de ${url}:`, err);
-            }
-          }
-          
-          // Créer un élément vidéo pour précharger
-          const video = document.createElement('video');
-          video.preload = 'auto';
-          video.muted = true;
-          video.src = url;
-          
-          // Gérer les erreurs de chargement
-          video.addEventListener('error', (e) => {
-            console.error(`Erreur lors du préchargement de ${url}:`, e);
-          });
-          
-          video.load();
-          
-          // Attendre que la vidéo soit suffisamment chargée
-          video.addEventListener('canplaythrough', () => {
-            console.info(`Vidéo ${url} préchargée complètement`);
-          });
-          
-          video.addEventListener('loadeddata', () => {
-            console.info(`Vidéo ${url} chargée`);
-          });
+        const response = await fetch(url, { method: 'HEAD' });
+        if (response.ok) {
+          console.info(`Métadonnées vidéo vérifiées pour ${url}`);
+        } else {
+          console.error(`Échec de vérification de ${url} - statut: ${response.status}`);
         }
       } catch (err) {
-        console.error('Erreur de préchargement:', err);
+        console.error(`Erreur lors de la vérification de ${url}:`, err);
       }
     };
-
-    // Précharger les vidéos dès que le composant est monté
-    preloadVideos();
+    
+    // Préchargement séquentiel pour éviter les requêtes simultanées
+    const preloadSequentially = async () => {
+      for (const url of videoUrls) {
+        await preloadVideo(url);
+      }
+    };
+    
+    preloadSequentially();
     
     return () => {
-      // Cleanup si nécessaire
+      // Nettoyage si nécessaire
       console.info('Nettoyage du contrôleur vidéo');
     };
-  }, []);
+  }, []); // Dépendance vide pour exécuter une seule fois au montage
 
   // Composant invisible qui gère uniquement le préchargement
   return null;

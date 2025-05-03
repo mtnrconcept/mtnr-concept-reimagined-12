@@ -1,5 +1,5 @@
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { useVideoErrorHandling } from './video/useVideoErrorHandling';
 import { useVideoTransition } from './video/useVideoTransition';
 import { useUVModeChange } from './video/useUVModeChange';
@@ -9,8 +9,8 @@ import { useDurationChange } from './video/useDurationChange';
 import { UseBackgroundVideoProps, UseBackgroundVideoReturn } from './video/types';
 
 export function useBackgroundVideo({
-  videoUrl = "/lovable-uploads/Composition_1.mp4", // Remplacé les espaces par des underscores
-  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4", // Remplacé les espaces par des underscores
+  videoUrl = "/lovable-uploads/Composition_1.mp4",
+  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
   autoPlay = false
 }: UseBackgroundVideoProps = {}): UseBackgroundVideoReturn {
@@ -30,6 +30,16 @@ export function useBackgroundVideo({
     retryCount
   };
   
+  // Création d'une fonction playVideoTransition memoizée
+  const playVideoTransitionCallback = useCallback(async () => {
+    // Cette fonction sera remplacée par l'implémentation de useVideoTransition
+  }, []);
+  
+  // Création d'une fonction handleVideoDurationChange memoizée
+  const handleVideoDurationChangeCallback = useCallback(() => {
+    // Cette fonction sera remplacée par l'implémentation de useDurationChange
+  }, []);
+  
   // Actions pour manipuler l'état de la vidéo
   const videoActions = {
     setIsFirstLoad,
@@ -37,8 +47,8 @@ export function useBackgroundVideo({
     setCurrentVideo,
     setVideoError,
     setRetryCount,
-    playVideoTransition: async () => {}, // Sera remplacé par l'implémentation de useVideoTransition
-    handleVideoDurationChange: () => {} // Sera remplacé par l'implémentation de useDurationChange
+    playVideoTransition: playVideoTransitionCallback,
+    handleVideoDurationChange: handleVideoDurationChangeCallback
   };
   
   // Hook pour gérer la transition vidéo
