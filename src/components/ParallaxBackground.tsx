@@ -24,12 +24,12 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       // Appliquer l'effet de parallaxe pour les éclaboussures
       // Tous les éléments se déplacent dans la même direction mais à des vitesses différentes
       document.querySelectorAll('.paint-splash').forEach((splash) => {
-        const depth = parseFloat(splash.getAttribute('data-depth') || '0');
+        const depth = parseFloat(splash.getAttribute('data-depth') || '1');
         // Vitesse proportionnelle à la profondeur (plus profond = plus lent)
         // Le facteur 0.3 détermine l'ampleur de l'effet de parallaxe
         const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
         (splash as HTMLElement).style.transform = `translateY(${translateY}px) 
-          translateZ(${depth * 100}px)
+          translateZ(${depth * 500}px)
           rotate(${splash.getAttribute('data-rotation')}deg) 
           scale(${splash.getAttribute('data-scale')})`;
       });
@@ -39,7 +39,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
         // Facteur de vitesse proche de 1 pour un mouvement presque synchrone avec le défilement
-        videoBackground.style.transform = `translateY(${scrollY * 0.85}px)`;
+        videoBackground.style.transform = `translateY(${scrollY * 0.15}px)`;
       }
     };
     
