@@ -84,9 +84,10 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             <defs>
               <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="transparent" stopOpacity="0" /> {/* Centre complètement transparent */}
-                <stop offset="30%" stopColor="transparent" stopOpacity="0" /> {/* Zone étendue de transparence */}
-                <stop offset="60%" stopColor="black" stopOpacity="0.4" /> {/* Transition très douce */}
-                <stop offset="85%" stopColor="black" stopOpacity="0.85" /> {/* Transition progressive */}
+                <stop offset="40%" stopColor="transparent" stopOpacity="0" /> {/* Zone étendue de transparence */}
+                <stop offset="60%" stopColor="black" stopOpacity="0.1" /> {/* Début de transition très douce */}
+                <stop offset="75%" stopColor="black" stopOpacity="0.5" /> {/* Transition progressive */}
+                <stop offset="90%" stopColor="black" stopOpacity="0.85" /> {/* Transition progressive */}
                 <stop offset="100%" stopColor="black" stopOpacity="0.95" /> {/* Bord extérieur sombre */}
               </radialGradient>
               <mask id="torch-mask">
@@ -94,7 +95,7 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <circle
                   cx={mousePosition.x}
                   cy={mousePosition.y}
-                  r={800}
+                  r={600}
                   fill="url(#torch-gradient)"
                 />
               </mask>
