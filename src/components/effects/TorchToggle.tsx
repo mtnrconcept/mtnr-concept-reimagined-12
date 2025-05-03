@@ -37,8 +37,11 @@ export const TorchToggle = () => {
       if (!isTorchActive) {
         setIsTorchActive(true);
       }
-      toggleUVMode();
-      console.log("UV mode on, torch activated");
+      // Ajout d'un délai pour s'assurer que la torche est activée avant le mode UV
+      setTimeout(() => {
+        toggleUVMode();
+        console.log("UV mode on, torch activated");
+      }, 50);
     } else {
       // Si on désactive le mode UV, on laisse la torche classique active
       toggleUVMode();

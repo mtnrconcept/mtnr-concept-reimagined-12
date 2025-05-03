@@ -23,11 +23,13 @@ export function useUVModeChange({
   const { setCurrentVideo, playVideoTransition } = videoActions;
   const previousUVModeRef = useRef(uvMode);
   const transitionRequestedRef = useRef(false);
+  const previousTorchActiveRef = useRef(isTorchActive);
 
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
     // Vérifier si le mode UV a réellement changé
     if (previousUVModeRef.current !== uvMode) {
+      console.log(`Changement mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
       previousUVModeRef.current = uvMode;
       
       // Sélectionner la bonne vidéo selon le mode UV
@@ -49,6 +51,26 @@ export function useUVModeChange({
             }, 1000);
           }, 50);
         }
+        
+        // Déclencher un événement personnalisé pour informer d'autres composants
+        const event = new CustomEvent('uv-mode-changed', { detail: { uvMode } });
+        document.dispatchEvent(event);
+      }
+    }
+    
+    // Réagir également aux changements de l'état de la torche
+    if (previousTorchActiveRef.current !== isTorchActive) {
+      previousTorchActiveRef.current = isTorchActive;
+      
+      // Si la torche vient d'être activée et que le mode UV est actif
+      if (isTorchActive && uvMode && !transitionRequestedRef.current) {
+        transitionRequestedRef.current = true;
+        setTimeout(() => {
+          playVideoTransition();
+          setTimeout(() => {
+            transitionRequestedRef.current = false;
+          }, 1000);
+        }, 50);
       }
     }
   }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition, isTorchActive]);

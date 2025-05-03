@@ -32,6 +32,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
 
@@ -55,6 +56,13 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           // Forcer un repaint pour les éléments proches
           if (distance < 300) {
             el.style.opacity = el.style.opacity; // Astuce pour forcer un repaint
+            
+            // Rendre l'élément visible s'il est suffisamment proche
+            if (distance < 150) {
+              el.classList.add('active');
+            } else {
+              el.classList.remove('active');
+            }
           }
         }
       });
@@ -68,26 +76,61 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         updateMousePosition({ x: e.clientX, y: e.clientY });
       }
     };
+    
+    // Également suivre les événements tactiles pour les appareils mobiles
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isTorchActive && e.touches.length > 0) {
+        e.preventDefault(); // Empêcher le défilement pendant l'utilisation de la torche
+        const touch = e.touches[0];
+        updateMousePosition({ x: touch.clientX, y: touch.clientY });
+      }
+    };
+    
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
   }, [isTorchActive]);
 
   // UV logic
   useEffect(() => {
-    if (isTorchActive && uvMode) {
-      createUVCircle(mousePosition);
-      
-      // Ajouter une classe au body pour faciliter le ciblage CSS
-      document.body.classList.add('torch-active');
-      document.body.classList.add('uv-torch-active');
-    } else if (isTorchActive && !uvMode) {
-      document.body.classList.add('torch-active');
-      document.body.classList.remove('uv-torch-active');
-      removeUVCircle();
+    // Si c'est le premier montage, attendre un peu pour laisser les autres composants se charger
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      setTimeout(() => {
+        // Appliquer la logique normale après un délai
+        if (isTorchActive && uvMode) {
+          createUVCircle(mousePosition);
+          document.body.classList.add('torch-active');
+          document.body.classList.add('uv-torch-active');
+        } else if (isTorchActive && !uvMode) {
+          document.body.classList.add('torch-active');
+          document.body.classList.remove('uv-torch-active');
+          removeUVCircle();
+        } else {
+          document.body.classList.remove('torch-active');
+          document.body.classList.remove('uv-torch-active');
+          removeUVCircle();
+        }
+      }, 200);
     } else {
-      document.body.classList.remove('torch-active');
-      document.body.classList.remove('uv-torch-active');
-      removeUVCircle();
+      // Logique normale pour les rendus suivants
+      if (isTorchActive && uvMode) {
+        createUVCircle(mousePosition);
+        document.body.classList.add('torch-active');
+        document.body.classList.add('uv-torch-active');
+      } else if (isTorchActive && !uvMode) {
+        document.body.classList.add('torch-active');
+        document.body.classList.remove('uv-torch-active');
+        removeUVCircle();
+      } else {
+        document.body.classList.remove('torch-active');
+        document.body.classList.remove('uv-torch-active');
+        removeUVCircle();
+      }
     }
     
     return () => {
