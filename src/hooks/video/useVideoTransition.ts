@@ -36,31 +36,27 @@ export function useVideoTransition({
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
       
-      // On utilise une promesse pour démarrer la lecture dès que possible
+      // On utilise une promesse pour démarrer la lecture immédiatement
       try {
         // Démarrer la lecture immédiatement sans attendre le chargement complet
-        const playPromise = videoElement.play();
-        
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            console.log('Lecture vidéo démarrée avec succès');
-          }).catch(error => {
-            if (error.name === 'AbortError') {
-              console.info('Lecture vidéo interrompue (comportement normal pendant la navigation)');
-            } else {
-              console.error('Erreur lors de la lecture de la vidéo:', error);
-              // Réessayer une fois en cas d'erreur autre qu'une interruption
-              setTimeout(() => {
-                videoElement.play().catch(e => {
-                  console.warn('Échec de la seconde tentative de lecture:', e);
-                  // Nettoyage en cas d'échec définitif
-                  setIsTransitioning(false);
-                  transitionInProgressRef.current = false;
-                });
-              }, 50);
-            }
-          });
-        }
+        videoElement.play().then(() => {
+          console.log('Lecture vidéo démarrée avec succès');
+        }).catch(error => {
+          if (error.name === 'AbortError') {
+            console.info('Lecture vidéo interrompue (comportement normal pendant la navigation)');
+          } else {
+            console.error('Erreur lors de la lecture de la vidéo:', error);
+            // Réessayer une fois en cas d'erreur autre qu'une interruption
+            setTimeout(() => {
+              videoElement.play().catch(e => {
+                console.warn('Échec de la seconde tentative de lecture:', e);
+                // Nettoyage en cas d'échec définitif
+                setIsTransitioning(false);
+                transitionInProgressRef.current = false;
+              });
+            }, 50);
+          }
+        });
       } catch (playError) {
         console.error('Erreur lors du démarrage de la lecture:', playError);
       }
@@ -84,14 +80,13 @@ export function useVideoTransition({
       videoElement.addEventListener('ended', handleVideoEnded);
       
       // Ajouter un timer de sécurité pour réinitialiser l'état si la vidéo ne se termine pas
+      // Ici on utilise 7 secondes pour la vidéo (selon la demande de l'utilisateur)
       const safetyTimer = setTimeout(() => {
         if (transitionInProgressRef.current) {
-          console.warn('Timer de sécurité activé: la vidéo n\'a pas terminé dans le délai prévu');
+          console.warn('Timer de sécurité activé: la vidéo n\'a pas terminé dans le délai prévu (7s)');
           handleVideoEnded();
         }
-      }, 5000); // 5 secondes max pour la transition
-      
-      // Pas besoin de retourner une fonction de nettoyage ici
+      }, 7000); // 7 secondes pour la transition (durée de la vidéo)
       
     } catch (error) {
       console.error('Erreur lors de la transition vidéo:', error);

@@ -30,19 +30,14 @@ export function useNavigationHandler({
     transitionRequestedRef.current = true;
     console.log('Déclenchement de transition reçu du NavigationContext');
     
-    // Jouer la transition avec un léger délai pour permettre au navigateur de traiter
-    const timer = setTimeout(() => {
-      playVideoTransition();
-      
-      // Réinitialisation après un délai pour permettre d'autres transitions
-      const resetTimer = setTimeout(() => {
-        transitionRequestedRef.current = false;
-      }, 1000);
-      
-      return () => clearTimeout(resetTimer);
-    }, 10);
+    // Jouer la transition immédiatement
+    playVideoTransition();
     
-    return () => clearTimeout(timer);
+    // Réinitialisation après un délai pour permettre d'autres transitions
+    setTimeout(() => {
+      transitionRequestedRef.current = false;
+    }, 1000);
+    
   }, [playVideoTransition]);
 
   // Écouter les événements de navigation pour jouer la vidéo instantanément
@@ -67,7 +62,8 @@ export function useNavigationHandler({
         setIsFirstLoad(false);
         console.log('Vidéo initialisée, prête pour la première transition');
       } else {
-        // Ne pas déclencher la transition ici, elle est maintenant gérée par le clic sur les liens
+        // Déclencher automatiquement la transition vidéo lors d'un changement de page
+        playVideoTransition();
       }
     }
     
@@ -76,6 +72,11 @@ export function useNavigationHandler({
       if (document.hidden && videoElement) {
         videoElement.pause();
         console.log('Page non visible, vidéo en pause');
+      } else if (!document.hidden && !isFirstLoad) {
+        // Possibilité de relancer la vidéo quand l'utilisateur revient sur la page
+        // mais uniquement si ce n'est pas le premier chargement
+        // Commenter pour désactiver cette fonctionnalité
+        // playVideoTransition();
       }
     };
     
@@ -84,5 +85,5 @@ export function useNavigationHandler({
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [location.pathname, isFirstLoad, videoRef, setIsFirstLoad]);
+  }, [location.pathname, isFirstLoad, videoRef, setIsFirstLoad, playVideoTransition]);
 }

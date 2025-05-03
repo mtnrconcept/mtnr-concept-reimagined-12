@@ -42,13 +42,13 @@ export const BackgroundVideoController = () => {
           reject(err);
         };
         
-        // Timeout de sécurité si les métadonnées ne se chargent pas
+        // Timeout de sécurité si les métadonnées ne se chargent pas (3 secondes)
         setTimeout(() => {
           if (!preloadEl.readyState) {
             console.warn(`Timeout du préchargement pour ${url}`);
             resolve(preloadEl); // On résout quand même pour ne pas bloquer
           }
-        }, 5000);
+        }, 3000);
       });
     };
     
@@ -67,6 +67,7 @@ export const BackgroundVideoController = () => {
           e.target.getAttribute('href') && 
           !e.target.getAttribute('href').startsWith('http')) {
         console.log('Clic sur un lien interne détecté, déclenchement de la transition vidéo');
+        // Déclencher la transition vidéo avant le changement de page
         navigation.triggerVideoTransition();
       }
     };
