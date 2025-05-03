@@ -92,10 +92,10 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             style={{
               background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
                 rgba(0,0,0,0) 0%, 
-                rgba(0,0,0,0.9) 40%, 
+                rgba(0,0,0,0.6) 40%, 
                 rgba(0,0,0,0.7) 60%,
                 rgba(0,0,0,0.4) 80%,
-                rgba(0,0,0,0.1) 100%)`,
+                rgba(0,0,0,0.9) 100%)`,
               mixBlendMode: 'normal',
               transition: 'all 0.05s ease-out',
             }}
