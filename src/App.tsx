@@ -62,12 +62,17 @@ function AppContent() {
     document.body.style.height = 'auto';
   }, []);
   
+  // Ajouter un attribut data-route pour les styles CSS spécifiques à chaque route
+  useEffect(() => {
+    document.body.setAttribute('data-route', location.pathname);
+  }, [location.pathname]);
+  
   return (
     <div className="app-container min-h-screen">
       {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
       
-      <div className="content-container">
+      <div className="content-container overflow-visible">
         {/* Une seule vidéo de fond au niveau de l'application */}
         <BackgroundVideo 
           videoUrl="/lovable-uploads/videonormale.mp4"

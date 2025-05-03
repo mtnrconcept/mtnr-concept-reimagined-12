@@ -8,6 +8,22 @@
  */
 @layer base {
   html, body, #root {
-    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
+    @apply m-0 p-0 min-h-screen bg-black text-white;
+    overflow-x: hidden;
+    overflow-y: auto; /* Garantir que le scroll vertical est toujours activé */
+    height: auto; /* Ne pas fixer la hauteur pour permettre le scroll */
+  }
+  
+  /* S'assurer qu'aucun élément racine ne bloque le défilement */
+  body, #root {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* Fix spécifique pour la page Home */
+  [data-route="/"] #main-content {
+    overflow-y: visible !important;
   }
 }

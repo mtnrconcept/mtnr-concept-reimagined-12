@@ -16,7 +16,8 @@ export default function Home() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Ne pas réinitialiser le scroll à 0 à chaque fois, uniquement lors du montage initial
+    // Cela permettra de conserver la position de scroll en navigation
   }, []);
   
   useEffect(() => {
@@ -39,12 +40,12 @@ export default function Home() {
     return () => observerRef.current?.disconnect();
   }, []);
   
-  return <div className="relative min-h-screen w-full overflow-x-hidden">
+  return <div className="relative w-full min-h-screen overflow-visible">
       {/* Intégration des éclaboussures de peinture spécifiques à la page d'accueil */}
       <PageSplashes pageVariant="home" />
       
-      <div className="relative z-20 flex flex-col min-h-screen w-full">
-        <main id="main-content" className="flex-grow w-full rounded-full">
+      <div className="relative z-20 flex flex-col w-full">
+        <main id="main-content" className="flex-grow w-full">
           <HeroSection />
           <StudioSection />
           <ServicesSection />

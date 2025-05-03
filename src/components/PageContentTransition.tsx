@@ -73,7 +73,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         initial="initial"
         animate={contentVisible ? "animate" : "initial"}
         exit="exit"
-        className="relative w-full overflow-auto" // Garantir que le défilement fonctionne
+        className="relative w-full overflow-y-auto" // Modifier overflow-auto en overflow-y-auto pour permettre le scroll vertical
         style={{
           // Ajouter un padding-top pour le contenu afin qu'il ne soit pas sous la navbar
           paddingTop: "64px", // Hauteur de la navbar
@@ -81,6 +81,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           height: "auto", // Permettre au contenu de s'étendre
           // Garantir que l'animation reste sous la navbar
           zIndex: 10,
+          // Assurer que le contenu est bien scrollable
+          position: "relative",
+          overflowY: "auto"
         }}
       >
         {displayChildren}
