@@ -27,6 +27,7 @@ import ParallaxScene from "./components/ParallaxScene";
 import UVPageSecrets from "./components/effects/UVPageSecrets";
 import LoadingScreen from "./components/LoadingScreen";
 import { initializePreloader } from "./lib/preloader";
+import { Progress } from "./components/ui/progress";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -101,12 +102,15 @@ function AppContent() {
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   // Effectuez le préchargement initial au chargement de l'application
   useEffect(() => {
-    // S'assurer que le scroll est activé
+    // S'assurer que le scroll est activé globalement
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
     
     // Fonction pour initialiser l'application
     const initialize = async () => {
@@ -125,11 +129,12 @@ const App = () => {
         
         // Progression complète
         setLoadingProgress(100);
+        setLoadingComplete(true);
         
         // Ajouter un délai minimum pour l'écran de chargement
         setTimeout(() => {
           setIsLoading(false);
-        }, 1000); // Réduit à 1 seconde
+        }, 2000); // Maintenir 2 secondes pour que l'utilisateur voie la progression à 100%
       } catch (error) {
         console.error("Erreur lors de l'initialisation:", error);
         // En cas d'erreur, on affiche quand même le site

@@ -137,7 +137,7 @@ export const preloadAllResources = async (): Promise<void> => {
 export const preloadRoutes = async (): Promise<void> => {
   try {
     // Importer dynamiquement les composants de page principaux
-    const routeImports = await Promise.all([
+    await Promise.all([
       import('../pages/Home'),
       import('../pages/WhatWeDo'),
       import('../pages/Artists'),
@@ -146,18 +146,8 @@ export const preloadRoutes = async (): Promise<void> => {
       import('../pages/NotFound')
     ]);
     
-    // Précharger également tous les assets de ces pages
-    // On suppose que chaque module exporté peut avoir une méthode ou propriété statique getAssets
-    routeImports.forEach(module => {
-      if (module.default && typeof module.default.getAssets === 'function') {
-        const assets = module.default.getAssets();
-        if (assets && assets.images) {
-          assets.images.forEach((url: string) => {
-            preloadImage(url);
-          });
-        }
-      }
-    });
+    // Note: On ne peut pas accéder à `getAssets` directement car ce n'est pas une propriété standard
+    // Au lieu de cela, nous préchargeons simplement les composants de page
     
     console.log("Composants de route préchargés");
   } catch (error) {
@@ -169,7 +159,7 @@ export const preloadRoutes = async (): Promise<void> => {
 export const preloadUI = async (): Promise<void> => {
   try {
     // Précharger les composants essentiels en parallèle
-    const componentImports = await Promise.all([
+    const componentModules = await Promise.all([
       import('../components/Navbar'),
       import('../components/effects/ParticleEffect'),
       import('../components/effects/TorchToggle'),
@@ -177,10 +167,14 @@ export const preloadUI = async (): Promise<void> => {
       import('../components/ParallaxScene')
     ]);
     
-    // Stocker les composants dans le cache
+    // Stocker les composants dans le cache - s'assurer que chaque module a un export default
     resources.components.forEach((componentName, index) => {
-      if (index < componentImports.length) {
-        resourceCache.components.set(componentName, componentImports[index].default);
+      if (index < componentModules.length) {
+        const module = componentModules[index];
+        // Vérifier si le module a un export default avant de l'utiliser
+        if ('default' in module) {
+          resourceCache.components.set(componentName, module.default);
+        }
       }
     });
     

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface LoadingScreenProps {
   onLoadingComplete: () => void;
@@ -19,6 +20,18 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
     // Utiliser la progression externe si elle est fournie
     if (externalProgress !== undefined) {
       setProgress(externalProgress);
+      
+      // Mettre à jour le texte en fonction de la progression
+      updateLoadingText(externalProgress);
+      
+      // Si la progression est à 100%, déclencher l'événement de fin après un court délai
+      if (externalProgress >= 100) {
+        const timer = setTimeout(() => {
+          onLoadingComplete();
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+      
       return;
     }
     
@@ -34,6 +47,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       "Préchargement des pages...",
       "Presque prêt..."
     ];
+    
+    // Fonction pour mettre à jour le texte en fonction de la progression
+    const updateLoadingText = (currentProgress: number) => {
+      const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
+      setLoadingText(loadingMessages[messageIndex]);
+    };
     
     // Simuler une progression de chargement
     let currentProgress = 0;
@@ -52,13 +71,30 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       setProgress(currentProgress);
       
       // Mise à jour du texte de chargement
-      const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
-      setLoadingText(loadingMessages[messageIndex]);
+      updateLoadingText(currentProgress);
       
-    }, 150); // Accéléré pour une durée totale d'environ 2-3 secondes
+    }, 150);
     
     return () => clearInterval(interval);
   }, [onLoadingComplete, externalProgress]);
+  
+  // Fonction pour mettre à jour le texte de chargement en fonction de la progression
+  const updateLoadingText = (currentProgress: number) => {
+    const loadingMessages = [
+      "Initialisation...",
+      "Chargement des vidéos...",
+      "Préparation des effets spéciaux...",
+      "Activation du mode UV...",
+      "Synchronisation des transitions...",
+      "Chargement des secrets...",
+      "Optimisation de la performance...",
+      "Préchargement des pages...",
+      "Presque prêt..."
+    ];
+    
+    const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
+    setLoadingText(loadingMessages[messageIndex]);
+  };
   
   return (
     <motion.div
@@ -79,12 +115,13 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
           </motion.div>
         </div>
 
-        <div className="relative w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: "0%" }}
-            animate={{ width: `${progress}%` }}
-            className="absolute top-0 left-0 h-full bg-yellow-400"
-          />
+        <div className="mb-2">
+          <Progress value={progress} className="h-2 bg-gray-800">
+            <div 
+              className="absolute bg-yellow-400 h-full transition-all duration-300 ease-in-out rounded-full"
+              style={{ width: `${progress}%` }} 
+            />
+          </Progress>
         </div>
         
         <div className="flex items-center justify-between mt-3">
