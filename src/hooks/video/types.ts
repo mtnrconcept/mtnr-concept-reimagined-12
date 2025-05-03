@@ -22,13 +22,11 @@ export interface VideoActions {
 export interface UseBackgroundVideoProps {
   videoUrl?: string;
   videoUrlUV?: string;
-  fallbackImage?: string;
   autoPlay?: boolean;
 }
 
 export interface UseBackgroundVideoReturn extends VideoState, VideoActions {
   videoRef: RefObject<HTMLVideoElement>;
-  fallbackImage: string;
   uvMode: boolean;
   isTorchActive: boolean;
 }
