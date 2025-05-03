@@ -79,7 +79,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   }, [videoRef, currentVideo, isTransitioning]);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
+    <div className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">
       {/* Indicateur de chargement/statut */}
       {loadingStatus === 'loading' && !videoError && (
         <div className="absolute top-0 left-0 bg-yellow-500 text-xs text-black px-2 py-0.5 opacity-70 z-50">
@@ -97,17 +97,19 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         </div>
       )}
       
-      {/* Vidéo en fond */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 min-w-full min-h-full object-cover"
-        poster={fallbackImg}
-        playsInline
-        muted
-        preload="auto"
-      >
-        <source src={currentVideo} type="video/mp4" />
-      </video>
+      {/* Vidéo en fond - maintenant complètement responsive */}
+      <div className="absolute inset-0 flex items-center justify-center w-full h-full">
+        <video
+          ref={videoRef}
+          className="w-auto h-auto max-w-full max-h-full"
+          poster={fallbackImg}
+          playsInline
+          muted
+          preload="auto"
+        >
+          <source src={currentVideo} type="video/mp4" />
+        </video>
+      </div>
       
       {/* Grille */}
       <div 
