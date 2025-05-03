@@ -29,8 +29,11 @@ export function useVideoStatus(
   
   // Référence pour suivre si c'est le premier chargement
   const isFirstMountRef = useRef(true);
+  
+  // Compteur de tentatives pour la gestion des erreurs de chargement
+  const retryCountRef = useRef(0);
 
-  // Effet pour initialiser la vidéo au chargement
+  // Effet pour initialiser la vidéo au chargement avec gestion des erreurs améliorée
   useEffect(() => {
     const video = videoRef.current;
     
@@ -53,22 +56,44 @@ export function useVideoStatus(
         if (isFirstMountRef.current) {
           // Au tout premier montage, on force le préchargement
           if (typeof window !== 'undefined' && window.__forcePrecacheVideos) {
-            window.__forcePrecacheVideos();
+            try {
+              await window.__forcePrecacheVideos();
+            } catch (e) {
+              console.warn('Erreur lors du préchargement forcé:', e);
+            }
           }
           isFirstMountRef.current = false;
         }
         
         // Chargement initial de la vidéo mais sans lecture
         video.load();
-        video.pause();
         
-        setLoadingStatus('ready');
-        // Signal que la vidéo est prête initialement
-        setVideoReady(true);
+        // Attendre un court instant pour s'assurer que la vidéo a commencé à charger
+        const checkLoading = () => {
+          if (video.readyState >= 3) { // HAVE_FUTURE_DATA ou plus
+            setLoadingStatus('ready');
+            setVideoReady(true);
+            console.log('Vidéo initialisée et prête');
+          } else {
+            // Réessayer si pas prêt
+            if (retryCountRef.current < 10) {
+              retryCountRef.current++;
+              setTimeout(checkLoading, 300);
+            } else {
+              console.warn('Impossible de charger la vidéo après plusieurs tentatives, on continue quand même');
+              setLoadingStatus('ready');
+              setVideoReady(true);
+            }
+          }
+        };
+        
+        checkLoading();
       } catch (error) {
         console.error('Erreur lors de l\'initialisation de la vidéo:', error);
         setVideoError(true);
         setLoadingStatus('error');
+        // Signaler que la vidéo est "prête" même en cas d'erreur pour ne pas bloquer l'interface
+        setVideoReady(true);
       }
     };
     

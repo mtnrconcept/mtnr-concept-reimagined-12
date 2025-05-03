@@ -16,9 +16,9 @@ export const BackgroundVideoController = () => {
     
     console.info('Initialisation du préchargement des vidéos');
     
-    // Fonction de préchargement optimisée qui utilise un élément vidéo et la mise en cache
+    // Fonction de préchargement optimisée qui utilise des méthodes multiples
     const preloadVideo = (url) => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         // Vérifier si la vidéo est déjà dans le cache du navigateur
         const cachedVideo = window.sessionStorage.getItem(`video-cache-${url}`);
         if (cachedVideo === 'loaded') {
@@ -38,28 +38,46 @@ export const BackgroundVideoController = () => {
         // Charger entièrement la vidéo pour un préchargement complet
         preloadEl.load();
         
+        let loaded = false;
         console.info(`Préchargement de ${url} initialisé`);
         
-        // Événements pour suivre le chargement complet
-        preloadEl.oncanplaythrough = () => {
-          console.info(`Vidéo ${url} entièrement préchargée et prête pour lecture fluide`);
-          // Marquer la vidéo comme mise en cache
-          window.sessionStorage.setItem(`video-cache-${url}`, 'loaded');
-          resolve(url);
+        // Utiliser plusieurs événements pour détecter le chargement
+        const markAsLoaded = () => {
+          if (!loaded) {
+            loaded = true;
+            console.info(`Vidéo ${url} préchargée avec succès`);
+            window.sessionStorage.setItem(`video-cache-${url}`, 'loaded');
+            resolve(url);
+          }
         };
+        
+        // Plusieurs événements qui peuvent indiquer une vidéo chargée
+        preloadEl.oncanplaythrough = markAsLoaded;
+        preloadEl.onloadeddata = () => setTimeout(markAsLoaded, 500);
         
         preloadEl.onerror = (err) => {
           console.error(`Erreur lors du préchargement de ${url}:`, err);
-          reject(err);
+          window.sessionStorage.setItem(`video-cache-${url}`, 'error');
+          resolve(url); // On résout quand même
         };
         
-        // Timeout de sécurité (10 secondes)
+        // Timeout de sécurité (5 secondes)
         setTimeout(() => {
-          if (!preloadEl.readyState) {
-            console.warn(`Timeout du préchargement pour ${url}`);
+          if (!loaded) {
+            console.warn(`Timeout du préchargement pour ${url}, mais on continue`);
+            window.sessionStorage.setItem(`video-cache-${url}`, 'partial');
             resolve(url); // On résout quand même pour ne pas bloquer
           }
-        }, 10000);
+        }, 5000);
+
+        // Essai de préchargement alternatif via l'API Fetch
+        fetch(url, { method: 'HEAD' })
+          .then(() => {
+            console.log(`Vérification d'en-tête pour ${url} réussie`);
+          })
+          .catch(err => {
+            console.warn(`Échec de la vérification d'en-tête pour ${url}:`, err);
+          });
       });
     };
     

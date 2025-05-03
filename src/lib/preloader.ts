@@ -49,7 +49,7 @@ const resourceCache = {
 
 // Précharger une image avec mise en cache
 const preloadImage = (url: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Vérifier si l'image est déjà dans le cache
     if (resourceCache.images.has(url)) {
       resolve();
@@ -69,9 +69,9 @@ const preloadImage = (url: string): Promise<void> => {
   });
 };
 
-// Précharger une vidéo avec mise en cache
+// Précharger une vidéo avec mise en cache et meilleure gestion des erreurs
 const preloadVideo = (url: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Vérifier si la vidéo est déjà dans le cache
     if (resourceCache.videos.has(url)) {
       resolve();
@@ -100,8 +100,8 @@ const preloadVideo = (url: string): Promise<void> => {
     
     let loaded = false;
     
-    // On considère qu'une vidéo est préchargée quand suffisamment de données sont disponibles
-    video.oncanplaythrough = () => {
+    // Utilisons plusieurs événements pour détecter quand la vidéo est suffisamment chargée
+    const markAsLoaded = () => {
       if (!loaded) {
         loaded = true;
         resourceCache.videos.set(url, video);
@@ -116,19 +116,36 @@ const preloadVideo = (url: string): Promise<void> => {
       }
     };
     
+    // Plusieurs événements qui peuvent indiquer une vidéo chargée
+    video.oncanplaythrough = markAsLoaded;
+    video.onloadeddata = () => {
+      // Si nous avons au moins les premières frames, c'est probablement suffisant
+      setTimeout(markAsLoaded, 500);
+    };
+    
     video.onerror = () => {
       console.warn(`Échec du préchargement de la vidéo: ${url}`);
+      // Même en cas d'erreur, on essaie de marquer une entrée dans le cache
+      // pour éviter de réessayer continuellement
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(`video-cache-${url}`, 'error');
+      }
       resolve(); // On résout quand même pour ne pas bloquer le processus
     };
     
-    // Timeout pour éviter d'attendre trop longtemps
+    // Timeout plus court pour éviter d'attendre trop longtemps
     setTimeout(() => {
       if (!loaded) {
         loaded = true;
-        console.warn(`Timeout du préchargement pour: ${url}`);
+        console.warn(`Timeout du préchargement pour: ${url}, mais on continue quand même`);
+        // Même avec un timeout, on enregistre ce qu'on a dans le cache
+        resourceCache.videos.set(url, video);
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(`video-cache-${url}`, 'partial');
+        }
         resolve();
       }
-    }, 8000); // 8 secondes maximum par vidéo
+    }, 5000); // 5 secondes maximum par vidéo (réduit de 8 à 5 secondes)
     
     video.src = url;
     video.load();
@@ -152,7 +169,7 @@ const preloadVideo = (url: string): Promise<void> => {
 export const forcePrecacheVideos = (): Promise<void> => {
   console.log('Forçage du préchargement des vidéos...');
   
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // Précharger les vidéos en parallèle
     const videoPromises = resources.videos.map(videoUrl => {
       // Si déjà en cache, on crée quand même un nouvel élément pour rafraîchir
@@ -170,7 +187,7 @@ export const forcePrecacheVideos = (): Promise<void> => {
       })
       .catch(error => {
         console.error('Erreur lors du préchargement forcé des vidéos:', error);
-        reject(error);
+        resolve(); // Toujours résoudre pour ne pas bloquer
       });
   });
 };

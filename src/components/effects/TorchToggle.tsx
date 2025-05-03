@@ -52,7 +52,7 @@ export const TorchToggle = () => {
       <Button
         onClick={handleToggleTorch}
         className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 ${
-          isTorchActive && !uvMode
+          isTorchActive
             ? "bg-yellow-400 text-black shadow-yellow-400/50"
             : "bg-gray-800 text-yellow-400"
         }`}
@@ -68,7 +68,7 @@ export const TorchToggle = () => {
       <Button
         onClick={handleToggleUV}
         className={`p-3 rounded-full shadow-lg transition-all hover:scale-105 relative ${
-          isTorchActive && uvMode
+          uvMode
             ? "bg-blue-600 text-white shadow-blue-600/50"
             : "bg-gray-800 text-purple-400"
         }`}
@@ -76,10 +76,11 @@ export const TorchToggle = () => {
         variant="outline"
         size="icon"
         style={{ isolation: "isolate" }}
+        disabled={!isTorchActive && uvMode} // Désactiver si torche inactive mais UV actif (état impossible)
       >
         <Eye className={`w-6 h-6 ${uvMode ? 'animate-pulse' : ''}`} />
         
-        {uvMode && isTorchActive && (
+        {uvMode && (
           <>
             <span className="absolute inset-0 rounded-full bg-blue-500 opacity-30 animate-ping scale-110"></span>
             <span className="absolute text-[8px] font-bold -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow">
