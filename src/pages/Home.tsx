@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
@@ -39,8 +40,6 @@ export default function Home() {
   
   return <div className="relative min-h-screen w-full overflow-x-hidden">
       <div className="relative z-20 flex flex-col min-h-screen w-full">
-        <Navbar />
-        
         <main id="main-content" className="flex-grow w-full rounded-full">
           <HeroSection />
           <StudioSection />
