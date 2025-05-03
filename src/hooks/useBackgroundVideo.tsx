@@ -31,7 +31,7 @@ export function useBackgroundVideo({
   };
   
   // Création d'une fonction playVideoTransition memoizée
-  const playVideoTransitionCallback = useCallback(async () => {
+  const playVideoTransitionCallback = useCallback((): void => {
     // Cette fonction sera remplacée par l'implémentation de useVideoTransition
   }, []);
   

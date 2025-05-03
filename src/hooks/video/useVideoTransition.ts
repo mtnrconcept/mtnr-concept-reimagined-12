@@ -17,7 +17,7 @@ export function useVideoTransition({
   const { setIsTransitioning } = videoActions;
   const transitionInProgressRef = useRef(false);
 
-  const playVideoTransition = useCallback(async () => {
+  const playVideoTransition = useCallback((): void => {
     const videoElement = videoRef.current;
     // Vérifier si une transition est déjà en cours pour éviter les appels multiples
     if (!videoElement || transitionInProgressRef.current) return;
@@ -91,12 +91,7 @@ export function useVideoTransition({
         }
       }, 5000); // 5 secondes max pour la transition
       
-      return () => {
-        clearTimeout(safetyTimer);
-        if (videoElement) {
-          videoElement.removeEventListener('ended', handleVideoEnded);
-        }
-      };
+      // Pas besoin de retourner une fonction de nettoyage ici
       
     } catch (error) {
       console.error('Erreur lors de la transition vidéo:', error);

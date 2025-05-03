@@ -15,7 +15,7 @@ export interface VideoActions {
   setCurrentVideo: (url: string) => void;
   setVideoError: (value: boolean) => void;
   setRetryCount: (value: number) => void;
-  playVideoTransition: () => Promise<void>;
+  playVideoTransition: () => void | Promise<void>;
   handleVideoDurationChange: () => void;
 }
 
