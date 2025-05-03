@@ -190,8 +190,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 
   // Exposer l'état de préparation de la vidéo au contexte global
   useEffect(() => {
-    // Cette partie pourrait être étendue pour intégrer avec un contexte global
-    window.__videoReady = videoReady;
+    // Cette partie est mise à jour pour utiliser la propriété que nous avons déclarée dans global.d.ts
+    if (typeof window !== 'undefined') {
+      window.__videoReady = videoReady;
+    }
   }, [videoReady]);
 
   return (
