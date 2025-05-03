@@ -39,7 +39,6 @@ export default function UVHiddenMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Modify visibility based on distance
       // Elliptical mask of ~100px
       const threshold = 100; 
       if (distance < threshold * 1.5 && uvMode) {
@@ -76,7 +75,7 @@ export default function UVHiddenMessage({
             const ellipticalDistance = Math.sqrt((charDx * charDx) / 1 + (charDy * charDy) / 2.25);
             const charVisibility = Math.max(0, 1 - ellipticalDistance / threshold);
             
-            return `<span style="opacity: ${charVisibility.toFixed(2)}; display: inline-block; filter: blur(${Math.max(0, (1 - charVisibility) * 10)}px);">${char}</span>`;
+            return `<span style="opacity: ${charVisibility.toFixed(2)}; display: inline-block;">${char}</span>`;
           });
           
           messageRef.current.innerHTML = processedChars.join('');
@@ -97,7 +96,6 @@ export default function UVHiddenMessage({
       } else {
         if (messageRef.current) {
           messageRef.current.style.opacity = '0';
-          messageRef.current.style.filter = 'blur(10px)';
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
         }

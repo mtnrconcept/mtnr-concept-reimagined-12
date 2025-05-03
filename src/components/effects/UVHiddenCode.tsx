@@ -49,7 +49,7 @@ export default function UVHiddenCode({
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Elliptical mask of ~100px
-      const proximityThreshold = 120;
+      const proximityThreshold = 100;
       
       if (distance < proximityThreshold * 1.5 && uvMode) {
         // Reveal code progressively based on cursor proximity
@@ -80,10 +80,7 @@ export default function UVHiddenCode({
               // Visibilité inversement proportionnelle à la distance
               const charVisibility = Math.max(0, 1 - ellipticalDistance / proximityThreshold);
               
-              // Appliquer un flou gaussien variable selon la distance
-              const blurAmount = Math.max(0, (1 - charVisibility) * 10);
-              
-              return `<span style="opacity: ${charVisibility.toFixed(2)}; filter: blur(${blurAmount.toFixed(1)}px);">${char === ' ' ? '&nbsp;' : char}</span>`;
+              return `<span style="opacity: ${charVisibility.toFixed(2)};">${char === ' ' ? '&nbsp;' : char}</span>`;
             }).join('');
           });
           
@@ -140,14 +137,8 @@ export default function UVHiddenCode({
           lineHeight: 1.2,
           letterSpacing: '0.05em',
           padding: '8px',
-          backgroundColor: 'rgba(0, 0, 20, 0.4)',
-          borderRadius: '4px',
-          backdropFilter: 'blur(2px)',
-          border: `1px solid ${color}`,
-          maxWidth: '250px',
-          overflow: 'hidden'
+          backgroundColor: 'transparent'
         }}
-        className="bg-black/10 p-2 rounded-md"
       >
         {code}
       </pre>
