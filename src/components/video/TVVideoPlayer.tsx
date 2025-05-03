@@ -52,13 +52,13 @@ export default function TVVideoPlayer() {
           {/* Conteneur du lecteur vidéo avec positionnement absolu pour maintenir la cohérence */}
           <div className="absolute inset-0 flex items-center justify-center">
             {/* Conteneur YouTube avec dimensions fixes correspondant à l'original */}
-            <div className="relative w-[55%] h-[55%]">
+            <div className="relative w-[60%] h-[60%]">
               {/* Affichage du chargement */}
               {isLoading && (
                 <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
                   <div className="w-full h-full opacity-30" style={{
                     backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
-                    animation: 'noise 0.2s infinite'
+                    animation: 'noise 1s infinite'
                   }}>
                   </div>
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono">
