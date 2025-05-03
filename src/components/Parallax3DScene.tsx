@@ -57,13 +57,13 @@ export default function Parallax3DScene() {
         data-depth="0.02"
         style={{
           opacity: 0.7,
-          mixBlendMode: 'multiply'
+          mixBlendMode: 'screen'
         }}
       />
       
       {/* Grid lines */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-30"
         data-depth="0.1"
         style={{
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
