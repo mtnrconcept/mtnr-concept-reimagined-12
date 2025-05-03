@@ -19,7 +19,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Garder l'ancien contenu pendant la transition de sortie
     const timer = setTimeout(() => {
       setDisplayChildren(children);
-    }, 3000); // 3 secondes de transition de sortie + 2 secondes de pause
+    }, 2000); // 3 secondes de transition de sortie + 2 secondes de pause
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -32,14 +32,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 3, // Apparaît après 5 secondes (3s de fondu + 2s de pause)
-            duration: 3 // Fondu entrant de 3 secondes
+            delay: 2, // Apparaît après 5 secondes (3s de fondu + 2s de pause)
+            duration: 2 // Fondu entrant de 3 secondes
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 3 // Fondu sortant de 3 secondes
+            duration: 2 // Fondu sortant de 3 secondes
           }
         }}
         className="relative z-10 min-h-screen w-full"
