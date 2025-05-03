@@ -44,23 +44,12 @@ export default function TVVideoPlayer() {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto my-24">
+    <div className="relative max-w-4xl mx-auto my-16">
       {/* TV Frame with actual image */}
       <div className="relative w-full aspect-video">
         {/* Video Player in the background */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          {/* Vidéo positionnée précisément dans l'écran de la TV */}
-          <div 
-            className="absolute overflow-hidden rounded-lg z-10"
-            style={{
-              width: '885px',
-              height: '653px',
-              top: '100px',
-              left: '100px',
-              right: '300px',
-              bottom: '100px'
-            }}
-          >
+          <div className="w-[60%] h-[60%] absolute top-[12%] left-[7.5%] overflow-hidden rounded-lg z-10">
             {/* Loading static */}
             {isLoading && (
               <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
@@ -85,15 +74,11 @@ export default function TVVideoPlayer() {
             ></iframe>
           </div>
           
-          {/* TV Overlay Image - agrandi légèrement */}
+          {/* TV Overlay Image */}
           <img 
             src="/lovable-uploads/tv.png" 
             alt="TV Frame" 
             className="absolute inset-0 w-full h-full z-20 pointer-events-none"
-            style={{ 
-              transform: 'scale(1.05)',
-              objectFit: 'contain'
-            }}
           />
         </div>
       </div>
