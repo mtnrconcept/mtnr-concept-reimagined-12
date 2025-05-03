@@ -24,12 +24,18 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         
         // Effets de souris plus subtils pour plus de réalisme
         const translateX = mouseX * (depth * 15);
-        const rotateX = -mouseY * (depth * 3);
-        const rotateY = mouseX * (depth * 3);
+        const rotateX = -mouseY * (depth * 2);
+        const rotateY = mouseX * (depth * 2);
         
         // Calcul de la profondeur Z basé sur la valeur de depth
         // Plus la valeur est élevée, plus l'élément est loin
         const translateZ = depth * -1000;
+        
+        // Appliquer un flou en fonction de la distance (pour les éléments qui n'en ont pas déjà)
+        if (!element.style.filter.includes('blur')) {
+          const blurAmount = Math.abs(depth) > 0.6 ? Math.abs(depth) * 5 : 0;
+          element.style.filter = `blur(${blurAmount}px)`;
+        }
         
         element.style.transform = `
           translate3d(${translateX}px, ${translateY}px, ${translateZ}px)

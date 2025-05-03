@@ -61,6 +61,9 @@ function AppContent() {
           videoUrlUV="/lovable-uploads/videouv.mp4"
         />
         
+        {/* Ajout du ParallaxScene au niveau de l'App pour qu'il soit disponible sur toutes les pages */}
+        <ParallaxScene />
+        
         <PageTransitionEffect />
         <PageTransition keyId={location.pathname}>
           <Routes location={location} key={location.pathname}>

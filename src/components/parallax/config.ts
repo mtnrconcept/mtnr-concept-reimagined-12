@@ -19,9 +19,9 @@ export const parallaxElements: ParallaxElementConfig[] = [
   
   // Splash très profonds (arrière-plan lointain)
   { type: 'paint', x: 75, y: 15, depth: 0.85, scale: 2.8, rotation: -15, blur: 5,
-    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug' },
+    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-30' },
   { type: 'paint', x: 10, y: 20, depth: 0.8, scale: 2.5, rotation: 25, blur: 4,
-    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug' },
+    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug opacity-25' },
     
   // Splash à distance moyenne
   { type: 'paint', x: 50, y: 30, depth: 0.6, scale: 2.2, rotation: 10, blur: 3,
@@ -50,4 +50,14 @@ export const parallaxElements: ParallaxElementConfig[] = [
     src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-40' },
   { type: 'paint', x: 80, y: 90, depth: -0.8, scale: 0.7, rotation: 12, blur: 0,
     src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-30' },
+  
+  // Ajouter des taches de couleur supplémentaires pour plus de variété
+  { type: 'paint', x: 35, y: 55, depth: 0.75, scale: 1.9, rotation: -8, blur: 3.5,
+    src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-50' },
+  { type: 'paint', x: 65, y: 12, depth: 0.4, scale: 1.7, rotation: 15, blur: 1.8,
+    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-65' },
+  { type: 'paint', x: 20, y: 60, depth: -0.35, scale: 1.0, rotation: 22, blur: 0,
+    src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'splash-debug opacity-55' },
+  { type: 'paint', x: 40, y: 80, depth: -0.6, scale: 0.85, rotation: -18, blur: 0,
+    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug opacity-35' },
 ];

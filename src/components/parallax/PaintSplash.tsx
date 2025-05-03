@@ -14,9 +14,9 @@ interface PaintSplashProps {
 
 export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0 }: PaintSplashProps) => {
   // Calculer l'intensité des effets en fonction de la profondeur
-  const shadowDepth = Math.abs(depth) < 0.3 ? 15 : Math.max(3, 20 * (1 - depth));
-  const shadowBlur = Math.abs(depth) < 0.3 ? 20 : Math.max(5, 25 * (1 - depth));
-  const shadowOpacity = Math.abs(depth) < 0.3 ? 0.7 : Math.max(0.3, 0.8 * (1 - depth));
+  const shadowDepth = Math.abs(depth) < 0.3 ? 15 : Math.max(3, 20 * (1 - Math.abs(depth)));
+  const shadowBlur = Math.abs(depth) < 0.3 ? 20 : Math.max(5, 25 * (1 - Math.abs(depth)));
+  const shadowOpacity = Math.abs(depth) < 0.3 ? 0.7 : Math.max(0.3, 0.8 * (1 - Math.abs(depth)));
   
   // Calcul de contraste et luminosité en fonction de la profondeur
   // Les éléments éloignés sont plus pâles, les éléments proches plus contrastés
@@ -24,8 +24,8 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
   const brightness = Math.max(1.2, 2.5 - Math.abs(depth) * 1.2);
   const saturation = Math.max(1.2, 1.8 - Math.abs(depth) * 0.5);
   
-  // Ensure blur value is never negative
-  const blurAmount = Math.max(0, blur);
+  // Calcul automatique du flou basé sur la profondeur si aucun flou spécifique n'est fourni
+  const blurAmount = blur ?? Math.abs(depth) > 0.6 ? Math.abs(depth) * 8 : 0;
   
   return (
     <ParallaxElement depth={depth} x={x} y={y} className={`${className} shadow-receiver`}>
@@ -45,11 +45,6 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
         }}
         onError={(e) => {
           console.error(`Error loading image: ${src}`, e);
-          const target = e.target as HTMLImageElement;
-          target.style.border = '2px solid red';
-          target.style.backgroundColor = 'yellow';
-          target.style.width = '100px';
-          target.style.height = '100px';
         }}
       />
     </ParallaxElement>
