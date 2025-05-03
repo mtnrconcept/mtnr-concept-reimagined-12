@@ -26,10 +26,10 @@ const TV_DIMENSIONS = {
 
 // Position de l'écran dans la TV
 const SCREEN_POSITION = {
-  top: 60 // Y en pixels
-  left: 79, // X en pixels
-  width: 819, // Largeur estimée de l'écran
-  height: 489, // Hauteur estimée de l'écran
+  top: 83, // Y en pixels
+  left: 97, // X en pixels
+  width: 1164, // Largeur estimée de l'écran
+  height: 655, // Hauteur estimée de l'écran
 };
 
 export default function TVVideoPlayer() {
