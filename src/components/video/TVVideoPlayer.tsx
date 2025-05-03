@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { TVPaginationControls } from './TVPaginationControls';
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface Video {
   id: string;
@@ -45,27 +44,20 @@ export default function TVVideoPlayer() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-8 sm:my-12 lg:my-16 px-3 sm:px-6">
-      {/* TV Frame avec dimensions préservées */}
-      <div className="relative w-full">
-        <AspectRatio ratio={16/9} className="relative overflow-hidden bg-black rounded-lg">
-          {/* TV Overlay Image - placée en premier avec position absolue pour servir de référence */}
-          <div className="absolute inset-0 w-full h-full">
-            <img 
-              src="/lovable-uploads/tv.png" 
-              alt="TV Frame" 
-              className="w-full h-full object-contain pointer-events-none"
-            />
-          </div>
-          
-          {/* Conteneur du lecteur YouTube, positionné précisément dans la zone d'écran de la TV */}
-          <div className="absolute top-[8%] left-[11.5%] w-[77%] h-[58%] flex items-center justify-center">
-            {/* Affichage du chargement */}
+    <div className="relative max-w-4xl mx-auto my-16">
+      {/* TV Frame with actual image */}
+      <div className="relative w-full aspect-video">
+        {/* Video Player in the background */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <div className="w-[60%] h-[60%] absolute top-[12%] left-[7.5%] overflow-hidden rounded-lg z-10" style={{
+            transform: 'translate(60px, 30px)'
+          }}>
+            {/* Loading static */}
             {isLoading && (
               <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
                 <div className="w-full h-full opacity-30" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
-                  animation: 'noise 1s infinite'
+                  animation: 'noise 0.2s infinite'
                 }}>
                 </div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono">
@@ -74,16 +66,23 @@ export default function TVVideoPlayer() {
               </div>
             )}
             
-            {/* YouTube Video - dimensions exactes adaptées à l'écran de la TV */}
+            {/* YouTube Video */}
             <iframe
-              className="w-full h-full"
+              className="absolute inset-0 w-full h-full"
               src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
               title={currentVideo.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
           </div>
-        </AspectRatio>
+          
+          {/* TV Overlay Image */}
+          <img 
+            src="/lovable-uploads/tv.png" 
+            alt="TV Frame" 
+            className="absolute inset-0 w-full h-full z-20 pointer-events-none"
+          />
+        </div>
       </div>
 
       {/* Video Info */}

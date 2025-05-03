@@ -46,14 +46,14 @@ export default function Artists() {
       <PageSplashes pageVariant="artists" />
       
       <div className="relative z-10 min-h-screen">
-        <main className="min-h-screen w-full flex flex-col items-center pt-16 xs:pt-20 sm:pt-24 md:pt-28 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
+        <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
           <div className="w-full max-w-5xl">
-            <div className="px-4 sm:px-8 md:px-16 lg:px-24">
-              <NeonText text="Le Crew" className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl mb-5 xs:mb-6 md:mb-8 uppercase text-center" color="yellow" flicker={true} />
+            <div className="px-[240px] mx-[83px]">
+              <NeonText text="Le Crew" className="text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={15} />
             </div>
             
-            <div className="text-base xs:text-lg md:text-xl font-grunge text-gray-100 mb-5 xs:mb-6 md:mb-8 text-center max-w-3xl mx-auto px-4 drop-shadow-md" style={{
+            <div className="text-base xs:text-lg md:text-xl font-grunge text-gray-100 mb-7 xs:mb-10 text-center max-w-3xl mx-auto drop-shadow-md" style={{
               letterSpacing: "0.06em"
             }}>
               <UVText 
@@ -68,9 +68,8 @@ export default function Artists() {
             {/* Lecteur vidéo avec effet TV */}
             <TVVideoPlayer />
             
-            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 xs:gap-5 md:gap-6 w-full px-3 xs:px-4 md:px-6 pb-12 md:pb-16">
-              {artists.map((a, index) => (
-                <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 xs:gap-7 w-full pb-16">
+              {artists.map((a, index) => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl relative">
                   <div className="w-full overflow-hidden rounded-lg shadow-lg">
                     <img 
                       src={index === 1 && isTorchActive && !uvMode ? "/lovable-uploads/anonymous.png" : a.img} 
@@ -96,8 +95,7 @@ export default function Artists() {
                       opacity={0.01}
                     />
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </main>

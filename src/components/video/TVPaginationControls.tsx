@@ -1,9 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TVPaginationProps {
   totalVideos: number;
@@ -20,25 +19,8 @@ export function TVPaginationControls({
   onNext,
   onSelect
 }: TVPaginationProps) {
-  const isMobile = useIsMobile();
+  // Pour la version mobile, nous allons afficher juste quelques boutons
   const [visiblePages, setVisiblePages] = useState(5);
-  
-  // Ajuster dynamiquement le nombre de pages visibles en fonction de la taille d'écran
-  useEffect(() => {
-    function updateVisiblePages() {
-      if (window.innerWidth < 400) {
-        setVisiblePages(3);
-      } else if (window.innerWidth < 640) {
-        setVisiblePages(5);
-      } else {
-        setVisiblePages(7);
-      }
-    }
-    
-    updateVisiblePages();
-    window.addEventListener('resize', updateVisiblePages);
-    return () => window.removeEventListener('resize', updateVisiblePages);
-  }, []);
   
   // Calculer quels indices afficher
   const calculateVisibleIndices = () => {
@@ -54,14 +36,17 @@ export function TVPaginationControls({
     
     // Ajuster si on dépasse les limites
     if (start < 0) {
-      end = Math.min(end - start, totalVideos - 1); // Ne pas dépasser le total
+      end += Math.abs(start);
       start = 0;
     }
     
     if (end >= totalVideos) {
-      start = Math.max(0, start - (end - totalVideos + 1));
+      start -= (end - totalVideos + 1);
       end = totalVideos - 1;
     }
+    
+    // S'assurer que start n'est pas négatif après ajustement
+    start = Math.max(0, start);
     
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
@@ -69,25 +54,25 @@ export function TVPaginationControls({
   const visibleIndices = calculateVisibleIndices();
   
   return (
-    <div className="w-full px-2">
-      <div className="flex justify-center items-center gap-2 sm:gap-4 mb-4">
+    <div className="w-full">
+      <div className="flex justify-center gap-4 mb-4">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={onPrevious}
           className="bg-yellow-900/30 hover:bg-yellow-900/50 border-yellow-600/30"
         >
-          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          <ArrowLeft className="h-4 w-4" />
           <span className="sr-only">Vidéo précédente</span>
         </Button>
         
-        <div className="hidden xs:flex gap-1 sm:gap-2 flex-wrap justify-center">
+        <div className="hidden xs:flex gap-2">
           {visibleIndices.map(index => (
             <button
               key={index}
               onClick={() => onSelect(index)}
               className={cn(
-                "w-6 h-6 sm:w-8 sm:h-8 rounded-md flex items-center justify-center text-xs sm:text-sm transition-colors",
+                "w-8 h-8 rounded-md flex items-center justify-center text-sm transition-colors",
                 index === currentIndex 
                   ? "bg-yellow-600/40 text-white border border-yellow-500" 
                   : "bg-yellow-900/20 text-gray-300 border border-yellow-500/30 hover:bg-yellow-600/20"
@@ -104,12 +89,12 @@ export function TVPaginationControls({
           onClick={onNext}
           className="bg-yellow-900/30 hover:bg-yellow-900/50 border-yellow-600/30"
         >
-          <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+          <ArrowRight className="h-4 w-4" />
           <span className="sr-only">Vidéo suivante</span>
         </Button>
       </div>
       
-      <div className="text-center text-xs sm:text-sm text-gray-400">
+      <div className="text-center text-sm text-gray-400">
         {currentIndex + 1} / {totalVideos}
       </div>
     </div>
