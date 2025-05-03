@@ -101,4 +101,24 @@
   .uv-hidden-text.visible {
     opacity: 1 !important;
   }
+  
+  /* Animations pour l'écran de chargement */
+  @keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
+    50% { text-shadow: 0 0 20px rgba(234, 179, 8, 0.9), 0 0 30px rgba(234, 179, 8, 0.5); }
+  }
+  
+  .loading-title {
+    animation: pulse-glow 2s infinite;
+  }
+  
+  /* Animation de progression pour la barre de chargement */
+  @keyframes progress-fill {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+  
+  .loading-bar-fill {
+    animation: progress-fill 3s ease-out forwards;
+  }
 }

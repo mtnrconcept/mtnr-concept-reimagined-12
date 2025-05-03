@@ -4,7 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
@@ -24,6 +25,8 @@ import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
 import ParallaxScene from "./components/ParallaxScene";
 import UVPageSecrets from "./components/effects/UVPageSecrets";
+import LoadingScreen from "./components/LoadingScreen";
+import { initializePreloader } from "./lib/preloader";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -89,27 +92,65 @@ function AppContent() {
   );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <UVModeProvider>
-        <TorchProvider>
-          <NavigationProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={null}>
-                <BackgroundVideoController />
-                <AppContent />
-              </Suspense>
-            </BrowserRouter>
-            <ParticleEffect />
-            <TorchToggle />
-          </NavigationProvider>
-        </TorchProvider>
-      </UVModeProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Effectuez le préchargement initial au chargement de l'application
+  useEffect(() => {
+    // Fonction pour initialiser l'application
+    const initialize = async () => {
+      try {
+        // Démarrage du processus de préchargement
+        await initializePreloader();
+        
+        // Ajouter un délai minimum pour l'écran de chargement
+        // afin que l'utilisateur puisse voir l'animation
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation:", error);
+        // En cas d'erreur, on affiche quand même le site
+        setIsLoading(false);
+      }
+    };
+
+    initialize();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <UVModeProvider>
+          <TorchProvider>
+            <NavigationProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={null}>
+                  <AnimatePresence mode="wait">
+                    {isLoading ? (
+                      <LoadingScreen 
+                        key="loading-screen"
+                        onLoadingComplete={() => setIsLoading(false)} 
+                      />
+                    ) : (
+                      <>
+                        <BackgroundVideoController />
+                        <AppContent />
+                        <ParticleEffect />
+                        <TorchToggle />
+                      </>
+                    )}
+                  </AnimatePresence>
+                </Suspense>
+              </BrowserRouter>
+            </NavigationProvider>
+          </TorchProvider>
+        </UVModeProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
