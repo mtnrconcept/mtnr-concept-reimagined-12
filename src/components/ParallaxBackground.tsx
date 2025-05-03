@@ -35,7 +35,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       // Effet parallax appliqué à la vidéo de fond
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
-        videoBackground.style.transform = `translateY(${scrollY * -0.20}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
+        videoBackground.style.transform = `translateY(${scroll-Y * 0.20}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
       }
     };
     
