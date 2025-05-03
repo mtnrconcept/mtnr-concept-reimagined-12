@@ -82,53 +82,53 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {isTorchActive && !uvMode && (
           <svg className="fixed top-0 left-0 w-full h-full z-[99] pointer-events-none">
   <defs>
-    {/* Halo diffus autour de la torche */}
-    <radialGradient id="halo-gradient" cx="50%" cy="50%" r="50%">
+    {/* Gradient doux pour le cône */}
+    <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stopColor="white" stopOpacity="1" />
-      <stop offset="60%" stopColor="white" stopOpacity="0.3" />
+      <stop offset="50%" stopColor="white" stopOpacity="0.4" />
       <stop offset="100%" stopColor="white" stopOpacity="0" />
     </radialGradient>
 
-    {/* Gradient pour simuler le faisceau conique */}
-    <linearGradient id="beam-gradient" x1="0.5" y1="1" x2="0.5" y2="0">
-      <stop offset="0%" stopColor="white" stopOpacity="0.4" />
-      <stop offset="100%" stopColor="white" stopOpacity="0" />
-    </linearGradient>
-
     <mask id="torch-mask">
-      {/* Par défaut tout est noir (masqué) */}
+      {/* Fond noir = masqué */}
       <rect width="100%" height="100%" fill="black" />
 
-      {/* Cône lumineux (forme de faisceau) */}
-      <polygon
-        points={`
-          ${mousePosition.x - 100},${mousePosition.y}
-          ${mousePosition.x + 100},${mousePosition.y}
-          ${mousePosition.x + 300},${mousePosition.y - 600}
-          ${mousePosition.x - 300},${mousePosition.y - 600}
-        `}
-        fill="url(#beam-gradient)"
-      />
-
-      {/* Halo autour de la source de lumière */}
-      <circle
+      {/* Cône lumineux doux */}
+      <ellipse
         cx={mousePosition.x}
-        cy={mousePosition.y}
-        r={140}
-        fill="url(#halo-gradient)"
+        cy={mousePosition.y - 150}
+        rx="200"
+        ry="500"
+        fill="url(#torch-gradient)"
       />
     </mask>
   </defs>
 
-  {/* Couche sombre avec masque de lumière */}
+  {/* Calque noir à 70 %, percé par le faisceau */}
   <rect
     width="100%"
     height="100%"
     fill="black"
+    fillOpacity="0.7"
     mask="url(#torch-mask)"
     style={{ transition: "all 0.2s ease-out" }}
   />
+
+  {/* (optionnel) ajout d’un léger halo jaune-blanc dans le cône */}
+  <ellipse
+    cx={mousePosition.x}
+    cy={mousePosition.y - 150}
+    rx="200"
+    ry="500"
+    fill="url(#torch-gradient)"
+    style={{
+      pointerEvents: "none",
+      mixBlendMode: "screen",
+      opacity: 0.15,
+    }}
+  />
 </svg>
+
 
 
 
