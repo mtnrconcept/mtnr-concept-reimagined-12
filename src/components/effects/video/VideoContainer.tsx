@@ -31,6 +31,7 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
       if (!videoRef.current || !videoContainerRef.current) return;
       
       // Applique un effet parallax à la vidéo en fonction du défilement
+      // Modification: translate positif (même direction, vitesse réduite)
       const scrollY = window.scrollY;
       videoRef.current.style.transform = `translateY(${scrollY * 0.15}px)`; // La vidéo se déplace à 15% de la vitesse de défilement
     };
@@ -43,6 +44,7 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
       const mouseY = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
       
       // Combine l'effet de défilement vertical et de mouvement de souris
+      // Maintient le mouvement de la vidéo dans la même direction que le défilement
       const scrollY = window.scrollY;
       videoRef.current.style.transform = `translate3d(${mouseX * -15}px, ${mouseY * -15 + scrollY * 0.15}px, 0)`;
     };

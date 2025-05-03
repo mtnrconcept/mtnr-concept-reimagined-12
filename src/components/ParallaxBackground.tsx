@@ -21,10 +21,11 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       
       const scrollY = window.scrollY;
       
-      // Effet parallax sur les éclaboussures
+      // Effet parallax sur les éclaboussures - dans la même direction mais plus lentement
       document.querySelectorAll('.paint-splash').forEach((splash) => {
         const depth = parseFloat(splash.getAttribute('data-depth') || '0');
-        const translateY = scrollY * depth;
+        // Modification: vitesse réduite de déplacement dans la même direction (valeur positive)
+        const translateY = scrollY * Math.abs(depth) * 0.3; // 30% de la vitesse de défilement
         const translateZ = depth * 100; // Ajout de la dimension Z pour l'effet 3D
         (splash as HTMLElement).style.transform = `translateY(${translateY}px) 
           translateZ(${translateZ}px)
@@ -32,10 +33,11 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
           scale(${splash.getAttribute('data-scale')})`;
       });
       
-      // Effet parallax appliqué à la vidéo de fond
+      // Effet parallax appliqué à la vidéo de fond - dans la même direction mais plus lentement
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
-        videoBackground.style.transform = `translateY(${scroll-Y * 0.20}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
+        // Changé pour une valeur positive (même direction, vitesse réduite)
+        videoBackground.style.transform = `translateY(${scrollY * 0.15}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
       }
     };
     
@@ -54,7 +56,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         const element = splash as HTMLElement;
         const currentTransform = element.style.transform;
         
-        // Si la transformation contient déjà translateX/Y depuis l'événement de défilement,
+        // Si la transformation contient déjà translateY depuis l'événement de défilement,
         // nous ajoutons simplement les offsets de souris
         if (currentTransform.includes('translateY')) {
           element.style.transform = currentTransform.replace(
