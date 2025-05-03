@@ -1,5 +1,4 @@
 
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
 

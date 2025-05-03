@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
