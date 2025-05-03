@@ -48,49 +48,42 @@ export default function UVHiddenCode({
       const dy = mousePosition.y - codeCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Reduced proximity threshold to limit visibility to ~7 characters
-      const proximityThreshold = 150; // Réduit pour une visibilité plus locale
+      // Elliptical mask of ~100px
+      const proximityThreshold = 120;
       
-      if (distance < proximityThreshold && uvMode) {
+      if (distance < proximityThreshold * 1.5 && uvMode) {
         // Reveal code progressively based on cursor proximity
         setIsVisible(true);
         
-        const visibilityRatio = Math.max(0, 1 - (distance / proximityThreshold));
+        const visibilityRatio = Math.max(0, 1 - (distance / (proximityThreshold * 1.5)));
         
         if (codeRef.current) {
-          // Déterminer de quel côté vient le curseur (direction)
-          const fromLeft = mousePosition.x < codeCenterX;
-          const fromTop = mousePosition.y < codeCenterY;
-          
-          // Créer un effet de révélation progressive basé sur la position du curseur
+          // Traiter le code ligne par ligne et caractère par caractère
           const lines = code.split('\n');
+          
           const processedLines = lines.map((line, lineIndex) => {
             const chars = line.split('');
             
+            // Pour chaque caractère, calculer sa distance au curseur
             return chars.map((char, charIndex) => {
-              // Calculer la position relative de ce caractère dans le bloc de code
-              const relX = fromLeft 
-                ? charIndex / chars.length 
-                : 1 - (charIndex / chars.length);
+              // Estimation de la position du caractère dans le conteneur
+              const charX = codeRect.left + (charIndex / chars.length) * codeRect.width;
+              const charY = codeRect.top + (lineIndex / lines.length) * codeRect.height;
               
-              const relY = fromTop 
-                ? lineIndex / lines.length 
-                : 1 - (lineIndex / lines.length);
+              // Distance du caractère au curseur
+              const charDx = mousePosition.x - charX;
+              const charDy = mousePosition.y - charY;
               
-              // Facteur d'échelle pour rendre la fenêtre de visibilité plus petite
-              // Ajusté pour montrer environ 7 caractères sur une ligne
-              const visibilityWindowX = 0.25; 
-              const visibilityWindowY = 0.5; // Plus grand pour les lignes
+              // Calculer la distance elliptique (masque elliptique)
+              const ellipticalDistance = Math.sqrt((charDx * charDx) / 1 + (charDy * charDy) / 2.25);
               
-              // Distance normalisée du curseur au caractère dans l'espace 2D
-              const charDistanceX = Math.abs(relX - 0.5) / visibilityWindowX;
-              const charDistanceY = Math.abs(relY - 0.5) / visibilityWindowY;
-              const charDistance = Math.sqrt(charDistanceX * charDistanceX + charDistanceY * charDistanceY);
+              // Visibilité inversement proportionnelle à la distance
+              const charVisibility = Math.max(0, 1 - ellipticalDistance / proximityThreshold);
               
-              // Combiner la distance globale avec la position relative
-              const charVisibility = Math.max(0, visibilityRatio * (1 - charDistance));
+              // Appliquer un flou gaussien variable selon la distance
+              const blurAmount = Math.max(0, (1 - charVisibility) * 10);
               
-              return `<span style="opacity: ${Math.max(0, charVisibility)};">${char === ' ' ? '&nbsp;' : char}</span>`;
+              return `<span style="opacity: ${charVisibility.toFixed(2)}; filter: blur(${blurAmount.toFixed(1)}px);">${char === ' ' ? '&nbsp;' : char}</span>`;
             }).join('');
           });
           
@@ -99,7 +92,7 @@ export default function UVHiddenCode({
           // Ajouter un effet de lueur basé sur la proximité
           const glowIntensity = 5 + (visibilityRatio * 15);
           codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
-          containerRef.current.style.opacity = visibilityRatio.toString();
+          containerRef.current.style.opacity = '1';
         }
       } else {
         // Hide when cursor is far

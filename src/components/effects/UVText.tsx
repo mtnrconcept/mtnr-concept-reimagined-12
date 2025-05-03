@@ -45,7 +45,7 @@ export default function UVText({
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Uniquement visible en mode UV
-      const threshold = uvMode ? 600 : 0; // Aucune détection en mode normal
+      const threshold = uvMode ? 150 : 0; // Réduit pour un effet plus localisé
       const newIsIlluminated = distance < threshold && uvMode;
       
       if (newIsIlluminated !== isIlluminated) {
@@ -56,31 +56,46 @@ export default function UVText({
         // Calculate intensity based on distance (stronger when closer)
         const intensity = 1 - (distance / threshold);
         
-        // Déterminer de quel côté vient le curseur
-        const fromLeft = mousePosition.x < centerX;
-        
         if (typeof hiddenText === 'string') {
-          // Diviser le texte en caractères et appliquer des opacités variables
+          // Diviser le texte en caractères pour un effet elliptique
           const chars = hiddenText.split('');
           const processedChars = chars.map((char, index) => {
-            // Position relative du caractère dans le texte
-            const relPos = fromLeft ? index / chars.length : 1 - (index / chars.length);
+            // Estimer la position horizontale de ce caractère 
+            const charElement = document.createElement('span');
+            charElement.textContent = char;
+            charElement.style.display = 'inline-block';
+            document.body.appendChild(charElement);
+            const charWidth = charElement.getBoundingClientRect().width;
+            document.body.removeChild(charElement);
             
-            // Combiner la distance globale avec la position relative
-            const charVisibility = Math.min(intensity * (1.5 - relPos), 1);
+            // Position approximative du caractère (en pixels)
+            const charPosition = index * (charWidth || 8); // 8px par défaut
+            const charX = rect.left + charPosition;
             
-            return `<span style="opacity: ${Math.max(0, charVisibility)}; display: inline-block;">${char}</span>`;
+            // Distance du caractère au curseur
+            const charDx = mousePosition.x - charX;
+            const charDy = mousePosition.y - centerY;
+            
+            // Distance elliptique (~100px mask)
+            const ellipticalDistance = Math.sqrt((charDx * charDx) / 1 + (charDy * charDy) / 2.25);
+            const charVisibility = Math.max(0, 1 - ellipticalDistance / 100);
+            
+            // Appliquer un flou gaussien variable selon la distance
+            const blurAmount = Math.max(0, (1 - charVisibility) * 10);
+            
+            return `<span style="opacity: ${charVisibility.toFixed(2)}; filter: blur(${blurAmount.toFixed(1)}px); display: inline-block;">${char}</span>`;
           });
           
           hiddenTextRef.current.innerHTML = processedChars.join('');
         } else {
-          const opacityValue = Math.min(1, intensity * 5);
+          const opacityValue = Math.min(1, intensity * 3);
           hiddenTextRef.current.style.opacity = `${opacityValue}`;
+          hiddenTextRef.current.style.filter = `blur(${Math.max(0, (1 - intensity) * 10)}px)`;
         }
         
         // Enhanced glow for UV mode with dynamic fluorescent yellow color
         const glowSize = 25 * intensity;
-        const primaryGlow = "#D2FF3F";
+        const primaryGlow = uvColor;
         const secondaryGlow = "#4FA9FF";
         
         hiddenTextRef.current.style.textShadow = `
@@ -94,7 +109,7 @@ export default function UVText({
         const vibrationX = Math.sin(time * 2) * 0.8;
         const vibrationY = Math.cos(time * 1.8) * 0.8;
         hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
-        hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
+        hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2) blur(${Math.max(0, (1 - intensity) * 10)}px)`;
         
         // Add letter spacing for dramatic effect in UV mode
         hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
