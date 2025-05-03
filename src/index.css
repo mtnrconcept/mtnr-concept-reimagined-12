@@ -9,4 +9,5 @@
 @import './styles/flashlight.css';
 
 /* Import UV mode styles */
-@import './styles/uv-mode.css';
+@import './styles/uv-mode/index.css';
+

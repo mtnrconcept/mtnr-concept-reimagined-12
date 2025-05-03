@@ -1,0 +1,84 @@
+
+@layer components {
+  .uv-mode-active .neon-text {
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F, 0 0 15px #D2FF3F, 0 0 25px #D2FF3F !important;
+    animation: uvPulse 3s infinite;
+  }
+  
+  .uv-mode-active h1, 
+  .uv-mode-active h2, 
+  .uv-mode-active h3 {
+    color: #D2FF3F;
+    text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
+    transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
+  }
+  
+  .uv-nav-link {
+    color: #4FA9FF !important;
+    text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
+    position: relative;
+  }
+  
+  .uv-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #00AAFF;
+    box-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
+    opacity: 1;
+  }
+  
+  /* UV glow for the texts */
+  .uv-hidden-text {
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F !important;
+  }
+  
+  /* UV mode active text-related elements */
+  .uv-mode-active .neon-text,
+  .uv-mode-active .logo-container {
+    animation: uvPulse 3s infinite;
+  }
+  
+  /* UV elements that appear with animation */
+  .uv-mode-active .uv-reveal {
+    animation: uvReveal 0.8s ease-out forwards;
+  }
+  
+  /* Electric text in UV mode */
+  .uv-mode-active .uv-electric-text {
+    animation: electricText 3s infinite;
+    color: #D2FF3F !important;
+  }
+
+  /* UV hidden formula */
+  .uv-formula {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: #D2FF3F;
+    text-shadow: 0 0 10px #D2FF3F;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+  
+  .uv-mode-active .uv-formula {
+    opacity: 1;
+  }
+
+  /* UV glitch text effect */
+  .uv-glitch-text {
+    animation: uvGlitch 3s infinite;
+    display: inline-block;
+  }
+
+  /* Special footer styles in UV mode */
+  .uv-mode-active footer {
+    color: #4FA9FF !important;
+    text-shadow: 0 0 8px rgba(0, 170, 255, 0.5) !important;
+  }
+}

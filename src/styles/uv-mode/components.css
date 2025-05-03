@@ -1,0 +1,53 @@
+
+@layer components {
+  .uv-button {
+    background: transparent !important;
+    box-shadow: 0 0 15px #00AAFF, inset 0 0 10px #00AAFF;
+    border: 1px solid #00AAFF !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 8px #D2FF3F;
+    transition: box-shadow 0.5s ease-out;
+  }
+  
+  .uv-button:hover {
+    box-shadow: 0 0 25px #00AAFF, inset 0 0 15px #00AAFF;
+  }
+  
+  /* UV specific styles for TV Player */
+  .uv-mode-active .tv-player-container {
+    box-shadow: 0 0 30px rgba(79, 169, 255, 0.5);
+  }
+  
+  .uv-mode-active .tv-frame {
+    filter: hue-rotate(180deg) brightness(1.2) saturate(1.5);
+  }
+  
+  /* Halo effect around "Book" buttons */
+  .uv-mode-active a[href*="book"], 
+  .uv-mode-active button:has(span:contains("Book")) {
+    background-color: transparent !important;
+    border: 1px solid #D2FF3F !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F !important;
+    box-shadow: 0 0 15px rgba(210, 255, 63, 0.6) !important;
+  }
+
+  /* Navbar style in UV mode */
+  .uv-mode-active nav {
+    background-color: rgba(10, 0, 40, 0.7) !important;
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.3) !important;
+    backdrop-filter: blur(10px);
+  }
+  
+  .uv-mode-active nav a {
+    color: #4FA9FF !important;
+    text-shadow: 0 0 5px #00AAFF !important;
+    letter-spacing: 0.05em;
+    transition: letter-spacing 0.3s ease-out;
+  }
+  
+  .uv-mode-active nav a:hover {
+    text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF !important;
+    letter-spacing: 0.08em;
+  }
+}
