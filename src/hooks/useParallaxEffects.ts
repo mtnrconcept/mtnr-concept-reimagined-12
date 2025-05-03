@@ -24,7 +24,8 @@ export const useParallaxEffects = ({ containerRef }: ParallaxHookProps) => {
       const elements = containerRef.current?.querySelectorAll<HTMLElement>('.parallax-element');
       elements?.forEach(el => {
         const depth = parseFloat(el.dataset.depth || '0');
-        const translateY = scrollY * depth;
+        // Inversion du signe pour que le mouvement aille dans le bon sens
+        const translateY = -scrollY * depth;
         const translateX = mouseX * (depth * 10);
         const scale = el.classList.contains('fixed') ? 1.1 : 1;
         

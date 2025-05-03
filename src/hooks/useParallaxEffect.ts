@@ -43,7 +43,8 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         const x = parseFloat(element.dataset.x || '0');
         const y = parseFloat(element.dataset.y || '0');
         
-        const translateY = depth * scrollY * 0.5;
+        // Déplacement vers le HAUT lors du défilement vers le bas (inverse du scroll)
+        const translateY = -depth * scrollY * 0.5;
         const translateX = mouseX * (depth * 50);
         const rotateX = -mouseY * (depth * 5);
         const rotateY = mouseX * (depth * 5);
@@ -60,7 +61,8 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.60; // Vitesse augmentée (3x plus rapide)
+          // Signe négatif pour que l'élément se déplace vers le haut lors du défilement vers le bas
+          const translateY = -scrollY * 0.60; 
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
