@@ -55,8 +55,28 @@ export default function UVText({
       if (newIsIlluminated && uvMode) {
         // Calculate intensity based on distance (stronger when closer)
         const intensity = 1 - (distance / threshold);
-        const opacityValue = Math.min(1, intensity * 5);
-        hiddenTextRef.current.style.opacity = `${opacityValue}`;
+        
+        // Déterminer de quel côté vient le curseur
+        const fromLeft = mousePosition.x < centerX;
+        
+        if (typeof hiddenText === 'string') {
+          // Diviser le texte en caractères et appliquer des opacités variables
+          const chars = hiddenText.split('');
+          const processedChars = chars.map((char, index) => {
+            // Position relative du caractère dans le texte
+            const relPos = fromLeft ? index / chars.length : 1 - (index / chars.length);
+            
+            // Combiner la distance globale avec la position relative
+            const charVisibility = Math.min(intensity * (1.5 - relPos), 1);
+            
+            return `<span style="opacity: ${Math.max(0, charVisibility)}; display: inline-block;">${char}</span>`;
+          });
+          
+          hiddenTextRef.current.innerHTML = processedChars.join('');
+        } else {
+          const opacityValue = Math.min(1, intensity * 5);
+          hiddenTextRef.current.style.opacity = `${opacityValue}`;
+        }
         
         // Enhanced glow for UV mode with dynamic fluorescent yellow color
         const glowSize = 25 * intensity;
@@ -79,11 +99,13 @@ export default function UVText({
         // Add letter spacing for dramatic effect in UV mode
         hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
       } else {
-        hiddenTextRef.current.style.opacity = '0';
-        hiddenTextRef.current.style.textShadow = 'none';
-        hiddenTextRef.current.style.transform = '';
-        hiddenTextRef.current.style.filter = '';
-        hiddenTextRef.current.style.letterSpacing = '';
+        if (hiddenTextRef.current) {
+          hiddenTextRef.current.style.opacity = '0';
+          hiddenTextRef.current.style.textShadow = 'none';
+          hiddenTextRef.current.style.transform = '';
+          hiddenTextRef.current.style.filter = '';
+          hiddenTextRef.current.style.letterSpacing = '';
+        }
       }
     };
 
@@ -95,20 +117,15 @@ export default function UVText({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, isIlluminated, uvColor, uvMode]);
+  }, [isTorchActive, mousePosition, isIlluminated, uvColor, uvMode, hiddenText]);
 
   // Auto-reveal hidden text if UV mode is active, regardless of mouse position
   useEffect(() => {
     if (uvMode && hiddenTextRef.current && isTorchActive) {
-      hiddenTextRef.current.style.opacity = '1';
-      hiddenTextRef.current.style.textShadow = `
-        0 0 10px ${uvColor},
-        0 0 20px ${uvColor},
-        0 0 30px ${uvColor}
-      `;
-      hiddenTextRef.current.style.letterSpacing = '0.1em';
+      // On continue à utiliser l'effet de survol du curseur
+      // Le reveal complet n'est fait que si la souris passe dessus
       
-      // Add subtle animation
+      // Mais on ajoute un effet de lueur subtil pour indiquer que quelque chose est là
       const animateGlow = () => {
         if (hiddenTextRef.current) {
           const time = Date.now() / 1000;

@@ -28,60 +28,81 @@ export default function UVHiddenCode({
   depth = "0.25"
 }: UVHiddenCodeProps) {
   const codeRef = useRef<HTMLPreElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!codeRef.current || !isTorchActive) return;
+    if (!codeRef.current || !isTorchActive || !uvMode) return;
 
     const handleVisibility = () => {
-      if (!codeRef.current) return;
+      if (!codeRef.current || !containerRef.current) return;
       
-      if (uvMode && isTorchActive) {
-        // Reveal the code with UV light
+      const codeRect = containerRef.current.getBoundingClientRect();
+      const codeCenterX = codeRect.left + codeRect.width / 2;
+      const codeCenterY = codeRect.top + codeRect.height / 2;
+      
+      // Distance from mouse to code
+      const dx = mousePosition.x - codeCenterX;
+      const dy = mousePosition.y - codeCenterY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      const proximityThreshold = 300; // Distance maximale pour commencer à voir
+      
+      if (distance < proximityThreshold && uvMode) {
+        // Reveal code progressively based on cursor proximity
         setIsVisible(true);
         
-        // Add subtle animation to make code feel "alive"
-        const animate = () => {
-          if (!codeRef.current) return;
-          const time = Date.now() / 1000;
-          const glowIntensity = 5 + (Math.sin(time * 2) * 3);
+        const visibilityRatio = Math.max(0, 1 - (distance / proximityThreshold));
+        
+        if (codeRef.current) {
+          // Déterminer de quel côté vient le curseur (direction)
+          const fromLeft = mousePosition.x < codeCenterX;
+          const fromTop = mousePosition.y < codeCenterY;
           
-          codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
-          
-          // Subtle character flicker effect - randomly change opacity of characters
-          const characters = codeRef.current.querySelectorAll('span');
-          characters.forEach((char, i) => {
-            if (Math.random() < 0.03) { // 3% chance per frame
-              (char as HTMLElement).style.opacity = (Math.random() * 0.5 + 0.5).toString(); // 0.5-1.0
-              setTimeout(() => {
-                if (char) (char as HTMLElement).style.opacity = '1';
-              }, 100 + Math.random() * 150);
-            }
+          // Créer un effet de révélation progressive basé sur la position du curseur
+          const lines = code.split('\n');
+          const processedLines = lines.map((line, lineIndex) => {
+            const chars = line.split('');
+            
+            return chars.map((char, charIndex) => {
+              // Calculer la position relative de ce caractère dans le bloc de code
+              const relX = fromLeft 
+                ? charIndex / chars.length 
+                : 1 - (charIndex / chars.length);
+              
+              const relY = fromTop 
+                ? lineIndex / lines.length 
+                : 1 - (lineIndex / lines.length);
+              
+              // Combiner la distance globale avec la position relative
+              // Plus le caractère est loin dans la direction d'où vient le curseur, plus il est transparent
+              const charVisibility = Math.min(
+                visibilityRatio * (1.5 - (relX * 0.8) - (relY * 0.2)),
+                1
+              );
+              
+              return `<span style="opacity: ${Math.max(0, charVisibility)};">${char === ' ' ? '&nbsp;' : char}</span>`;
+            }).join('');
           });
           
-          requestAnimationFrame(animate);
-        };
-        
-        // Split code into individual characters for the flicker effect
-        if (codeRef.current) {
-          codeRef.current.innerHTML = code
-            .split('\n')
-            .map(line => 
-              line
-                .split('')
-                .map(char => `<span>${char === ' ' ? '&nbsp;' : char}</span>`)
-                .join('')
-            )
-            .join('<br>');
+          codeRef.current.innerHTML = processedLines.join('<br>');
+          
+          // Ajouter un effet de lueur basé sur la proximité
+          const glowIntensity = 5 + (visibilityRatio * 15);
+          codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
+          containerRef.current.style.opacity = visibilityRatio.toString();
         }
-        
-        const animationId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animationId);
       } else {
-        // Hide when UV mode is off
+        // Hide when cursor is far
         setIsVisible(false);
+        if (codeRef.current) {
+          codeRef.current.style.textShadow = 'none';
+        }
+        if (containerRef.current) {
+          containerRef.current.style.opacity = '0';
+        }
       }
     };
     
@@ -97,13 +118,14 @@ export default function UVHiddenCode({
 
   return (
     <div
-      className={`absolute pointer-events-none select-none transition-all duration-700 uv-hidden-code ${className}`}
+      ref={containerRef}
+      className={`absolute pointer-events-none select-none transition-opacity duration-300 uv-hidden-code ${className}`}
       data-depth={depth}
       style={{
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
         top: typeof position.y === 'number' ? `${position.y}%` : position.y,
         transform: `rotate(${rotation}deg)`,
-        opacity: isVisible ? 0.85 : 0,
+        opacity: 0,
         zIndex: 20
       }}
     >
