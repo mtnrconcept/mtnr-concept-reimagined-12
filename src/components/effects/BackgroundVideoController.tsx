@@ -65,7 +65,8 @@ export const BackgroundVideoController = () => {
     const handleLinkClick = (e) => {
       if (e.target.tagName === 'A' && 
           e.target.getAttribute('href') && 
-          !e.target.getAttribute('href').startsWith('http')) {
+          !e.target.getAttribute('href').startsWith('http') &&
+          !e.target.getAttribute('href').startsWith('#')) {
         console.log('Clic sur un lien interne détecté, déclenchement de la transition vidéo');
         // Déclencher la transition vidéo avant le changement de page
         navigation.triggerVideoTransition();

@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import useBackgroundVideo from '../../hooks/useBackgroundVideo';
 import { useUVMode } from './UVModeContext';
+import { useLocation } from 'react-router-dom';
+import { useNavigation } from './NavigationContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -20,6 +22,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   
   const [loadingStatus, setLoadingStatus] = useState('loading');
   const [videoError, setVideoError] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const location = useLocation();
+  const navigation = useNavigation();
+  
+  // Référence pour stocker le chemin précédent
+  const previousPathRef = useRef(location.pathname);
   
   // Utilisation du contexte UV pour déterminer quelle vidéo afficher
   const { uvMode } = useUVMode();
@@ -34,20 +42,13 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     // Configuration initiale des vidéos
     const setupVideo = async () => {
       try {
-        // Lecture initiale silencieuse des deux vidéos
-        await normalVideo.play();
-        await uvVideo.play();
+        // Chargement initial des deux vidéos mais sans lecture
+        normalVideo.load();
+        uvVideo.load();
         
-        // Mettre en pause après le début pour que la vidéo soit prête
+        // Les vidéos restent en pause initialement
         normalVideo.pause();
         uvVideo.pause();
-        
-        // Lire la vidéo normale au début
-        if (!uvMode) {
-          normalVideo.play();
-        } else {
-          uvVideo.play();
-        }
         
         setLoadingStatus('ready');
       } catch (error) {
@@ -59,6 +60,64 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     
     setupVideo();
   }, []);
+
+  // Gestion des changements de page pour démarrer la lecture
+  useEffect(() => {
+    const normalVideo = normalVideoRef.current;
+    const uvVideo = uvVideoRef.current;
+    
+    if (!normalVideo || !uvVideo) return;
+    
+    // Vérifier si la page a réellement changé
+    if (location.pathname !== previousPathRef.current) {
+      console.log(`Navigation détectée: ${previousPathRef.current} -> ${location.pathname}`);
+      previousPathRef.current = location.pathname;
+      
+      setIsTransitioning(true);
+      
+      // Lire la vidéo appropriée selon le mode UV
+      if (uvMode) {
+        uvVideo.currentTime = 0;
+        uvVideo.play()
+          .then(() => console.log('Lecture de la vidéo UV démarrée'))
+          .catch(err => console.error('Erreur de lecture vidéo UV:', err));
+      } else {
+        normalVideo.currentTime = 0;
+        normalVideo.play()
+          .then(() => console.log('Lecture de la vidéo normale démarrée'))
+          .catch(err => console.error('Erreur de lecture vidéo normale:', err));
+      }
+    }
+  }, [location.pathname, uvMode]);
+
+  // Écouter les événements de navigation (via NavigationContext)
+  useEffect(() => {
+    const handleTransition = () => {
+      const normalVideo = normalVideoRef.current;
+      const uvVideo = uvVideoRef.current;
+      
+      if (!normalVideo || !uvVideo) return;
+      
+      setIsTransitioning(true);
+      
+      // Lire la vidéo appropriée selon le mode UV
+      if (uvMode) {
+        uvVideo.currentTime = 0;
+        uvVideo.play()
+          .then(() => console.log('Lecture de la vidéo UV démarrée (via navigationContext)'))
+          .catch(err => console.error('Erreur de lecture vidéo UV:', err));
+      } else {
+        normalVideo.currentTime = 0;
+        normalVideo.play()
+          .then(() => console.log('Lecture de la vidéo normale démarrée (via navigationContext)'))
+          .catch(err => console.error('Erreur de lecture vidéo normale:', err));
+      }
+    };
+    
+    // S'abonner au contexte de navigation pour les transitions
+    const unregister = navigation.registerVideoTransitionListener(handleTransition);
+    return unregister;
+  }, [navigation, uvMode]);
 
   // Gestion des événements vidéo
   useEffect(() => {
@@ -77,6 +136,13 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         console.log(`Lecture vidéo ${name} mise en pause:`, video.src);
       };
       
+      const handleEnded = () => {
+        console.log(`Vidéo ${name} terminée, mise en pause automatique`);
+        setIsTransitioning(false);
+        // Mettre en pause la vidéo lorsqu'elle est terminée
+        video.pause();
+      };
+      
       const handleError = (e: Event) => {
         console.error(`Erreur vidéo ${name} détectée:`, e);
         setVideoError(true);
@@ -91,6 +157,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('playing', handlePlaying);
       video.addEventListener('pause', handlePause);
+      video.addEventListener('ended', handleEnded);
       video.addEventListener('error', handleError);
       video.addEventListener('waiting', handleWaiting);
 
@@ -98,6 +165,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('playing', handlePlaying);
         video.removeEventListener('pause', handlePause);
+        video.removeEventListener('ended', handleEnded);
         video.removeEventListener('error', handleError);
         video.removeEventListener('waiting', handleWaiting);
       };
@@ -130,6 +198,11 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
           Erreur vidéo - Mode fallback
         </div>
       )}
+      {isTransitioning && (
+        <div className="absolute top-0 left-0 bg-blue-500 text-xs text-white px-2 py-0.5 opacity-70 z-50">
+          Transition de page
+        </div>
+      )}
       
       {/* Vidéo normale - visible quand UV est désactivé */}
       <video
@@ -139,7 +212,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         playsInline
         muted
         preload="auto"
-        loop
       >
         <source src={videoUrl} type="video/mp4" />
       </video>
@@ -152,7 +224,6 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         playsInline
         muted
         preload="auto"
-        loop
       >
         <source src={videoUrlUV} type="video/mp4" />
       </video>

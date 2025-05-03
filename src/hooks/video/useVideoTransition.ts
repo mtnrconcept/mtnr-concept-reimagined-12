@@ -16,12 +16,29 @@ export function useVideoTransition({
   const { isTransitioning } = videoState;
   const { setIsTransitioning } = videoActions;
 
-  // Fonction simplifiée qui ne fait plus de transition vidéo
-  // car nous utilisons l'opacité CSS
+  // Fonction de transition vidéo - désormais elle joue la vidéo et la remet en pause à la fin
   const playVideoTransition = useCallback((): void => {
-    // Ne rien faire, les transitions sont gérées par CSS
-    console.log('Transition par opacité uniquement, pas de changement de lecture vidéo');
-  }, []);
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+    
+    setIsTransitioning(true);
+    
+    // Remettre la vidéo au début pour la transition
+    videoElement.currentTime = 0;
+    
+    // Lancer la lecture et mettre en place un gestionnaire pour mettre en pause à la fin
+    videoElement.play()
+      .then(() => {
+        console.log('Transition vidéo lancée');
+        
+        // Cette fonction sera remplacée par le gestionnaire d'événements 'ended'
+        // dans le composant BackgroundVideo, qui mettra la vidéo en pause
+      })
+      .catch(error => {
+        console.error('Erreur lors de la lecture de la vidéo de transition:', error);
+        setIsTransitioning(false);
+      });
+  }, [videoRef, setIsTransitioning]);
 
   return { playVideoTransition };
 }

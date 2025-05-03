@@ -40,7 +40,7 @@ export function useNavigationHandler({
     
   }, [playVideoTransition]);
 
-  // Écouter les événements de navigation pour jouer la vidéo instantanément
+  // Écouter les événements de navigation pour jouer la vidéo lors des transitions
   useEffect(() => {
     const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
@@ -62,7 +62,8 @@ export function useNavigationHandler({
         setIsFirstLoad(false);
         console.log('Vidéo initialisée, prête pour la première transition');
       } else {
-        // Déclencher automatiquement la transition vidéo lors d'un changement de page
+        // Déclencher la transition vidéo lors d'un changement de page
+        // La vidéo se mettra en pause automatiquement à la fin via onended
         playVideoTransition();
       }
     }
@@ -72,11 +73,6 @@ export function useNavigationHandler({
       if (document.hidden && videoElement) {
         videoElement.pause();
         console.log('Page non visible, vidéo en pause');
-      } else if (!document.hidden && !isFirstLoad) {
-        // Possibilité de relancer la vidéo quand l'utilisateur revient sur la page
-        // mais uniquement si ce n'est pas le premier chargement
-        // Commenter pour désactiver cette fonctionnalité
-        // playVideoTransition();
       }
     };
     
