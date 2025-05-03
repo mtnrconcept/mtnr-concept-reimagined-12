@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import useBackgroundVideo from '../../hooks/useBackgroundVideo';
 
@@ -97,19 +96,17 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         </div>
       )}
       
-      {/* Vidéo en fond - maintenant complètement responsive */}
-      <div className="absolute inset-0 flex items-center justify-center w-full h-full">
-        <video
-          ref={videoRef}
-          className="w-auto h-auto max-w-full max-h-full"
-          poster={fallbackImg}
-          playsInline
-          muted
-          preload="auto"
-        >
-          <source src={currentVideo} type="video/mp4" />
-        </video>
-      </div>
+      {/* Vidéo en fond - plein écran et responsive */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover"
+        poster={fallbackImg}
+        playsInline
+        muted
+        preload="auto"
+      >
+        <source src={currentVideo} type="video/mp4" />
+      </video>
       
       {/* Grille */}
       <div 
