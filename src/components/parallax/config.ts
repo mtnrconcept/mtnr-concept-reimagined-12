@@ -11,7 +11,10 @@ export interface ParallaxElementConfig {
   blur?: number;
   size?: number;
   glow?: string;
-  blendMode?: string;
+  blendMode?: 'normal' | 'multiply' | 'screen' | 'overlay' 
+  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
+  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
+  | 'hue' | 'saturation' | 'color' | 'luminosity';
 }
 
 export const parallaxElements: ParallaxElementConfig[] = [

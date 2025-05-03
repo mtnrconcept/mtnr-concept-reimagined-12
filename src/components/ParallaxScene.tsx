@@ -7,6 +7,13 @@ import { PaintSplash } from './parallax/PaintSplash';
 import { Light } from './parallax/Light';
 import { useLocation } from 'react-router-dom';
 
+// Import or define MixBlendMode type to match what's in PaintSplash.tsx
+type MixBlendMode = 
+  | 'normal' | 'multiply' | 'screen' | 'overlay' 
+  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
+  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
+  | 'hue' | 'saturation' | 'color' | 'luminosity';
+
 export default function ParallaxScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -62,7 +69,7 @@ export default function ParallaxScene() {
                 className={element.className}
                 src={element.src!}
                 blur={element.blur}
-                blendMode={element.blendMode}
+                blendMode={element.blendMode as MixBlendMode}
               />
             );
           }
