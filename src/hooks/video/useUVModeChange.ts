@@ -30,8 +30,8 @@ export function useUVModeChange({
     if (previousUVModeRef.current !== uvMode) {
       previousUVModeRef.current = uvMode;
       
-      // Inversion des vidéos selon l'état d'UV
-      const newVideoUrl = uvMode ? videoUrl : videoUrlUV;
+      // Sélectionner la bonne vidéo selon le mode UV
+      const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
       
       if (currentVideo !== newVideoUrl) {
         console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);

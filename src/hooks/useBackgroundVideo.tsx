@@ -9,15 +9,15 @@ import { useDurationChange } from './video/useDurationChange';
 import { UseBackgroundVideoProps, UseBackgroundVideoReturn } from './video/types';
 
 export function useBackgroundVideo({
-  videoUrl = "/lovable-uploads/Composition_1.mp4",
-  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4",
+  videoUrl = "/lovable-uploads/videonormale.mp4",
+  videoUrlUV = "/lovable-uploads/videouv.mp4",
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
   autoPlay = false
 }: UseBackgroundVideoProps = {}): UseBackgroundVideoReturn {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [currentVideo, setCurrentVideo] = useState(videoUrlUV);
+  const [currentVideo, setCurrentVideo] = useState(videoUrl);
   const [videoError, setVideoError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   

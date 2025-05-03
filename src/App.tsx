@@ -50,10 +50,10 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Vidéo de fond avec chemin mis à jour pour la vidéo normale */}
+      {/* Vidéo de fond avec chemins mis à jour */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/videonormale.mp4"
-        videoUrlUV="/lovable-uploads/Composition_1_1.mp4"
+        videoUrlUV="/lovable-uploads/videouv.mp4"
       />
       
       <PageTransitionEffect />

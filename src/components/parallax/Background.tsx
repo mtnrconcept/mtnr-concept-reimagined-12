@@ -15,7 +15,11 @@ export const Background = ({
 }: BackgroundProps) => {
   // Si useVideo est true, on utilise le composant BackgroundVideo
   if (useVideo) {
-    return <BackgroundVideo fallbackImage={imagePath} />;
+    return <BackgroundVideo 
+      videoUrl="/lovable-uploads/videonormale.mp4"
+      videoUrlUV="/lovable-uploads/videouv.mp4" 
+      fallbackImage={imagePath} 
+    />;
   }
   
   // Sinon, on utilise l'image de fond classique

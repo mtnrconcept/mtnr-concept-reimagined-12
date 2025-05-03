@@ -9,8 +9,8 @@ interface BackgroundVideoProps {
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/Composition_1.mp4", 
-  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4", 
+  videoUrl = "/lovable-uploads/videonormale.mp4", 
+  videoUrlUV = "/lovable-uploads/videouv.mp4", 
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   const {

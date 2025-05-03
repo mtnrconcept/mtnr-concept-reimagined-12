@@ -12,7 +12,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       {/* Vidéo de fond avec les chemins mis à jour */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/videonormale.mp4"
-        videoUrlUV="/lovable-uploads/Composition_1_1.mp4"
+        videoUrlUV="/lovable-uploads/videouv.mp4"
       />
       
       {/* Container pour les éléments parallax */}
