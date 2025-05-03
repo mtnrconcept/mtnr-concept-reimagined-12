@@ -39,40 +39,33 @@ export default function UVHiddenMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Elliptical mask of ~100px
-      const threshold = 100; 
+      // Elliptical mask of ~150px (augmenté pour une meilleure visibilité)
+      const threshold = 150; 
       if (distance < threshold * 1.5 && uvMode) {
         const intensity = 1 - (distance / (threshold * 1.5));
-        
-        // Déterminer de quel côté vient le curseur
-        const fromLeft = mousePosition.x < elementCenterX;
         
         // Créer un effet de révélation progressive du texte
         if (messageRef.current) {
           // Diviser le texte en caractères et appliquer des opacités variables
           const chars = message.split('');
           const processedChars = chars.map((char, index) => {
-            // Calculer la position du caractère par rapport au curseur
-            const charElement = document.createElement('span');
-            charElement.textContent = char;
-            charElement.style.display = 'inline-block';
-            document.body.appendChild(charElement);
-            const charWidth = charElement.getBoundingClientRect().width;
-            document.body.removeChild(charElement);
+            // Position approximative du caractère en pourcentage de la largeur totale
+            const charPosPercent = index / chars.length;
             
-            // Position approximative du caractère (en pixels)
-            const charPosition = index * (charWidth || 8); // 8px de largeur par défaut
-            const charOffset = fromLeft ? charPosition : rect.width - charPosition;
-            const charX = rect.left + charOffset;
+            // Position du caractère en pixels par rapport au début du texte
+            const charPosPixels = charPosPercent * rect.width;
+            const charX = rect.left + charPosPixels;
             
             // Distance du caractère au curseur
             const charDx = mousePosition.x - charX;
-            const charDy = mousePosition.y - rect.top - rect.height / 2;
+            const charDy = mousePosition.y - elementCenterY;
             
-            // Visibilité basée sur la distance au curseur (effet masque elliptique inversé)
+            // Distance absolue sans effet miroir
+            const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
+            
+            // Visibilité basée sur la distance absolue au curseur (pas d'effet miroir)
             // Plus le caractère est proche du curseur, plus il est visible
-            const ellipticalDistance = Math.sqrt((charDx * charDx) / 1 + (charDy * charDy) / 2.25);
-            const charVisibility = Math.max(0, 1 - ellipticalDistance / threshold);
+            const charVisibility = Math.max(0, 1 - charDistance / threshold);
             
             return `<span style="opacity: ${charVisibility.toFixed(2)}; display: inline-block;">${char}</span>`;
           });
@@ -114,8 +107,9 @@ export default function UVHiddenMessage({
   return (
     <div
       ref={messageRef}
-      className={`absolute pointer-events-none select-none transition-opacity duration-200 ${className}`}
+      className={`uv-secret-message pointer-events-none select-none z-20 ${className}`}
       style={{
+        position: 'absolute',
         color,
         fontSize,
         opacity: 0, // Always start with opacity 0 until mouse is in perimeter

@@ -44,13 +44,34 @@ export default function UVSecretMessage({
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Augmenter la distance d'activation
-      const threshold = 150; 
+      const threshold = 200; 
       
       // Show only when UV torch is close and in UV mode
       if (distance < threshold && uvMode) {
         setIsVisible(true);
         
         if (messageRef.current) {
+          // Diviser le message en caractères pour un effet de révélation précis
+          const chars = message.split('');
+          const processedChars = chars.map((char, index) => {
+            // Estimation de la position du caractère
+            const charPosPercent = index / chars.length;
+            const charPosPixels = charPosPercent * rect.width;
+            const charX = rect.left + charPosPixels;
+            
+            // Distance directe du caractère au curseur
+            const charDx = mousePosition.x - charX;
+            const charDy = mousePosition.y - elementCenterY;
+            const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
+            
+            // Visibilité basée sur la distance directe
+            const charVisibility = Math.max(0, 1 - charDistance / threshold);
+            
+            return `<span style="opacity: ${charVisibility.toFixed(2)}; display: inline-block;">${char}</span>`;
+          });
+          
+          messageRef.current.innerHTML = processedChars.join('');
+          
           // Calculate intensity based on distance (stronger when closer)
           const intensity = 1 - (distance / threshold);
           

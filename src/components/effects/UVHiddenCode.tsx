@@ -43,50 +43,47 @@ export default function UVHiddenCode({
       const codeCenterX = codeRect.left + codeRect.width / 2;
       const codeCenterY = codeRect.top + codeRect.height / 2;
       
-      // Distance from mouse to code
+      // Distance from mouse to code center
       const dx = mousePosition.x - codeCenterX;
       const dy = mousePosition.y - codeCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Elliptical mask of ~100px
-      const proximityThreshold = 100;
+      // Elliptical mask of ~150px (augmenté pour une meilleure visibilité)
+      const proximityThreshold = 150;
       
       if (distance < proximityThreshold * 1.5 && uvMode) {
         // Reveal code progressively based on cursor proximity
         setIsVisible(true);
         
-        const visibilityRatio = Math.max(0, 1 - (distance / (proximityThreshold * 1.5)));
+        // Traiter le code ligne par ligne
+        const lines = code.split('\n');
+        
+        const processedLines = lines.map((line, lineIndex) => {
+          const chars = line.split('');
+          
+          // Pour chaque caractère, calculer sa distance absolue au curseur
+          return chars.map((char, charIndex) => {
+            // Estimation de la position du caractère dans le conteneur
+            const charX = codeRect.left + (charIndex / chars.length) * codeRect.width;
+            const charY = codeRect.top + (lineIndex / lines.length) * codeRect.height;
+            
+            // Distance directe du caractère au curseur (sans ellipse)
+            const charDx = mousePosition.x - charX;
+            const charDy = mousePosition.y - charY;
+            const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
+            
+            // Visibilité inversement proportionnelle à la distance
+            const charVisibility = Math.max(0, 1 - charDistance / proximityThreshold);
+            
+            return `<span style="opacity: ${charVisibility.toFixed(2)};">${char === ' ' ? '&nbsp;' : char}</span>`;
+          }).join('');
+        });
         
         if (codeRef.current) {
-          // Traiter le code ligne par ligne et caractère par caractère
-          const lines = code.split('\n');
-          
-          const processedLines = lines.map((line, lineIndex) => {
-            const chars = line.split('');
-            
-            // Pour chaque caractère, calculer sa distance au curseur
-            return chars.map((char, charIndex) => {
-              // Estimation de la position du caractère dans le conteneur
-              const charX = codeRect.left + (charIndex / chars.length) * codeRect.width;
-              const charY = codeRect.top + (lineIndex / lines.length) * codeRect.height;
-              
-              // Distance du caractère au curseur
-              const charDx = mousePosition.x - charX;
-              const charDy = mousePosition.y - charY;
-              
-              // Calculer la distance elliptique (masque elliptique)
-              const ellipticalDistance = Math.sqrt((charDx * charDx) / 1 + (charDy * charDy) / 2.25);
-              
-              // Visibilité inversement proportionnelle à la distance
-              const charVisibility = Math.max(0, 1 - ellipticalDistance / proximityThreshold);
-              
-              return `<span style="opacity: ${charVisibility.toFixed(2)};">${char === ' ' ? '&nbsp;' : char}</span>`;
-            }).join('');
-          });
-          
           codeRef.current.innerHTML = processedLines.join('<br>');
           
           // Ajouter un effet de lueur basé sur la proximité
+          const visibilityRatio = Math.max(0, 1 - (distance / (proximityThreshold * 1.5)));
           const glowIntensity = 5 + (visibilityRatio * 15);
           codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
           containerRef.current.style.opacity = '1';

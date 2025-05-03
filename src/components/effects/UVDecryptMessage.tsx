@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
@@ -63,8 +64,8 @@ export default function UVDecryptMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Define reveal threshold - within 150px
-      const threshold = 150;
+      // Define reveal threshold - within 200px
+      const threshold = 200;
       const newIsRevealing = distance < threshold && uvMode;
       
       if (newIsRevealing !== isRevealing) {
@@ -83,7 +84,7 @@ export default function UVDecryptMessage({
         const glowSize = Math.max(5, 15 * proximityRatio * pulseIntensity);
         
         if (messageRef.current) {
-          messageRef.current.style.opacity = '1';
+          messageRef.current.style.opacity = proximityRatio.toFixed(2);
           messageRef.current.style.filter = createSafeFilter({ 
             blur: Math.max(0, 3 * (1 - proximityRatio)),
             brightness: 100 + (50 * proximityRatio),
@@ -149,7 +150,7 @@ export default function UVDecryptMessage({
     return () => {
       cancelAnimationFrame(animationFrame);
     };
-  }, [isRevealing, message, decryptSpeed]);
+  }, [isRevealing, message, decryptSpeed, decryptProgress]);
 
   if (!uvMode || !isTorchActive) return null;
 
