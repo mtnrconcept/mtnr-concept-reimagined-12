@@ -71,20 +71,11 @@ export default function TVVideoPlayer() {
       <div className="relative w-full" style={{ paddingBottom: `${(TV_DIMENSIONS.height / TV_DIMENSIONS.width) * 100}%` }}>
         {/* Conteneur pour maintenir le ratio et positionner les éléments */}
         <div className="absolute inset-0">
-          {/* Lecteur YouTube - Positionné absolument à l'intérieur de l'écran TV */}
+          {/* La position relative du lecteur vidéo par rapport à la TV */}
           <div className="absolute" style={screenPositionStyle}>
-            {/* Lecteur YouTube */}
-            <iframe
-              className="absolute inset-0 w-full h-full z-10"
-              src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
-              title={currentVideo.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-            
-            {/* Animation de chargement - Exactement la même taille que l'iframe et positionnée au-dessus */}
+            {/* Animation de chargement - En dessous de la vidéo mais au-dessus du fond */}
             {isLoading && (
-              <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center z-20">
+              <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center z-10">
                 <div className="w-full h-full opacity-30" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
                   animation: 'noise 0.2s infinite'
@@ -95,14 +86,27 @@ export default function TVVideoPlayer() {
                 </div>
               </div>
             )}
+            
+            {/* Lecteur YouTube - Positionné pour permettre l'interaction avec z-index élevé */}
+            <div className="absolute inset-0 w-full h-full z-20">
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
+                title={currentVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
           </div>
           
-          {/* Image de la TV (par-dessus tout) */}
-          <img 
-            src="/lovable-uploads/74a3fc95-3585-4ec5-83d9-080e4dffabb7.png" 
-            alt="TV Frame" 
-            className="absolute inset-0 w-full h-full object-contain z-30"
-          />
+          {/* Image de la TV - Utilise un clip-path pour permettre l'interaction avec le lecteur */}
+          <div className="absolute inset-0 w-full h-full z-30 pointer-events-none">
+            <img 
+              src="/lovable-uploads/74a3fc95-3585-4ec5-83d9-080e4dffabb7.png" 
+              alt="TV Frame" 
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            />
+          </div>
         </div>
       </div>
 
