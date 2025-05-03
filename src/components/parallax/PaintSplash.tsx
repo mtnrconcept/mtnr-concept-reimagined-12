@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 type SupportedBlendMode = 'screen' | 'overlay' | 'soft-light';
 
@@ -42,6 +42,38 @@ export const PaintSplash: React.FC<PaintSplashProps> = ({
   // pour accentuer l'effet parallaxe (plus grand quand proche, plus petit quand loin)
   const depthScale = 1 + Math.abs(depth) * (depth < 0 ? 0.3 : -0.2);
   const finalScale = scale * depthScale;
+  
+  // Effet pour gérer le déplacement en fonction du scroll
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+    
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      
+      // Facteur de parallaxe : les éléments proches (négatifs) se déplacent plus vite que les éléments lointains
+      const parallaxFactor = depth * 0.5;
+      
+      // Calculer le déplacement vertical
+      const translateY = -scrollY * parallaxFactor;
+      
+      // Appliquer la transformation avec le décalage du scroll
+      element.style.transform = `
+        translate(-50%, calc(-50% + ${translateY}px))
+        scale(${finalScale}) 
+        rotate(${rotation}deg)
+      `;
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initialiser la position
+    handleScroll();
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [depth, finalScale, rotation]);
 
   return (
     <div
@@ -51,12 +83,10 @@ export const PaintSplash: React.FC<PaintSplashProps> = ({
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        transform: `translate(-50%, -50%) scale(${finalScale}) rotate(${rotation}deg)`,
-        filter: `blur(${blur + Math.abs(depth) * 2}px)`, // Plus flou en fonction de la profondeur
         mixBlendMode: blendMode,
         zIndex: zIndex,
         willChange: 'transform, opacity',
-        transition: 'transform 0.05s ease-out, opacity 0.2s ease-out',
+        transition: 'opacity 0.2s ease-out',
       }}
     >
       <img 
@@ -65,7 +95,8 @@ export const PaintSplash: React.FC<PaintSplashProps> = ({
         className="w-full h-full object-contain"
         style={{ 
           maxWidth: depth < 0 ? '550px' : depth < 0.5 ? '450px' : '350px',
-          opacity: Math.max(0.1, Math.min(1, baseOpacity * (1 - Math.abs(depth) * 0.3)))
+          opacity: Math.max(0.1, Math.min(1, baseOpacity * (1 - Math.abs(depth) * 0.3))),
+          filter: `blur(${blur + Math.abs(depth) * 2}px)`, // Plus flou en fonction de la profondeur
         }}
       />
     </div>
