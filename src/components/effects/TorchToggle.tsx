@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 import { Flashlight, Eye } from "lucide-react";
@@ -8,8 +8,23 @@ import { Button } from "@/components/ui/button";
 export const TorchToggle = () => {
   const { isTorchActive, setIsTorchActive } = useTorch();
   const { uvMode, toggleUVMode } = useUVMode();
+  const isHandlingRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleToggleTorch = () => {
+  // Nettoyer les timeouts lors du démontage
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleToggleTorch = useCallback(() => {
+    // Éviter les clics multiples rapides
+    if (isHandlingRef.current) return;
+    isHandlingRef.current = true;
+    
     // Activer/désactiver la torche classique
     setIsTorchActive(!isTorchActive);
     
@@ -19,10 +34,19 @@ export const TorchToggle = () => {
     }
     
     console.log(`Torch toggled: ${!isTorchActive}`);
-  };
+    
+    // Réinitialiser le drapeau après un délai
+    timeoutRef.current = setTimeout(() => {
+      isHandlingRef.current = false;
+    }, 300);
+  }, [isTorchActive, uvMode, setIsTorchActive, toggleUVMode]);
 
-  const handleToggleUV = () => {
-    // Vibration pour feedback tactile
+  const handleToggleUV = useCallback(() => {
+    // Éviter les clics multiples rapides
+    if (isHandlingRef.current) return;
+    isHandlingRef.current = true;
+    
+    // Vibration pour feedback tactile si disponible
     if ("vibrate" in navigator) {
       try {
         navigator.vibrate(50);
@@ -37,17 +61,28 @@ export const TorchToggle = () => {
       if (!isTorchActive) {
         setIsTorchActive(true);
       }
-      // Ajout d'un délai pour s'assurer que la torche est activée avant le mode UV
-      setTimeout(() => {
+      
+      // Ajouter un délai pour s'assurer que la torche est activée avant le mode UV
+      timeoutRef.current = setTimeout(() => {
         toggleUVMode();
         console.log("UV mode on, torch activated");
-      }, 50);
+        
+        // Réinitialiser le drapeau
+        timeoutRef.current = setTimeout(() => {
+          isHandlingRef.current = false;
+        }, 300);
+      }, 100);
     } else {
       // Si on désactive le mode UV, on laisse la torche classique active
       toggleUVMode();
       console.log("UV mode off, torch remains active");
+      
+      // Réinitialiser le drapeau
+      timeoutRef.current = setTimeout(() => {
+        isHandlingRef.current = false;
+      }, 300);
     }
-  };
+  }, [isTorchActive, uvMode, setIsTorchActive, toggleUVMode]);
 
   return (
     <div className="fixed bottom-4 right-4 z-[200] flex gap-2">
@@ -63,6 +98,7 @@ export const TorchToggle = () => {
         variant="outline"
         size="icon"
         style={{ isolation: "isolate" }}
+        disabled={isHandlingRef.current} // Désactiver pendant les transitions
       >
         <Flashlight className="w-6 h-6" />
       </Button>
@@ -79,7 +115,7 @@ export const TorchToggle = () => {
         variant="outline"
         size="icon"
         style={{ isolation: "isolate" }}
-        disabled={!isTorchActive && uvMode} // Désactiver si torche inactive mais UV actif (état impossible)
+        disabled={(!isTorchActive && uvMode) || isHandlingRef.current} // Désactiver pendant les transitions
       >
         <Eye className={`w-6 h-6 ${uvMode ? 'animate-pulse' : ''}`} />
         

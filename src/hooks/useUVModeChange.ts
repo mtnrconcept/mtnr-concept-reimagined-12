@@ -24,6 +24,16 @@ export function useUVModeChange({
   const previousUVModeRef = useRef(uvMode);
   const transitionRequestedRef = useRef(false);
   const previousTorchActiveRef = useRef(isTorchActive);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Nettoyage des timeouts existants
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
@@ -39,20 +49,27 @@ export function useUVModeChange({
         console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
         setCurrentVideo(newVideoUrl);
         
-        // Jouer la transition vidéo immédiatement quand le mode UV change
-        // mais uniquement si la torche est active et qu'une transition n'est pas déjà en cours
+        // Jouer la transition vidéo avec un délai réduit 
+        // seulement si la torche est active et qu'aucune transition n'est en cours
         if (isTorchActive && !transitionRequestedRef.current) {
           transitionRequestedRef.current = true;
-          setTimeout(() => {
+          
+          // Utiliser un seul timeout pour éviter une pile d'appels
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          
+          timeoutRef.current = setTimeout(() => {
             playVideoTransition();
             // Réinitialisation après un délai
-            setTimeout(() => {
+            timeoutRef.current = setTimeout(() => {
               transitionRequestedRef.current = false;
-            }, 1000);
+              timeoutRef.current = null;
+            }, 500);
           }, 50);
         }
         
-        // Déclencher un événement personnalisé pour informer d'autres composants
+        // Déclencher un événement personnalisé
         const event = new CustomEvent('uv-mode-changed', { detail: { uvMode } });
         document.dispatchEvent(event);
       }
@@ -65,11 +82,18 @@ export function useUVModeChange({
       // Si la torche vient d'être activée et que le mode UV est actif
       if (isTorchActive && uvMode && !transitionRequestedRef.current) {
         transitionRequestedRef.current = true;
-        setTimeout(() => {
+        
+        // Utiliser un seul timeout pour éviter une pile d'appels
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        
+        timeoutRef.current = setTimeout(() => {
           playVideoTransition();
-          setTimeout(() => {
+          timeoutRef.current = setTimeout(() => {
             transitionRequestedRef.current = false;
-          }, 1000);
+            timeoutRef.current = null;
+          }, 500);
         }, 50);
       }
     }

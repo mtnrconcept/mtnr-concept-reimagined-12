@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { VideoActions } from "./types";
 
 interface UseTorchHandlerProps {
@@ -13,26 +13,21 @@ export function useTorchHandler({
   isFirstLoad,
   playVideoTransition,
 }: UseTorchHandlerProps) {
+  // Référence pour éviter les appels multiples
+  const isHandlingRef = useRef(false);
+  
   // S'assurer que la torche standard reste active même en mode UV
   useEffect(() => {
-    // Débugger le statut de la torche
+    // Éviter les opérations DOM excessives
+    if (isHandlingRef.current) return;
+    
+    isHandlingRef.current = true;
     console.log(`Statut torche modifié: ${isTorchActive ? 'active' : 'inactive'}`);
     
-    const applyTorchState = () => {
-      // Garder la torche classique visible même si le mode UV est actif
+    // Utiliser RAF pour éviter les problèmes de performance
+    requestAnimationFrame(() => {
       if (isTorchActive) {
         document.body.classList.add('torch-active');
-        
-        // Forcer une mise à jour des éléments qui dépendent de la torche
-        requestAnimationFrame(() => {
-          const torchElements = document.querySelectorAll('.torch-dependent, .uv-hidden-message, .uv-secret-message');
-          torchElements.forEach(el => {
-            if (el instanceof HTMLElement) {
-              // Forcer un repaint
-              el.style.opacity = el.style.opacity;
-            }
-          });
-        });
       } else {
         document.body.classList.remove('torch-active');
         
@@ -45,22 +40,19 @@ export function useTorchHandler({
           }
         });
       }
-    };
-    
-    // Appliquer immédiatement
-    applyTorchState();
-    
-    // Force refresh du DOM après un court délai pour s'assurer que les changements sont appliqués
-    const timeoutId = setTimeout(() => {
+      
+      // Notifier les autres composants - une seule fois
       const event = new Event('torch-state-changed');
       document.dispatchEvent(event);
       
-      // Re-appliquer l'état après un court délai pour gérer des conflits potentiels
-      setTimeout(applyTorchState, 50);
-    }, 50);
+      // Réinitialiser le flag après un délai pour permettre d'autres changements
+      setTimeout(() => {
+        isHandlingRef.current = false;
+      }, 100);
+    });
     
     return () => {
-      clearTimeout(timeoutId);
+      isHandlingRef.current = false;
     };
-  }, [isTorchActive, isFirstLoad]);
+  }, [isTorchActive]);
 }
