@@ -40,7 +40,8 @@ export default function UVHiddenMessage({
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Modify visibility based on distance
-      const threshold = 300;
+      // Reduced threshold to make the effect more localized - showing fewer letters
+      const threshold = 150; // Réduit pour limiter la visibilité à environ 7 lettres
       if (distance < threshold && uvMode) {
         const intensity = 1 - (distance / threshold);
         
@@ -55,8 +56,16 @@ export default function UVHiddenMessage({
             // Position relative du caractère dans le texte
             const relPos = fromLeft ? index / chars.length : 1 - (index / chars.length);
             
+            // Facteur d'échelle pour rendre la fenêtre de visibilité plus petite
+            const visibilityWindow = 0.3; // Ajusté pour montrer environ 7 lettres
+            
+            // Calculer la distance du curseur au caractère
+            // Plus la valeur est grande, plus la fenêtre de visibilité sera petite
+            const charDistanceFactor = Math.abs(relPos - 0.5) / visibilityWindow;
+            
             // Combiner la distance globale avec la position relative
-            const charVisibility = Math.min(intensity * (1.5 - relPos), 1);
+            // La formule crée une fenêtre de visibilité réduite centrée sur la position du curseur
+            const charVisibility = Math.max(0, intensity * (1 - charDistanceFactor));
             
             return `<span style="opacity: ${Math.max(0, charVisibility)}; display: inline-block;">${char}</span>`;
           });

@@ -48,7 +48,8 @@ export default function UVHiddenCode({
       const dy = mousePosition.y - codeCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      const proximityThreshold = 300; // Distance maximale pour commencer à voir
+      // Reduced proximity threshold to limit visibility to ~7 characters
+      const proximityThreshold = 150; // Réduit pour une visibilité plus locale
       
       if (distance < proximityThreshold && uvMode) {
         // Reveal code progressively based on cursor proximity
@@ -76,12 +77,18 @@ export default function UVHiddenCode({
                 ? lineIndex / lines.length 
                 : 1 - (lineIndex / lines.length);
               
+              // Facteur d'échelle pour rendre la fenêtre de visibilité plus petite
+              // Ajusté pour montrer environ 7 caractères sur une ligne
+              const visibilityWindowX = 0.25; 
+              const visibilityWindowY = 0.5; // Plus grand pour les lignes
+              
+              // Distance normalisée du curseur au caractère dans l'espace 2D
+              const charDistanceX = Math.abs(relX - 0.5) / visibilityWindowX;
+              const charDistanceY = Math.abs(relY - 0.5) / visibilityWindowY;
+              const charDistance = Math.sqrt(charDistanceX * charDistanceX + charDistanceY * charDistanceY);
+              
               // Combiner la distance globale avec la position relative
-              // Plus le caractère est loin dans la direction d'où vient le curseur, plus il est transparent
-              const charVisibility = Math.min(
-                visibilityRatio * (1.5 - (relX * 0.8) - (relY * 0.2)),
-                1
-              );
+              const charVisibility = Math.max(0, visibilityRatio * (1 - charDistance));
               
               return `<span style="opacity: ${Math.max(0, charVisibility)};">${char === ' ' ? '&nbsp;' : char}</span>`;
             }).join('');
