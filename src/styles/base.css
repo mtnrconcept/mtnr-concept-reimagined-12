@@ -10,7 +10,7 @@
   html, body, #root {
     @apply m-0 p-0 min-h-screen bg-black text-white;
     overflow-x: hidden;
-    overflow-y: auto; /* Garantir que le scroll vertical est toujours activé */
+    overflow-y: visible !important; /* Forcer l'activation du scroll vertical */
     height: auto; /* Ne pas fixer la hauteur pour permettre le scroll */
   }
   
@@ -22,8 +22,16 @@
     width: 100%;
   }
   
-  /* Fix spécifique pour la page Home */
-  [data-route="/"] #main-content {
+  /* Fix spécifique pour toutes les pages */
+  [data-route] #main-content {
     overflow-y: visible !important;
+  }
+  
+  /* Garantir que le contenu de la page peut défiler */
+  .content-container, 
+  .page-content-wrapper {
+    overflow-y: visible !important;
+    min-height: 100vh;
+    position: relative;
   }
 }

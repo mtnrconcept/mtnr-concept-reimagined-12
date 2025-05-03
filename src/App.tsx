@@ -60,6 +60,15 @@ function AppContent() {
     document.documentElement.style.overflow = 'auto';
     document.documentElement.style.height = 'auto';
     document.body.style.height = 'auto';
+    
+    // Débloquer tous les conteneurs potentiels
+    setTimeout(() => {
+      const scrollableElements = document.querySelectorAll('.content-container, #main-content, .page-content-wrapper');
+      scrollableElements.forEach(el => {
+        (el as HTMLElement).style.overflowY = 'visible';
+        (el as HTMLElement).style.height = 'auto';
+      });
+    }, 500);
   }, []);
   
   // Ajouter un attribut data-route pour les styles CSS spécifiques à chaque route
@@ -68,7 +77,7 @@ function AppContent() {
   }, [location.pathname]);
   
   return (
-    <div className="app-container min-h-screen">
+    <div className="app-container min-h-screen overflow-visible">
       {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
       
