@@ -39,7 +39,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
         // Facteur de vitesse proche de 1 pour un mouvement presque synchrone avec le défilement
-        videoBackground.style.transform = `translateY(${scrollY * 0.15}px)`;
+        videoBackground.style.transform = `translateY(${scrollY * -2}px)`;
       }
     };
     
