@@ -52,7 +52,7 @@ export default function TVVideoPlayer() {
           {/* Conteneur du lecteur vidéo avec positionnement absolu pour maintenir la cohérence */}
           <div className="absolute inset-0 flex items-center justify-center">
             {/* Conteneur YouTube avec dimensions fixes correspondant à l'original */}
-            <div className="relative w-[60%] h-[60%]">
+            <div className="relative w-[55%] h-[55%]">
               {/* Affichage du chargement */}
               {isLoading && (
                 <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
