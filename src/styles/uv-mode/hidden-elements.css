@@ -10,7 +10,7 @@
     color: #00FFBB;
     box-shadow: 0 0 15px rgba(0, 255, 187, 0.5);
     animation: uvGlow 3s infinite;
-    z-index: 20; /* Réduire le z-index pour ne pas interférer avec le contenu principal */
+    z-index: 99; /* Augmenter le z-index pour s'assurer qu'ils sont visibles */
     pointer-events: none; /* Rendre les éléments non-cliquables */
     opacity: 0.85; /* Légèrement transparent */
     backdrop-filter: blur(2px);
@@ -19,7 +19,7 @@
   /* Positionnement et style d'arrière-plan pour les secrets UV */
   .uv-hidden-code, .uv-secret-message, .uv-hidden-message {
     pointer-events: none;
-    z-index: 20;
+    z-index: 99;
     backdrop-filter: blur(1px);
     background-color: rgba(10, 0, 40, 0.3);
     border-radius: 8px;
@@ -31,6 +31,7 @@
   .uv-hidden-drawing {
     opacity: 0;
     transition: opacity 0.5s ease-out, transform 0.7s ease-out;
+    z-index: 99;
   }
   
   .uv-mode-active .uv-hidden-drawing {
@@ -76,10 +77,36 @@
     padding: 8px;
     opacity: 0;
     transition: opacity 0.3s ease-out;
+    z-index: 99;
   }
   
   .decrypt-message.visible {
     opacity: 1;
     animation: uvReveal 0.5s forwards;
+  }
+
+  /* Ensure hidden UV elements start with opacity 0 */
+  .uv-hidden-code, 
+  .uv-hidden-message, 
+  .uv-hidden-text,
+  .uv-secret-message {
+    opacity: 0 !important; 
+    transition: opacity 0.3s ease-out !important;
+  }
+
+  /* Only visible when explicitly made visible */
+  .uv-hidden-code.visible, 
+  .uv-hidden-message.visible, 
+  .uv-hidden-text.visible,
+  .uv-secret-message.visible {
+    opacity: 1 !important;
+  }
+  
+  /* Ensure UV elements are on top of other content */
+  #uv-page-secrets-container {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
   }
 }

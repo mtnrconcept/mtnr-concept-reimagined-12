@@ -80,8 +80,10 @@ function AppContent() {
         </PageTransition>
         <UVCornerLabel />
         
-        {/* Ajout des messages et dessins secrets UV */}
-        <UVPageSecrets />
+        {/* Conteneur dédié pour les messages et dessins secrets UV avec z-index élevé */}
+        <div id="uv-page-secrets-container">
+          <UVPageSecrets />
+        </div>
       </div>
     </div>
   );

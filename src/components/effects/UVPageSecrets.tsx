@@ -17,11 +17,17 @@ export default function UVPageSecrets() {
   const { isTorchActive } = useTorch();
   const { uvMode } = useUVMode();
   
-  // Ne rien afficher si le mode UV n'est pas activé
+  // Ne rien afficher si le mode UV n'est pas activé ou si la torche est désactivée
   if (!uvMode || !isTorchActive) return null;
   
   // Render page-specific secrets based on the current route
-  switch (location.pathname) {
+  const path = location.pathname;
+  
+  // Ajouter un log pour voir quel chemin est actuellement actif
+  console.log("UVPageSecrets: current path is", path);
+  
+  // Render page-specific secrets based on the current route
+  switch (path) {
     case '/':
       return <HomePageSecrets />;
       
@@ -32,17 +38,18 @@ export default function UVPageSecrets() {
       return <ContactPageSecrets />;
       
     case '/what-we-do':
+      console.log("Rendering WhatWeDoPageSecrets");
       return <WhatWeDoPageSecrets />;
       
     case '/book':
       return <BookPageSecrets />;
       
-    case '/404':
     default:
       // Handle 404 and unknown paths
-      if (location.pathname === '/404' || location.pathname.includes('*')) {
+      if (path.includes('404')) {
         return <NotFoundPageSecrets />;
       }
+      console.log("No secrets for path:", path);
       return null;
   }
 }
