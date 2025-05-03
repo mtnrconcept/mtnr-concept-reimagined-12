@@ -1,8 +1,8 @@
 
 import { useEffect, useRef } from "react";
-import { useUVMode } from "../../components/effects/UVModeContext";
-import { useTorch } from "../../components/effects/TorchContext";
-import { VideoState, VideoActions } from "./types";
+import { useUVMode } from "../components/effects/UVModeContext";
+import { useTorch } from "../components/effects/TorchContext";
+import { VideoState, VideoActions } from "./video/types";
 
 interface UseUVModeChangeProps {
   videoUrl: string;
