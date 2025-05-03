@@ -1,6 +1,12 @@
 
 import { ParallaxElement } from './ParallaxElement';
 
+type MixBlendMode = 
+  | 'normal' | 'multiply' | 'screen' | 'overlay' 
+  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
+  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
+  | 'hue' | 'saturation' | 'color' | 'luminosity';
+
 interface PaintSplashProps {
   x: number;
   y: number;
@@ -10,7 +16,7 @@ interface PaintSplashProps {
   className?: string;
   src: string;
   blur?: number;
-  blendMode?: string;
+  blendMode?: MixBlendMode;
 }
 
 export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0, blendMode = 'screen' }: PaintSplashProps) => {
@@ -38,7 +44,7 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
           transform: `rotate(${rotation}deg) scale(${scale})`,
           filter: `contrast(${contrast}) brightness(${brightness}) saturate(${saturation}) blur(${blurAmount}px) drop-shadow(0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}))`,
           opacity: 1,
-          mixBlendMode: blendMode || 'screen',
+          mixBlendMode: blendMode,
           willChange: 'transform, filter, opacity',
         }}
         onLoad={() => {
