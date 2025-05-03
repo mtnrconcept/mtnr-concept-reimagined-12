@@ -225,4 +225,23 @@
     animation: electricText 3s infinite;
     color: #D2FF3F !important;
   }
+  
+  /* Nouveaux styles pour les paint splashes en UV mode */
+  .uv-mode-active .parallax-element img {
+    filter: hue-rotate(45deg) brightness(1.5) saturate(2) !important; 
+    mix-blend-mode: screen !important;
+  }
+  
+  /* Style spécifique pour les éléments plus proches en UV mode */
+  .uv-mode-active .parallax-element[data-depth^="-"] img {
+    filter: hue-rotate(60deg) brightness(1.8) saturate(2.5) !important;
+    animation: uvPulse 5s infinite;
+  }
+  
+  /* Style pour le logo en mode UV */
+  .uv-mode-active img[src*="logo"] {
+    filter: hue-rotate(120deg) brightness(1.5) saturate(1.5) contrast(1.2) !important;
+    mix-blend-mode: screen;
+    animation: uvPulse 4s infinite;
+  }
 }

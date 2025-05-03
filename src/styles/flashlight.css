@@ -4,7 +4,12 @@
   .flashlight {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 80%);
+    background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), 
+      rgba(0,0,0,0) 10%, 
+      rgba(0,0,0,0.1) 20%, 
+      rgba(0,0,0,0.4) 40%, 
+      rgba(0,0,0,0.8) 70%, 
+      rgba(0,0,0,0.95) 90%);
     pointer-events: none;
     z-index: 50;
   }
@@ -14,7 +19,11 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, rgba(0,0,0,0.95) 60%);
+    background: radial-gradient(circle, 
+      rgba(255,255,255,0.2) 0%, 
+      rgba(255,255,255,0.1) 30%, 
+      rgba(0,0,0,0.3) 60%, 
+      rgba(0,0,0,0.95) 90%);
     pointer-events: none;
     z-index: 50;
     transform: translate(var(--cursor-x), var(--cursor-y));
@@ -45,12 +54,13 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(
       circle,
-      rgba(70, 28, 252, 0.05) 0%,
-      rgba(15, 4, 48, 0.1) 20%,
-      rgba(10, 0, 60, 0.3) 40%,
-      rgba(0, 0, 0, 0.9) 80%
+      rgba(210, 255, 63, 0.08) 0%,
+      rgba(210, 255, 63, 0.05) 20%,
+      rgba(15, 4, 48, 0.1) 40%,
+      rgba(10, 0, 60, 0.5) 70%,
+      rgba(0, 0, 0, 0.9) 90%
     );
-    box-shadow: 0 0 300px 150px rgba(0, 120, 255, 0.1);
+    box-shadow: 0 0 300px 150px rgba(210, 255, 63, 0.1);
     filter: blur(20px);
   }
   

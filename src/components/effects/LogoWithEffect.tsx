@@ -1,6 +1,8 @@
+
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useUVMode } from './UVModeContext';
 
 interface LogoWithEffectProps {
   src: string;
@@ -30,6 +32,10 @@ export default function LogoWithEffect({
 }: LogoWithEffectProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { uvMode } = useUVMode();
+  
+  // Déterminer la couleur du glow en fonction du mode UV
+  const activeGlowColor = uvMode ? '210, 255, 63' : glowColor;
 
   // Callback quand l'image est chargée
   const handleImageLoad = useCallback(() => {
@@ -42,7 +48,9 @@ export default function LogoWithEffect({
     if (!glowEffect || !imageLoaded || !wrapperRef.current) return;
     const el = wrapperRef.current;
     const base = (intensity: number) =>
-      `drop-shadow(0 0 5px rgba(${glowColor}, ${intensity * 0.5})) drop-shadow(0 0 10px rgba(${glowColor}, ${intensity * 0.3})) drop-shadow(0 0 15px rgba(${glowColor}, ${intensity * 0.2}))`;
+      `drop-shadow(0 0 5px rgba(${activeGlowColor}, ${intensity * 0.5})) 
+       drop-shadow(0 0 10px rgba(${activeGlowColor}, ${intensity * 0.3})) 
+       drop-shadow(0 0 15px rgba(${activeGlowColor}, ${intensity * 0.2}))`;
 
     const animation = el.animate(
       [
@@ -59,7 +67,7 @@ export default function LogoWithEffect({
     );
 
     return () => animation.cancel();
-  }, [glowEffect, imageLoaded, glowColor]);
+  }, [glowEffect, imageLoaded, activeGlowColor, uvMode]);
 
   return (
     <AnimatePresence mode="wait">
@@ -93,6 +101,13 @@ export default function LogoWithEffect({
             className={cn('w-full', 'h-auto', 'object-contain')}
             draggable={false}
             onLoad={handleImageLoad}
+            style={{
+              filter: uvMode 
+                ? 'hue-rotate(120deg) brightness(1.5) saturate(1.5) contrast(1.2)' 
+                : 'none',
+              mixBlendMode: uvMode ? 'screen' : 'normal',
+              transition: 'filter 0.5s ease-out'
+            }}
           />
         </motion.div>
       )}
