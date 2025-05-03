@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { safeBlur } from "@/lib/animation-utils";
 
 interface PageContentTransitionProps {
   children: React.ReactNode;
@@ -23,34 +24,52 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       setDisplayChildren(children);
       
       // Ajouter un délai plus long pour l'apparition du contenu après le chargement de la vidéo
-      // Ce délai permet à la vidéo de bien s'afficher avant le contenu
       setTimeout(() => {
         setContentVisible(true);
-      }, 1200); // Augmenté de 500ms à 1200ms pour donner plus de temps à la vidéo
+      }, 1200);
       
-    }, 2500); // Augmenté de 2000ms à 2500ms pour une transition de sortie plus lente
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [children, location]);
+
+  // Configuration des variantes pour l'effet d'accélération et de flou
+  const contentVariants = {
+    initial: {
+      opacity: 0,
+      y: 100, // Commence depuis le bas de l'écran
+      filter: "blur(8px)"
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: {
+        opacity: { duration: 2.2, ease: [0.16, 1, 0.3, 1] },
+        y: { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }, // Cubic-bezier pour un effet d'entrée rapide puis douce
+        filter: { duration: 1.8, ease: [0.33, 1, 0.68, 1] }
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: -100, // Disparaît vers le haut
+      filter: "blur(8px)",
+      transition: {
+        opacity: { duration: 1.8, ease: [0.33, 1, 0.68, 1] },
+        y: { duration: 1.5, ease: [0.33, 1, 0.68, 1] }, // Effet d'accélération
+        filter: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }
+      }
+    }
+  };
 
   return (
     <AnimatePresence mode="wait" onExitComplete={() => setIsTransitioning(false)}>
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: contentVisible ? 1 : 0,
-          transition: { 
-            delay: contentVisible ? 0.3 : 3.5, // Ajout d'un délai de 0.3s avant l'apparition et augmenté le délai d'attente
-            duration: 2.5 // Augmenté de 1.5s à 2.5s pour un fondu entrant plus progressif
-          }
-        }}
-        exit={{ 
-          opacity: 0,
-          transition: { 
-            duration: 1.8 // Augmenté de 1s à 1.8s pour un fondu sortant plus lent
-          }
-        }}
+        variants={contentVariants}
+        initial="initial"
+        animate={contentVisible ? "animate" : "initial"}
+        exit="exit"
         className="relative z-10 min-h-screen w-full"
       >
         {displayChildren}
