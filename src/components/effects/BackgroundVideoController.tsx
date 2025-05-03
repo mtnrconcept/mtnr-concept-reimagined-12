@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from './NavigationContext';
@@ -10,7 +9,7 @@ export const BackgroundVideoController = () => {
   useEffect(() => {
     // Initialiser le préchargement une seule fois
     const videoUrls = [
-      '/lovable-uploads/Composition_1.mp4',
+      '/lovable-uploads/videonormale.mp4',  // Mis à jour pour utiliser videonormale.mp4
       '/lovable-uploads/Composition_1_1.mp4'
     ];
     

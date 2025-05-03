@@ -50,8 +50,11 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Vidéo de fond qui est maintenant en arrière-plan de toutes les pages */}
-      <BackgroundVideo />
+      {/* Vidéo de fond avec chemin mis à jour pour la vidéo normale */}
+      <BackgroundVideo 
+        videoUrl="/lovable-uploads/videonormale.mp4"
+        videoUrlUV="/lovable-uploads/Composition_1_1.mp4"
+      />
       
       <PageTransitionEffect />
       <PageTransition keyId={location.pathname}>
