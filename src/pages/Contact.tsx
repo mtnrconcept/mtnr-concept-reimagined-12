@@ -23,7 +23,7 @@ export default function Contact() {
     <ParallaxBackground>
       <PageSplashes pageVariant="contact" />
       
-      <div className="relative z-10 min-h-screen">
+      <div className="relative z-10 min-h-screen overflow-visible pb-16">
         <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
           <h1 className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4 animate-wiggle">
             Contact

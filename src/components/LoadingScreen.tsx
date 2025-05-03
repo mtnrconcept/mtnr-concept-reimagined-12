@@ -5,13 +5,23 @@ import { Loader2 } from "lucide-react";
 
 interface LoadingScreenProps {
   onLoadingComplete: () => void;
+  progress?: number; // Permettre de passer une progression externe
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
+  onLoadingComplete, 
+  progress: externalProgress 
+}) => {
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("Initialisation...");
   
   useEffect(() => {
+    // Utiliser la progression externe si elle est fournie
+    if (externalProgress !== undefined) {
+      setProgress(externalProgress);
+      return;
+    }
+    
     // Liste des messages à afficher pendant le chargement
     const loadingMessages = [
       "Initialisation...",
@@ -20,6 +30,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
       "Activation du mode UV...",
       "Synchronisation des transitions...",
       "Chargement des secrets...",
+      "Optimisation de la performance...",
+      "Préchargement des pages...",
       "Presque prêt..."
     ];
     
@@ -43,10 +55,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
       const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
       setLoadingText(loadingMessages[messageIndex]);
       
-    }, 180); // Ajusté pour une durée totale d'environ 3-4 secondes
+    }, 150); // Accéléré pour une durée totale d'environ 2-3 secondes
     
     return () => clearInterval(interval);
-  }, [onLoadingComplete]);
+  }, [onLoadingComplete, externalProgress]);
   
   return (
     <motion.div
@@ -62,7 +74,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-yellow-400 text-4xl md:text-6xl font-bold mb-2">MTNR</h1>
+            <h1 className="text-yellow-400 text-4xl md:text-6xl font-bold mb-2 loading-title">MTNR</h1>
             <p className="text-gray-400 text-xl">Studio Concept</p>
           </motion.div>
         </div>
@@ -84,7 +96,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
         </div>
         
         <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>Préparez-vous à entrer dans l'univers MTNR</p>
+          <p>Préparation de l'expérience immersive...</p>
         </div>
       </div>
     </motion.div>

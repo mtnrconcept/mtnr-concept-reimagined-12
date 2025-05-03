@@ -28,14 +28,39 @@ const resources = {
     "/lovable-uploads/tv.png",
     "/lovable-uploads/yellow-watercolor-splatter-3.png",
     "/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png",
+  ],
+  components: [
+    // Liste des chemins des composants principaux à précharger
+    'Navbar',
+    'ParallaxScene', 
+    'PageSplashes',
+    'LoadingScreen',
+    'BackgroundVideo',
+    'ParticleEffect'
   ]
 };
 
-// Précharger une image
+// Cache de ressources
+const resourceCache = {
+  images: new Map<string, HTMLImageElement>(),
+  videos: new Map<string, HTMLVideoElement>(),
+  components: new Map<string, any>()
+};
+
+// Précharger une image avec mise en cache
 const preloadImage = (url: string): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // Vérifier si l'image est déjà dans le cache
+    if (resourceCache.images.has(url)) {
+      resolve();
+      return;
+    }
+    
     const img = new Image();
-    img.onload = () => resolve();
+    img.onload = () => {
+      resourceCache.images.set(url, img);
+      resolve();
+    };
     img.onerror = () => {
       console.warn(`Échec du préchargement de l'image: ${url}`);
       resolve(); // On résout quand même pour ne pas bloquer le processus
@@ -44,9 +69,15 @@ const preloadImage = (url: string): Promise<void> => {
   });
 };
 
-// Précharger une vidéo
+// Précharger une vidéo avec mise en cache
 const preloadVideo = (url: string): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // Vérifier si la vidéo est déjà dans le cache
+    if (resourceCache.videos.has(url)) {
+      resolve();
+      return;
+    }
+    
     const video = document.createElement('video');
     video.preload = 'auto';
     video.muted = true;
@@ -57,6 +88,7 @@ const preloadVideo = (url: string): Promise<void> => {
     video.oncanplaythrough = () => {
       if (!loaded) {
         loaded = true;
+        resourceCache.videos.set(url, video);
         resolve();
       }
     };
@@ -73,7 +105,7 @@ const preloadVideo = (url: string): Promise<void> => {
         console.warn(`Timeout du préchargement pour: ${url}`);
         resolve();
       }
-    }, 10000); // 10 secondes maximum par vidéo
+    }, 8000); // 8 secondes maximum par vidéo
     
     video.src = url;
     video.load();
@@ -105,7 +137,7 @@ export const preloadAllResources = async (): Promise<void> => {
 export const preloadRoutes = async (): Promise<void> => {
   try {
     // Importer dynamiquement les composants de page principaux
-    await Promise.all([
+    const routeImports = await Promise.all([
       import('../pages/Home'),
       import('../pages/WhatWeDo'),
       import('../pages/Artists'),
@@ -113,6 +145,20 @@ export const preloadRoutes = async (): Promise<void> => {
       import('../pages/Book'),
       import('../pages/NotFound')
     ]);
+    
+    // Précharger également tous les assets de ces pages
+    // On suppose que chaque module exporté peut avoir une méthode ou propriété statique getAssets
+    routeImports.forEach(module => {
+      if (module.default && typeof module.default.getAssets === 'function') {
+        const assets = module.default.getAssets();
+        if (assets && assets.images) {
+          assets.images.forEach((url: string) => {
+            preloadImage(url);
+          });
+        }
+      }
+    });
+    
     console.log("Composants de route préchargés");
   } catch (error) {
     console.error("Erreur lors du préchargement des routes:", error);
@@ -122,13 +168,22 @@ export const preloadRoutes = async (): Promise<void> => {
 // Précharger les principaux composants UI
 export const preloadUI = async (): Promise<void> => {
   try {
-    await Promise.all([
+    // Précharger les composants essentiels en parallèle
+    const componentImports = await Promise.all([
       import('../components/Navbar'),
       import('../components/effects/ParticleEffect'),
       import('../components/effects/TorchToggle'),
       import('../components/effects/BackgroundVideo'),
       import('../components/ParallaxScene')
     ]);
+    
+    // Stocker les composants dans le cache
+    resources.components.forEach((componentName, index) => {
+      if (index < componentImports.length) {
+        resourceCache.components.set(componentName, componentImports[index].default);
+      }
+    });
+    
     console.log("Composants UI principaux préchargés");
   } catch (error) {
     console.error("Erreur lors du préchargement des composants UI:", error);
@@ -138,6 +193,8 @@ export const preloadUI = async (): Promise<void> => {
 // Fonction globale de préchargement
 export const initializePreloader = async (): Promise<void> => {
   try {
+    console.log("Initialisation du préchargeur...");
+    
     // Précharger les routes et l'UI en parallèle
     await Promise.all([
       preloadRoutes(),
@@ -169,9 +226,38 @@ const attachNavigationPreloading = () => {
       if (href && href.startsWith('/')) {
         // Précharger la page au survol
         const route = href.substring(1) || 'home';
-        import(`../pages/${route.charAt(0).toUpperCase() + route.slice(1)}`)
-          .catch(() => console.log(`Préchargement de ${route} non nécessaire ou impossible`));
+        let routeName = route.charAt(0).toUpperCase() + route.slice(1);
+        
+        // Gérer les routes avec des tirets
+        if (route.includes('-')) {
+          routeName = route.split('-')
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join('');
+        }
+        
+        import(`../pages/${routeName}`)
+          .catch(() => console.log(`Préchargement de ${routeName} non nécessaire ou impossible`));
       }
     });
   });
+};
+
+// Récupérer une ressource du cache
+export const getCachedResource = (type: 'image' | 'video', url: string): HTMLImageElement | HTMLVideoElement | null => {
+  if (type === 'image') {
+    return resourceCache.images.get(url) || null;
+  } else if (type === 'video') {
+    return resourceCache.videos.get(url) || null;
+  }
+  return null;
+};
+
+// Vérifier si une ressource est dans le cache
+export const isResourceCached = (type: 'image' | 'video', url: string): boolean => {
+  if (type === 'image') {
+    return resourceCache.images.has(url);
+  } else if (type === 'video') {
+    return resourceCache.videos.has(url);
+  }
+  return false;
 };

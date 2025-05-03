@@ -53,10 +53,16 @@ function AppContent() {
     checkFeatureSupport('vr');
     checkFeatureSupport('ambient-light-sensor');
     checkFeatureSupport('battery');
+    
+    // S'assurer que le document peut défiler
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
   }, []);
   
   return (
-    <div className="app-container">
+    <div className="app-container min-h-screen">
       {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
       
@@ -94,20 +100,36 @@ function AppContent() {
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Effectuez le préchargement initial au chargement de l'application
   useEffect(() => {
+    // S'assurer que le scroll est activé
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
     // Fonction pour initialiser l'application
     const initialize = async () => {
       try {
+        // Démarrer un timer pour simuler la progression
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 2;
+          if (progress > 90) progress = 90;
+          setLoadingProgress(Math.floor(progress));
+        }, 100);
+        
         // Démarrage du processus de préchargement
         await initializePreloader();
+        clearInterval(interval);
+        
+        // Progression complète
+        setLoadingProgress(100);
         
         // Ajouter un délai minimum pour l'écran de chargement
-        // afin que l'utilisateur puisse voir l'animation
         setTimeout(() => {
           setIsLoading(false);
-        }, 2000);
+        }, 1000); // Réduit à 1 seconde
       } catch (error) {
         console.error("Erreur lors de l'initialisation:", error);
         // En cas d'erreur, on affiche quand même le site
@@ -132,6 +154,7 @@ const App = () => {
                     {isLoading ? (
                       <LoadingScreen 
                         key="loading-screen"
+                        progress={loadingProgress}
                         onLoadingComplete={() => setIsLoading(false)} 
                       />
                     ) : (
