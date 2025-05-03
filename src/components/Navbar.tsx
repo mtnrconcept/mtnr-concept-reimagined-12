@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { DesktopNav } from "./navbar/DesktopNav";
 import { MobileNav } from "./navbar/MobileNav";
+// Nous n'utilisons plus vraiment l'effet de mouvement, mais on garde l'import pour compatibilité
 import { useNavbarEffect } from "@/hooks/useNavbarEffect";
 
 const navLinks = [
@@ -17,8 +18,7 @@ const navLinks = [
 export default function Navbar() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { mousePosition } = useNavbarEffect();
-
+  
   return (
     <nav 
       className="w-full fixed top-0 left-0 z-[9999] bg-black/85 backdrop-blur-lg shadow-lg"
@@ -27,13 +27,7 @@ export default function Navbar() {
         isolation: 'isolate'
       }}
     >
-      <div 
-        className="container mx-auto flex justify-center h-16 px-4 sm:px-6"
-        style={{ 
-          transform: `translateZ(${mousePosition.y}px) rotateX(${mousePosition.y * -0.1}deg) rotateY(${mousePosition.x * 0.1}deg)`,
-          transition: "transform 0.1s ease-out"
-        }}
-      >
+      <div className="container mx-auto flex justify-center h-16 px-4 sm:px-6">
         {/* Mobile menu toggle */}
         <button 
           className="md:hidden absolute left-4 top-4 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
