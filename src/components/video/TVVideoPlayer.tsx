@@ -111,7 +111,8 @@ export default function TVVideoPlayer() {
       />
 
       {/* Animation for TV static */}
-      <style jsx global>{`
+      <style>
+        {`
         @keyframes noise {
           0% { transform: translate(0,0); }
           10% { transform: translate(-5%,-5%); }
@@ -125,7 +126,8 @@ export default function TVVideoPlayer() {
           90% { transform: translate(10%,5%); }
           100% { transform: translate(5%,0); }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 }
