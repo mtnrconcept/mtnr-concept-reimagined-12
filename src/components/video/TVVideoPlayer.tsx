@@ -50,7 +50,7 @@ export default function TVVideoPlayer() {
         {/* Video Player in the background */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <div className="w-[60%] h-[60%] absolute top-[12%] left-[7.5%] overflow-hidden rounded-lg z-10" style={{
-            transform: 'translate(60px, 60px)'
+            transform: 'translate(60px, 30px)'
           }}>
             {/* Loading static */}
             {isLoading && (
