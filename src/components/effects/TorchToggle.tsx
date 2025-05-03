@@ -29,7 +29,7 @@ export const TorchToggle = () => {
 
     // Active la torche si UV est déclenché seul
     if (!isTorchActive) {
-      setIsTorchActive(true);
+      setIsTorchActive(false);
     }
 
     toggleUVMode();
