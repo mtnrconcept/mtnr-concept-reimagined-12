@@ -122,7 +122,16 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   };
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none" ref={containerRef}>
+    <div 
+      className="fixed inset-0 pointer-events-none" 
+      ref={containerRef}
+      style={{
+        // Z-index ajusté pour être en dessous de la navbar (qui est à 99999)
+        zIndex: 50,
+        // Ajouter un padding-top pour ne pas chevaucher la navbar
+        paddingTop: '64px' // 16px de hauteur de la navbar
+      }}
+    >
       {isActive && (
         <>
           <InfiniteTileBackground />
@@ -144,6 +153,6 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
       )}
     </div>
   );
-};
+}
 
 export default ElevatorTransition;

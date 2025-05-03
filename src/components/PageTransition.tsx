@@ -64,7 +64,7 @@ export default function PageTransition({
       {/* Logo avec dispersion et callback de fin */}
       <OptimizedDisperseLogo onTransitionComplete={handleDisperseComplete} />
 
-      {/* Effet d'ascenseur */}
+      {/* Effet d'ascenseur avec z-index ajusté pour rester sous la navbar */}
       <ElevatorTransition 
         isActive={isTransitioning}
         onAnimationComplete={handleTransitionComplete}

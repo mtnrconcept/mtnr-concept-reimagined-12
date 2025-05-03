@@ -76,6 +76,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={contentVisible ? "animate" : "initial"}
         exit="exit"
         className="relative z-10 min-h-screen w-full"
+        style={{
+          // Ajouter un padding-top pour le contenu afin qu'il ne soit pas sous la navbar
+          paddingTop: "64px", // Hauteur de la navbar
+        }}
       >
         {displayChildren}
       </motion.div>
