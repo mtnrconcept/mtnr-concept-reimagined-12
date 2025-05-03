@@ -1,6 +1,6 @@
 
-import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { DesktopNav } from "./navbar/DesktopNav";
@@ -18,13 +18,12 @@ const navLinks = [
 export default function Navbar() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { scrolled, mousePosition } = useNavbarEffect();
+  const { mousePosition } = useNavbarEffect();
 
   return (
     <nav 
       className={cn(
-        "w-full fixed top-0 left-0 z-[100] transition-all duration-300",
-        scrolled ? "bg-black/85 backdrop-blur-lg shadow-lg" : "bg-transparent"
+        "w-full fixed top-0 left-0 z-[100] bg-black/85 backdrop-blur-lg shadow-lg",
       )}
       style={{ 
         perspective: "1000px",
