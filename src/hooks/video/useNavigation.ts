@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigation } from "../../components/effects/NavigationContext";
 import { VideoState, VideoActions } from "./types";
@@ -22,24 +22,34 @@ export function useNavigationHandler({
   const prevPathRef = useRef(location.pathname);
   const transitionRequestedRef = useRef(false);
 
+  // Fonction memoizée pour éviter les créations multiples
+  const handleTransition = useCallback(() => {
+    // Éviter les déclenchements multiples
+    if (transitionRequestedRef.current) return;
+    
+    transitionRequestedRef.current = true;
+    console.log('Déclenchement de transition reçu du NavigationContext');
+    
+    // Jouer la transition avec un léger délai pour permettre au navigateur de traiter
+    const timer = setTimeout(() => {
+      playVideoTransition();
+      
+      // Réinitialisation après un délai pour permettre d'autres transitions
+      const resetTimer = setTimeout(() => {
+        transitionRequestedRef.current = false;
+      }, 1000);
+      
+      return () => clearTimeout(resetTimer);
+    }, 10);
+    
+    return () => clearTimeout(timer);
+  }, [playVideoTransition]);
+
   // Écouter les événements de navigation pour jouer la vidéo instantanément
   useEffect(() => {
-    const unregister = navigation.registerVideoTransitionListener(() => {
-      // Éviter les déclenchements multiples
-      if (!transitionRequestedRef.current) {
-        transitionRequestedRef.current = true;
-        // On ne change pas la vidéo lors de la navigation, on joue juste la transition
-        setTimeout(() => {
-          playVideoTransition();
-          // Réinitialisation après un délai pour permettre d'autres transitions
-          setTimeout(() => {
-            transitionRequestedRef.current = false;
-          }, 1000);
-        }, 50);
-      }
-    });
+    const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
-  }, [navigation, playVideoTransition]);
+  }, [navigation, handleTransition]);
   
   // Gestion de la lecture/pause de la vidéo lors des transitions de page
   useEffect(() => {
@@ -48,24 +58,16 @@ export function useNavigationHandler({
     
     // Vérifier si le chemin a vraiment changé
     if (prevPathRef.current !== location.pathname) {
+      console.log(`Navigation détectée: ${prevPathRef.current} -> ${location.pathname}`);
       prevPathRef.current = location.pathname;
       
       if (isFirstLoad) {
-        // À la première charge, mettre la vidéo en pause
-        videoElement.pause();
-        videoElement.currentTime = 0;
+        // À la première charge, préparer la vidéo sans la jouer
+        videoElement.load();
         setIsFirstLoad(false);
-        console.log('Vidéo initialisée en pause');
-      } else if (!transitionRequestedRef.current) {
-        // Éviter les déclenchements multiples de transition
-        transitionRequestedRef.current = true;
-        setTimeout(() => {
-          playVideoTransition();
-          // Réinitialisation après un délai
-          setTimeout(() => {
-            transitionRequestedRef.current = false;
-          }, 1000);
-        }, 50);
+        console.log('Vidéo initialisée, prête pour la première transition');
+      } else {
+        // Ne pas déclencher la transition ici, elle est maintenant gérée par le clic sur les liens
       }
     }
     
@@ -81,9 +83,6 @@ export function useNavigationHandler({
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (videoElement) {
-        videoElement.pause();
-      }
     };
-  }, [location.pathname, isFirstLoad, videoRef, setIsFirstLoad, playVideoTransition]);
+  }, [location.pathname, isFirstLoad, videoRef, setIsFirstLoad]);
 }

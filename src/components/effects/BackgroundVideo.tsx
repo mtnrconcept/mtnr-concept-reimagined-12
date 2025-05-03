@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import useBackgroundVideo from '../../hooks/useBackgroundVideo';
 
 interface BackgroundVideoProps {
@@ -8,45 +9,94 @@ interface BackgroundVideoProps {
 }
 
 export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({ 
-  videoUrl = "/lovable-uploads/Composition_1.mp4", // Remplacé les espaces par des underscores
-  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4", // Remplacé les espaces par des underscores
+  videoUrl = "/lovable-uploads/Composition_1.mp4", 
+  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4", 
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   const {
     videoRef,
     currentVideo,
-    fallbackImage: fallbackImg
+    isTransitioning,
+    fallbackImage: fallbackImg,
+    videoError
   } = useBackgroundVideo({
     videoUrl,
     videoUrlUV,
     fallbackImage
   });
+  
+  // État local pour gérer le statut de chargement
+  const [loadingStatus, setLoadingStatus] = useState('loading');
 
-  // Ajouter un effet pour aider à déboguer les problèmes vidéo
+  // Gérer les événements vidéo pour déboguer et mettre à jour l'interface
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
     const handleCanPlay = () => {
       console.log('Vidéo prête à être lue:', currentVideo);
+      setLoadingStatus('ready');
+    };
+    
+    const handlePlaying = () => {
+      console.log('Lecture vidéo démarrée:', currentVideo);
+      setLoadingStatus('playing');
+    };
+    
+    const handlePause = () => {
+      console.log('Lecture vidéo mise en pause:', currentVideo);
+      if (!isTransitioning) {
+        setLoadingStatus('paused');
+      }
     };
     
     const handleError = (e: Event) => {
       console.error('Erreur vidéo détectée:', e);
       console.error('Source de la vidéo:', currentVideo);
+      setLoadingStatus('error');
+    };
+    
+    const handleWaiting = () => {
+      console.log('Vidéo en attente de données:', currentVideo);
+      setLoadingStatus('waiting');
     };
 
+    // Attacher les gestionnaires d'événements
     videoElement.addEventListener('canplay', handleCanPlay);
+    videoElement.addEventListener('playing', handlePlaying);
+    videoElement.addEventListener('pause', handlePause);
     videoElement.addEventListener('error', handleError);
+    videoElement.addEventListener('waiting', handleWaiting);
 
+    // Nettoyer les gestionnaires d'événements
     return () => {
       videoElement.removeEventListener('canplay', handleCanPlay);
+      videoElement.removeEventListener('playing', handlePlaying);
+      videoElement.removeEventListener('pause', handlePause);
       videoElement.removeEventListener('error', handleError);
+      videoElement.removeEventListener('waiting', handleWaiting);
     };
-  }, [videoRef, currentVideo]);
+  }, [videoRef, currentVideo, isTransitioning]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0">
+      {/* Indicateur de chargement/statut */}
+      {loadingStatus === 'loading' && !videoError && (
+        <div className="absolute top-0 left-0 bg-yellow-500 text-xs text-black px-2 py-0.5 opacity-70 z-50">
+          Chargement vidéo...
+        </div>
+      )}
+      {loadingStatus === 'waiting' && !videoError && (
+        <div className="absolute top-0 left-0 bg-yellow-500 text-xs text-black px-2 py-0.5 opacity-70 z-50">
+          Mise en mémoire tampon...
+        </div>
+      )}
+      {videoError && (
+        <div className="absolute top-0 left-0 bg-red-500 text-xs text-white px-2 py-0.5 opacity-70 z-50">
+          Erreur vidéo - Mode fallback
+        </div>
+      )}
+      
       {/* Vidéo en fond */}
       <video
         ref={videoRef}
