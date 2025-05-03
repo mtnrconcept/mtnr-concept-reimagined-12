@@ -21,27 +21,29 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       
       const scrollY = window.scrollY;
       
-      // Effet parallax sur les éclaboussures - dans la même direction mais plus lentement
+      // Appliquer l'effet de parallaxe pour les éclaboussures
+      // Tous les éléments se déplacent dans la même direction mais à des vitesses différentes
       document.querySelectorAll('.paint-splash').forEach((splash) => {
         const depth = parseFloat(splash.getAttribute('data-depth') || '0');
-        // Modification: vitesse réduite de déplacement dans la même direction (valeur positive)
-        const translateY = scrollY * Math.abs(depth) * 0.3; // 30% de la vitesse de défilement
-        const translateZ = depth * 100; // Ajout de la dimension Z pour l'effet 3D
+        // Vitesse proportionnelle à la profondeur (plus profond = plus lent)
+        // Le facteur 0.3 détermine l'ampleur de l'effet de parallaxe
+        const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
         (splash as HTMLElement).style.transform = `translateY(${translateY}px) 
-          translateZ(${translateZ}px)
+          translateZ(${depth * 100}px)
           rotate(${splash.getAttribute('data-rotation')}deg) 
           scale(${splash.getAttribute('data-scale')})`;
       });
       
-      // Effet parallax appliqué à la vidéo de fond - dans la même direction mais plus lentement
+      // Effet parallax pour la vidéo d'arrière-plan
+      // La vidéo se déplace plus lentement pour créer l'effet de profondeur
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
-        // Changé pour une valeur positive (même direction, vitesse réduite)
-        videoBackground.style.transform = `translateY(${scrollY * 0.15}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
+        // Facteur de vitesse proche de 1 pour un mouvement presque synchrone avec le défilement
+        videoBackground.style.transform = `translateY(${scrollY * 0.85}px)`;
       }
     };
     
-    // Effet parallax sur la souris également
+    // Effet parallaxe pour les mouvements de souris
     const handleMouseMove = (e: MouseEvent) => {
       if (!parallaxRef.current) return;
       
@@ -56,8 +58,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         const element = splash as HTMLElement;
         const currentTransform = element.style.transform;
         
-        // Si la transformation contient déjà translateY depuis l'événement de défilement,
-        // nous ajoutons simplement les offsets de souris
+        // Combiner l'effet de défilement et de mouvement de souris
         if (currentTransform.includes('translateY')) {
           element.style.transform = currentTransform.replace(
             'translateY',
@@ -73,10 +74,11 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
         }
       });
       
-      // Effet parallax de la souris sur la vidéo de fond
+      // Effet parallax de la souris sur la vidéo (léger pour la profondeur)
       const videoBackground = document.querySelector('video');
       if (videoBackground) {
-        videoBackground.style.transform = `translate3d(${mouseX * -15}px, ${mouseY * -15}px, 0) translateY(${window.scrollY * 0.15}px)`;
+        const scrollY = window.scrollY;
+        videoBackground.style.transform = `translate3d(${mouseX * -5}px, ${mouseY * -5 + scrollY * 0.85}px, 0)`;
       }
     };
     

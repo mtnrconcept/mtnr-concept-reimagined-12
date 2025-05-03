@@ -17,7 +17,7 @@ const VideoElement: React.FC<VideoElementProps> = ({
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 w-full h-full object-cover will-change-transform transition-transform duration-200"
+      className="absolute inset-0 w-full h-full object-cover will-change-transform transition-transform duration-100"
       playsInline
       muted
       preload="auto"
@@ -25,7 +25,8 @@ const VideoElement: React.FC<VideoElementProps> = ({
         // Styles par défaut pour avoir un effet parallax fluide
         transform: 'translate3d(0, 0, 0)',
         backfaceVisibility: 'hidden',
-        transformStyle: 'preserve-3d'
+        transformStyle: 'preserve-3d',
+        transformOrigin: 'center center'
       }}
     >
       <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />
