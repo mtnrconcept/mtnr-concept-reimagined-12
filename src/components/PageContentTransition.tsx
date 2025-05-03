@@ -24,13 +24,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Afficher immédiatement le contenu lorsque la vidéo se termine
-      // Normalement la vidéo se termine vers 4000ms
+      // Afficher le contenu 2 secondes plus tôt (5000ms au lieu de 7000ms)
       setTimeout(() => {
         setContentVisible(true);
-      }, 0); // Plus d'attente supplémentaire pour synchroniser avec la fin de la vidéo
+      }, 0); // Pas d'attente supplémentaire
       
-    }, 7000); // Durée totale de la vidéo de transition
+    }, 5000); // Réduit à 5000ms au lieu de 7000ms pour faire entrer le contenu 2s plus tôt
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -47,9 +46,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Modifié à 3.0s avec décélération
-        y: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Modifié à 3.0s avec décélération fluide
-        filter: { duration: 3.0, ease: [0.33, 1, 0.68, 1] } // Modifié à 3.0s
+        opacity: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Garde la même décélération
+        y: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Garde la même décélération fluide
+        filter: { duration: 3.0, ease: [0.33, 1, 0.68, 1] } // Garde la même durée
       }
     },
     exit: {
