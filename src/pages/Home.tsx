@@ -7,6 +7,7 @@ import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
+import { PageSplashes } from "@/components/effects/PageSplashes";
 
 export default function Home() {
   const {
@@ -39,6 +40,9 @@ export default function Home() {
   }, []);
   
   return <div className="relative min-h-screen w-full overflow-x-hidden">
+      {/* Intégration des éclaboussures de peinture spécifiques à la page d'accueil */}
+      <PageSplashes pageVariant="home" />
+      
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <main id="main-content" className="flex-grow w-full rounded-full">
           <HeroSection />

@@ -2,6 +2,7 @@
 import ParallaxBackground from "@/components/ParallaxBackground";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PageSplashes } from "@/components/effects/PageSplashes";
 
 export default function Book() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -20,6 +21,8 @@ export default function Book() {
 
   return (
     <ParallaxBackground>
+      <PageSplashes pageVariant="book" />
+      
       <div className="relative z-10 min-h-screen">
         <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
           <h1 className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4 animate-wiggle">

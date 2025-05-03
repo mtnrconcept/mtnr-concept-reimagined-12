@@ -1,9 +1,13 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
+import { PageSplashes } from "@/components/effects/PageSplashes";
 
 const About = () => (
   <ParallaxBackground>
+    <PageSplashes pageVariant="about" />
+    
     <main className="pt-36 pb-24 min-h-screen max-w-3xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl my-8 px-7">
       <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-center text-primary uppercase">À propos</h1>
       <div className="flex flex-col md:flex-row items-center gap-10 mt-7">

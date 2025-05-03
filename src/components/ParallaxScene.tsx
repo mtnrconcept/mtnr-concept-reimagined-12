@@ -2,18 +2,8 @@
 import { useRef, useEffect } from 'react';
 import { Background } from './parallax/Background';
 import { useParallaxEffect } from '@/hooks/useParallaxEffect';
-import { parallaxElements } from './parallax/config';
-import { PaintSplash } from './parallax/PaintSplash';
-import { Light } from './parallax/Light';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from '@/components/effects/NavigationContext';
-
-// Import or define MixBlendMode type to match what's in PaintSplash.tsx
-type MixBlendMode = 
-  | 'normal' | 'multiply' | 'screen' | 'overlay' 
-  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
-  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
-  | 'hue' | 'saturation' | 'color' | 'luminosity';
 
 export default function ParallaxScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,40 +19,6 @@ export default function ParallaxScene() {
     return () => console.log("ParallaxScene unmounted");
   }, []);
 
-  // Effet lors des changements de route pour les éléments parallax
-  useEffect(() => {
-    const paintElements = document.querySelectorAll('.parallax-element');
-    paintElements.forEach(el => {
-      // Ajouter une classe qui déclenche une animation temporaire
-      el.classList.add('route-change-transition');
-      
-      // Retirer la classe après l'animation
-      setTimeout(() => {
-        el.classList.remove('route-change-transition');
-      }, 1000);
-    });
-  }, [location.pathname]);
-  
-  // Synchroniser les transitions de splash avec les transitions vidéo
-  useEffect(() => {
-    const unregister = registerVideoTransitionListener(() => {
-      console.log("Video transition triggered in ParallaxScene");
-      const paintElements = document.querySelectorAll('.parallax-element');
-      paintElements.forEach(el => {
-        // Animation plus intense pour les transitions vidéo
-        el.classList.add('route-change-transition');
-        
-        // Retirer la classe après l'animation
-        setTimeout(() => {
-          el.classList.remove('route-change-transition');
-        }, 1000);
-      });
-    });
-    
-    // Nettoyer l'écouteur lors du démontage
-    return () => unregister();
-  }, [registerVideoTransitionListener]);
-  
   return (
     <>
       {/* Le fond n'est plus nécessaire car il est géré par le BackgroundVideo */}
@@ -76,42 +32,7 @@ export default function ParallaxScene() {
           transformStyle: 'preserve-3d',
         }}
       >
-        {parallaxElements.map((element, index) => {
-          if (element.type === 'background') return null;
-
-          if (element.type === 'paint') {
-            return (
-              <PaintSplash
-                key={`paint-${index}`}
-                x={element.x!}
-                y={element.y!}
-                depth={element.depth}
-                scale={element.scale}
-                rotation={element.rotation}
-                className={element.className}
-                src={element.src!}
-                blur={element.blur}
-                blendMode={element.blendMode as MixBlendMode}
-              />
-            );
-          }
-          
-          if (element.type === 'light') {
-            return (
-              <Light 
-                key={`light-${index}`}
-                x={element.x!}
-                y={element.y!}
-                depth={element.depth}
-                size={element.size!}
-                glow={element.glow!}
-                className={element.className}
-              />
-            );
-          }
-          
-          return null;
-        })}
+        {/* Les éléments paint splash sont maintenant gérés par le composant PageSplashes dans chaque page */}
       </div>
     </>
   );

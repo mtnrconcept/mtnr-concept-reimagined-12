@@ -1,8 +1,10 @@
+
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
+import { PageSplashes } from "@/components/effects/PageSplashes";
 
 const artists = [{
   name: "U.D Sensei",
@@ -29,6 +31,8 @@ export default function Artists() {
   }, []);
 
   return <ParallaxBackground>
+      <PageSplashes pageVariant="artists" />
+      
       <div className="relative z-10 min-h-screen">
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
           <div className="w-full max-w-5xl">
