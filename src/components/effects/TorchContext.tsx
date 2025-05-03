@@ -41,6 +41,24 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       uvCircleRef.current.style.left = `${position.x}px`;
       uvCircleRef.current.style.top = `${position.y}px`;
     }
+    
+    // Trigger browser repaints for UV elements nearby
+    if (uvMode) {
+      const uvElements = document.querySelectorAll('.uv-hidden-code, .uv-hidden-message, .uv-secret-message, .decrypt-message');
+      uvElements.forEach(el => {
+        if (el instanceof HTMLElement) {
+          const rect = el.getBoundingClientRect();
+          const dx = position.x - (rect.left + rect.width/2);
+          const dy = position.y - (rect.top + rect.height/2);
+          const distance = Math.sqrt(dx*dx + dy*dy);
+          
+          // Forcer un repaint pour les éléments proches
+          if (distance < 300) {
+            el.style.opacity = el.style.opacity; // Astuce pour forcer un repaint
+          }
+        }
+      });
+    }
   };
 
   // Mouse tracking
@@ -58,13 +76,26 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     if (isTorchActive && uvMode) {
       createUVCircle(mousePosition);
+      
+      // Ajouter une classe au body pour faciliter le ciblage CSS
+      document.body.classList.add('torch-active');
+      document.body.classList.add('uv-torch-active');
+    } else if (isTorchActive && !uvMode) {
+      document.body.classList.add('torch-active');
+      document.body.classList.remove('uv-torch-active');
+      removeUVCircle();
     } else {
+      document.body.classList.remove('torch-active');
+      document.body.classList.remove('uv-torch-active');
       removeUVCircle();
     }
+    
     return () => {
+      document.body.classList.remove('torch-active');
+      document.body.classList.remove('uv-torch-active');
       removeUVCircle();
     };
-  }, [isTorchActive, uvMode, mousePosition]);
+  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
 
   const contextValue: TorchContextType = {
     isTorchActive,

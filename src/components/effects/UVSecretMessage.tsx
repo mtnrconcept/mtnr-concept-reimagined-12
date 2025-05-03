@@ -29,13 +29,23 @@ export default function UVSecretMessage({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!messageRef.current || !isTorchActive || !uvMode) return;
+    if (!isTorchActive || !uvMode) return;
+    console.log("UVSecretMessage active with torche UV");
 
     const handleVisibility = () => {
       if (!messageRef.current) return;
       
       // Calculate distance between mouse and element
       const rect = messageRef.current.getBoundingClientRect();
+      
+      // Skip if not in viewport
+      if (rect.bottom < 0 || 
+          rect.top > window.innerHeight || 
+          rect.right < 0 || 
+          rect.left > window.innerWidth) {
+        return;
+      }
+      
       const elementCenterX = rect.left + rect.width / 2;
       const elementCenterY = rect.top + rect.height / 2;
       
@@ -43,8 +53,8 @@ export default function UVSecretMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Augmenter la distance d'activation
-      const threshold = 200; 
+      // Rayon de détection augmenté
+      const threshold = 250; 
       
       // Show only when UV torch is close and in UV mode
       if (distance < threshold && uvMode) {
@@ -77,6 +87,7 @@ export default function UVSecretMessage({
           
           // Apply visibility with a smooth transition
           messageRef.current.style.opacity = intensity.toFixed(2);
+          messageRef.current.classList.add('visible');
           
           // Add stronger glow effect when closer
           const glowSize = 5 + (intensity * 15);
@@ -89,31 +100,42 @@ export default function UVSecretMessage({
           messageRef.current.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) translate(${vibrationX}px, ${vibrationY}px)`;
         }
       } else {
-        // Hide when cursor is far
         setIsVisible(false);
         
         if (messageRef.current) {
           messageRef.current.style.opacity = '0';
+          messageRef.current.classList.remove('visible');
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
         }
       }
     };
     
-    // Setup event listener for cursor movement
+    handleVisibility(); // Initial check
     window.addEventListener('mousemove', handleVisibility);
     
-    // Initial visibility check
-    handleVisibility();
+    // Setup MutationObserver to detect when element becomes visible in DOM
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'childList' || mutation.type === 'attributes') {
+          handleVisibility();
+        }
+      }
+    });
     
-    // Cleanup
+    if (messageRef.current) {
+      observer.observe(document.body, { 
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+    }
+    
     return () => {
       window.removeEventListener('mousemove', handleVisibility);
+      observer.disconnect();
     };
   }, [isTorchActive, mousePosition, message, color, uvMode, rotation]);
-
-  // Don't render anything if torch is off or not in UV mode
-  if (!isTorchActive || !uvMode) return null;
 
   return (
     <div

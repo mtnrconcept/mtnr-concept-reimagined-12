@@ -64,8 +64,21 @@
     100% { opacity: 0.85; transform: scale(1); }
   }
   
-  .uv-mode-active .uv-hidden-code {
-    animation: uvCodeReveal 0.8s forwards;
+  /* Assurer que les éléments UV sont visibles en mode UV */
+  .uv-mode-active .uv-hidden-code,
+  .uv-mode-active .uv-hidden-message,
+  .uv-mode-active .uv-secret-message,
+  .uv-mode-active .decrypt-message {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+  
+  .uv-mode-active .uv-hidden-code.visible,
+  .uv-mode-active .uv-hidden-message.visible,
+  .uv-mode-active .uv-secret-message.visible,
+  .uv-mode-active .decrypt-message.visible {
+    opacity: 1;
+    animation: uvReveal 0.5s forwards;
   }
   
   /* Decrypt message styling */
@@ -110,5 +123,26 @@
     pointer-events: none;
     width: 100%;
     height: 100%;
+  }
+  
+  /* Container spécifique pour les secrets UV */
+  .uv-secrets-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 90;
+    pointer-events: none;
+    overflow: visible;
+  }
+  
+  /* Helper class pour forcer la visibilité */
+  .uv-secrets-visible .uv-hidden-code.visible, 
+  .uv-secrets-visible .uv-hidden-message.visible,
+  .uv-secrets-visible .uv-secret-message.visible,
+  .uv-secrets-visible .decrypt-message.visible {
+    opacity: 1 !important;
+    z-index: 999 !important;
   }
 }
