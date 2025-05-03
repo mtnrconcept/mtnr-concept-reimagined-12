@@ -82,32 +82,54 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {isTorchActive && !uvMode && (
           <svg className="fixed top-0 left-0 w-full h-full z-[99] pointer-events-none">
   <defs>
-    <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+    {/* Dégradé radial pour le halo */}
+    <radialGradient id="halo-gradient" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stopColor="white" stopOpacity="1" />
-      <stop offset="70%" stopColor="white" stopOpacity="0.4" />
+      <stop offset="40%" stopColor="white" stopOpacity="0.4" />
       <stop offset="100%" stopColor="white" stopOpacity="0" />
     </radialGradient>
 
+    {/* Dégradé linéaire pour le cône */}
+    <linearGradient id="beam-gradient" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stopColor="white" stopOpacity="0.3" />
+      <stop offset="100%" stopColor="white" stopOpacity="0" />
+    </linearGradient>
+
     <mask id="torch-mask">
       <rect width="100%" height="100%" fill="black" />
+
+      {/* Faisceau conique (triangle flou vers le haut) */}
+      <polygon
+        points={`
+          ${mousePosition.x - 100},${mousePosition.y}
+          ${mousePosition.x + 100},${mousePosition.y}
+          ${mousePosition.x + 300},${mousePosition.y - 600}
+          ${mousePosition.x - 300},${mousePosition.y - 600}
+        `}
+        fill="url(#beam-gradient)"
+      />
+
+      {/* Halo central */}
       <circle
         cx={mousePosition.x}
         cy={mousePosition.y}
-        r={300}
-        fill="url(#torch-gradient)"
+        r={120}
+        fill="url(#halo-gradient)"
       />
     </mask>
   </defs>
 
+  {/* Fond sombre + masque de lumière */}
   <rect
     width="100%"
     height="100%"
     fill="black"
-    fillOpacity="0.9"
+    fillOpacity="0.92"
     mask="url(#torch-mask)"
     style={{ transition: "all 0.3s ease-out" }}
   />
 </svg>
+
 
         )}
       </div>
