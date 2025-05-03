@@ -20,16 +20,17 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
-    // Temps d'attente ajusté pour correspondre à la durée de la vidéo
+    // Pour que l'animation se termine au même moment que la vidéo (7000ms),
+    // et commence à apparaître 3 secondes plus tôt, à 4000ms
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Afficher le contenu 2 secondes plus tôt (5000ms au lieu de 7000ms)
+      // Afficher le contenu 3 secondes avant la fin de la vidéo
       setTimeout(() => {
         setContentVisible(true);
       }, 0); // Pas d'attente supplémentaire
       
-    }, 5000); // Maintenu à 5000ms pour faire entrer le contenu 2s plus tôt
+    }, 4000); // Démarrer à 4000ms (7000ms - 3000ms de durée d'animation)
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -46,9 +47,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 4.5, ease: [0.12, 0, 0.39, 0] }, // Ralenti à 4.5s avec une courbe d'accélération plus douce
-        y: { duration: 4.5, ease: [0.12, 0, 0.39, 0] }, // Ralenti à 4.5s avec la même courbe
-        filter: { duration: 4.0, ease: [0.16, 1, 0.3, 1] } // Ralenti à 4.0s
+        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Décélération plus lente sur 3s
+        y: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Même courbe pour y
+        filter: { duration: 2.8, ease: [0.1, 0.4, 0.2, 1.0] } // Légèrement plus rapide pour le blur
       }
     },
     exit: {
