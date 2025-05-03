@@ -32,7 +32,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: 1,
           transition: { 
-            delay: 2, // Apparaît après 5 secondes (3s de fondu + 2s de pause)
+            delay: 3, // Apparaît après 5 secondes (3s de fondu + 2s de pause)
             duration: 2 // Fondu entrant de 3 secondes
           }
         }}
