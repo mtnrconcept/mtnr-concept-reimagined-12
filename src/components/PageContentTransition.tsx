@@ -49,7 +49,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       transition: {
         opacity: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.2s à 0.8s pour terminer avec la vidéo
         y: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.5s à 0.8s pour terminer avec la vidéo
-        filter: { duration: 0.8, ease: [0.33, 1, 0.68, 1] } // Réduit de 1.8s à 0.8s pour terminer avec la vidéo
+        filter: { duration: 2.8, ease: [0.33, 1, 0.68, 1] } // Réduit de 1.8s à 0.8s pour terminer avec la vidéo
       }
     },
     exit: {
