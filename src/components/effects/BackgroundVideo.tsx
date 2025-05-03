@@ -97,10 +97,10 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         </div>
       )}
       
-      {/* Vidéo en fond - style modifié pour conserver les proportions */}
+      {/* Vidéo en fond */}
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-contain bg-black"
+        className="absolute inset-0 min-w-full min-h-full object-cover"
         poster={fallbackImg}
         playsInline
         muted
