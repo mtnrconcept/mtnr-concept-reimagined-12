@@ -1,5 +1,3 @@
-
-import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
@@ -14,7 +12,6 @@ export default function WhatWeDo() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <div className="relative z-10 min-h-screen">
-        <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
             <div className="relative px-[103px]">

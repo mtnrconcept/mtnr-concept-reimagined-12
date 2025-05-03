@@ -1,4 +1,3 @@
-
 import ParallaxBackground from "@/components/ParallaxBackground";
 import Navbar from "@/components/Navbar";
 import { useState } from "react";

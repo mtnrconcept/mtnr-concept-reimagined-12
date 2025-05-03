@@ -1,5 +1,3 @@
-
-import Navbar from "@/components/Navbar";
 import { useEffect } from "react";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import NeonText from "@/components/effects/NeonText";
@@ -32,7 +30,6 @@ export default function Artists() {
 
   return <ParallaxBackground>
       <div className="relative z-10 min-h-screen">
-        <Navbar />
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 px-3 xs:px-6 font-grunge selection:bg-primary selection:text-black">
           <div className="w-full max-w-5xl">
             <div className="px-[240px] mx-[83px]">

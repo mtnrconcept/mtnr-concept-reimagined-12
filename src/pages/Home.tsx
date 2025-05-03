@@ -7,14 +7,17 @@ import ArtistsSection from "@/components/home/ArtistsSection";
 import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
+
 export default function Home() {
   const {
     uvMode
   } = useUVMode();
   const observerRef = useRef<IntersectionObserver | null>(null);
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -34,6 +37,7 @@ export default function Home() {
     });
     return () => observerRef.current?.disconnect();
   }, []);
+  
   return <div className="relative min-h-screen w-full overflow-x-hidden">
       <div className="relative z-20 flex flex-col min-h-screen w-full">
         <Navbar />
