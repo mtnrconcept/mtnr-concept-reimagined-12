@@ -44,24 +44,24 @@ export default function UVText({
       const dy = mousePosition.y - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Enhanced threshold and effects for UV mode
-      const threshold = uvMode ? 600 : 300; // Larger detection area in UV mode
-      const newIsIlluminated = distance < threshold;
+      // Uniquement visible en mode UV
+      const threshold = uvMode ? 600 : 0; // Aucune détection en mode normal
+      const newIsIlluminated = distance < threshold && uvMode;
       
       if (newIsIlluminated !== isIlluminated) {
         setIsIlluminated(newIsIlluminated);
       }
 
-      if (newIsIlluminated) {
+      if (newIsIlluminated && uvMode) {
         // Calculate intensity based on distance (stronger when closer)
         const intensity = 1 - (distance / threshold);
-        const opacityValue = Math.min(1, intensity * (uvMode ? 5 : 3));
+        const opacityValue = Math.min(1, intensity * 5);
         hiddenTextRef.current.style.opacity = `${opacityValue}`;
         
         // Enhanced glow for UV mode with dynamic fluorescent yellow color
-        const glowSize = uvMode ? 25 * intensity : 15 * intensity;
-        const primaryGlow = uvMode ? "#D2FF3F" : uvColor;
-        const secondaryGlow = uvMode ? "#4FA9FF" : uvColor;
+        const glowSize = 25 * intensity;
+        const primaryGlow = "#D2FF3F";
+        const secondaryGlow = "#4FA9FF";
         
         hiddenTextRef.current.style.textShadow = `
           0 0 ${glowSize}px ${primaryGlow}, 
@@ -69,21 +69,15 @@ export default function UVText({
           0 0 ${glowSize * 3}px ${secondaryGlow}
         `;
         
-        if (uvMode) {
-          // Dynamic animation effects in UV mode
-          const time = Date.now() / 1000;
-          const vibrationX = Math.sin(time * 2) * 0.8;
-          const vibrationY = Math.cos(time * 1.8) * 0.8;
-          hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
-          hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
-          
-          // Add letter spacing for dramatic effect in UV mode
-          hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
-        } else {
-          hiddenTextRef.current.style.transform = '';
-          hiddenTextRef.current.style.filter = '';
-          hiddenTextRef.current.style.letterSpacing = '';
-        }
+        // Dynamic animation effects in UV mode
+        const time = Date.now() / 1000;
+        const vibrationX = Math.sin(time * 2) * 0.8;
+        const vibrationY = Math.cos(time * 1.8) * 0.8;
+        hiddenTextRef.current.style.transform = `translate(${vibrationX}px, ${vibrationY}px)`;
+        hiddenTextRef.current.style.filter = `brightness(1.5) contrast(1.2)`;
+        
+        // Add letter spacing for dramatic effect in UV mode
+        hiddenTextRef.current.style.letterSpacing = `${0.05 + (intensity * 0.1)}em`;
       } else {
         hiddenTextRef.current.style.opacity = '0';
         hiddenTextRef.current.style.textShadow = 'none';
@@ -105,7 +99,7 @@ export default function UVText({
 
   // Auto-reveal hidden text if UV mode is active, regardless of mouse position
   useEffect(() => {
-    if (uvMode && hiddenTextRef.current) {
+    if (uvMode && hiddenTextRef.current && isTorchActive) {
       hiddenTextRef.current.style.opacity = '1';
       hiddenTextRef.current.style.textShadow = `
         0 0 10px ${uvColor},
@@ -130,7 +124,7 @@ export default function UVText({
       const animId = requestAnimationFrame(animateGlow);
       return () => cancelAnimationFrame(animId);
     }
-  }, [uvMode, uvColor]);
+  }, [uvMode, uvColor, isTorchActive]);
 
   return (
     <div className={cn(

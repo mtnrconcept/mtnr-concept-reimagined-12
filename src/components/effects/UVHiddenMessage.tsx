@@ -40,8 +40,9 @@ export default function UVHiddenMessage({
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Modify visibility based on distance - increased threshold for wider effect
+      // Message visible UNIQUEMENT en mode UV
       const threshold = 600;
-      if (distance < threshold) {
+      if (distance < threshold && uvMode) {
         const intensity = 1 - (distance / threshold);
         
         // Apply effects

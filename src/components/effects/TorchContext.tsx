@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useContext,
@@ -83,56 +84,38 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Masque en dehors du flux DOM via portail */}
+      {/* Masque de la torche */}
       {isTorchActive && !uvMode &&
         createPortal(
-          <svg
-            className="fixed inset-0 w-full h-full z-[99] pointer-events-none"
-            aria-hidden="true"
+          <div 
+            className="fixed inset-0 z-[99] pointer-events-none"
+            style={{
+              background: `radial-gradient(circle 300px at ${mousePosition.x}px ${mousePosition.y}px, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.2) 40%, 
+                rgba(0,0,0,0.6) 60%,
+                rgba(0,0,0,0.8) 80%,
+                rgba(0,0,0,0.95) 100%)`,
+              mixBlendMode: 'normal',
+              transition: 'all 0.05s ease-out',
+            }}
           >
-            <defs>
-              <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="white" stopOpacity="1" />
-                <stop offset="50%" stopColor="white" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="white" stopOpacity="0" />
-              </radialGradient>
-
-              <mask id="torch-mask">
-                <rect width="100%" height="100%" fill="black" />
-                <ellipse
-                  cx={mousePosition.x}
-                  cy={mousePosition.y - 150}
-                  rx="200"
-                  ry="500"
-                  fill="url(#torch-gradient)"
-                />
-              </mask>
-            </defs>
-
-            {/* Calque noir semi-transparent percé par le faisceau */}
-            <rect
-              width="100%"
-              height="100%"
-              fill="black"
-              fillOpacity="0.7"
-              mask="url(#torch-mask)"
-              style={{ transition: "all 0.2s ease-out" }}
-            />
-
-            {/* Halo doux dans le faisceau */}
-            <ellipse
-              cx={mousePosition.x}
-              cy={mousePosition.y - 150}
-              rx="200"
-              ry="500"
-              fill="url(#torch-gradient)"
+            {/* Halo lumineux au centre */}
+            <div 
+              className="absolute pointer-events-none"
               style={{
-                pointerEvents: "none",
-                mixBlendMode: "screen",
-                opacity: 0.15,
+                width: '600px',
+                height: '600px',
+                borderRadius: '50%',
+                transform: 'translate(-50%, -50%)',
+                left: `${mousePosition.x}px`,
+                top: `${mousePosition.y}px`,
+                background: 'radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,248,150,0.1) 70%, transparent 100%)',
+                filter: 'blur(15px)',
+                mixBlendMode: 'screen',
               }}
             />
-          </svg>,
+          </div>,
           document.body
         )}
     </TorchContext.Provider>
