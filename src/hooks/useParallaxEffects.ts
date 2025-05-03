@@ -20,15 +20,15 @@ export const useParallaxEffects = ({ containerRef }: ParallaxHookProps) => {
       elements?.forEach(el => {
         const depth = parseFloat(el.dataset.depth || '0');
         
-        // Direction du déplacement inversée pour suivre le contenu
-        // Utilisation d'un coefficient positif pour déplacer dans le même sens que le scroll
-        const translateY = scrollY * depth * 0.2; // 20% de la vitesse de défilement
-        const translateX = mouseX * (depth * 10);
-        const scale = el.classList.contains('fixed') ? 1.1 : 1;
+        // Direction du déplacement cohérente pour tous les éléments
+        // Utilisation d'un coefficient qui ralentit proportionnellement à la profondeur
+        const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
+        const translateX = mouseX * (depth * 15);
+        const translateZ = depth * -1000;
         
         el.style.transform = `
-          translate3d(${translateX}px, ${translateY}px, 0)
-          scale(${scale})
+          translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
+          scale(${1 + Math.abs(depth) * 0.1})
         `;
       });
 

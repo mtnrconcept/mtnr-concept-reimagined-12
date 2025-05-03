@@ -18,13 +18,18 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       elements.forEach((element) => {
         const depth = parseFloat(element.dataset.depth || '0');
         
-        // Déplacement dans la MÊME direction que le scroll (coefficient positif)
-        // mais à une vitesse réduite pour donner l'impression de profondeur
-        const translateY = depth * scrollY * 0.15;
-        const translateX = mouseX * (depth * 20);
-        const rotateX = -mouseY * (depth * 5);
-        const rotateY = mouseX * (depth * 5);
-        const translateZ = depth * -400; // Réduction de la profondeur Z pour effet plus subtil
+        // Coefficient positif pour que tous les éléments se déplacent dans le MÊME sens
+        // La vitesse est proportionnelle à la profondeur (plus profond = plus lent)
+        const translateY = scrollY * (1 - Math.abs(depth) * 0.7); // 30% de variation maximum
+        
+        // Effets de souris plus subtils pour plus de réalisme
+        const translateX = mouseX * (depth * 15);
+        const rotateX = -mouseY * (depth * 3);
+        const rotateY = mouseX * (depth * 3);
+        
+        // Calcul de la profondeur Z basé sur la valeur de depth
+        // Plus la valeur est élevée, plus l'élément est loin
+        const translateZ = depth * -1000;
         
         element.style.transform = `
           translate3d(${translateX}px, ${translateY}px, ${translateZ}px)
@@ -33,11 +38,12 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         `;
       });
       
-      // Traitement spécial pour l'arrière-plan avec effet de parallax encore plus subtil
+      // Traitement spécial pour l'arrière-plan avec un effet de parallaxe encore plus subtil
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.10; // Coefficient positif et réduit (10%)
+          // Déplacement très léger pour le fond (5% de la vitesse de défilement)
+          const translateY = scrollY * 0.95; 
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
@@ -47,17 +53,17 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
 
     const handleScroll = () => {
       scrollY = window.scrollY;
-      requestAnimationUpdate();
+      if (!ticking) {
+        rafId = requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       mouseX = (clientX / window.innerWidth - 0.5) * 2;
       mouseY = (clientY / window.innerHeight - 0.5) * 2;
-      requestAnimationUpdate();
-    };
-
-    const requestAnimationUpdate = () => {
+      
       if (!ticking) {
         rafId = requestAnimationFrame(updateParallax);
         ticking = true;
@@ -68,7 +74,7 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
     // Initialisation immédiate pour éviter les sauts
-    requestAnimationUpdate();
+    updateParallax();
     
     return () => {
       window.removeEventListener('scroll', handleScroll);

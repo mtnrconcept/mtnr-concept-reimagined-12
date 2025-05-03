@@ -15,29 +15,39 @@ export interface ParallaxElementConfig {
 
 export const parallaxElements: ParallaxElementConfig[] = [
   // Background avec mouvement très lent
-  { type: 'background', depth: 0.15, className: 'opacity-90' },
+  { type: 'background', depth: 0.9, className: 'opacity-90' },
   
-  // Splash très profonds (arrière-plan)
-  { type: 'paint', x: 75, y: 15, depth: 0.4, scale: 2.8, rotation: -15, blur: 3,
+  // Splash très profonds (arrière-plan lointain)
+  { type: 'paint', x: 75, y: 15, depth: 0.85, scale: 2.8, rotation: -15, blur: 5,
     src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug' },
-  { type: 'paint', x: 10, y: 20, depth: 0.35, scale: 2.5, rotation: 25, blur: 2,
+  { type: 'paint', x: 10, y: 20, depth: 0.8, scale: 2.5, rotation: 25, blur: 4,
     src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug' },
     
   // Splash à distance moyenne
-  { type: 'paint', x: 50, y: 30, depth: 0.2, scale: 2.2, rotation: 10, blur: 1,
-    src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-50' },
-  { type: 'paint', x: 30, y: 40, depth: 0.25, scale: 2.0, rotation: 5, blur: 1,
-    src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'splash-debug opacity-50' },
+  { type: 'paint', x: 50, y: 30, depth: 0.6, scale: 2.2, rotation: 10, blur: 3,
+    src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-60' },
+  { type: 'paint', x: 30, y: 40, depth: 0.5, scale: 2.0, rotation: 5, blur: 2,
+    src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'splash-debug opacity-60' },
   
-  // Splash très proches, au premier plan absolu (devant tout le contenu)
-  { type: 'paint', x: 85, y: 65, depth: -0.5, scale: 1.4, rotation: -10, blur: 0,
+  // Splash proches
+  { type: 'paint', x: 85, y: 65, depth: 0.3, scale: 1.8, rotation: -10, blur: 1,
+    src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-70' },
+  { type: 'paint', x: 15, y: 70, depth: 0.2, scale: 1.6, rotation: 15, blur: 0.5,
+    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-80' },
+  
+  // Niveau normal (profondeur neutre)
+  { type: 'paint', x: 70, y: 42, depth: 0, scale: 1.4, rotation: 8, blur: 0,
+    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug opacity-90' },
+  
+  // Premier plan (devant le contenu)
+  { type: 'paint', x: 90, y: 25, depth: -0.2, scale: 1.2, rotation: 20, blur: 0,
+    src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'splash-debug opacity-70' },
+  { type: 'paint', x: 5, y: 85, depth: -0.3, scale: 1.1, rotation: -25, blur: 0,
+    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug opacity-60' },
+    
+  // Premier plan extrême (très proche)
+  { type: 'paint', x: 25, y: 5, depth: -0.5, scale: 0.9, rotation: -5, blur: 0,
     src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'splash-debug opacity-40' },
-  { type: 'paint', x: 15, y: 70, depth: -0.6, scale: 1.3, rotation: 15, blur: 0,
-    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-35' },
-  
-  // Nouveaux splash extrêmement proches
-  { type: 'paint', x: 90, y: 25, depth: -0.8, scale: 1.2, rotation: 20, blur: 0,
-    src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'splash-debug opacity-30' },
-  { type: 'paint', x: 5, y: 85, depth: -1, scale: 1.1, rotation: -25, blur: 0,
-    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'splash-debug opacity-25' },
+  { type: 'paint', x: 80, y: 90, depth: -0.8, scale: 0.7, rotation: 12, blur: 0,
+    src: '/lovable-uploads/paint-splatter-hi.png', className: 'splash-debug opacity-30' },
 ];
