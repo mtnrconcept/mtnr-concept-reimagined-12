@@ -37,8 +37,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const contentVariants = {
     initial: {
       opacity: 0,
-      y: 100, // Commence depuis le bas de l'écran
-      filter: "blur(8px)"
+      y: "100vh", // Commence complètement en dehors de l'écran (bas)
+      filter: "blur(12px)"
     },
     animate: {
       opacity: 1,
@@ -46,14 +46,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { duration: 2.2, ease: [0.16, 1, 0.3, 1] },
-        y: { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }, // Cubic-bezier pour un effet d'entrée rapide puis douce
+        y: { duration: 2.5, ease: [0.16, 1, 0.3, 1] }, // Cubique modifié pour une arrivée plus douce
         filter: { duration: 1.8, ease: [0.33, 1, 0.68, 1] }
       }
     },
     exit: {
       opacity: 0,
-      y: -100, // Disparaît vers le haut
-      filter: "blur(8px)",
+      y: "-100vh", // Disparaît complètement vers le haut de l'écran
+      filter: "blur(12px)",
       transition: {
         opacity: { duration: 1.8, ease: [0.33, 1, 0.68, 1] },
         y: { duration: 1.5, ease: [0.33, 1, 0.68, 1] }, // Effet d'accélération
