@@ -49,40 +49,39 @@ export default function TVVideoPlayer() {
       {/* TV Frame avec dimensions préservées */}
       <div className="relative w-full">
         <AspectRatio ratio={16/9} className="relative overflow-hidden bg-black rounded-lg">
-          {/* Conteneur du lecteur vidéo avec positionnement absolu pour maintenir la cohérence */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* Conteneur YouTube avec dimensions fixes correspondant à l'original */}
-            <div className="relative w-[60%] h-[60%]">
-              {/* Affichage du chargement */}
-              {isLoading && (
-                <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
-                  <div className="w-full h-full opacity-30" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
-                    animation: 'noise 1s infinite'
-                  }}>
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono">
-                    Chargement...
-                  </div>
-                </div>
-              )}
-              
-              {/* YouTube Video - dimensions exactes préservées */}
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
-                title={currentVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            
-            {/* TV Overlay Image - position fixe par rapport au lecteur */}
+          {/* TV Overlay Image - placée en premier avec position absolue pour servir de référence */}
+          <div className="absolute inset-0 w-full h-full">
             <img 
               src="/lovable-uploads/tv.png" 
               alt="TV Frame" 
-              className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none"
+              className="w-full h-full object-contain pointer-events-none"
             />
+          </div>
+          
+          {/* Conteneur du lecteur YouTube, positionné précisément dans la zone d'écran de la TV */}
+          <div className="absolute top-[8%] left-[11.5%] w-[77%] h-[58%] flex items-center justify-center">
+            {/* Affichage du chargement */}
+            {isLoading && (
+              <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
+                <div className="w-full h-full opacity-30" style={{
+                  backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
+                  animation: 'noise 1s infinite'
+                }}>
+                </div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono">
+                  Chargement...
+                </div>
+              </div>
+            )}
+            
+            {/* YouTube Video - dimensions exactes adaptées à l'écran de la TV */}
+            <iframe
+              className="w-full h-full"
+              src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
+              title={currentVideo.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </AspectRatio>
       </div>
