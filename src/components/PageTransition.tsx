@@ -80,14 +80,12 @@ export default function PageTransition({
       <PageContentTransition>
         <motion.div
           ref={contentRef}
-          className="page-content-wrapper overflow-auto"
+          className="page-content-wrapper"
           style={{
             perspective: "1400px",
             willChange: "transform, opacity",
             position: "relative",
-            zIndex: 10,
-            height: "auto",
-            minHeight: "100vh"
+            zIndex: 10
           }}
         >
           {children}

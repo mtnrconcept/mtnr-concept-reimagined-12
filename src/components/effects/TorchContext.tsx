@@ -4,12 +4,11 @@ import React, {
   useContext,
   useState,
   useRef,
+  useEffect,
   ReactNode,
 } from "react";
-import { useTorchMouseTracking } from "@/hooks/useTorchMouseTracking";
-import { useTorchUVEffects } from "@/hooks/useTorchUVEffects";
-import { useNearbyUVElements } from "@/hooks/useNearbyUVElements";
-import { TorchMask } from "./TorchMask";
+import { createPortal } from "react-dom";
+import { useUVMode } from "./UVModeContext";
 
 interface TorchContextType {
   isTorchActive: boolean;
@@ -33,27 +32,39 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInitialMount = useRef(true);
 
-  // Handler for updating mouse position
+  const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
+
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
+    if (uvCircleRef.current && uvMode) {
+      uvCircleRef.current.style.left = `${position.x}px`;
+      uvCircleRef.current.style.top = `${position.y}px`;
+    }
   };
 
-  // Use our new hooks
-  useTorchMouseTracking({ isTorchActive, updateMousePosition });
-  
-  const { uvMode } = useTorchUVEffects({ 
-    isTorchActive, 
-    mousePosition,
-    isInitialMount
-  });
-  
-  useNearbyUVElements({
-    isTorchActive,
-    uvMode,
-    mousePosition
-  });
+  // Mouse tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isTorchActive) {
+        updateMousePosition({ x: e.clientX, y: e.clientY });
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isTorchActive]);
+
+  // UV logic
+  useEffect(() => {
+    if (isTorchActive && uvMode) {
+      createUVCircle(mousePosition);
+    } else {
+      removeUVCircle();
+    }
+    return () => {
+      removeUVCircle();
+    };
+  }, [isTorchActive, uvMode, mousePosition]);
 
   const contextValue: TorchContextType = {
     isTorchActive,
@@ -73,12 +84,40 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Use our new TorchMask component */}
-      <TorchMask 
-        isTorchActive={isTorchActive}
-        mousePosition={mousePosition}
-        uvMode={uvMode}
-      />
+      {/* Masque de la torche */}
+      {isTorchActive && !uvMode &&
+        createPortal(
+          <div 
+            className="fixed inset-0 z-[99] pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.6) 40%, 
+                rgba(0,0,0,0.7) 60%,
+                rgba(0,0,0,0.7) 80%,
+                rgba(0,0,0,0.9) 100%)`,
+              mixBlendMode: 'normal',
+              transition: 'all 0.05s ease-out',
+            }}
+          >
+            {/* Halo lumineux au centre */}
+            <div 
+              className="absolute pointer-events-none"
+              style={{
+                width: '650px',
+                height: '650px',
+                borderRadius: '50%',
+                transform: 'translate(-50%, -50%)',
+                left: `${mousePosition.x}px`,
+                top: `${mousePosition.y}px`,
+                background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 100%)',
+                filter: 'blur(15px)',
+                mixBlendMode: 'screen',
+              }}
+            />
+          </div>,
+          document.body
+        )}
     </TorchContext.Provider>
   );
 };

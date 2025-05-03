@@ -50,22 +50,12 @@ export default function UVDecryptMessage({
   };
 
   useEffect(() => {
-    if (!isTorchActive || !uvMode) return;
-    console.log("UVDecryptMessage active with torche UV");
+    if (!messageRef.current || !isTorchActive || !uvMode) return;
 
     const handleMouseMove = () => {
       if (!messageRef.current) return;
       
       const rect = messageRef.current.getBoundingClientRect();
-      
-      // Skip if not in viewport
-      if (rect.bottom < 0 || 
-          rect.top > window.innerHeight || 
-          rect.right < 0 || 
-          rect.left > window.innerWidth) {
-        return;
-      }
-      
       const elementCenterX = rect.left + rect.width / 2;
       const elementCenterY = rect.top + rect.height / 2;
       
@@ -74,8 +64,8 @@ export default function UVDecryptMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Define reveal threshold - plus large pour une meilleure accessibilité
-      const threshold = 250;
+      // Define reveal threshold - within 200px
+      const threshold = 200;
       const newIsRevealing = distance < threshold && uvMode;
       
       if (newIsRevealing !== isRevealing) {
@@ -95,7 +85,6 @@ export default function UVDecryptMessage({
         
         if (messageRef.current) {
           messageRef.current.style.opacity = proximityRatio.toFixed(2);
-          messageRef.current.classList.add('visible');
           messageRef.current.style.filter = createSafeFilter({ 
             blur: Math.max(0, 3 * (1 - proximityRatio)),
             brightness: 100 + (50 * proximityRatio),
@@ -112,7 +101,6 @@ export default function UVDecryptMessage({
         // Hide message when cursor is far away
         if (messageRef.current) {
           messageRef.current.style.opacity = '0';
-          messageRef.current.classList.remove('visible');
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = '';
           messageRef.current.style.filter = '';
@@ -120,29 +108,10 @@ export default function UVDecryptMessage({
       }
     };
 
-    handleMouseMove(); // Initial check
     window.addEventListener('mousemove', handleMouseMove);
-    
-    // Setup MutationObserver to detect when element becomes visible in DOM
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.type === 'childList' || mutation.type === 'attributes') {
-          handleMouseMove();
-        }
-      }
-    });
-    
-    if (messageRef.current) {
-      observer.observe(document.body, { 
-        childList: true,
-        subtree: true,
-        attributes: true
-      });
-    }
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      observer.disconnect();
     };
   }, [isRevealing, mousePosition, color, uvMode, isTorchActive]);
 
@@ -183,10 +152,12 @@ export default function UVDecryptMessage({
     };
   }, [isRevealing, message, decryptSpeed, decryptProgress]);
 
+  if (!uvMode || !isTorchActive) return null;
+
   return (
     <div
       ref={messageRef}
-      className={`absolute pointer-events-none select-none decrypt-message ${className} ${isRevealing ? 'visible' : ''}`}
+      className={`absolute pointer-events-none select-none decrypt-message ${className}`}
       data-depth={depth}
       style={{
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
@@ -201,7 +172,7 @@ export default function UVDecryptMessage({
         borderRadius: '4px',
         backgroundColor: 'rgba(10, 0, 40, 0.1)', // Subtle background
         backdropFilter: 'blur(1px)',
-        zIndex: 99
+        zIndex: 20
       }}
     >
       {decryptedText || message.replace(/./g, (c) => 

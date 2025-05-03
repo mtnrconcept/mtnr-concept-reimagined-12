@@ -21,7 +21,7 @@ export const ParallaxContainer = ({ children }: ParallaxContainerProps) => {
       />
       
       {/* Contenu de la page, à l'avant-plan avec zIndex élevé */}
-      <div className="relative min-h-screen w-full z-10 overflow-auto">
+      <div className="relative min-h-screen w-full z-10">
         {children}
       </div>
     </>

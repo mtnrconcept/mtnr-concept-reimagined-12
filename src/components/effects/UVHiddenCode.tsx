@@ -34,22 +34,12 @@ export default function UVHiddenCode({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!isTorchActive || !uvMode) return;
-    console.log("UVHiddenCode active with torche UV");
+    if (!codeRef.current || !isTorchActive || !uvMode) return;
 
     const handleVisibility = () => {
-      if (!containerRef.current || !codeRef.current) return;
+      if (!codeRef.current || !containerRef.current) return;
       
       const codeRect = containerRef.current.getBoundingClientRect();
-      
-      // Skip if not in viewport
-      if (codeRect.bottom < 0 || 
-          codeRect.top > window.innerHeight || 
-          codeRect.right < 0 || 
-          codeRect.left > window.innerWidth) {
-        return;
-      }
-      
       const codeCenterX = codeRect.left + codeRect.width / 2;
       const codeCenterY = codeRect.top + codeRect.height / 2;
       
@@ -58,10 +48,11 @@ export default function UVHiddenCode({
       const dy = mousePosition.y - codeCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Rayon augmenté pour améliorer la visibilité
-      const proximityThreshold = 200;
+      // Elliptical mask of ~150px (augmenté pour une meilleure visibilité)
+      const proximityThreshold = 150;
       
-      if (distance < proximityThreshold && uvMode) {
+      if (distance < proximityThreshold * 1.5 && uvMode) {
+        // Reveal code progressively based on cursor proximity
         setIsVisible(true);
         
         // Traiter le code ligne par ligne
@@ -70,12 +61,13 @@ export default function UVHiddenCode({
         const processedLines = lines.map((line, lineIndex) => {
           const chars = line.split('');
           
+          // Pour chaque caractère, calculer sa distance absolue au curseur
           return chars.map((char, charIndex) => {
             // Estimation de la position du caractère dans le conteneur
             const charX = codeRect.left + (charIndex / chars.length) * codeRect.width;
             const charY = codeRect.top + (lineIndex / lines.length) * codeRect.height;
             
-            // Distance du caractère au curseur
+            // Distance directe du caractère au curseur (sans ellipse)
             const charDx = mousePosition.x - charX;
             const charDy = mousePosition.y - charY;
             const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
@@ -91,68 +83,45 @@ export default function UVHiddenCode({
           codeRef.current.innerHTML = processedLines.join('<br>');
           
           // Ajouter un effet de lueur basé sur la proximité
-          const visibilityRatio = Math.max(0, 1 - (distance / proximityThreshold));
+          const visibilityRatio = Math.max(0, 1 - (distance / (proximityThreshold * 1.5)));
           const glowIntensity = 5 + (visibilityRatio * 15);
           codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
-          containerRef.current.style.opacity = visibilityRatio.toString();
-          containerRef.current.classList.add('visible');
-          
-          // Ajouter un léger effet de vibration
-          const time = Date.now() / 1000;
-          const vibrationX = Math.sin(time * 2) * 0.5;
-          const vibrationY = Math.cos(time * 2.3) * 0.5;
-          containerRef.current.style.transform = `rotate(${rotation}deg) translate(${vibrationX}px, ${vibrationY}px)`;
+          containerRef.current.style.opacity = '1';
         }
       } else {
+        // Hide when cursor is far
         setIsVisible(false);
         if (codeRef.current) {
           codeRef.current.style.textShadow = 'none';
         }
         if (containerRef.current) {
           containerRef.current.style.opacity = '0';
-          containerRef.current.classList.remove('visible');
-          containerRef.current.style.transform = `rotate(${rotation}deg)`;
         }
       }
     };
     
-    handleVisibility(); // Initial check
+    handleVisibility();
     window.addEventListener('mousemove', handleVisibility);
-    
-    // Setup MutationObserver to detect when element becomes visible in DOM
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.type === 'childList' || mutation.type === 'attributes') {
-          handleVisibility();
-        }
-      }
-    });
-    
-    if (containerRef.current) {
-      observer.observe(document.body, { 
-        childList: true,
-        subtree: true,
-        attributes: true
-      });
-    }
     
     return () => {
       window.removeEventListener('mousemove', handleVisibility);
-      observer.disconnect();
     };
-  }, [uvMode, isTorchActive, mousePosition, code, color, rotation]);
+  }, [uvMode, isTorchActive, mousePosition, code, color]);
+
+  if (!uvMode || !isTorchActive) return null;
 
   return (
     <div
       ref={containerRef}
-      className={`absolute pointer-events-none select-none transition-opacity duration-300 uv-hidden-code ${className} ${isVisible ? 'visible' : ''}`}
+      className={`absolute pointer-events-none select-none transition-opacity duration-300 uv-hidden-code ${className}`}
       data-depth={depth}
       style={{
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
         top: typeof position.y === 'number' ? `${position.y}%` : position.y,
         transform: `rotate(${rotation}deg)`,
         opacity: 0, // Start with opacity 0
-        zIndex: 99,
+        zIndex: 20,
+        backgroundColor: 'transparent', // Remove background
       }}
     >
       <pre
@@ -161,11 +130,12 @@ export default function UVHiddenCode({
           fontSize,
           color,
           fontFamily,
-          textShadow: `0 0 5px ${color}`,
+          textShadow: `0 0 5px ${color}, 0 0 10px ${color}`,
           whiteSpace: 'pre',
           lineHeight: 1.2,
           letterSpacing: '0.05em',
           padding: '8px',
+          backgroundColor: 'transparent' // No background
         }}
       >
         {code}

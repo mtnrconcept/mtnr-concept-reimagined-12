@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useUVMode } from '../../UVModeContext';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from '../../NavigationContext';
-import { isResourceCached } from '@/lib/preloader';
 
 export function useVideoStatus(
   videoUrl: string = "/lovable-uploads/videonormale.mp4",
@@ -26,14 +25,8 @@ export function useVideoStatus(
 
   // Signal au reste de l'application que la vidéo est prête
   const [videoReady, setVideoReady] = useState(false);
-  
-  // Référence pour suivre si c'est le premier chargement
-  const isFirstMountRef = useRef(true);
-  
-  // Compteur de tentatives pour la gestion des erreurs de chargement
-  const retryCountRef = useRef(0);
 
-  // Effet pour initialiser la vidéo au chargement avec gestion des erreurs améliorée
+  // Effet pour initialiser la vidéo au chargement
   useEffect(() => {
     const video = videoRef.current;
     
@@ -43,57 +36,19 @@ export function useVideoStatus(
     const setupVideo = async () => {
       try {
         // Définir la source vidéo en fonction du mode UV
-        const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
-        video.src = currentVideoUrl;
-        
-        // Vérifier si la vidéo est préchargée
-        const isCached = isResourceCached('video', currentVideoUrl);
-        console.log(`La vidéo ${currentVideoUrl} est-elle en cache? ${isCached ? 'Oui' : 'Non'}`);
-        
-        // Optimisations pour le chargement
-        video.preload = 'auto';
-        
-        if (isFirstMountRef.current) {
-          // Au tout premier montage, on force le préchargement
-          if (typeof window !== 'undefined' && window.__forcePrecacheVideos) {
-            try {
-              await window.__forcePrecacheVideos();
-            } catch (e) {
-              console.warn('Erreur lors du préchargement forcé:', e);
-            }
-          }
-          isFirstMountRef.current = false;
-        }
+        video.src = uvMode ? videoUrlUV : videoUrl;
         
         // Chargement initial de la vidéo mais sans lecture
         video.load();
+        video.pause();
         
-        // Attendre un court instant pour s'assurer que la vidéo a commencé à charger
-        const checkLoading = () => {
-          if (video.readyState >= 3) { // HAVE_FUTURE_DATA ou plus
-            setLoadingStatus('ready');
-            setVideoReady(true);
-            console.log('Vidéo initialisée et prête');
-          } else {
-            // Réessayer si pas prêt
-            if (retryCountRef.current < 10) {
-              retryCountRef.current++;
-              setTimeout(checkLoading, 300);
-            } else {
-              console.warn('Impossible de charger la vidéo après plusieurs tentatives, on continue quand même');
-              setLoadingStatus('ready');
-              setVideoReady(true);
-            }
-          }
-        };
-        
-        checkLoading();
+        setLoadingStatus('ready');
+        // Signal que la vidéo est prête initialement
+        setVideoReady(true);
       } catch (error) {
         console.error('Erreur lors de l\'initialisation de la vidéo:', error);
         setVideoError(true);
         setLoadingStatus('error');
-        // Signaler que la vidéo est "prête" même en cas d'erreur pour ne pas bloquer l'interface
-        setVideoReady(true);
       }
     };
     
@@ -109,18 +64,7 @@ export function useVideoStatus(
     setVideoReady(false);
     
     // Changer la source vidéo immédiatement quand le mode UV change
-    const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
-    video.src = currentVideoUrl;
-    
-    // Vérifier si la vidéo est préchargée
-    const isCached = isResourceCached('video', currentVideoUrl);
-    console.log(`Changement de mode UV - La vidéo ${currentVideoUrl} est-elle en cache? ${isCached ? 'Oui' : 'Non'}`);
-    
-    // Si la vidéo n'est pas en cache, forcer le préchargement
-    if (!isCached && typeof window !== 'undefined' && window.__forcePrecacheVideos) {
-      window.__forcePrecacheVideos();
-    }
-    
+    video.src = uvMode ? videoUrlUV : videoUrl;
     video.load();
     
     // S'assurer que la vidéo reste en pause
@@ -150,30 +94,15 @@ export function useVideoStatus(
       setVideoReady(false);
       setIsTransitioning(true);
       
-      // Vérifier si la vidéo courante est en cache
-      const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
-      const isCached = isResourceCached('video', currentVideoUrl);
-      
-      if (!isCached) {
-        console.log(`La vidéo ${currentVideoUrl} n'est pas en cache, forçage du préchargement`);
-        if (typeof window !== 'undefined' && window.__forcePrecacheVideos) {
-          window.__forcePrecacheVideos();
-        }
-      }
-      
       // Remettre la vidéo au début et lancer la lecture
       video.currentTime = 0;
-      
-      // Utilisation de setTimeout pour laisser le temps au navigateur de finaliser le préchargement
-      setTimeout(() => {
-        video.play()
-          .then(() => {
-            console.log('Lecture de la vidéo démarrée pour transition de page');
-          })
-          .catch(err => console.error('Erreur de lecture vidéo:', err));
-      }, 10);
+      video.play()
+        .then(() => {
+          console.log('Lecture de la vidéo démarrée pour transition de page');
+        })
+        .catch(err => console.error('Erreur de lecture vidéo:', err));
     }
-  }, [location.pathname, videoUrl, videoUrlUV, uvMode]);
+  }, [location.pathname]);
 
   // Écouter les événements de navigation (via NavigationContext)
   useEffect(() => {
@@ -186,32 +115,17 @@ export function useVideoStatus(
       setVideoReady(false);
       setIsTransitioning(true);
       
-      // Vérifier si la vidéo courante est en cache
-      const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
-      const isCached = isResourceCached('video', currentVideoUrl);
-      
-      if (!isCached) {
-        console.log(`La vidéo ${currentVideoUrl} n'est pas en cache, forçage du préchargement`);
-        if (typeof window !== 'undefined' && window.__forcePrecacheVideos) {
-          window.__forcePrecacheVideos();
-        }
-      }
-      
       // Remettre la vidéo au début et lancer la lecture
       video.currentTime = 0;
-      
-      // Utilisation de setTimeout pour laisser le temps au navigateur de finaliser le préchargement
-      setTimeout(() => {
-        video.play()
-          .then(() => console.log('Lecture de la vidéo démarrée (via navigationContext)'))
-          .catch(err => console.error('Erreur de lecture vidéo:', err));
-      }, 10);
+      video.play()
+        .then(() => console.log('Lecture de la vidéo démarrée (via navigationContext)'))
+        .catch(err => console.error('Erreur de lecture vidéo:', err));
     };
     
     // S'abonner au contexte de navigation pour les transitions
     const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
-  }, [navigation, videoUrl, videoUrlUV, uvMode]);
+  }, [navigation]);
 
   // Gestion des événements vidéo
   useEffect(() => {

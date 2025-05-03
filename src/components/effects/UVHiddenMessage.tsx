@@ -1,5 +1,5 @@
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 
@@ -23,7 +23,6 @@ export default function UVHiddenMessage({
   const messageRef = useRef<HTMLDivElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
-  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (!messageRef.current || !isTorchActive || !uvMode) return;
@@ -40,15 +39,14 @@ export default function UVHiddenMessage({
       const dy = mousePosition.y - elementCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Elliptical mask radius augmenté pour meilleure visibilité
-      const threshold = 200; 
-      
-      if (distance < threshold && uvMode && isTorchActive) {
-        setIsVisible(true);
-        messageRef.current.style.visibility = 'visible';
+      // Elliptical mask of ~150px (augmenté pour une meilleure visibilité)
+      const threshold = 150; 
+      if (distance < threshold * 1.5 && uvMode) {
+        const intensity = 1 - (distance / (threshold * 1.5));
         
-        // Diviser le texte en caractères et appliquer des opacités variables
+        // Créer un effet de révélation progressive du texte
         if (messageRef.current) {
+          // Diviser le texte en caractères et appliquer des opacités variables
           const chars = message.split('');
           const processedChars = chars.map((char, index) => {
             // Position approximative du caractère en pourcentage de la largeur totale
@@ -65,7 +63,8 @@ export default function UVHiddenMessage({
             // Distance absolue sans effet miroir
             const charDistance = Math.sqrt(charDx * charDx + charDy * charDy);
             
-            // Visibilité basée sur la distance absolue au curseur
+            // Visibilité basée sur la distance absolue au curseur (pas d'effet miroir)
+            // Plus le caractère est proche du curseur, plus il est visible
             const charVisibility = Math.max(0, 1 - charDistance / threshold);
             
             return `<span style="opacity: ${charVisibility.toFixed(2)}; display: inline-block;">${char}</span>`;
@@ -75,10 +74,9 @@ export default function UVHiddenMessage({
           
           // Apply effects
           messageRef.current.style.opacity = '1';
-          messageRef.current.classList.add('visible');
           
           // Strong glow effect matching the desired color
-          const glowIntensity = 5 + 20 * (1 - distance / threshold);
+          const glowIntensity = 5 + (intensity * 25);
           messageRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity * 2}px ${color}`;
           
           // Add subtle motion
@@ -88,42 +86,28 @@ export default function UVHiddenMessage({
           messageRef.current.style.transform = `translate(${offsetX + vibrationX}px, ${offsetY + vibrationY}px)`;
         }
       } else {
-        setIsVisible(false);
         if (messageRef.current) {
           messageRef.current.style.opacity = '0';
-          messageRef.current.classList.remove('visible');
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-          // Ne pas cacher tout de suite pour permettre l'animation de transition
-          setTimeout(() => {
-            if (messageRef.current && !isVisible) {
-              messageRef.current.style.visibility = 'hidden';
-            }
-          }, 300);
         }
       }
     };
 
-    // S'assurer que le message est visible par défaut en mode UV
-    if (messageRef.current && uvMode && isTorchActive) {
-      messageRef.current.classList.add('uv-ready');
-    }
-
     window.addEventListener('mousemove', handleMouseMove);
-    
-    // Initial check
-    handleMouseMove();
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY, isVisible]);
+  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY]);
 
-  // Render even when not visible to ensure we have DOM elements to check against
+  // Only render when torch is active and in UV mode
+  if (!isTorchActive || !uvMode) return null;
+
   return (
     <div
       ref={messageRef}
-      className={`uv-hidden-message pointer-events-none select-none z-20 ${className} ${isVisible ? 'visible' : ''}`}
+      className={`uv-secret-message pointer-events-none select-none z-20 ${className}`}
       style={{
         position: 'absolute',
         color,
@@ -134,7 +118,6 @@ export default function UVHiddenMessage({
         letterSpacing: '0.07em',
         fontWeight: 'bold',
         backgroundColor: 'transparent', // Remove any background
-        visibility: 'hidden', // Start hidden
       }}
     >
       {message}

@@ -1,5 +1,5 @@
 
-/* Import base styles with Tailwind directives */
+/* Import base styles */
 @import './styles/base.css';
 
 /* Import component styles */
@@ -10,3 +10,4 @@
 
 /* Import UV mode styles */
 @import './styles/uv-mode/index.css';
+

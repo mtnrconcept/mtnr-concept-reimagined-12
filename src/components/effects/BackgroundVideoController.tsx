@@ -8,7 +8,7 @@ export const BackgroundVideoController = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Initialiser le préchargement une seule fois avec les noms corrects des fichiers vidéo
+    // Initialiser le préchargement une seule fois
     const videoUrls = [
       '/lovable-uploads/videonormale.mp4',
       '/lovable-uploads/videouv.mp4'
@@ -16,89 +16,46 @@ export const BackgroundVideoController = () => {
     
     console.info('Initialisation du préchargement des vidéos');
     
-    // Fonction de préchargement optimisée qui utilise des méthodes multiples
+    // Fonction de préchargement optimisée qui utilise un élément vidéo
     const preloadVideo = (url) => {
-      return new Promise((resolve) => {
-        // Vérifier si la vidéo est déjà dans le cache du navigateur
-        const cachedVideo = window.sessionStorage.getItem(`video-cache-${url}`);
-        if (cachedVideo === 'loaded') {
-          console.info(`Vidéo ${url} déjà en cache`);
-          resolve(url);
-          return;
-        }
-
-        // Créer un élément vidéo de préchargement invisible
-        const preloadEl = document.createElement('video');
-        preloadEl.preload = 'auto';
-        preloadEl.muted = true;
-        preloadEl.playsInline = true;
-        preloadEl.crossOrigin = 'anonymous'; // Pour permettre la mise en cache
-        preloadEl.src = url;
-        
-        // Charger entièrement la vidéo pour un préchargement complet
-        preloadEl.load();
-        
-        let loaded = false;
-        console.info(`Préchargement de ${url} initialisé`);
-        
-        // Utiliser plusieurs événements pour détecter le chargement
-        const markAsLoaded = () => {
-          if (!loaded) {
-            loaded = true;
-            console.info(`Vidéo ${url} préchargée avec succès`);
-            window.sessionStorage.setItem(`video-cache-${url}`, 'loaded');
-            resolve(url);
-          }
+      // Créer un élément vidéo de préchargement invisible
+      const preloadEl = document.createElement('video');
+      preloadEl.preload = 'auto';
+      preloadEl.muted = true;
+      preloadEl.playsInline = true;
+      preloadEl.src = url;
+      
+      // Charger les métadonnées pour préparer la lecture
+      preloadEl.load();
+      
+      console.info(`Préchargement de ${url} initialisé`);
+      
+      // Retourner une promesse qui se résout quand les métadonnées sont chargées
+      return new Promise((resolve, reject) => {
+        preloadEl.onloadedmetadata = () => {
+          console.info(`Métadonnées chargées pour ${url}`);
+          resolve(preloadEl);
         };
-        
-        // Plusieurs événements qui peuvent indiquer une vidéo chargée
-        preloadEl.oncanplaythrough = markAsLoaded;
-        preloadEl.onloadeddata = () => setTimeout(markAsLoaded, 300); // Réduit de 500 à 300ms
         
         preloadEl.onerror = (err) => {
           console.error(`Erreur lors du préchargement de ${url}:`, err);
-          window.sessionStorage.setItem(`video-cache-${url}`, 'error');
-          resolve(url); // On résout quand même
+          reject(err);
         };
         
-        // Timeout de sécurité (3 secondes au lieu de 5)
+        // Timeout de sécurité si les métadonnées ne se chargent pas (3 secondes)
         setTimeout(() => {
-          if (!loaded) {
-            console.warn(`Timeout du préchargement pour ${url}, mais on continue`);
-            window.sessionStorage.setItem(`video-cache-${url}`, 'partial');
-            resolve(url); // On résout quand même pour ne pas bloquer
+          if (!preloadEl.readyState) {
+            console.warn(`Timeout du préchargement pour ${url}`);
+            resolve(preloadEl); // On résout quand même pour ne pas bloquer
           }
         }, 3000);
-
-        // Essai de préchargement alternatif via l'API Fetch
-        fetch(url, { method: 'HEAD', cache: 'force-cache' })
-          .then(() => {
-            console.log(`Vérification d'en-tête pour ${url} réussie`);
-          })
-          .catch(err => {
-            console.warn(`Échec de la vérification d'en-tête pour ${url}:`, err);
-          });
-          
-        // Utiliser l'API Cache si disponible
-        if ('caches' in window) {
-          caches.open('video-cache').then(cache => {
-            cache.add(url).catch(e => console.warn("Erreur de mise en cache:", e));
-          }).catch(err => {
-            console.warn("Cache API non disponible:", err);
-          });
-        }
       });
     };
     
     // Précharger les deux vidéos en parallèle
     Promise.all(videoUrls.map(url => preloadVideo(url)))
-      .then((results) => {
-        console.info('Préchargement des vidéos terminé, prêt pour la navigation', results);
-        
-        // Éventuellement signaler à l'application que les vidéos sont prêtes
-        if (typeof window !== 'undefined') {
-          window.__videoAssetsPreloaded = true;
-        }
+      .then(() => {
+        console.info('Préchargement des vidéos terminé, prêt pour la navigation');
       })
       .catch(err => {
         console.warn('Certaines vidéos n\'ont pas été préchargées correctement:', err);

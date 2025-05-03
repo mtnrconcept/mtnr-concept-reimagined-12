@@ -64,23 +64,8 @@
     100% { opacity: 0.85; transform: scale(1); }
   }
   
-  /* Assurer que les éléments UV sont visibles en mode UV */
-  .uv-mode-active .uv-hidden-code.uv-ready,
-  .uv-mode-active .uv-hidden-message.uv-ready,
-  .uv-mode-active .uv-secret-message.uv-ready,
-  .uv-mode-active .decrypt-message.uv-ready {
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-    visibility: visible;
-  }
-  
-  .uv-mode-active .uv-hidden-code.visible,
-  .uv-mode-active .uv-hidden-message.visible,
-  .uv-mode-active .uv-secret-message.visible,
-  .uv-mode-active .decrypt-message.visible {
-    opacity: 1 !important;
-    animation: uvReveal 0.5s forwards;
-    visibility: visible;
+  .uv-mode-active .uv-hidden-code {
+    animation: uvCodeReveal 0.8s forwards;
   }
   
   /* Decrypt message styling */
@@ -107,7 +92,6 @@
   .uv-secret-message {
     opacity: 0 !important; 
     transition: opacity 0.3s ease-out !important;
-    visibility: hidden;
   }
 
   /* Only visible when explicitly made visible */
@@ -116,17 +100,6 @@
   .uv-hidden-text.visible,
   .uv-secret-message.visible {
     opacity: 1 !important;
-    visibility: visible;
-  }
-
-  /* S'assurer que les messages sont visibles quand le body a la classe de secrets visibles */
-  body.uv-secrets-visible .uv-hidden-code.visible,
-  body.uv-secrets-visible .uv-hidden-message.visible,
-  body.uv-secrets-visible .uv-secret-message.visible,
-  body.uv-secrets-visible .decrypt-message.visible {
-    opacity: 1 !important;
-    visibility: visible;
-    z-index: 999 !important;
   }
   
   /* Modifier le conteneur pour qu'il suive le défilement au lieu d'être fixe */
@@ -137,25 +110,5 @@
     pointer-events: none;
     width: 100%;
     height: 100%;
-  }
-  
-  /* Container spécifique pour les secrets UV */
-  .uv-secrets-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 90;
-    pointer-events: none;
-    overflow: visible;
-  }
-  
-  /* Helper class pour forcer la visibilité */
-  .uv-secrets-visible .uv-hidden-code,
-  .uv-secrets-visible .uv-hidden-message,
-  .uv-secrets-visible .uv-secret-message,
-  .uv-secrets-visible .decrypt-message {
-    visibility: visible;
   }
 }

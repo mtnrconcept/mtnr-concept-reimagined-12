@@ -29,29 +29,14 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const createUVCircle = (mousePosition: { x: number; y: number }) => {
-    // Supprime l'ancien cercle s'il existe
-    removeUVCircle();
-
-    // Crée un nouveau cercle
-    const circle = document.createElement('div');
-    circle.className = 'uv-light-circle active';
-    circle.style.left = `${mousePosition.x}px`;
-    circle.style.top = `${mousePosition.y}px`;
-    circle.style.zIndex = '999'; // S'assurer qu'il est au-dessus des autres éléments
-    document.body.appendChild(circle);
-    uvCircleRef.current = circle;
-    
-    // Ajouter un effet de pulsation
-    const pulseEffect = () => {
-      if (uvCircleRef.current) {
-        const time = Date.now() / 1000;
-        const scale = 1 + Math.sin(time * 2) * 0.03;
-        uvCircleRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        requestAnimationFrame(pulseEffect);
-      }
-    };
-    
-    requestAnimationFrame(pulseEffect);
+    if (!uvCircleRef.current) {
+      const circle = document.createElement('div');
+      circle.className = 'uv-light-circle active';
+      circle.style.left = `${mousePosition.x}px`;
+      circle.style.top = `${mousePosition.y}px`;
+      document.body.appendChild(circle);
+      uvCircleRef.current = circle;
+    }
   };
 
   const removeUVCircle = () => {
@@ -63,8 +48,6 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Apply global UV mode effects
   useEffect(() => {
-    console.log("UV Mode changed:", uvMode);
-    
     const logos = document.querySelectorAll('img[src*="logo"]');
     const navLinks = document.querySelectorAll('nav a');
     const buttons = document.querySelectorAll('button, a.btn, .btn, [role="button"]');
@@ -81,14 +64,6 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Apply effects to buttons
       buttons.forEach(button => {
         button.classList.add('uv-button');
-      });
-      
-      // Rendre visibles tous les éléments UV
-      document.querySelectorAll('.uv-hidden-code, .uv-hidden-message, .uv-secret-message, .decrypt-message').forEach(el => {
-        if (el instanceof HTMLElement) {
-          // Les rendre prêts à réagir au mouvement de la souris
-          el.classList.add('uv-ready');
-        }
       });
       
       // Play subtle sound if available
@@ -123,15 +98,6 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       buttons.forEach(button => {
         button.classList.remove('uv-button');
-      });
-      
-      // Cacher les éléments UV
-      document.querySelectorAll('.uv-hidden-code, .uv-hidden-message, .uv-secret-message, .decrypt-message').forEach(el => {
-        if (el instanceof HTMLElement) {
-          el.classList.remove('uv-ready');
-          el.classList.remove('visible');
-          el.style.opacity = '0';
-        }
       });
     }
     

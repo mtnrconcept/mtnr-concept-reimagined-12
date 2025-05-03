@@ -8,34 +8,6 @@
  */
 @layer base {
   html, body, #root {
-    @apply m-0 p-0 min-h-screen bg-black text-white;
-    overflow-x: hidden;
-    overflow-y: auto !important; /* Forcer l'activation du scroll vertical */
-    height: auto !important; /* Ne pas fixer la hauteur pour permettre le scroll */
-  }
-  
-  /* S'assurer qu'aucun élément racine ne bloque le défilement */
-  body, #root {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-    height: auto !important; /* Surcharger toute hauteur fixe */
-  }
-  
-  /* Fix spécifique pour toutes les pages */
-  [data-route] #main-content {
-    overflow-y: auto !important;
-    height: auto !important;
-  }
-  
-  /* Garantir que le contenu de la page peut défiler */
-  .content-container, 
-  .page-content-wrapper {
-    overflow-y: auto !important;
-    min-height: 100vh;
-    height: auto !important;
-    position: relative;
+    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
   }
 }
