@@ -20,12 +20,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
-    // Pour que l'animation se termine exactement à 7000ms (durée de la vidéo),
+    // Pour que l'animation se termine exactement à 6500ms (durée réduite de 0.5s),
     // et commence à apparaître à 3000ms
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Afficher le contenu 4 secondes avant la fin de la vidéo
+      // Afficher le contenu 3.5 secondes avant la fin de la vidéo
       setTimeout(() => {
         setContentVisible(true);
       }, 0); // Pas d'attente supplémentaire
@@ -47,9 +47,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] }, // 3.5s pour la fondue d'entrée
-        y: { duration: 4.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Exactement 4.0s pour finir à 7000ms
-        filter: { duration: 3.5, ease: [0.1, 0.4, 0.2, 1.0] } // Synchronisé avec l'opacité
+        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // 3.0s au lieu de 3.5s
+        y: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] }, // 3.5s au lieu de 4.0s
+        filter: { duration: 3.0, ease: [0.1, 0.4, 0.2, 1.0] } // Synchronisé avec l'opacité
       }
     },
     exit: {
@@ -57,12 +57,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: "-100vh", // Disparaît complètement vers le haut de l'écran
       filter: "blur(12px)",
       transition: {
-        opacity: { duration: 4.6, ease: [0.33, 1, 0.68, 1] },
+        opacity: { duration: 4.1, ease: [0.33, 1, 0.68, 1] },
         y: { 
-          duration: 4.0,
+          duration: 3.5,
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 3.4, ease: [0.33, 1, 0.68, 1] }
+        filter: { duration: 2.9, ease: [0.33, 1, 0.68, 1] }
       }
     }
   };
