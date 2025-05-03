@@ -26,17 +26,24 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
       document.querySelectorAll('.paint-splash').forEach((splash) => {
         const depth = parseFloat(splash.getAttribute('data-depth') || '1');
         // Vitesse proportionnelle à la profondeur (plus profond = plus lent)
-        // Le facteur 0.7 détermine l'ampleur de l'effet de parallaxe
-        // Le signe moins inverse le mouvement pour suivre le défilement naturel
-        const translateY = -scrollY * (1 - Math.abs(depth) * 0.7);
+        // Le facteur 0.3 détermine l'ampleur de l'effet de parallaxe
+        const translateY = scrollY * (1 - Math.abs(depth) * 0.7);
         (splash as HTMLElement).style.transform = `translateY(${translateY}px) 
           translateZ(${depth * 500}px)
           rotate(${splash.getAttribute('data-rotation')}deg) 
           scale(${splash.getAttribute('data-scale')})`;
       });
+      
+      // Effet parallax pour la vidéo d'arrière-plan
+      // La vidéo se déplace plus lentement pour créer l'effet de profondeur
+      const videoBackground = document.querySelector('video');
+      if (videoBackground) {
+        // Facteur de vitesse proche de 1 pour un mouvement presque synchrone avec le défilement
+        videoBackground.style.transform = `translateY(${scrollY * 2}px)`;
+      }
     };
     
-    // Effet parallax pour les mouvements de souris
+    // Effet parallaxe pour les mouvements de souris
     const handleMouseMove = (e: MouseEvent) => {
       if (!parallaxRef.current) return;
       
@@ -66,6 +73,13 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             scale(${splash.getAttribute('data-scale')})`;
         }
       });
+      
+      // Effet parallax de la souris sur la vidéo (léger pour la profondeur)
+      const videoBackground = document.querySelector('video');
+      if (videoBackground) {
+        const scrollY = window.scrollY;
+        videoBackground.style.transform = `translate3d(${mouseX * -5}px, ${mouseY * -5 + scrollY * 0.85}px, 0)`;
+      }
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
