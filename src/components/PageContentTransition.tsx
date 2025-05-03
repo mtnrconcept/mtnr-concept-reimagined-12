@@ -47,7 +47,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Décélération plus lente sur 3s
+        opacity: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] }, // Rallongée à 3.5s pour la fondue d'entrée
         y: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Même courbe pour y
         filter: { duration: 2.8, ease: [0.1, 0.4, 0.2, 1.0] } // Légèrement plus rapide pour le blur
       }
@@ -57,12 +57,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: "-100vh", // Disparaît complètement vers le haut de l'écran
       filter: "blur(12px)",
       transition: {
-        opacity: { duration: 3.6, ease: [0.33, 1, 0.68, 1] },
+        opacity: { duration: 4.6, ease: [0.33, 1, 0.68, 1] }, // Rallongée à 4.6s (+1s)
         y: { 
-          duration: 3.0, // Maintenu à 3.0 secondes
+          duration: 4.0, // Rallongée à 4.0 secondes (+1s)
           ease: [0.05, 0.1, 0.9, 1.0] // Courbe cubique modifiée pour un départ TRÈS lent et une accélération très rapide à la fin
         },
-        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Maintenu à 2.4 secondes
+        filter: { duration: 3.4, ease: [0.33, 1, 0.68, 1] } // Rallongée à 3.4 secondes (+1s)
       }
     }
   };
