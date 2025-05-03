@@ -46,17 +46,14 @@ export default function TVVideoPlayer() {
 
   return (
     <div className="max-w-4xl mx-auto my-8 sm:my-12 lg:my-16 px-3 sm:px-6">
-      {/* TV Frame with consistent placement */}
+      {/* TV Frame avec dimensions préservées */}
       <div className="relative w-full">
-        {/* AspectRatio garantit une dimension constante quelle que soit la taille de l'écran */}
         <AspectRatio ratio={16/9} className="relative overflow-hidden bg-black rounded-lg">
-          {/* Video Player avec position relative pour maintenir l'aspect ratio */}
+          {/* Conteneur du lecteur vidéo avec positionnement absolu pour maintenir la cohérence */}
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* Container pour la vidéo avec position relative pour le placement absolu de l'iframe */}
-            <div className="relative w-[92%] h-[88%]" style={{
-              transform: 'scale(0.82)'
-            }}>
-              {/* Loading static */}
+            {/* Conteneur YouTube avec dimensions fixes correspondant à l'original */}
+            <div className="relative w-[92%] h-[88%]">
+              {/* Affichage du chargement */}
               {isLoading && (
                 <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
                   <div className="w-full h-full opacity-30" style={{
@@ -70,7 +67,7 @@ export default function TVVideoPlayer() {
                 </div>
               )}
               
-              {/* YouTube Video */}
+              {/* YouTube Video - dimensions exactes préservées */}
               <iframe
                 className="absolute inset-0 w-full h-full"
                 src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
@@ -80,7 +77,7 @@ export default function TVVideoPlayer() {
               ></iframe>
             </div>
             
-            {/* TV Overlay Image - maintenant en position absolue avec dimensions fixes */}
+            {/* TV Overlay Image - position fixe par rapport au lecteur */}
             <img 
               src="/lovable-uploads/tv.png" 
               alt="TV Frame" 
