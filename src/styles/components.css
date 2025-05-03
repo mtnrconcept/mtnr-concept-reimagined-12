@@ -103,9 +103,38 @@
   
   .route-change-transition {
     animation: route-change-float 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: transform, filter, opacity;
   }
   
   .parallax-element {
     transition: opacity 0.5s ease-out, transform 0.2s ease-out;
+  }
+  
+  /** Animation plus intense pour les transitions de page */
+  @keyframes page-transition-splash {
+    0% {
+      transform: translateY(0) scale(1) rotate(0deg);
+      filter: blur(0px);
+      opacity: 0.8;
+    }
+    20% {
+      transform: translateY(-75px) scale(1.3) rotate(-5deg);
+      filter: blur(5px);
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(-100px) scale(1.5) rotate(5deg);
+      filter: blur(8px);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(0) scale(1) rotate(0deg);
+      filter: blur(0px);
+      opacity: 0.8;
+    }
+  }
+  
+  .page-transition .parallax-element {
+    animation: page-transition-splash 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 }

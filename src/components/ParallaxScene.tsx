@@ -6,6 +6,7 @@ import { parallaxElements } from './parallax/config';
 import { PaintSplash } from './parallax/PaintSplash';
 import { Light } from './parallax/Light';
 import { useLocation } from 'react-router-dom';
+import { useNavigation } from '@/components/effects/NavigationContext';
 
 // Import or define MixBlendMode type to match what's in PaintSplash.tsx
 type MixBlendMode = 
@@ -17,6 +18,7 @@ type MixBlendMode =
 export default function ParallaxScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const { registerVideoTransitionListener } = useNavigation();
   
   // Utiliser notre hook de parallaxe
   useParallaxEffect(containerRef);
@@ -40,6 +42,26 @@ export default function ParallaxScene() {
       }, 1000);
     });
   }, [location.pathname]);
+  
+  // Synchroniser les transitions de splash avec les transitions vidéo
+  useEffect(() => {
+    const unregister = registerVideoTransitionListener(() => {
+      console.log("Video transition triggered in ParallaxScene");
+      const paintElements = document.querySelectorAll('.parallax-element');
+      paintElements.forEach(el => {
+        // Animation plus intense pour les transitions vidéo
+        el.classList.add('route-change-transition');
+        
+        // Retirer la classe après l'animation
+        setTimeout(() => {
+          el.classList.remove('route-change-transition');
+        }, 1000);
+      });
+    });
+    
+    // Nettoyer l'écouteur lors du démontage
+    return () => unregister();
+  }, [registerVideoTransitionListener]);
   
   return (
     <>

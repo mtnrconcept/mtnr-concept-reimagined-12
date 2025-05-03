@@ -1,5 +1,7 @@
 
 import { ParallaxElement } from './ParallaxElement';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type MixBlendMode = 
   | 'normal' | 'multiply' | 'screen' | 'overlay' 
@@ -20,6 +22,33 @@ interface PaintSplashProps {
 }
 
 export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0, blendMode = 'screen' }: PaintSplashProps) => {
+  const splashRef = useRef<HTMLImageElement>(null);
+  const location = useLocation();
+  
+  // Effet pour animer les splashs lors des transitions de page
+  useEffect(() => {
+    const splash = splashRef.current;
+    if (!splash) return;
+    
+    // Animation à chaque changement de page
+    const animateSplash = () => {
+      splash.classList.add('page-transition');
+      
+      setTimeout(() => {
+        splash.classList.remove('page-transition');
+      }, 3000); // 3s correspond à la durée de l'animation
+    };
+    
+    animateSplash();
+    
+    // Nettoyage
+    return () => {
+      if (splash) {
+        splash.classList.remove('page-transition');
+      }
+    };
+  }, [location.pathname]);
+  
   // Calculer l'intensité des effets en fonction de la profondeur
   const shadowDepth = Math.abs(depth) < 0.3 ? 15 : Math.max(3, 20 * (1 - Math.abs(depth)));
   const shadowBlur = Math.abs(depth) < 0.3 ? 20 : Math.max(5, 25 * (1 - Math.abs(depth)));
@@ -37,6 +66,7 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
   return (
     <ParallaxElement depth={depth} x={x} y={y} className={`${className} shadow-receiver transition-all duration-500`}>
       <img
+        ref={splashRef}
         src={src}
         alt="Paint splash"
         className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain transition-all duration-500"
