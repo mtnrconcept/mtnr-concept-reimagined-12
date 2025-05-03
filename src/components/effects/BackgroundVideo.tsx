@@ -62,12 +62,15 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const video = videoRef.current;
     if (!video) return;
     
-    // Changer la source vidéo quand le mode UV change
+    // Changer la source vidéo immédiatement quand le mode UV change
     video.src = uvMode ? videoUrlUV : videoUrl;
     video.load();
-    video.pause();
+    // S'assurer que la vidéo reste en pause
+    setTimeout(() => {
+      video.pause();
+    }, 0);
     
-    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée`);
+    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée immédiatement et mise en pause`);
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Gestion des changements de page pour démarrer la lecture

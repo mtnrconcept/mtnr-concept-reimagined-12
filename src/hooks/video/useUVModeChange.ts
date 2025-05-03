@@ -35,7 +35,7 @@ export function useUVModeChange({
       if (currentVideo !== newVideoUrl) {
         console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
         setCurrentVideo(newVideoUrl);
-        // Note: Nous ne déclenchons plus de lecture vidéo ici
+        // Note: Nous ne déclenchons plus de lecture vidéo ici, la vidéo reste en pause
       }
     }
   }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo]);
