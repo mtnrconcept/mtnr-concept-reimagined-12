@@ -44,7 +44,7 @@ export default function TVVideoPlayer() {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto my-16">
+    <div className="relative max-w-4xl mx-auto my-24">
       {/* TV Frame with actual image */}
       <div className="relative w-full aspect-video">
         {/* Video Player in the background */}
