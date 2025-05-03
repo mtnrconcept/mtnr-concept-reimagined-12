@@ -5,6 +5,7 @@ import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
 import { PageSplashes } from "@/components/effects/PageSplashes";
+import TVVideoPlayer from "@/components/video/TVVideoPlayer";
 
 const artists = [{
   name: "U.D Sensei",
@@ -52,6 +53,9 @@ export default function Artists() {
                 position="default"
               />
             </div>
+            
+            {/* Lecteur vidéo avec effet TV */}
+            <TVVideoPlayer />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 xs:gap-7 w-full pb-16">
               {artists.map(a => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl">
