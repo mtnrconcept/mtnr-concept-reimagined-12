@@ -1,5 +1,3 @@
-
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import GalleryGrid from "@/components/GalleryGrid";
@@ -19,8 +17,7 @@ const galleryImages = [
 const Portfolio = () => {
   return (
     <ParallaxBackground>
-      <Navbar />
-      <main className="pt-36 pb-24 min-h-screen max-w-6xl mx-auto bg-white/90 rounded-3xl shadow-xl my-8">
+      <main className="pt-36 pb-24 min-h-screen max-w-6xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl my-8">
         <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-center text-primary uppercase">Portfolio</h1>
         <p className="text-center font-inter text-lg mb-12 text-gray-700">
           Une sélection de nos réalisations : portraits, photos de mode, événements, paysages & créations artistiques.

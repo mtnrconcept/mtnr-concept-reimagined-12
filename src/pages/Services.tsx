@@ -1,10 +1,11 @@
+
 import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
 
 const Services = () => {
   return (
     <ParallaxBackground>
-      <main className="pt-36 pb-24 min-h-screen max-w-3xl mx-auto bg-white/90 rounded-3xl shadow-xl my-8 px-5">
+      <main className="pt-36 pb-24 min-h-screen max-w-3xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl my-8 px-5">
         <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-center text-primary uppercase">Prestations & Tarifs</h1>
         <p className="text-center font-inter text-lg mb-12 text-gray-700">
           Choisissez la formule qui correspond à vos besoins. N'hésitez pas à nous contacter pour toute demande personnalisée.
