@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { DesktopNav } from "./navbar/DesktopNav";
 import { MobileNav } from "./navbar/MobileNav";
@@ -22,10 +21,10 @@ export default function Navbar() {
 
   return (
     <nav 
-      className="w-full fixed top-0 left-0 z-[999] bg-black/85 backdrop-blur-lg shadow-lg"
+      className="w-full fixed top-0 left-0 z-[9999] bg-black/85 backdrop-blur-lg shadow-lg"
       style={{ 
-        perspective: "1000px",
-        transformStyle: "preserve-3d"
+        position: 'fixed',
+        isolation: 'isolate'
       }}
     >
       <div 
