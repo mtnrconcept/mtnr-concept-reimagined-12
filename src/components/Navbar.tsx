@@ -22,9 +22,7 @@ export default function Navbar() {
 
   return (
     <nav 
-      className={cn(
-        "w-full fixed top-0 left-0 z-[100] bg-black/85 backdrop-blur-lg shadow-lg",
-      )}
+      className="w-full fixed top-0 left-0 z-[999] bg-black/85 backdrop-blur-lg shadow-lg"
       style={{ 
         perspective: "1000px",
         transformStyle: "preserve-3d"

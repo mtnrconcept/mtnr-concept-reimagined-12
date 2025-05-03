@@ -7,14 +7,9 @@ export interface MousePosition {
 }
 
 export function useNavbarEffect() {
-  const [scrolled, setScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX - window.innerWidth / 2) / 25,
@@ -22,17 +17,14 @@ export function useNavbarEffect() {
       });
     };
 
-    window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
   return {
-    scrolled,
     mousePosition
   };
 }
