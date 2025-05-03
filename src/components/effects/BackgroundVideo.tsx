@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, useRef } from 'react';
 import useBackgroundVideo from '../../hooks/useBackgroundVideo';
+import { useUVMode } from './UVModeContext';
 
 interface BackgroundVideoProps {
   videoUrl?: string;
@@ -12,70 +14,103 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoUrlUV = "/lovable-uploads/videouv.mp4", 
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
-  const {
-    videoRef,
-    currentVideo,
-    isTransitioning,
-    fallbackImage: fallbackImg,
-    videoError
-  } = useBackgroundVideo({
-    videoUrl,
-    videoUrlUV,
-    fallbackImage
-  });
+  // Références pour les éléments vidéo
+  const normalVideoRef = useRef<HTMLVideoElement>(null);
+  const uvVideoRef = useRef<HTMLVideoElement>(null);
   
-  // État local pour gérer le statut de chargement
   const [loadingStatus, setLoadingStatus] = useState('loading');
+  const [videoError, setVideoError] = useState(false);
+  
+  // Utilisation du contexte UV pour déterminer quelle vidéo afficher
+  const { uvMode } = useUVMode();
 
-  // Gérer les événements vidéo pour déboguer et mettre à jour l'interface
+  // Effet pour initialiser les vidéos au chargement
   useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-
-    const handleCanPlay = () => {
-      console.log('Vidéo prête à être lue:', currentVideo);
-      setLoadingStatus('ready');
-    };
+    const normalVideo = normalVideoRef.current;
+    const uvVideo = uvVideoRef.current;
     
-    const handlePlaying = () => {
-      console.log('Lecture vidéo démarrée:', currentVideo);
-      setLoadingStatus('playing');
-    };
+    if (!normalVideo || !uvVideo) return;
     
-    const handlePause = () => {
-      console.log('Lecture vidéo mise en pause:', currentVideo);
-      if (!isTransitioning) {
-        setLoadingStatus('paused');
+    // Configuration initiale des vidéos
+    const setupVideo = async () => {
+      try {
+        // Lecture initiale silencieuse des deux vidéos
+        await normalVideo.play();
+        await uvVideo.play();
+        
+        // Mettre en pause après le début pour que la vidéo soit prête
+        normalVideo.pause();
+        uvVideo.pause();
+        
+        // Lire la vidéo normale au début
+        if (!uvMode) {
+          normalVideo.play();
+        } else {
+          uvVideo.play();
+        }
+        
+        setLoadingStatus('ready');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des vidéos:', error);
+        setVideoError(true);
+        setLoadingStatus('error');
       }
     };
     
-    const handleError = (e: Event) => {
-      console.error('Erreur vidéo détectée:', e);
-      console.error('Source de la vidéo:', currentVideo);
-      setLoadingStatus('error');
+    setupVideo();
+  }, []);
+
+  // Gestion des événements vidéo
+  useEffect(() => {
+    const handleEvents = (video: HTMLVideoElement | null, name: string) => {
+      if (!video) return;
+      
+      const handleCanPlay = () => {
+        console.log(`Vidéo ${name} prête à être lue:`, video.src);
+      };
+      
+      const handlePlaying = () => {
+        console.log(`Lecture vidéo ${name} démarrée:`, video.src);
+      };
+      
+      const handlePause = () => {
+        console.log(`Lecture vidéo ${name} mise en pause:`, video.src);
+      };
+      
+      const handleError = (e: Event) => {
+        console.error(`Erreur vidéo ${name} détectée:`, e);
+        setVideoError(true);
+        setLoadingStatus('error');
+      };
+      
+      const handleWaiting = () => {
+        console.log(`Vidéo ${name} en attente de données:`, video.src);
+        setLoadingStatus('waiting');
+      };
+
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('pause', handlePause);
+      video.addEventListener('error', handleError);
+      video.addEventListener('waiting', handleWaiting);
+
+      return () => {
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('pause', handlePause);
+        video.removeEventListener('error', handleError);
+        video.removeEventListener('waiting', handleWaiting);
+      };
     };
     
-    const handleWaiting = () => {
-      console.log('Vidéo en attente de données:', currentVideo);
-      setLoadingStatus('waiting');
-    };
-
-    // Attacher les gestionnaires d'événements
-    videoElement.addEventListener('canplay', handleCanPlay);
-    videoElement.addEventListener('playing', handlePlaying);
-    videoElement.addEventListener('pause', handlePause);
-    videoElement.addEventListener('error', handleError);
-    videoElement.addEventListener('waiting', handleWaiting);
-
-    // Nettoyer les gestionnaires d'événements
+    const cleanupNormal = handleEvents(normalVideoRef.current, 'normale');
+    const cleanupUV = handleEvents(uvVideoRef.current, 'UV');
+    
     return () => {
-      videoElement.removeEventListener('canplay', handleCanPlay);
-      videoElement.removeEventListener('playing', handlePlaying);
-      videoElement.removeEventListener('pause', handlePause);
-      videoElement.removeEventListener('error', handleError);
-      videoElement.removeEventListener('waiting', handleWaiting);
+      cleanupNormal?.();
+      cleanupUV?.();
     };
-  }, [videoRef, currentVideo, isTransitioning]);
+  }, []);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">
@@ -96,17 +131,30 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         </div>
       )}
       
-      {/* Vidéo en fond - plein écran et responsive */}
+      {/* Vidéo normale - visible quand UV est désactivé */}
       <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        poster={fallbackImg}
+        ref={normalVideoRef}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${uvMode ? 'opacity-0' : 'opacity-100'}`}
+        poster={fallbackImage}
         playsInline
         muted
         preload="auto"
-        autoPlay
+        loop
       >
-        <source src={currentVideo} type="video/mp4" />
+        <source src={videoUrl} type="video/mp4" />
+      </video>
+      
+      {/* Vidéo UV - visible quand UV est activé */}
+      <video
+        ref={uvVideoRef}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${uvMode ? 'opacity-100' : 'opacity-0'}`}
+        poster={fallbackImage}
+        playsInline
+        muted
+        preload="auto"
+        loop
+      >
+        <source src={videoUrlUV} type="video/mp4" />
       </video>
       
       {/* Grille */}

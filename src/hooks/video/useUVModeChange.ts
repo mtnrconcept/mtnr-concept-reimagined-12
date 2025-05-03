@@ -8,7 +8,7 @@ interface UseUVModeChangeProps {
   videoUrl: string;
   videoUrlUV: string;
   videoState: Pick<VideoState, "currentVideo">;
-  videoActions: Pick<VideoActions, "setCurrentVideo" | "playVideoTransition">;
+  videoActions: Pick<VideoActions, "setCurrentVideo">;
 }
 
 export function useUVModeChange({
@@ -20,30 +20,20 @@ export function useUVModeChange({
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   const { currentVideo } = videoState;
-  const { setCurrentVideo, playVideoTransition } = videoActions;
+  const { setCurrentVideo } = videoActions;
   const previousUVModeRef = useRef(uvMode);
 
-  // Gestion du changement de vidéo lorsque le mode UV change
+  // Gestion du changement de mode UV
   useEffect(() => {
     // Vérifier si le mode UV a réellement changé
     if (previousUVModeRef.current !== uvMode) {
       previousUVModeRef.current = uvMode;
       
-      // Sélectionner la bonne vidéo selon le mode UV
-      const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
-      
-      if (currentVideo !== newVideoUrl) {
-        console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
-        setCurrentVideo(newVideoUrl);
-        
-        // Forcer la lecture immédiate de la vidéo sans condition
-        // et sans délais pour un changement instantané
-        setTimeout(() => {
-          playVideoTransition();
-        }, 0);
-      }
+      // On n'a plus besoin de changer la source vidéo ici
+      // car nous utilisons deux vidéos séparées avec opacité
+      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, transition par opacité`);
     }
-  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition]);
+  }, [uvMode]);
 
   return { uvMode, isTorchActive };
 }

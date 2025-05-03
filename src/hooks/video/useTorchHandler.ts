@@ -13,11 +13,9 @@ export function useTorchHandler({
   isFirstLoad,
   playVideoTransition,
 }: UseTorchHandlerProps) {
-  // Jouer la vidéo quand la torche est activée/désactivée
+  // Ne plus déclencher de transition vidéo lors de l'activation/désactivation de la torche
+  // car nous utilisons CSS pour les transitions d'opacité
   useEffect(() => {
-    if (!isFirstLoad) {
-      // Ne pas changer de vidéo ici, juste jouer la transition
-      playVideoTransition();
-    }
-  }, [isTorchActive, isFirstLoad, playVideoTransition]);
+    // Ne rien faire, les transitions sont gérées par CSS
+  }, [isTorchActive, isFirstLoad]);
 }
