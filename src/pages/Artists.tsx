@@ -10,19 +10,23 @@ import TVVideoPlayer from "@/components/video/TVVideoPlayer";
 const artists = [{
   name: "U.D Sensei",
   img: "/lovable-uploads/211284ce-8851-4248-8f65-0ea7e3c0c8ff.png",
-  desc: "Producteur maudit, MC, boss du son MTNR. Beat sale, vision claire."
+  desc: "Producteur maudit, MC, boss du son MTNR. Beat sale, vision claire.",
+  secretCode: "FANTOME-1"
 }, {
   name: "Mairo",
   img: "/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png",
-  desc: "Ruff lyricist, cracheur de feu, rimes brutales sur instrus obscures."
+  desc: "Ruff lyricist, cracheur de feu, rimes brutales sur instrus obscures.",
+  secretCode: "FANTOME-2"
 }, {
   name: "Aray",
   img: "/lovable-uploads/62a9a9d9-c7b1-4cce-b401-180c42e9a514.png",
-  desc: "Rappeur, groove noir, punchlines crasses, flow toujours under."
+  desc: "Rappeur, groove noir, punchlines crasses, flow toujours under.",
+  secretCode: "FANTOME-3"
 }, {
   name: "Neverzed",
   img: "/lovable-uploads/07c10d93-651e-4ab2-a2d1-66268cbb231b.png",
-  desc: "L'ombre du mic, plume acide, chronique la ruelle."
+  desc: "L'ombre du mic, plume acide, chronique la ruelle.",
+  secretCode: "FANTOME-4"
 }];
 
 export default function Artists() {
@@ -43,8 +47,8 @@ export default function Artists() {
             </div>
             
             <div className="text-base xs:text-lg md:text-xl font-grunge text-gray-100 mb-7 xs:mb-10 text-center max-w-3xl mx-auto drop-shadow-md" style={{
-            letterSpacing: "0.06em"
-          }}>
+              letterSpacing: "0.06em"
+            }}>
               <UVText 
                 text="Celles et ceux qui bâtissent la légende MTNR. Un collectif, des styles, une vision crue et toujours underground."
                 hiddenText="MTNR - L'ÉLITE DE L'UNDERGROUND - NOUS SOMMES LES FANTÔMES DE LA SCÈNE - LA VIBE QUI RÉSISTE"
@@ -58,7 +62,7 @@ export default function Artists() {
             <TVVideoPlayer />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 xs:gap-7 w-full pb-16">
-              {artists.map(a => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl">
+              {artists.map(a => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl relative">
                   <div className="w-full overflow-hidden rounded-lg shadow-lg">
                     <img src={a.img} alt={a.name} className="w-full aspect-square object-cover rounded-lg grayscale hover:grayscale-0 transition-all duration-300 scale-100 hover:scale-105" />
                   </div>
@@ -66,7 +70,7 @@ export default function Artists() {
                   <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
                     <UVText 
                       text={a.desc}
-                      hiddenText="MTNR ALCHIMISTE - SECRET KEEPER - GARDIEN DE LA VIBE"
+                      hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`}
                       uvColor="#D946EF"
                       textSize="text-xs xs:text-sm"
                       opacity={0.01}

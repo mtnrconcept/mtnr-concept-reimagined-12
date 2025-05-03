@@ -23,6 +23,7 @@ import BackgroundVideoController from "./components/effects/BackgroundVideoContr
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
 import ParallaxScene from "./components/ParallaxScene";
+import UVPageSecrets from "./components/effects/UVPageSecrets"; // Nouveau composant
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -78,6 +79,9 @@ function AppContent() {
           </Routes>
         </PageTransition>
         <UVCornerLabel />
+        
+        {/* Ajout des messages et dessins secrets UV */}
+        <UVPageSecrets />
       </div>
     </div>
   );
