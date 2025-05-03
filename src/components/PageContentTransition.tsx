@@ -30,7 +30,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         setContentVisible(true);
       }, 0); // Plus d'attente supplémentaire pour synchroniser avec la fin de la vidéo
       
-    }, 4000); // Durée totale de la vidéo de transition
+    }, 7000); // Durée totale de la vidéo de transition
 
     return () => clearTimeout(timer);
   }, [children, location]);
