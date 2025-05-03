@@ -10,15 +10,18 @@ export const TorchToggle = () => {
   const { uvMode, toggleUVMode } = useUVMode();
 
   const handleToggleTorch = () => {
-    if (!isTorchActive || uvMode) {
-      setIsTorchActive(true);
-      if (uvMode) toggleUVMode(); // Quitte le mode UV si actif
-    } else {
-      setIsTorchActive(false);
+    // Activer/désactiver uniquement la torche classique
+    // La torche UV reste inchangée
+    setIsTorchActive(!isTorchActive);
+    
+    // Si le mode UV est activé, le désactiver quand on éteint la torche
+    if (isTorchActive && uvMode) {
+      toggleUVMode();
     }
   };
 
   const handleToggleUV = () => {
+    // Vibration pour feedback tactile
     if ("vibrate" in navigator) {
       try {
         navigator.vibrate(50);
@@ -27,11 +30,13 @@ export const TorchToggle = () => {
       }
     }
 
-    // Active la torche si UV est déclenché seul
+    // Activer la torche normale si elle n'est pas déjà active
+    // et également activer le mode UV
     if (!isTorchActive) {
-      setIsTorchActive(false);
+      setIsTorchActive(true);
     }
-
+    
+    // Toujours basculer le mode UV
     toggleUVMode();
   };
 
@@ -80,4 +85,3 @@ export const TorchToggle = () => {
     </div>
   );
 };
-

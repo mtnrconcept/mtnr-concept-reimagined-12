@@ -267,6 +267,21 @@
     color: #00FFBB;
     box-shadow: 0 0 15px rgba(0, 255, 187, 0.5);
     animation: uvGlow 3s infinite;
+    z-index: 20; /* Réduire le z-index pour ne pas interférer avec le contenu principal */
+    pointer-events: none; /* Rendre les éléments non-cliquables */
+    opacity: 0.85; /* Légèrement transparent */
+    backdrop-filter: blur(2px);
+  }
+  
+  /* Positionnement et style d'arrière-plan pour les secrets UV */
+  .uv-hidden-code, .uv-secret-message, .uv-hidden-message {
+    pointer-events: none;
+    z-index: 20;
+    backdrop-filter: blur(1px);
+    background-color: rgba(10, 0, 40, 0.3);
+    border-radius: 8px;
+    padding: 4px 8px;
+    mix-blend-mode: screen; /* Mélanger avec l'arrière-plan */
   }
   
   /* UV secret drawings */
@@ -347,5 +362,15 @@
   
   .uv-mode-active .tv-frame {
     filter: hue-rotate(180deg) brightness(1.2) saturate(1.5);
+  }
+
+  /* Modifions l'animation pour les codes secrets afin qu'ils soient moins intrusifs */
+  @keyframes uvCodeReveal {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 0.85; transform: scale(1); }
+  }
+  
+  .uv-mode-active .uv-hidden-code {
+    animation: uvCodeReveal 0.8s forwards;
   }
 }

@@ -48,16 +48,16 @@ export default function UVHiddenCode({
           const time = Date.now() / 1000;
           const glowIntensity = 5 + (Math.sin(time * 2) * 3);
           
-          codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*2}px ${color}`;
+          codeRef.current.style.textShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity*1.5}px ${color}`;
           
           // Subtle character flicker effect - randomly change opacity of characters
           const characters = codeRef.current.querySelectorAll('span');
           characters.forEach((char, i) => {
-            if (Math.random() < 0.05) { // 5% chance per frame
+            if (Math.random() < 0.03) { // 3% chance per frame
               (char as HTMLElement).style.opacity = (Math.random() * 0.5 + 0.5).toString(); // 0.5-1.0
               setTimeout(() => {
                 if (char) (char as HTMLElement).style.opacity = '1';
-              }, 100 + Math.random() * 200);
+              }, 100 + Math.random() * 150);
             }
           });
           
@@ -97,14 +97,14 @@ export default function UVHiddenCode({
 
   return (
     <div
-      className={`absolute pointer-events-none select-none transition-all duration-700 ${className}`}
+      className={`absolute pointer-events-none select-none transition-all duration-700 uv-hidden-code ${className}`}
       data-depth={depth}
       style={{
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
         top: typeof position.y === 'number' ? `${position.y}%` : position.y,
         transform: `rotate(${rotation}deg)`,
-        opacity: isVisible ? 1 : 0,
-        zIndex: 50
+        opacity: isVisible ? 0.85 : 0,
+        zIndex: 20
       }}
     >
       <pre
@@ -116,9 +116,16 @@ export default function UVHiddenCode({
           textShadow: `0 0 5px ${color}, 0 0 10px ${color}`,
           whiteSpace: 'pre',
           lineHeight: 1.2,
-          letterSpacing: '0.05em'
+          letterSpacing: '0.05em',
+          padding: '8px',
+          backgroundColor: 'rgba(0, 0, 20, 0.4)',
+          borderRadius: '4px',
+          backdropFilter: 'blur(2px)',
+          border: `1px solid ${color}`,
+          maxWidth: '250px',
+          overflow: 'hidden'
         }}
-        className="bg-black/30 p-4 rounded-md backdrop-blur-sm"
+        className="bg-black/10 p-2 rounded-md"
       >
         {code}
       </pre>

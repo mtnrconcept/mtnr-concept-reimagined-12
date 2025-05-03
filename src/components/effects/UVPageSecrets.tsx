@@ -2,7 +2,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import UVHiddenMessage from './UVHiddenMessage';
-import UVHiddenDrawing from './UVHiddenDrawing';
 import UVHiddenCode from './UVHiddenCode';
 import UVSecretMessage from './UVSecretMessage';
 import { useTorch } from './TorchContext';
@@ -51,13 +50,12 @@ export default function UVPageSecrets() {
           color="#00FFBB"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/c51ac031-c85b-42b2-8d7d-b14f16692636.png"
-          alt="Logo caché"
+        <UVHiddenCode
+          code={`// CLASSIFIED INFORMATION\n// USER-ID: 8X724Z\n// ACCESS: LEVEL 3\n// CRYPTO KEY: 0xA723FEB1`}
           position={{ x: 70, y: 50 }}
-          width="200px"
+          fontSize="0.7rem"
+          color="#D946EF"
           rotation={-5}
-          glowColor="#D946EF"
         />
       </>
     );
@@ -89,21 +87,12 @@ export default function UVPageSecrets() {
           color="#00FFBB"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/c0a483ca-deba-4667-a277-1e85c6960e36.png"
-          alt="Symbole caché"
-          position={{ x: 30, y: 40 }}
-          width="100px"
-          glowColor="#D2FF3F"
-        />
-        
-        <UVHiddenDrawing
-          src="/lovable-uploads/abe06f9b-f700-4a49-a4d8-b4d68c473e70.png"
-          alt="Symbole caché 2"
+        <UVHiddenCode
+          code={`SESSION CODE: 0xFADE\nTRANSMISSION: SECURE\nENCRYPTION: AES-384\nCHANNEL: ULTRAVIOLET`}
           position={{ x: 80, y: 65 }}
-          width="120px"
+          fontSize="0.7rem"
+          color="#FF00DD"
           rotation={15}
-          glowColor="#FF00DD"
         />
       </>
     );
@@ -134,12 +123,11 @@ export default function UVPageSecrets() {
           color="#4FA9FF"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/d5371d86-1927-4507-9da6-d2ee46d0d577.png"
-          alt="QR Code caché"
-          position={{ x: 80, y: 80 }}
-          width="150px"
-          glowColor="#D946EF"
+        <UVHiddenCode
+          code={`SECURE CONTACT PROTOCOL\nHASH: SHA-512\nINITIALIZATION: 0xB347DF\nTIMEOUT: 48h`}
+          position={{ x: 75, y: 80 }}
+          fontSize="0.7rem"
+          color="#D946EF"
         />
       </>
     );
@@ -170,13 +158,12 @@ export default function UVPageSecrets() {
           color="#4FA9FF"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/51d0caf2-88c4-425d-8751-e697fb315c42.png"
-          alt="Équipement caché"
+        <UVHiddenCode
+          code={`// EQUIPMENT SPECS\n// MODEL: XR-7\n// SERIAL: MT75-UV\n// POWER: 1.21 GW\n// WARNING: DO NOT EXPOSE`}
           position={{ x: 30, y: 70 }}
-          width="180px"
+          fontSize="0.7rem"
+          color="#00FFBB"
           rotation={-8}
-          glowColor="#00FFBB"
         />
       </>
     );
@@ -207,13 +194,12 @@ export default function UVPageSecrets() {
           color="#4FA9FF"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/ff5c872a-d737-47fe-a427-a31849cceac3.png"
-          alt="Document caché"
+        <UVHiddenCode
+          code={`DOCUMENT ID: UV-734\nSECURITY: LEVEL 9\nEYES ONLY\nDESTROY AFTER READING\nAUTH CODE: NEBULA-7`}
           position={{ x: 75, y: 60 }}
-          width="130px"
+          fontSize="0.7rem"
+          color="#D946EF"
           rotation={5}
-          glowColor="#D946EF"
         />
       </>
     );
@@ -244,13 +230,12 @@ export default function UVPageSecrets() {
           color="#00FFBB"
         />
         
-        <UVHiddenDrawing
-          src="/lovable-uploads/7eefa948-da3a-4bfd-8b4b-e19299caaa22.png"
-          alt="Glitch"
+        <UVHiddenCode
+          code={`SYS://RECOVERY\nBOOT_MODE: SAFE\nDIAGNOSTIC: RUNNING\nMEMORY_DUMP: /dev/null\nRECOVERY_SEQ: 42-23-16`}
           position={{ x: 70, y: 80 }}
-          width="200px"
+          fontSize="0.7rem"
+          color="#4FA9FF"
           rotation={-3}
-          glowColor="#4FA9FF"
         />
       </>
     );
