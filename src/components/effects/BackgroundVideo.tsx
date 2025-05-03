@@ -79,7 +79,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">
-      {/* Indicateur de chargement/statut */}
+      {/* Indicateurs de statut */}
       {loadingStatus === 'loading' && !videoError && (
         <div className="absolute top-0 left-0 bg-yellow-500 text-xs text-black px-2 py-0.5 opacity-70 z-50">
           Chargement vidéo...
@@ -104,6 +104,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         playsInline
         muted
         preload="auto"
+        autoPlay
       >
         <source src={currentVideo} type="video/mp4" />
       </video>

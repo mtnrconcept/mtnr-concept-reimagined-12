@@ -22,7 +22,6 @@ export function useUVModeChange({
   const { currentVideo } = videoState;
   const { setCurrentVideo, playVideoTransition } = videoActions;
   const previousUVModeRef = useRef(uvMode);
-  const transitionRequestedRef = useRef(false);
 
   // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
@@ -37,21 +36,14 @@ export function useUVModeChange({
         console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
         setCurrentVideo(newVideoUrl);
         
-        // Jouer la transition vidéo immédiatement quand le mode UV change
-        // mais uniquement si la torche est active et qu'une transition n'est pas déjà en cours
-        if (isTorchActive && !transitionRequestedRef.current) {
-          transitionRequestedRef.current = true;
-          setTimeout(() => {
-            playVideoTransition();
-            // Réinitialisation après un délai
-            setTimeout(() => {
-              transitionRequestedRef.current = false;
-            }, 1000);
-          }, 50);
-        }
+        // Forcer la lecture immédiate de la vidéo sans condition
+        // et sans délais pour un changement instantané
+        setTimeout(() => {
+          playVideoTransition();
+        }, 0);
       }
     }
-  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition, isTorchActive]);
+  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition]);
 
   return { uvMode, isTorchActive };
 }
