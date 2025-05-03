@@ -15,11 +15,27 @@ export default function Home() {
   } = useUVMode();
   const observerRef = useRef<IntersectionObserver | null>(null);
   
+  // S'assurer que le défilement fonctionne correctement
   useEffect(() => {
-    // Ne pas réinitialiser le scroll à 0 à chaque fois, uniquement lors du montage initial
-    // Cela permettra de conserver la position de scroll en navigation
+    // Débloquer le défilement sur toute la page
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
+    // Débloquer tous les conteneurs potentiels
+    setTimeout(() => {
+      const containers = document.querySelectorAll('.content-container, #main-content, .page-content-wrapper');
+      containers.forEach(container => {
+        (container as HTMLElement).style.overflowY = 'auto';
+        (container as HTMLElement).style.height = 'auto';
+      });
+    }, 500);
+    
+    return () => {
+      // Nettoyage
+    };
   }, []);
   
+  // Effet d'animation au défilement
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -33,19 +49,22 @@ export default function Home() {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     });
+    
     document.querySelectorAll('[data-animate]').forEach(el => {
       el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
       observerRef.current?.observe(el);
     });
+    
     return () => observerRef.current?.disconnect();
   }, []);
   
-  return <div className="relative w-full min-h-screen overflow-visible">
+  return (
+    <div className="scrollable-section w-full">
       {/* Intégration des éclaboussures de peinture spécifiques à la page d'accueil */}
       <PageSplashes pageVariant="home" />
       
       <div className="relative z-20 flex flex-col w-full">
-        <main id="main-content" className="flex-grow w-full">
+        <main id="main-content" className="flex-grow w-full scrollable-section">
           <HeroSection />
           <StudioSection />
           <ServicesSection />
@@ -68,5 +87,6 @@ export default function Home() {
           </footer>
         </main>
       </div>
-    </div>;
+    </div>
+  );
 }
