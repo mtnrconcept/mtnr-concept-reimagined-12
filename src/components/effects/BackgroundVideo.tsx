@@ -28,6 +28,9 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   // Utilisation du contexte UV pour déterminer quelle vidéo afficher
   const { uvMode } = useUVMode();
 
+  // Signal au reste de l'application que la vidéo est prête
+  const [videoReady, setVideoReady] = useState(false);
+
   // Effet pour initialiser la vidéo au chargement
   useEffect(() => {
     const video = videoRef.current;
@@ -45,6 +48,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         video.pause();
         
         setLoadingStatus('ready');
+        // Signal que la vidéo est prête initialement
+        setVideoReady(true);
       } catch (error) {
         console.error('Erreur lors de l\'initialisation de la vidéo:', error);
         setVideoError(true);
@@ -60,13 +65,21 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const video = videoRef.current;
     if (!video) return;
     
+    // Marquer la vidéo comme non prête pendant le changement
+    setVideoReady(false);
+    
     // Changer la source vidéo immédiatement quand le mode UV change
     video.src = uvMode ? videoUrlUV : videoUrl;
     video.load();
+    
     // S'assurer que la vidéo reste en pause
     setTimeout(() => {
-      video.pause();
-    }, 0);
+      if (video) {
+        video.pause();
+        // Signaler que la nouvelle source est prête
+        setVideoReady(true);
+      }
+    }, 100);
     
     console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée immédiatement et mise en pause`);
   }, [uvMode, videoUrl, videoUrlUV]);
@@ -82,12 +95,16 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       console.log(`Navigation détectée: ${previousPathRef.current} -> ${location.pathname}`);
       previousPathRef.current = location.pathname;
       
+      // Marquer la vidéo comme non prête pendant la transition
+      setVideoReady(false);
       setIsTransitioning(true);
       
       // Remettre la vidéo au début et lancer la lecture
       video.currentTime = 0;
       video.play()
-        .then(() => console.log('Lecture de la vidéo démarrée pour transition de page'))
+        .then(() => {
+          console.log('Lecture de la vidéo démarrée pour transition de page');
+        })
         .catch(err => console.error('Erreur de lecture vidéo:', err));
     }
   }, [location.pathname]);
@@ -99,6 +116,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       if (!video) return;
       
+      // Marquer la vidéo comme non prête pendant la transition
+      setVideoReady(false);
       setIsTransitioning(true);
       
       // Remettre la vidéo au début et lancer la lecture
@@ -133,6 +152,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     const handleEnded = () => {
       console.log('Vidéo terminée, mise en pause automatique');
       setIsTransitioning(false);
+      // Signaler que la vidéo est prête après la fin de la transition
+      setVideoReady(true);
       // Mettre en pause la vidéo lorsqu'elle est terminée
       video.pause();
     };
@@ -141,6 +162,8 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       console.error('Erreur vidéo détectée:', e);
       setVideoError(true);
       setLoadingStatus('error');
+      // En cas d'erreur, considérer la vidéo comme "prête" pour ne pas bloquer l'interface
+      setVideoReady(true);
     };
     
     const handleWaiting = () => {
@@ -164,6 +187,12 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       video.removeEventListener('waiting', handleWaiting);
     };
   }, []);
+
+  // Exposer l'état de préparation de la vidéo au contexte global
+  useEffect(() => {
+    // Cette partie pourrait être étendue pour intégrer avec un contexte global
+    window.__videoReady = videoReady;
+  }, [videoReady]);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">

@@ -11,15 +11,24 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const location = useLocation();
   const [displayChildren, setDisplayChildren] = useState(children);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
 
   useEffect(() => {
     // Lorsque la route change, initialiser la transition
     setIsTransitioning(true);
+    setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
     const timer = setTimeout(() => {
       setDisplayChildren(children);
-    }, 2000); // 3 secondes de transition de sortie + 2 secondes de pause
+      
+      // Ajouter un délai pour l'apparition du contenu après le chargement de la vidéo
+      // Ce délai permet à la vidéo de bien s'afficher avant le contenu
+      setTimeout(() => {
+        setContentVisible(true);
+      }, 500); // Délai supplémentaire après la transition de la vidéo
+      
+    }, 2000); // 2 secondes de transition de sortie + pause
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -30,16 +39,16 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         key={location.pathname}
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: 1,
+          opacity: contentVisible ? 1 : 0,
           transition: { 
-            delay: 3, // Apparaît après 5 secondes (3s de fondu + 2s de pause)
-            duration: 2 // Fondu entrant de 3 secondes
+            delay: contentVisible ? 0 : 3, // Apparaît après la vidéo
+            duration: 1.5 // Fondu entrant plus rapide
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 2 // Fondu sortant de 3 secondes
+            duration: 1 // Fondu sortant plus rapide
           }
         }}
         className="relative z-10 min-h-screen w-full"
