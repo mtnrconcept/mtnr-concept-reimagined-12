@@ -18,18 +18,18 @@ const videos: Video[] = [
   { id: "pgBjz5xn0lI", title: "Bourreau", artist: "Aray" }
 ];
 
-// Dimensions de référence de la TV
+// Dimensions réelles de la TV
 const TV_DIMENSIONS = {
-  width: 1164, // largeur en pixels
-  height: 655, // hauteur en pixels
+  width: 1614, // largeur en pixels
+  height: 881, // hauteur en pixels
 };
 
-// Position de l'écran dans la TV
+// Position et taille de l'écran dans la TV
 const SCREEN_POSITION = {
   top: 83, // Y en pixels
   left: 97, // X en pixels
-  width: 1164, // Largeur estimée de l'écran
-  height: 655, // Hauteur estimée de l'écran
+  width: 1164, // Largeur en pixels de l'écran
+  height: 655, // Hauteur en pixels de l'écran
 };
 
 export default function TVVideoPlayer() {
@@ -67,13 +67,13 @@ export default function TVVideoPlayer() {
 
   return (
     <div className="relative max-w-4xl mx-auto my-16">
-      {/* TV Frame with actual image */}
-      <div className="relative w-full aspect-video">
-        {/* Conteneur pour maintenir le ratio */}
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          {/* YouTube Player - Position relative à l'intérieur de l'écran TV */}
+      {/* Conteneur principal avec ratio d'aspect de la TV */}
+      <div className="relative w-full" style={{ paddingBottom: `${(TV_DIMENSIONS.height / TV_DIMENSIONS.width) * 100}%` }}>
+        {/* Conteneur pour maintenir le ratio et positionner les éléments */}
+        <div className="absolute inset-0">
+          {/* Lecteur YouTube - Positionné absolument à l'intérieur de l'écran TV */}
           <div className="absolute" style={screenPositionStyle}>
-            {/* Loading static */}
+            {/* Animation de chargement */}
             {isLoading && (
               <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
                 <div className="w-full h-full opacity-30" style={{
@@ -87,7 +87,7 @@ export default function TVVideoPlayer() {
               </div>
             )}
             
-            {/* YouTube Video */}
+            {/* Lecteur YouTube */}
             <iframe
               className="absolute inset-0 w-full h-full"
               src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=0&controls=0&showinfo=0&rel=0&modestbranding=1`}
@@ -97,22 +97,22 @@ export default function TVVideoPlayer() {
             ></iframe>
           </div>
           
-          {/* TV Overlay Image (nouvelle image) */}
+          {/* Image de la TV (par-dessus le lecteur) */}
           <img 
             src="/lovable-uploads/74a3fc95-3585-4ec5-83d9-080e4dffabb7.png" 
             alt="TV Frame" 
-            className="w-full h-full object-contain pointer-events-none z-10"
+            className="absolute inset-0 w-full h-full object-contain z-10"
           />
         </div>
       </div>
 
-      {/* Video Info */}
+      {/* Informations sur la vidéo */}
       <div className="mt-6 mb-4 text-center">
         <h3 className="text-yellow-400 text-xl font-bold">{currentVideo.title}</h3>
         <p className="text-gray-400 text-sm">par {currentVideo.artist}</p>
       </div>
       
-      {/* Custom Pagination Controls */}
+      {/* Contrôles de pagination personnalisés */}
       <TVPaginationControls 
         totalVideos={videos.length}
         currentIndex={currentVideoIndex}
@@ -121,7 +121,7 @@ export default function TVVideoPlayer() {
         onSelect={goToVideo}
       />
 
-      {/* Animation for TV static */}
+      {/* Animation pour le statique TV */}
       <style>
         {`
         @keyframes noise {
