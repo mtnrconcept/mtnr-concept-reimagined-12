@@ -15,7 +15,7 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
-import Book from "./pages/Book"; // Import de la page Book
+import Book from "./pages/Book";
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
@@ -23,7 +23,7 @@ import BackgroundVideoController from "./components/effects/BackgroundVideoContr
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
 import ParallaxScene from "./components/ParallaxScene";
-import UVPageSecrets from "./components/effects/UVPageSecrets"; // Nouveau composant
+import UVPageSecrets from "./components/effects/UVPageSecrets";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -77,13 +77,13 @@ function AppContent() {
             <Route path="/book" element={<Book />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Le conteneur des secrets UV est maintenant dans le flux de la page */}
+          <div id="uv-page-secrets-container" className="relative">
+            <UVPageSecrets />
+          </div>
         </PageTransition>
         <UVCornerLabel />
-        
-        {/* Conteneur dédié pour les messages et dessins secrets UV avec z-index élevé */}
-        <div id="uv-page-secrets-container">
-          <UVPageSecrets />
-        </div>
       </div>
     </div>
   );

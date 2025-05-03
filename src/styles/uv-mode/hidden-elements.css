@@ -102,11 +102,13 @@
     opacity: 1 !important;
   }
   
-  /* Ensure UV elements are on top of other content */
+  /* Modifier le conteneur pour qu'il suive le défilement au lieu d'être fixe */
   #uv-page-secrets-container {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 90;
     pointer-events: none;
+    width: 100%;
+    height: 100%;
   }
 }

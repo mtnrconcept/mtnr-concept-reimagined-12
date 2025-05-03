@@ -6,13 +6,11 @@ import UVSecretMessage from '../UVSecretMessage';
 
 export default function BookPageSecrets() {
   return (
-    <>
+    <div className="relative w-full h-full">
       <UVHiddenMessage 
         message="ARCHIVES SECRÈTES" 
         color="#D2FF3F" 
-        className="text-2xl font-bold" 
-        offsetX={-10}
-        offsetY={50}
+        className="text-2xl font-bold absolute top-[50px] left-[10px]" 
       />
       
       <UVSecretMessage 
@@ -35,6 +33,6 @@ export default function BookPageSecrets() {
         color="#D946EF"
         rotation={5}
       />
-    </>
+    </div>
   );
 }

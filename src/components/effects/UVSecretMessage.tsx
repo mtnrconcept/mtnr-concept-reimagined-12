@@ -97,8 +97,9 @@ export default function UVSecretMessage({
   return (
     <div
       ref={messageRef}
-      className={`uv-secret-message absolute pointer-events-none select-none z-20 ${isVisible ? 'visible' : ''}`}
+      className={`uv-secret-message pointer-events-none select-none z-20 ${isVisible ? 'visible' : ''}`}
       style={{
+        position: 'absolute',
         left: typeof position.x === 'number' ? `${position.x}%` : position.x,
         top: typeof position.y === 'number' ? `${position.y}%` : position.y,
         transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
