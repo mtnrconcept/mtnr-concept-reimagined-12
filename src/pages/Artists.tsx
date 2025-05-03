@@ -17,7 +17,7 @@ const artists = [{
 }, {
   name: "Mairo",
   img: "/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png",
-  desc: "Ruff lyricist, cracheur de feu, rimes brutales sur instrus obscures.",
+  desc: "Trouve le code secret en enclanchant la lampe UV.",
   secretCode: "FANTOME-2"
 }, {
   name: "Aray",
@@ -68,10 +68,10 @@ export default function Artists() {
             <TVVideoPlayer />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 xs:gap-7 w-full pb-16">
-              {artists.map(a => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl relative">
+              {artists.map((a, index) => <div key={a.name} className="bg-black/80 paper-texture border-2 border-yellow-400/25 rounded-xl shadow-2xl flex flex-col items-center p-4 xs:p-6 transition-transform hover:scale-105 hover:shadow-yellow-400/20 hover:shadow-xl relative">
                   <div className="w-full overflow-hidden rounded-lg shadow-lg">
                     <img 
-                      src={isTorchActive && !uvMode ? "/lovable-uploads/anonymous.png" : a.img} 
+                      src={index === 1 && isTorchActive && !uvMode ? "/lovable-uploads/anonymous.png" : a.img} 
                       alt={a.name} 
                       className="w-full aspect-square object-cover rounded-lg grayscale hover:grayscale-0 transition-all duration-300 scale-100 hover:scale-105" 
                     />
@@ -93,3 +93,4 @@ export default function Artists() {
       </div>
     </ParallaxBackground>;
 }
+
