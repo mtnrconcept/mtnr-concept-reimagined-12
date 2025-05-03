@@ -83,7 +83,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           zIndex: 10,
           // Assurer que le contenu est bien scrollable
           position: "relative",
-          display: "block" // Assurer que le div se comporte comme un bloc
+          display: "block", // Assurer que le div se comporte comme un bloc
+          overflowY: "auto" // Permettre le défilement vertical
         }}
       >
         {displayChildren}
