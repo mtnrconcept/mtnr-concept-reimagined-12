@@ -18,6 +18,20 @@ const videos: Video[] = [
   { id: "pgBjz5xn0lI", title: "Bourreau", artist: "Aray" }
 ];
 
+// Dimensions de référence de la TV
+const TV_DIMENSIONS = {
+  width: 1164, // largeur en pixels
+  height: 655, // hauteur en pixels
+};
+
+// Position de l'écran dans la TV
+const SCREEN_POSITION = {
+  top: 83, // Y en pixels
+  left: 97, // X en pixels
+  width: 819, // Largeur estimée de l'écran
+  height: 489, // Hauteur estimée de l'écran
+};
+
 export default function TVVideoPlayer() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,21 +57,22 @@ export default function TVVideoPlayer() {
     setCurrentVideoIndex(index);
   };
 
+  // Calcul des pourcentages pour le positionnement relatif
+  const screenPositionStyle = {
+    top: `${(SCREEN_POSITION.top / TV_DIMENSIONS.height) * 100}%`,
+    left: `${(SCREEN_POSITION.left / TV_DIMENSIONS.width) * 100}%`,
+    width: `${(SCREEN_POSITION.width / TV_DIMENSIONS.width) * 100}%`,
+    height: `${(SCREEN_POSITION.height / TV_DIMENSIONS.height) * 100}%`,
+  };
+
   return (
     <div className="relative max-w-4xl mx-auto my-16">
       {/* TV Frame with actual image */}
       <div className="relative w-full aspect-video">
-        {/* Video Player in the background */}
+        {/* Conteneur pour maintenir le ratio */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          {/* YouTube Player - Position fixe relative à l'image TV */}
-          <div className="absolute" style={{
-            top: '8%',
-            left: '11.5%',
-            width: '77%',
-            height: '58%',
-            overflow: 'hidden',
-            borderRadius: '8px'
-          }}>
+          {/* YouTube Player - Position relative à l'intérieur de l'écran TV */}
+          <div className="absolute" style={screenPositionStyle}>
             {/* Loading static */}
             {isLoading && (
               <div className="absolute inset-0 bg-black flex items-center justify-center z-20">
@@ -82,11 +97,11 @@ export default function TVVideoPlayer() {
             ></iframe>
           </div>
           
-          {/* TV Overlay Image */}
+          {/* TV Overlay Image (nouvelle image) */}
           <img 
-            src="/lovable-uploads/tv.png" 
+            src="/lovable-uploads/74a3fc95-3585-4ec5-83d9-080e4dffabb7.png" 
             alt="TV Frame" 
-            className="w-full h-full object-contain pointer-events-none"
+            className="w-full h-full object-contain pointer-events-none z-10"
           />
         </div>
       </div>
