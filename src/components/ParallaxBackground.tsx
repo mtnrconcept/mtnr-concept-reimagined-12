@@ -1,7 +1,5 @@
 
 import { useRef, useEffect } from 'react';
-import { ParallaxContainer } from './parallax/ParallaxContainer';
-import { PaintSplash } from './parallax/PaintSplash';
 
 interface ParallaxBackgroundProps {
   children?: React.ReactNode;
@@ -9,14 +7,12 @@ interface ParallaxBackgroundProps {
 
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   const parallaxRef = useRef<HTMLDivElement>(null);
+  // Réduit le nombre de splashes à 4 (au lieu de 6) et réduit leur taille
   const paintSplashes = [
-    { src: '/lovable-uploads/paint-splatter-hi.png', x: 80, y: 15, depth: 0.3, scale: 2.2, rotation: -15 },
-    { src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', x: 10, y: 25, depth: 0.4, scale: 1.8, rotation: 20 },
-    { src: '/lovable-uploads/yellow-watercolor-splatter-3.png', x: 70, y: 60, depth: 0.1, scale: 1.5, rotation: 5 },
-    { src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', x: 20, y: 70, depth: 0.2, scale: 1.3, rotation: -10 },
-    // Éclaboussures au premier plan (avec depth négative pour être devant le contenu)
-    { src: '/lovable-uploads/yellow-watercolor-splatter-3.png', x: 85, y: 30, depth: -0.3, scale: 0.9, rotation: 15, opacity: 0.25 },
-    { src: '/lovable-uploads/paint-splatter-hi.png', x: 15, y: 85, depth: -0.4, scale: 0.8, rotation: -5, opacity: 0.2 }
+    { src: '/lovable-uploads/paint-splatter-hi.png', x: 80, y: 15, depth: 0.3, scale: 1.6, rotation: -15 },
+    { src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', x: 10, y: 25, depth: 0.4, scale: 1.4, rotation: 20 },
+    { src: '/lovable-uploads/yellow-watercolor-splatter-3.png', x: 70, y: 60, depth: 0.1, scale: 1.1, rotation: 5 },
+    { src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', x: 20, y: 85, depth: -0.3, scale: 0.8, rotation: -10, opacity: 0.2 }
   ];
 
   useEffect(() => {
@@ -35,6 +31,12 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
           rotate(${splash.getAttribute('data-rotation')}deg) 
           scale(${splash.getAttribute('data-scale')})`;
       });
+      
+      // Effet parallax appliqué à la vidéo de fond
+      const videoBackground = document.querySelector('video');
+      if (videoBackground) {
+        videoBackground.style.transform = `translateY(${scrollY * 0.15}px)`;  // La vidéo se déplace à 15% de la vitesse de défilement
+      }
     };
     
     // Effet parallax sur la souris également
@@ -68,6 +70,12 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             scale(${splash.getAttribute('data-scale')})`;
         }
       });
+      
+      // Effet parallax de la souris sur la vidéo de fond
+      const videoBackground = document.querySelector('video');
+      if (videoBackground) {
+        videoBackground.style.transform = `translate3d(${mouseX * -15}px, ${mouseY * -15}px, 0) translateY(${window.scrollY * 0.15}px)`;
+      }
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -93,7 +101,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
           }}
         />
         
-        {/* Éclaboussures de peinture avec effet parallax */}
+        {/* Éclaboussures de peinture avec effet parallax (réduites en nombre) */}
         {paintSplashes.map((splash, index) => (
           <div 
             key={`splash-${index}`}
@@ -102,7 +110,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
               left: `${splash.x}%`,
               top: `${splash.y}%`,
               zIndex: splash.depth < 0 ? 50 : 0, // Les éclaboussures avec depth négative sont au-dessus du contenu
-              opacity: splash.opacity || 0.3 // Opacité réduite par défaut
+              opacity: splash.opacity || 0.25 // Opacité réduite
             }}
             data-depth={splash.depth}
             data-rotation={splash.rotation}
@@ -111,7 +119,7 @@ export default function ParallaxBackground({ children }: ParallaxBackgroundProps
             <img 
               src={splash.src}
               alt="Paint splash"
-              className="w-auto h-auto max-w-[300px] max-h-[300px] object-contain"
+              className="w-auto h-auto max-w-[250px] max-h-[250px] object-contain" // Taille réduite
               style={{
                 filter: 'contrast(1.5) brightness(1.2)',
                 mixBlendMode: 'screen',
