@@ -48,7 +48,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] }, // Rallongée à 3.5s pour la fondue d'entrée
-        y: { duration: 4.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Allongée à 4.0s pour synchroniser avec la vidéo
+        y: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // Allongée à 4.0s pour synchroniser avec la vidéo
         filter: { duration: 2.8, ease: [0.1, 0.4, 0.2, 1.0] } // Légèrement plus rapide pour le blur
       }
     },
