@@ -47,9 +47,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.2s à 0.8s pour terminer avec la vidéo
-        y: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.5s à 0.8s pour terminer avec la vidéo
-        filter: { duration: 2.8, ease: [0.33, 1, 0.68, 1] } // Réduit de 1.8s à 0.8s pour terminer avec la vidéo
+        opacity: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Modifié à 3.0s avec décélération
+        y: { duration: 3.0, ease: [0.16, 1, 0.3, 1] }, // Modifié à 3.0s avec décélération fluide
+        filter: { duration: 3.0, ease: [0.33, 1, 0.68, 1] } // Modifié à 3.0s
       }
     },
     exit: {
@@ -59,7 +59,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       transition: {
         opacity: { duration: 3.6, ease: [0.33, 1, 0.68, 1] },
         y: { 
-          duration: 3.0, // Maintenu à 3.0 secondes comme demandé précédemment
+          duration: 3.0, // Maintenu à 3.0 secondes
           ease: [0.05, 0.1, 0.9, 1.0] // Courbe cubique modifiée pour un départ TRÈS lent et une accélération très rapide à la fin
         },
         filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Maintenu à 2.4 secondes
