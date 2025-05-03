@@ -22,13 +22,13 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Ajouter un délai pour l'apparition du contenu après le chargement de la vidéo
+      // Ajouter un délai plus long pour l'apparition du contenu après le chargement de la vidéo
       // Ce délai permet à la vidéo de bien s'afficher avant le contenu
       setTimeout(() => {
         setContentVisible(true);
-      }, 500); // Délai supplémentaire après la transition de la vidéo
+      }, 1200); // Augmenté de 500ms à 1200ms pour donner plus de temps à la vidéo
       
-    }, 2000); // 2 secondes de transition de sortie + pause
+    }, 2500); // Augmenté de 2000ms à 2500ms pour une transition de sortie plus lente
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -41,14 +41,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         animate={{ 
           opacity: contentVisible ? 1 : 0,
           transition: { 
-            delay: contentVisible ? 0 : 3, // Apparaît après la vidéo
-            duration: 1.5 // Fondu entrant plus rapide
+            delay: contentVisible ? 0.3 : 3.5, // Ajout d'un délai de 0.3s avant l'apparition et augmenté le délai d'attente
+            duration: 2.5 // Augmenté de 1.5s à 2.5s pour un fondu entrant plus progressif
           }
         }}
         exit={{ 
           opacity: 0,
           transition: { 
-            duration: 1 // Fondu sortant plus rapide
+            duration: 1.8 // Augmenté de 1s à 1.8s pour un fondu sortant plus lent
           }
         }}
         className="relative z-10 min-h-screen w-full"
