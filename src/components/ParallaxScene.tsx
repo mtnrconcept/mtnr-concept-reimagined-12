@@ -5,9 +5,11 @@ import { useParallaxEffect } from '@/hooks/useParallaxEffect';
 import { parallaxElements } from './parallax/config';
 import { PaintSplash } from './parallax/PaintSplash';
 import { Light } from './parallax/Light';
+import { useLocation } from 'react-router-dom';
 
 export default function ParallaxScene() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   
   // Utiliser notre hook de parallaxe
   useParallaxEffect(containerRef);
@@ -17,6 +19,20 @@ export default function ParallaxScene() {
     console.log("ParallaxScene mounted");
     return () => console.log("ParallaxScene unmounted");
   }, []);
+
+  // Effet lors des changements de route pour les éléments parallax
+  useEffect(() => {
+    const paintElements = document.querySelectorAll('.parallax-element');
+    paintElements.forEach(el => {
+      // Ajouter une classe qui déclenche une animation temporaire
+      el.classList.add('route-change-transition');
+      
+      // Retirer la classe après l'animation
+      setTimeout(() => {
+        el.classList.remove('route-change-transition');
+      }, 1000);
+    });
+  }, [location.pathname]);
   
   return (
     <>
@@ -25,11 +41,10 @@ export default function ParallaxScene() {
 
       <div 
         ref={containerRef}
-        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
+        className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-10"
         style={{ 
           perspective: '2000px',
           transformStyle: 'preserve-3d',
-          zIndex: 10,
         }}
       >
         {parallaxElements.map((element, index) => {
@@ -47,6 +62,7 @@ export default function ParallaxScene() {
                 className={element.className}
                 src={element.src!}
                 blur={element.blur}
+                blendMode={element.blendMode}
               />
             );
           }

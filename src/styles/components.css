@@ -84,4 +84,28 @@
     opacity: 1;
     transform: translateY(0);
   }
+  
+  /** Animation de transition pour les éléments parallax lors des changements de route */
+  @keyframes route-change-float {
+    0% {
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+    50% {
+      transform: translateY(-40px) scale(1.1);
+      filter: blur(3px);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+  }
+  
+  .route-change-transition {
+    animation: route-change-float 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  .parallax-element {
+    transition: opacity 0.5s ease-out, transform 0.2s ease-out;
+  }
 }

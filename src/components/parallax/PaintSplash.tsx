@@ -10,9 +10,10 @@ interface PaintSplashProps {
   className?: string;
   src: string;
   blur?: number;
+  blendMode?: string;
 }
 
-export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0 }: PaintSplashProps) => {
+export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = '', src, blur = 0, blendMode = 'screen' }: PaintSplashProps) => {
   // Calculer l'intensité des effets en fonction de la profondeur
   const shadowDepth = Math.abs(depth) < 0.3 ? 15 : Math.max(3, 20 * (1 - Math.abs(depth)));
   const shadowBlur = Math.abs(depth) < 0.3 ? 20 : Math.max(5, 25 * (1 - Math.abs(depth)));
@@ -28,17 +29,17 @@ export const PaintSplash = ({ x, y, depth, scale = 1, rotation = 0, className = 
   const blurAmount = blur ?? Math.abs(depth) > 0.6 ? Math.abs(depth) * 8 : 0;
   
   return (
-    <ParallaxElement depth={depth} x={x} y={y} className={`${className} shadow-receiver`}>
+    <ParallaxElement depth={depth} x={x} y={y} className={`${className} shadow-receiver transition-all duration-500`}>
       <img
         src={src}
         alt="Paint splash"
-        className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain"
+        className="w-auto h-auto max-w-[350px] max-h-[350px] object-contain transition-all duration-500"
         style={{
           transform: `rotate(${rotation}deg) scale(${scale})`,
           filter: `contrast(${contrast}) brightness(${brightness}) saturate(${saturation}) blur(${blurAmount}px) drop-shadow(0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity}))`,
           opacity: 1,
-          mixBlendMode: 'screen',
-          willChange: 'transform, filter',
+          mixBlendMode: blendMode || 'screen',
+          willChange: 'transform, filter, opacity',
         }}
         onLoad={() => {
           console.log(`Image loaded: ${src}`);

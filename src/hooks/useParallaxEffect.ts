@@ -20,21 +20,24 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
         
         // Coefficient négatif pour que tous les éléments se déplacent dans le MÊME sens
         // La vitesse est proportionnelle à la profondeur (plus profond = plus lent)
-        const translateY = -scrollY * depth * 0.2; // Négatif pour que les éléments montent quand on scrolle vers le bas
+        const translateY = -scrollY * depth * 0.3; // Augmenté pour plus d'effet de scroll
         
         // Effets de souris plus subtils pour plus de réalisme
-        const translateX = mouseX * (depth * 15);
-        const rotateX = -mouseY * (depth * 2);
-        const rotateY = mouseX * (depth * 2);
+        const translateX = mouseX * (depth * 10); // Réduit pour moins d'effet de déplacement latéral
+        const rotateX = -mouseY * (depth * 1.5); // Rotation moins prononcée
+        const rotateY = mouseX * (depth * 1.5);
         
         // Calcul de la profondeur Z basé sur la valeur de depth
-        // Plus la valeur est élevée, plus l'élément est loin
-        const translateZ = depth * -1000;
+        const translateZ = depth * -800; // Moins de profondeur pour un effet plus subtil
         
-        // Appliquer un flou en fonction de la distance (pour les éléments qui n'en ont pas déjà)
-        if (!element.style.filter.includes('blur')) {
-          const blurAmount = Math.abs(depth) > 0.6 ? Math.abs(depth) * 5 : 0;
-          element.style.filter = `blur(${blurAmount}px)`;
+        // Opacité basée sur la profondeur et la position
+        let opacity = 1;
+        if (Math.abs(depth) > 0.7) {
+          // Éléments très éloignés deviennent plus transparents avec le scroll
+          opacity = Math.max(0.2, 1 - (Math.abs(scrollY) * 0.0005));
+        } else if (depth < -0.3) {
+          // Éléments au premier plan deviennent plus transparents quand on scrolle
+          opacity = Math.max(0.3, 1 - (Math.abs(scrollY) * 0.001));
         }
         
         element.style.transform = `
@@ -42,6 +45,11 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
           rotateX(${rotateX}deg)
           rotateY(${rotateY}deg)
         `;
+        
+        // Applique l'opacité basée sur le scroll uniquement si aucune classe de transition n'est active
+        if (!element.classList.contains('route-change-transition')) {
+          element.style.opacity = opacity.toString();
+        }
       });
       
       // Traitement spécial pour l'arrière-plan avec un effet de parallaxe encore plus subtil
