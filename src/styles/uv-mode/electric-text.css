@@ -1,0 +1,105 @@
+
+@layer components {
+  /* Electric text effect animation */
+  @keyframes electricTextPulse {
+    0% { 
+      text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F;
+      color: #D2FF3F; 
+    }
+    25% { 
+      text-shadow: 0 0 7px #D2FF3F, 0 0 14px #D2FF3F, 0 0 21px #D2FF3F;
+      color: #EEFF8A;
+    }
+    26% {
+      text-shadow: 0 0 2px #D2FF3F;
+      color: #A0E515;
+    }
+    27% {
+      text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
+      color: #D2FF3F;
+    }
+    70% { 
+      text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F, 0 0 15px #D2FF3F;
+      color: #D2FF3F;
+    }
+    80% { 
+      text-shadow: 0 0 2px #D2FF3F, 0 0 5px #D2FF3F;
+      color: #A0E515;
+    }
+    85% {
+      text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F, 0 0 30px #D2FF3F;
+      color: #EEFF8A;
+    }
+    100% { 
+      text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F;
+      color: #D2FF3F;
+    }
+  }
+  
+  /* Enhanced electric text styling */
+  .uv-electric-text {
+    animation: electricTextPulse 3s infinite;
+    position: relative;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+  }
+  
+  /* Spark effect for electric text */
+  .uv-electric-text::before,
+  .uv-electric-text::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: #D2FF3F;
+    border-radius: 50%;
+    filter: blur(1px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .uv-electric-text::before {
+    top: -5px;
+    left: 30%;
+    animation: sparkAnim 3s infinite 0.5s;
+  }
+  
+  .uv-electric-text::after {
+    bottom: -5px;
+    right: 30%;
+    animation: sparkAnim 3s infinite 1.5s;
+  }
+  
+  @keyframes sparkAnim {
+    0%, 100% { 
+      opacity: 0;
+      transform: scale(1);
+    }
+    10%, 15% { 
+      opacity: 1;
+      transform: scale(2);
+      filter: blur(2px);
+    }
+    20% { 
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  
+  /* Small text flickering to simulate electricity */
+  .uv-electric-text {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Add vibration effect */
+  @keyframes textVibration {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
+  }
+  
+  .uv-electric-text {
+    animation: electricTextPulse 3s infinite, textVibration 0.1s infinite;
+  }
+}

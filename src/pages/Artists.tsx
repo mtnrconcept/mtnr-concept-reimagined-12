@@ -16,6 +16,7 @@ const artists = [{
   secretCode: "FANTOME-1"
 }, {
   name: "Mairo",
+  displayName: "Hidden Code",
   img: "/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png",
   desc: "Trouve le code secret en enclanchant la lampe UV.",
   secretCode: "FANTOME-2"
@@ -76,7 +77,15 @@ export default function Artists() {
                       className="w-full aspect-square object-cover rounded-lg grayscale hover:grayscale-0 transition-all duration-300 scale-100 hover:scale-105" 
                     />
                   </div>
-                  <div className="mt-4 font-black text-lg xs:text-xl text-yellow-400 uppercase text-center tracking-wide">{a.name}</div>
+                  <div className="mt-4 font-black text-lg xs:text-xl text-yellow-400 uppercase text-center tracking-wide">
+                    {index === 1 && isTorchActive ? (
+                      <span className="uv-electric-text animate-[electricText_3s_infinite]">
+                        {a.displayName || a.name}
+                      </span>
+                    ) : (
+                      a.name
+                    )}
+                  </div>
                   <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
                     <UVText 
                       text={a.desc}
@@ -93,4 +102,3 @@ export default function Artists() {
       </div>
     </ParallaxBackground>;
 }
-
