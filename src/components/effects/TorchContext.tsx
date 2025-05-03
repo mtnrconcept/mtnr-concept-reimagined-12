@@ -90,12 +90,12 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           <div 
             className="fixed inset-0 z-[99] pointer-events-none"
             style={{
-              background: `radial-gradient(circle 300px at ${mousePosition.x}px ${mousePosition.y}px, 
+              background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
                 rgba(0,0,0,0) 0%, 
-                rgba(0,0,0,0.2) 40%, 
-                rgba(0,0,0,0.6) 60%,
-                rgba(0,0,0,0.8) 80%,
-                rgba(0,0,0,0.95) 100%)`,
+                rgba(0,0,0,0.1) 40%, 
+                rgba(0,0,0,0.4) 60%,
+                rgba(0,0,0,0.7) 80%,
+                rgba(0,0,0,0.9) 100%)`,
               mixBlendMode: 'normal',
               transition: 'all 0.05s ease-out',
             }}
@@ -104,13 +104,13 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             <div 
               className="absolute pointer-events-none"
               style={{
-                width: '600px',
-                height: '600px',
+                width: '650px',
+                height: '650px',
                 borderRadius: '50%',
                 transform: 'translate(-50%, -50%)',
                 left: `${mousePosition.x}px`,
                 top: `${mousePosition.y}px`,
-                background: 'radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,248,150,0.1) 70%, transparent 100%)',
+                background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 100%)',
                 filter: 'blur(15px)',
                 mixBlendMode: 'screen',
               }}
