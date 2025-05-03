@@ -66,4 +66,20 @@
   .uv-mode-active .uv-hidden-code {
     animation: uvCodeReveal 0.8s forwards;
   }
+  
+  /* Decrypt message styling */
+  .decrypt-message {
+    font-family: monospace;
+    letter-spacing: 0.05em;
+    background-color: rgba(10, 0, 40, 0.2);
+    border-radius: 4px;
+    padding: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+  
+  .decrypt-message.visible {
+    opacity: 1;
+    animation: uvReveal 0.5s forwards;
+  }
 }

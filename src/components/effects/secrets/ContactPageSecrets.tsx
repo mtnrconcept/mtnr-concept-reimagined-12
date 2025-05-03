@@ -3,6 +3,7 @@ import React from 'react';
 import UVHiddenMessage from '../UVHiddenMessage';
 import UVHiddenCode from '../UVHiddenCode';
 import UVSecretMessage from '../UVSecretMessage';
+import UVDecryptMessage from '../UVDecryptMessage';
 
 export default function ContactPageSecrets() {
   return (
@@ -19,6 +20,15 @@ export default function ContactPageSecrets() {
         message="TEL: +33 6 ** ** ** 42" 
         position={{ x: 65, y: 40 }}
         color="#D2FF3F"
+      />
+      
+      <UVDecryptMessage
+        message="ACCÈS SÉCURISÉ: CODE 8734-XD29-M71R"
+        position={{ x: 40, y: 25 }}
+        fontSize="1.2rem"
+        color="#4FA9FF"
+        decryptSpeed={20}
+        depth="0.4"
       />
       
       <UVHiddenCode
