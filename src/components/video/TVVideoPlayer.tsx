@@ -76,7 +76,7 @@ export default function TVVideoPlayer() {
           
           {/* TV Overlay Image */}
           <img 
-            src="/lovable-uploads/ed3157a2-e211-4f4e-87c4-f3976efe1025.png" 
+            src="/lovable-uploads/tv.png" 
             alt="TV Frame" 
             className="absolute inset-0 w-full h-full z-20 pointer-events-none"
           />
