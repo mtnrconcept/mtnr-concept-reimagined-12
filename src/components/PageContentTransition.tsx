@@ -20,16 +20,17 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
-    // Augmenter le délai pour correspondre à la nouvelle durée d'animation
+    // Réduire le délai pour afficher le nouveau contenu plus tôt
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Ajouter un délai plus long pour l'apparition du contenu après le chargement de la vidéo
+      // Réduire le délai pour l'apparition du contenu (1200ms → 200ms)
+      // Cela fera apparaître le contenu 1 seconde plus tôt
       setTimeout(() => {
         setContentVisible(true);
-      }, 1200);
+      }, 200); // Réduit de 1200ms à 200ms pour afficher 1 seconde plus tôt
       
-    }, 5000); // Doublé de 2500 à 5000 pour correspondre à la nouvelle durée d'animation de sortie
+    }, 4000); // Réduit de 5000ms à 4000ms pour charger le contenu plus tôt
 
     return () => clearTimeout(timer);
   }, [children, location]);
