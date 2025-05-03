@@ -20,6 +20,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
+    // Augmenter le délai pour correspondre à la nouvelle durée d'animation
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
@@ -28,7 +29,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         setContentVisible(true);
       }, 1200);
       
-    }, 2500);
+    }, 5000); // Doublé de 2500 à 5000 pour correspondre à la nouvelle durée d'animation de sortie
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -55,9 +56,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: "-100vh", // Disparaît complètement vers le haut de l'écran
       filter: "blur(12px)",
       transition: {
-        opacity: { duration: 1.8, ease: [0.33, 1, 0.68, 1] },
-        y: { duration: 1.5, ease: [0.33, 1, 0.68, 1] }, // Effet d'accélération
-        filter: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }
+        opacity: { duration: 3.6, ease: [0.33, 1, 0.68, 1] },
+        y: { 
+          duration: 3.0, // Doublé de 1.5 à 3.0 secondes
+          ease: [0.05, 0.1, 0.9, 1.0] // Courbe cubique modifiée pour un départ TRÈS lent et une accélération très rapide à la fin
+        },
+        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Doublé de 1.2 à 2.4 secondes
       }
     }
   };
