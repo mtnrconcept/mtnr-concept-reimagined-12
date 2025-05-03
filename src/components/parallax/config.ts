@@ -1,4 +1,9 @@
 
+export type SupportedBlendMode = 'normal' | 'multiply' | 'screen' | 'overlay' 
+  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
+  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
+  | 'hue' | 'saturation' | 'color' | 'luminosity';
+
 export interface ParallaxElementConfig {
   type: 'background' | 'paint' | 'pipe' | 'light' | 'vent';
   x?: number;
@@ -11,10 +16,7 @@ export interface ParallaxElementConfig {
   blur?: number;
   size?: number;
   glow?: string;
-  blendMode?: 'normal' | 'multiply' | 'screen' | 'overlay' 
-  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' 
-  | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' 
-  | 'hue' | 'saturation' | 'color' | 'luminosity';
+  blendMode?: SupportedBlendMode;
 }
 
 export const parallaxElements: ParallaxElementConfig[] = [
@@ -37,7 +39,7 @@ export const parallaxElements: ParallaxElementConfig[] = [
   
   // Premier plan
   { type: 'paint', x: 70, y: 42, depth: -0.1, scale: 1.3, rotation: 8, blur: 0,
-    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-30', blendMode: 'multiply' },
+    src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-30', blendMode: 'overlay' },
   { type: 'paint', x: 25, y: 5, depth: -0.3, scale: 1.0, rotation: -5, blur: 0,
     src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'opacity-25', blendMode: 'screen' },
 ];

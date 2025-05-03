@@ -69,7 +69,7 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
         splashes = [
           ...splashes,
           { x: 75, y: 40, depth: -0.2, scale: 1.4, rotation: 8, blur: 0,
-            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-30', blendMode: 'multiply' as const },
+            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-30', blendMode: 'overlay' as const },
           { x: 30, y: 20, depth: -0.3, scale: 1.1, rotation: -12, blur: 0,
             src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'opacity-25', blendMode: 'screen' as const },
         ];
@@ -85,7 +85,7 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
         splashes = [
           ...splashes,
           { x: 68, y: 55, depth: -0.25, scale: 1.5, rotation: 15, blur: 0,
-            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-35', blendMode: 'multiply' as const },
+            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-35', blendMode: 'overlay' as const },
           { x: 25, y: 35, depth: -0.4, scale: 1.2, rotation: -10, blur: 0,
             src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'opacity-30', blendMode: 'screen' as const },
         ];
@@ -108,7 +108,8 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
       splashes = splashes.map(splash => ({
         ...splash,
         className: splash.className.replace('opacity-25', 'opacity-40').replace('opacity-20', 'opacity-35'),
-        blendMode: (splash.blendMode === 'multiply' ? 'screen' : splash.blendMode),
+        // Si c'était overlay avant, on le garde overlay
+        blendMode: splash.blendMode,
       }));
     }
     
