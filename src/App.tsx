@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Artists from "./pages/Artists";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import WhatWeDo from "./pages/WhatWeDo";
+import Book from "./pages/Book"; // Import de la page Book
 import PageTransition from "./components/PageTransition";
 import PageTransitionEffect from "./components/PageTransitionEffect";
 import { checkFeatureSupport } from "@/lib/feature-detection";
@@ -71,6 +73,7 @@ function AppContent() {
             <Route path="/what-we-do" element={<WhatWeDo />} />
             <Route path="/artists" element={<Artists />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/book" element={<Book />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>

@@ -108,6 +108,18 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
             src: '/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png', className: 'opacity-10', blendMode: 'screen' as const },
         ];
         break;
+      case 'book':
+        splashes = [
+          ...splashes,
+          // Éclaboussures spécifiques pour la page book - avec beaucoup de profondeur
+          { x: 20, y: 20, depth: -0.92, scale: 0.58, rotation: -12, blur: 0,
+            src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'opacity-60', blendMode: 'screen' as const },
+          { x: 80, y: 70, depth: 0.97, scale: 3.3, rotation: 15, blur: 11,
+            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-10', blendMode: 'overlay' as const },
+          { x: 50, y: 85, depth: -0.8, scale: 0.7, rotation: 0, blur: 0,
+            src: '/lovable-uploads/paint-splatter-hi.png', className: 'opacity-50', blendMode: 'soft-light' as const },
+        ];
+        break;
       case 'artists':
         splashes = [
           ...splashes,
