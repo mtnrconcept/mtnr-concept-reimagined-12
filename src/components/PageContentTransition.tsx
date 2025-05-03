@@ -20,17 +20,17 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     setContentVisible(false);
 
     // Garder l'ancien contenu pendant la transition de sortie
-    // Réduire le délai pour afficher le nouveau contenu plus tôt
+    // Temps d'attente ajusté pour correspondre à la durée de la vidéo
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Réduire le délai pour l'apparition du contenu (1200ms → 200ms)
-      // Cela fera apparaître le contenu 1 seconde plus tôt
+      // Afficher immédiatement le contenu lorsque la vidéo se termine
+      // Normalement la vidéo se termine vers 4000ms
       setTimeout(() => {
         setContentVisible(true);
-      }, 200); // Réduit de 1200ms à 200ms pour afficher 1 seconde plus tôt
+      }, 0); // Plus d'attente supplémentaire pour synchroniser avec la fin de la vidéo
       
-    }, 4000); // Réduit de 5000ms à 4000ms pour charger le contenu plus tôt
+    }, 4000); // Durée totale de la vidéo de transition
 
     return () => clearTimeout(timer);
   }, [children, location]);
@@ -47,9 +47,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 2.2, ease: [0.16, 1, 0.3, 1] },
-        y: { duration: 2.5, ease: [0.16, 1, 0.3, 1] }, // Cubique modifié pour une arrivée plus douce
-        filter: { duration: 1.8, ease: [0.33, 1, 0.68, 1] }
+        opacity: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.2s à 0.8s pour terminer avec la vidéo
+        y: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Réduit de 2.5s à 0.8s pour terminer avec la vidéo
+        filter: { duration: 0.8, ease: [0.33, 1, 0.68, 1] } // Réduit de 1.8s à 0.8s pour terminer avec la vidéo
       }
     },
     exit: {
@@ -59,10 +59,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       transition: {
         opacity: { duration: 3.6, ease: [0.33, 1, 0.68, 1] },
         y: { 
-          duration: 3.0, // Doublé de 1.5 à 3.0 secondes
+          duration: 3.0, // Maintenu à 3.0 secondes comme demandé précédemment
           ease: [0.05, 0.1, 0.9, 1.0] // Courbe cubique modifiée pour un départ TRÈS lent et une accélération très rapide à la fin
         },
-        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Doublé de 1.2 à 2.4 secondes
+        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Maintenu à 2.4 secondes
       }
     }
   };
