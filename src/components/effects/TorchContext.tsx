@@ -1,5 +1,5 @@
-
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useUVMode } from "./UVModeContext";
 
 interface TorchContextType {
@@ -24,25 +24,24 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { 
-    uvMode, 
-    uvCircleRef, 
-    createUVCircle, 
-    removeUVCircle 
+
+  const {
+    uvMode,
+    uvCircleRef,
+    createUVCircle,
+    removeUVCircle
   } = useUVMode();
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
-    
-    // Update UV circle position if active
+
     if (uvCircleRef.current && uvMode) {
       uvCircleRef.current.style.left = `${position.x}px`;
       uvCircleRef.current.style.top = `${position.y}px`;
     }
   };
 
-  // Handle mouse movement
+  // Écoute les mouvements de souris
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isTorchActive) {
@@ -54,14 +53,14 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isTorchActive]);
 
-  // Create UV circle when UV mode is activated
+  // Gestion du cercle UV
   useEffect(() => {
     if (isTorchActive && uvMode) {
       createUVCircle(mousePosition);
     } else {
       removeUVCircle();
     }
-    
+
     return () => {
       removeUVCircle();
     };
@@ -77,66 +76,65 @@ export const TorchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <TorchContext.Provider value={contextValue}>
-      <div ref={containerRef} className="torch-container relative w-full h-full overflow-hidden">
+      <div ref={containerRef} className="relative w-full h-full overflow-hidden">
         {children}
-        {isTorchActive && !uvMode && (
-          <svg className="fixed top-0 left-0 w-full h-full z-[99] pointer-events-none">
-  <defs>
-    {/* Gradient doux pour le cône */}
-    <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stopColor="white" stopOpacity="1" />
-      <stop offset="50%" stopColor="white" stopOpacity="0.4" />
-      <stop offset="100%" stopColor="white" stopOpacity="0" />
-    </radialGradient>
 
-    <mask id="torch-mask">
-      {/* Fond noir = masqué */}
-      <rect width="100%" height="100%" fill="black" />
+        {/* PORTAIL SVG EN DEHORS DU CONTENEUR */}
+        {isTorchActive && !uvMode &&
+          createPortal(
+            <svg className="fixed inset-0 w-full h-full z-[99] pointer-events-none">
+              <defs>
+                {/* Dégradé radial pour faisceau */}
+                <radialGradient id="torch-gradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="white" stopOpacity="1" />
+                  <stop offset="50%" stopColor="white" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="white" stopOpacity="0" />
+                </radialGradient>
 
-      {/* Cône lumineux doux */}
-      <ellipse
-        cx={mousePosition.x}
-        cy={mousePosition.y - 150}
-        rx="200"
-        ry="500"
-        fill="url(#torch-gradient)"
-      />
-    </mask>
-  </defs>
+                <mask id="torch-mask">
+                  <rect width="100%" height="100%" fill="black" />
 
-  {/* Calque noir à 70 %, percé par le faisceau */}
-  <rect
-    width="100%"
-    height="100%"
-    fill="black"
-    fillOpacity="0.7"
-    mask="url(#torch-mask)"
-    style={{ transition: "all 0.2s ease-out" }}
-  />
+                  {/* Cône lumineux doux */}
+                  <ellipse
+                    cx={mousePosition.x}
+                    cy={mousePosition.y - 150}
+                    rx="200"
+                    ry="500"
+                    fill="url(#torch-gradient)"
+                  />
+                </mask>
+              </defs>
 
-  {/* (optionnel) ajout d’un léger halo jaune-blanc dans le cône */}
-  <ellipse
-    cx={mousePosition.x}
-    cy={mousePosition.y - 150}
-    rx="200"
-    ry="500"
-    fill="url(#torch-gradient)"
-    style={{
-      pointerEvents: "none",
-      mixBlendMode: "screen",
-      opacity: 0.15,
-    }}
-  />
-</svg>
+              {/* Calque noir semi-transparent avec le masque appliqué */}
+              <rect
+                width="100%"
+                height="100%"
+                fill="black"
+                fillOpacity="0.7"
+                mask="url(#torch-mask)"
+                style={{ transition: "all 0.2s ease-out" }}
+              />
 
-
-
-
-        )}
+              {/* Halo jaune-blanc doux (optionnel pour style ciné) */}
+              <ellipse
+                cx={mousePosition.x}
+                cy={mousePosition.y - 150}
+                rx="200"
+                ry="500"
+                fill="url(#torch-gradient)"
+                style={{
+                  pointerEvents: "none",
+                  mixBlendMode: "screen",
+                  opacity: 0.15,
+                }}
+              />
+            </svg>,
+            document.body // Affiche le SVG dans le body
+          )
+        }
       </div>
     </TorchContext.Provider>
   );
 };
 
-// Re-export useIlluminated for backward compatibility
 export { useIlluminated } from './useElementIllumination';
