@@ -1,6 +1,5 @@
 
 import React from 'react';
-import BackgroundVideo from '../effects/BackgroundVideo';
 
 interface BackgroundProps {
   useVideo?: boolean;
@@ -11,15 +10,8 @@ export const Background = ({
   useVideo = true,
   depth = 0.08 
 }: BackgroundProps) => {
-  // Si useVideo est true, on utilise le composant BackgroundVideo
-  if (useVideo) {
-    return <BackgroundVideo 
-      videoUrl="/lovable-uploads/videonormale.mp4"
-      videoUrlUV="/lovable-uploads/videouv.mp4" 
-    />;
-  }
-  
-  // Sinon, on utilise un fond noir simple avec la grille et l'effet de vignette
+  // Ne plus utiliser la vidéo ici, car elle est maintenant gérée au niveau de l'App
+  // Utiliser uniquement un fond noir simple avec la grille et l'effet de vignette
   return (
     <div 
       className="fixed inset-0 w-full h-full bg-black"

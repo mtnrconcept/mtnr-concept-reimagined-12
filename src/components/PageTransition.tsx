@@ -76,7 +76,7 @@ export default function PageTransition({
         </div>
       </ElevatorTransition>
 
-      {/* Utilisation du nouveau composant de transition */}
+      {/* Utilisation du composant de transition */}
       <PageContentTransition>
         <motion.div
           ref={contentRef}

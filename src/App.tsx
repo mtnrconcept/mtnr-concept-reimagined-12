@@ -49,7 +49,7 @@ function AnimatedRoutes() {
   
   return (
     <>
-      {/* Vidéo de fond avec chemins mis à jour */}
+      {/* Une seule vidéo de fond au niveau de l'application */}
       <BackgroundVideo 
         videoUrl="/lovable-uploads/videonormale.mp4"
         videoUrlUV="/lovable-uploads/videouv.mp4"
