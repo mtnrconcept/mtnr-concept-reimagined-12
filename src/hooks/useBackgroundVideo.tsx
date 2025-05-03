@@ -9,8 +9,8 @@ import { useDurationChange } from './video/useDurationChange';
 import { UseBackgroundVideoProps, UseBackgroundVideoReturn } from './video/types';
 
 export function useBackgroundVideo({
-  videoUrl = "/lovable-uploads/Composition 1.mp4",
-  videoUrlUV = "/lovable-uploads/Composition 1_1.mp4",
+  videoUrl = "/lovable-uploads/Composition_1.mp4", // Remplacé les espaces par des underscores
+  videoUrlUV = "/lovable-uploads/Composition_1_1.mp4", // Remplacé les espaces par des underscores
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png",
   autoPlay = false
 }: UseBackgroundVideoProps = {}): UseBackgroundVideoReturn {

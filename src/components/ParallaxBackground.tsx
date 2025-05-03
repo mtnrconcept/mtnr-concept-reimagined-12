@@ -9,8 +9,11 @@ interface ParallaxBackgroundProps {
 export default function ParallaxBackground({ children }: ParallaxBackgroundProps) {
   return (
     <>
-      {/* Remplacer l'image de fond par la vidéo */}
-      <BackgroundVideo />
+      {/* Vidéo de fond avec les chemins corrects */}
+      <BackgroundVideo 
+        videoUrl="/lovable-uploads/Composition_1.mp4"
+        videoUrlUV="/lovable-uploads/Composition_1_1.mp4"
+      />
       
       {/* Container pour les éléments parallax */}
       <ParallaxContainer>

@@ -23,9 +23,14 @@ export function useVideoTransition({
     try {
       console.log('Transition vidéo déclenchée (torche ou navigation)');
       setIsTransitioning(true);
-      videoElement.load(); // Recharge la vidéo avec la source actuelle
+      
+      // Assurons-nous que la vidéo est prête à être lue
+      videoElement.load();
       videoElement.currentTime = 0;
       videoElement.playbackRate = 1.0;
+      
+      // Ajout d'un petit délai pour donner le temps à la vidéo de se charger
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Ajouter l'écouteur d'événement 'ended' avant de lancer la lecture
       const handleVideoEnded = () => {
@@ -42,7 +47,22 @@ export function useVideoTransition({
       // Ajouter l'écouteur d'événement
       videoElement.addEventListener('ended', handleVideoEnded);
       
-      await videoElement.play();
+      // Utiliser une approche plus robuste pour lire la vidéo
+      try {
+        const playPromise = videoElement.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          console.log('Lecture vidéo démarrée avec succès');
+        }
+      } catch (playError) {
+        console.error('Erreur lors de la lecture de la vidéo:', playError);
+        // Gérer les erreurs de lecture spécifiques
+        if (playError.name === 'AbortError') {
+          console.warn('Lecture vidéo interrompue par une autre action');
+        }
+        setIsTransitioning(false);
+        videoElement.removeEventListener('ended', handleVideoEnded);
+      }
     } catch (error) {
       console.error('Erreur lors de la lecture de la vidéo:', error);
       setIsTransitioning(false);

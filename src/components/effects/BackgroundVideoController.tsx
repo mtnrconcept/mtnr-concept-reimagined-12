@@ -11,19 +11,27 @@ export const BackgroundVideoController = () => {
       console.info('Préchargement des vidéos');
       
       const videoUrls = [
-        '/lovable-uploads/Composition_1.mp4',
-        '/lovable-uploads/Composition_1_1.mp4'
+        '/lovable-uploads/Composition_1.mp4',  // Remplacé les espaces par des underscores
+        '/lovable-uploads/Composition_1_1.mp4' // Remplacé les espaces par des underscores
       ];
       
       try {
         // Précharger les deux vidéos
         for (const url of videoUrls) {
+          console.info(`Tentative de préchargement de la vidéo ${url}`);
+          
           // Tenter de mettre en cache les vidéos
           if ('caches' in window) {
-            const cache = await caches.open('video-cache');
             try {
-              await cache.add(url);
-              console.info(`Vidéo ${url} mise en cache`);
+              const cache = await caches.open('video-cache');
+              const response = await fetch(url, { method: 'HEAD' });
+              
+              if (response.ok) {
+                await cache.add(url);
+                console.info(`Vidéo ${url} mise en cache avec succès`);
+              } else {
+                console.error(`Échec de mise en cache: ${url} - statut: ${response.status}`);
+              }
             } catch (err) {
               console.error(`Erreur lors de la mise en cache de ${url}:`, err);
             }
@@ -34,6 +42,12 @@ export const BackgroundVideoController = () => {
           video.preload = 'auto';
           video.muted = true;
           video.src = url;
+          
+          // Gérer les erreurs de chargement
+          video.addEventListener('error', (e) => {
+            console.error(`Erreur lors du préchargement de ${url}:`, e);
+          });
+          
           video.load();
           
           // Attendre que la vidéo soit suffisamment chargée
@@ -55,6 +69,7 @@ export const BackgroundVideoController = () => {
     
     return () => {
       // Cleanup si nécessaire
+      console.info('Nettoyage du contrôleur vidéo');
     };
   }, []);
 
