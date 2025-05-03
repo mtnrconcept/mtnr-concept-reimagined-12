@@ -37,7 +37,7 @@ export const useParallaxEffect = (containerRef: React.RefObject<HTMLDivElement>)
       const bgElements = document.querySelectorAll<HTMLElement>('[data-depth="0.05"]');
       bgElements.forEach((el) => {
         if (!el.classList.contains('parallax-element')) {
-          const translateY = scrollY * 0.10; // Coefficient positif et réduit (10%)
+          const translateY = -scrollY * 0.10; // Coefficient positif et réduit (10%)
           el.style.transform = `translateY(${translateY}px) scale(1.1)`;
         }
       });
