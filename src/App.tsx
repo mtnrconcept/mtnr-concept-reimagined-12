@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
+import ParallaxScene from "./components/ParallaxScene";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
