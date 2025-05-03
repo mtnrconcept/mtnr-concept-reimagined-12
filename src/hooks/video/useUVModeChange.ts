@@ -29,11 +29,16 @@ export function useUVModeChange({
     if (previousUVModeRef.current !== uvMode) {
       previousUVModeRef.current = uvMode;
       
-      // On n'a plus besoin de changer la source vidéo ici
-      // car nous utilisons deux vidéos séparées avec opacité
-      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, transition par opacité`);
+      // Mettre à jour la source vidéo en fonction du mode UV
+      const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
+      
+      if (currentVideo !== newVideoUrl) {
+        console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
+        setCurrentVideo(newVideoUrl);
+        // Note: Nous ne déclenchons plus de lecture vidéo ici
+      }
     }
-  }, [uvMode]);
+  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo]);
 
   return { uvMode, isTorchActive };
 }

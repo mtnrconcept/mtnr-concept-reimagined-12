@@ -14,9 +14,10 @@ export function useTorchHandler({
   playVideoTransition,
 }: UseTorchHandlerProps) {
   // Ne plus déclencher de transition vidéo lors de l'activation/désactivation de la torche
-  // Nous utilisons uniquement l'opacité CSS pour la transition entre les vidéos
+  // La vidéo reste en pause et seule la source est changée
   useEffect(() => {
-    // Ne déclencher aucune lecture de vidéo quand la torche est activée/désactivée
-    // La lecture est déclenchée uniquement lors des changements de page
+    // Ne rien faire lorsque la torche est activée/désactivée
+    // Le changement de vidéo se fait via useUVModeChange sans lecture
+    console.log(`Statut torche modifié: ${isTorchActive ? 'active' : 'inactive'}, aucune lecture vidéo déclenchée`);
   }, [isTorchActive, isFirstLoad]);
 }

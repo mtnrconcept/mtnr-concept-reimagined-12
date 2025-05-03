@@ -61,7 +61,7 @@ export function useBackgroundVideo({
   // Mise à jour des actions avec les fonctions réelles
   videoActions.playVideoTransition = playVideoTransition;
   
-  // Hook pour gérer le changement de mode UV
+  // Hook pour gérer le changement de mode UV (sans lecture automatique)
   const { uvMode, isTorchActive } = useUVModeChange({
     videoUrl,
     videoUrlUV,
@@ -77,14 +77,14 @@ export function useBackgroundVideo({
     fallbackImage
   });
   
-  // Hook pour gérer la navigation
+  // Hook pour gérer la navigation (avec lecture de la vidéo)
   useNavigationHandler({
     videoRef,
     videoState,
     videoActions
   });
   
-  // Hook pour gérer l'activation/désactivation de la torche
+  // Hook pour gérer l'activation/désactivation de la torche (sans lecture)
   useTorchHandler({
     isTorchActive,
     isFirstLoad,

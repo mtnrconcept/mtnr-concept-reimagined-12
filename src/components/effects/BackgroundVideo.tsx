@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import useBackgroundVideo from '../../hooks/useBackgroundVideo';
 import { useUVMode } from './UVModeContext';
 import { useLocation } from 'react-router-dom';
 import { useNavigation } from './NavigationContext';
@@ -17,8 +16,7 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   fallbackImage = "/lovable-uploads/edc0f8c8-4feb-44fd-ad3a-d1bf77f75bf6.png"
 }) => {
   // Références pour les éléments vidéo
-  const normalVideoRef = useRef<HTMLVideoElement>(null);
-  const uvVideoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   const [loadingStatus, setLoadingStatus] = useState('loading');
   const [videoError, setVideoError] = useState(false);
@@ -32,27 +30,25 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   // Utilisation du contexte UV pour déterminer quelle vidéo afficher
   const { uvMode } = useUVMode();
 
-  // Effet pour initialiser les vidéos au chargement
+  // Effet pour initialiser la vidéo au chargement
   useEffect(() => {
-    const normalVideo = normalVideoRef.current;
-    const uvVideo = uvVideoRef.current;
+    const video = videoRef.current;
     
-    if (!normalVideo || !uvVideo) return;
+    if (!video) return;
     
-    // Configuration initiale des vidéos
+    // Configuration initiale de la vidéo
     const setupVideo = async () => {
       try {
-        // Chargement initial des deux vidéos mais sans lecture
-        normalVideo.load();
-        uvVideo.load();
+        // Définir la source vidéo en fonction du mode UV
+        video.src = uvMode ? videoUrlUV : videoUrl;
         
-        // Les vidéos restent en pause initialement
-        normalVideo.pause();
-        uvVideo.pause();
+        // Chargement initial de la vidéo mais sans lecture
+        video.load();
+        video.pause();
         
         setLoadingStatus('ready');
       } catch (error) {
-        console.error('Erreur lors de l\'initialisation des vidéos:', error);
+        console.error('Erreur lors de l\'initialisation de la vidéo:', error);
         setVideoError(true);
         setLoadingStatus('error');
       }
@@ -61,12 +57,24 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
     setupVideo();
   }, []);
 
+  // Mise à jour de la source vidéo lors du changement de mode UV
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    // Changer la source vidéo quand le mode UV change
+    video.src = uvMode ? videoUrlUV : videoUrl;
+    video.load();
+    video.pause();
+    
+    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée`);
+  }, [uvMode, videoUrl, videoUrlUV]);
+
   // Gestion des changements de page pour démarrer la lecture
   useEffect(() => {
-    const normalVideo = normalVideoRef.current;
-    const uvVideo = uvVideoRef.current;
+    const video = videoRef.current;
     
-    if (!normalVideo || !uvVideo) return;
+    if (!video) return;
     
     // Vérifier si la page a réellement changé
     if (location.pathname !== previousPathRef.current) {
@@ -75,108 +83,84 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       
       setIsTransitioning(true);
       
-      // Lire la vidéo appropriée selon le mode UV
-      if (uvMode) {
-        uvVideo.currentTime = 0;
-        uvVideo.play()
-          .then(() => console.log('Lecture de la vidéo UV démarrée'))
-          .catch(err => console.error('Erreur de lecture vidéo UV:', err));
-      } else {
-        normalVideo.currentTime = 0;
-        normalVideo.play()
-          .then(() => console.log('Lecture de la vidéo normale démarrée'))
-          .catch(err => console.error('Erreur de lecture vidéo normale:', err));
-      }
+      // Remettre la vidéo au début et lancer la lecture
+      video.currentTime = 0;
+      video.play()
+        .then(() => console.log('Lecture de la vidéo démarrée pour transition de page'))
+        .catch(err => console.error('Erreur de lecture vidéo:', err));
     }
-  }, [location.pathname, uvMode]);
+  }, [location.pathname]);
 
   // Écouter les événements de navigation (via NavigationContext)
   useEffect(() => {
     const handleTransition = () => {
-      const normalVideo = normalVideoRef.current;
-      const uvVideo = uvVideoRef.current;
+      const video = videoRef.current;
       
-      if (!normalVideo || !uvVideo) return;
+      if (!video) return;
       
       setIsTransitioning(true);
       
-      // Lire la vidéo appropriée selon le mode UV
-      if (uvMode) {
-        uvVideo.currentTime = 0;
-        uvVideo.play()
-          .then(() => console.log('Lecture de la vidéo UV démarrée (via navigationContext)'))
-          .catch(err => console.error('Erreur de lecture vidéo UV:', err));
-      } else {
-        normalVideo.currentTime = 0;
-        normalVideo.play()
-          .then(() => console.log('Lecture de la vidéo normale démarrée (via navigationContext)'))
-          .catch(err => console.error('Erreur de lecture vidéo normale:', err));
-      }
+      // Remettre la vidéo au début et lancer la lecture
+      video.currentTime = 0;
+      video.play()
+        .then(() => console.log('Lecture de la vidéo démarrée (via navigationContext)'))
+        .catch(err => console.error('Erreur de lecture vidéo:', err));
     };
     
     // S'abonner au contexte de navigation pour les transitions
     const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
-  }, [navigation, uvMode]);
+  }, [navigation]);
 
   // Gestion des événements vidéo
   useEffect(() => {
-    const handleEvents = (video: HTMLVideoElement | null, name: string) => {
-      if (!video) return;
-      
-      const handleCanPlay = () => {
-        console.log(`Vidéo ${name} prête à être lue:`, video.src);
-      };
-      
-      const handlePlaying = () => {
-        console.log(`Lecture vidéo ${name} démarrée:`, video.src);
-      };
-      
-      const handlePause = () => {
-        console.log(`Lecture vidéo ${name} mise en pause:`, video.src);
-      };
-      
-      const handleEnded = () => {
-        console.log(`Vidéo ${name} terminée, mise en pause automatique`);
-        setIsTransitioning(false);
-        // Mettre en pause la vidéo lorsqu'elle est terminée
-        video.pause();
-      };
-      
-      const handleError = (e: Event) => {
-        console.error(`Erreur vidéo ${name} détectée:`, e);
-        setVideoError(true);
-        setLoadingStatus('error');
-      };
-      
-      const handleWaiting = () => {
-        console.log(`Vidéo ${name} en attente de données:`, video.src);
-        setLoadingStatus('waiting');
-      };
-
-      video.addEventListener('canplay', handleCanPlay);
-      video.addEventListener('playing', handlePlaying);
-      video.addEventListener('pause', handlePause);
-      video.addEventListener('ended', handleEnded);
-      video.addEventListener('error', handleError);
-      video.addEventListener('waiting', handleWaiting);
-
-      return () => {
-        video.removeEventListener('canplay', handleCanPlay);
-        video.removeEventListener('playing', handlePlaying);
-        video.removeEventListener('pause', handlePause);
-        video.removeEventListener('ended', handleEnded);
-        video.removeEventListener('error', handleError);
-        video.removeEventListener('waiting', handleWaiting);
-      };
+    const video = videoRef.current;
+    if (!video) return;
+    
+    const handleCanPlay = () => {
+      console.log('Vidéo prête à être lue:', video.src);
     };
     
-    const cleanupNormal = handleEvents(normalVideoRef.current, 'normale');
-    const cleanupUV = handleEvents(uvVideoRef.current, 'UV');
+    const handlePlaying = () => {
+      console.log('Lecture vidéo démarrée:', video.src);
+    };
     
+    const handlePause = () => {
+      console.log('Lecture vidéo mise en pause:', video.src);
+    };
+    
+    const handleEnded = () => {
+      console.log('Vidéo terminée, mise en pause automatique');
+      setIsTransitioning(false);
+      // Mettre en pause la vidéo lorsqu'elle est terminée
+      video.pause();
+    };
+    
+    const handleError = (e: Event) => {
+      console.error('Erreur vidéo détectée:', e);
+      setVideoError(true);
+      setLoadingStatus('error');
+    };
+    
+    const handleWaiting = () => {
+      console.log('Vidéo en attente de données:', video.src);
+      setLoadingStatus('waiting');
+    };
+
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('ended', handleEnded);
+    video.addEventListener('error', handleError);
+    video.addEventListener('waiting', handleWaiting);
+
     return () => {
-      cleanupNormal?.();
-      cleanupUV?.();
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('waiting', handleWaiting);
     };
   }, []);
 
@@ -204,28 +188,16 @@ export const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         </div>
       )}
       
-      {/* Vidéo normale - visible quand UV est désactivé */}
+      {/* Une seule vidéo avec source dynamique */}
       <video
-        ref={normalVideoRef}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${uvMode ? 'opacity-0' : 'opacity-100'}`}
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
         poster={fallbackImage}
         playsInline
         muted
         preload="auto"
       >
-        <source src={videoUrl} type="video/mp4" />
-      </video>
-      
-      {/* Vidéo UV - visible quand UV est activé */}
-      <video
-        ref={uvVideoRef}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${uvMode ? 'opacity-100' : 'opacity-0'}`}
-        poster={fallbackImage}
-        playsInline
-        muted
-        preload="auto"
-      >
-        <source src={videoUrlUV} type="video/mp4" />
+        <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />
       </video>
       
       {/* Grille */}
