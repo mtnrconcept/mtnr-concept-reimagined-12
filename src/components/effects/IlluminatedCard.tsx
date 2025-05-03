@@ -1,9 +1,11 @@
 
 import React from 'react';
 import { useIlluminated } from './TorchContext';
+import { useTorch } from './TorchContext';
 
 export const IlluminatedCard = ({ children }: { children: React.ReactNode }) => {
-  const { ref, isTorchActive } = useIlluminated();
+  const { ref } = useIlluminated();
+  const { isTorchActive } = useTorch();
   
   return (
     <div
