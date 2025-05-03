@@ -115,8 +115,8 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Masque de la torche */}
-      {isTorchActive && !uvMode &&
+      {/* Masque de la torche normale - toujours affiché quand la torche est active, même en mode UV */}
+      {isTorchActive &&
         createPortal(
           <div 
             className="fixed inset-0 z-[99] pointer-events-none"
@@ -129,6 +129,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 rgba(0,0,0,0.9) 100%)`,
               mixBlendMode: 'normal',
               transition: 'all 0.05s ease-out',
+              opacity: uvMode ? '0.7' : '1', // Réduire l'opacité en mode UV mais toujours visible
             }}
           >
             {/* Halo lumineux au centre */}

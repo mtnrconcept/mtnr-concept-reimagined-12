@@ -43,8 +43,9 @@ export default function UVHiddenMessage({
       // Elliptical mask radius augmenté pour meilleure visibilité
       const threshold = 200; 
       
-      if (distance < threshold && uvMode) {
+      if (distance < threshold && uvMode && isTorchActive) {
         setIsVisible(true);
+        messageRef.current.style.visibility = 'visible';
         
         // Diviser le texte en caractères et appliquer des opacités variables
         if (messageRef.current) {
@@ -93,9 +94,20 @@ export default function UVHiddenMessage({
           messageRef.current.classList.remove('visible');
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+          // Ne pas cacher tout de suite pour permettre l'animation de transition
+          setTimeout(() => {
+            if (messageRef.current && !isVisible) {
+              messageRef.current.style.visibility = 'hidden';
+            }
+          }, 300);
         }
       }
     };
+
+    // S'assurer que le message est visible par défaut en mode UV
+    if (messageRef.current && uvMode && isTorchActive) {
+      messageRef.current.classList.add('uv-ready');
+    }
 
     window.addEventListener('mousemove', handleMouseMove);
     
@@ -105,7 +117,7 @@ export default function UVHiddenMessage({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY]);
+  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY, isVisible]);
 
   // Render even when not visible to ensure we have DOM elements to check against
   return (
@@ -122,6 +134,7 @@ export default function UVHiddenMessage({
         letterSpacing: '0.07em',
         fontWeight: 'bold',
         backgroundColor: 'transparent', // Remove any background
+        visibility: 'hidden', // Start hidden
       }}
     >
       {message}

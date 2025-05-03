@@ -31,16 +31,18 @@ export const TorchToggle = () => {
       }
     }
 
-    // Si on désactive le mode UV, on désactive la torche
-    if (uvMode) {
-      setIsTorchActive(false);
+    // Si on active le mode UV, on s'assure que la torche est active également
+    if (!uvMode) {
+      // Activer la torche si elle n'est pas déjà active
+      if (!isTorchActive) {
+        setIsTorchActive(true);
+      }
       toggleUVMode();
-      console.log("UV mode off");
+      console.log("UV mode on, torch activated");
     } else {
-      // Si on active le mode UV, on s'assure que la torche est active
-      setIsTorchActive(true);
+      // Si on désactive le mode UV, on laisse la torche classique active
       toggleUVMode();
-      console.log("UV mode on");
+      console.log("UV mode off, torch remains active");
     }
   };
 
