@@ -11,8 +11,8 @@ export const BackgroundVideoController = () => {
       console.info('Préchargement des vidéos');
       
       const videoUrls = [
-        '/lovable-uploads/Composition 1.mp4',
-        '/lovable-uploads/Composition 1_1.mp4'
+        '/lovable-uploads/Composition_1.mp4',
+        '/lovable-uploads/Composition_1_1.mp4'
       ];
       
       try {
