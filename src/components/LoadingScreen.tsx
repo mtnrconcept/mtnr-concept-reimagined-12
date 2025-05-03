@@ -16,6 +16,26 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("Initialisation...");
   
+  // Liste des messages à afficher pendant le chargement
+  const loadingMessages = [
+    "Initialisation...",
+    "Chargement des vidéos...",
+    "Préparation des effets spéciaux...",
+    "Activation du mode UV...",
+    "Synchronisation des transitions...",
+    "Chargement des secrets...",
+    "Optimisation de la performance...",
+    "Préchargement des pages...",
+    "Presque prêt..."
+  ];
+  
+  // Fonction pour mettre à jour le texte en fonction de la progression
+  // Déplacée avant son utilisation pour éviter l'erreur
+  const updateLoadingText = (currentProgress: number) => {
+    const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
+    setLoadingText(loadingMessages[messageIndex]);
+  };
+  
   useEffect(() => {
     // Utiliser la progression externe si elle est fournie
     if (externalProgress !== undefined) {
@@ -34,25 +54,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       
       return;
     }
-    
-    // Liste des messages à afficher pendant le chargement
-    const loadingMessages = [
-      "Initialisation...",
-      "Chargement des vidéos...",
-      "Préparation des effets spéciaux...",
-      "Activation du mode UV...",
-      "Synchronisation des transitions...",
-      "Chargement des secrets...",
-      "Optimisation de la performance...",
-      "Préchargement des pages...",
-      "Presque prêt..."
-    ];
-    
-    // Fonction pour mettre à jour le texte en fonction de la progression
-    const updateLoadingText = (currentProgress: number) => {
-      const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
-      setLoadingText(loadingMessages[messageIndex]);
-    };
     
     // Simuler une progression de chargement
     let currentProgress = 0;
@@ -77,24 +78,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
     
     return () => clearInterval(interval);
   }, [onLoadingComplete, externalProgress]);
-  
-  // Fonction pour mettre à jour le texte de chargement en fonction de la progression
-  const updateLoadingText = (currentProgress: number) => {
-    const loadingMessages = [
-      "Initialisation...",
-      "Chargement des vidéos...",
-      "Préparation des effets spéciaux...",
-      "Activation du mode UV...",
-      "Synchronisation des transitions...",
-      "Chargement des secrets...",
-      "Optimisation de la performance...",
-      "Préchargement des pages...",
-      "Presque prêt..."
-    ];
-    
-    const messageIndex = Math.floor((currentProgress / 100) * (loadingMessages.length - 1));
-    setLoadingText(loadingMessages[messageIndex]);
-  };
   
   return (
     <motion.div
