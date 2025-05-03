@@ -34,7 +34,7 @@
     transition: transform 0.1s ease-out;
   }
   
-  /* UV light circle - effet adouci comme demandé */
+  /* UV light circle - effet adouci */
   .uv-light-circle {
     position: fixed;
     width: 600px;
@@ -65,5 +65,11 @@
   
   .uv-light-circle.active {
     animation: uv-vibration 4s infinite;
+  }
+  
+  /* Isoler les contrôles de torche */
+  .torch-controls {
+    isolation: isolate;
+    z-index: 200;
   }
 }

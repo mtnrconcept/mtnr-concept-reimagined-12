@@ -51,40 +51,13 @@ export default function Navbar() {
     navigation.triggerVideoTransition();
   };
 
-  const navVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 24 
-      }
-    }
-  };
-
+  // On supprime les animations pour que la navbar reste toujours visible
   return (
-    <motion.nav 
+    <nav 
       className={cn(
-        "w-full fixed top-0 left-0 z-50 transition-all duration-300",
+        "w-full fixed top-0 left-0 z-[100] transition-all duration-300",
         scrolled ? "bg-black/85 backdrop-blur-lg shadow-lg" : "bg-transparent"
       )}
-      initial="hidden"
-      animate="visible"
-      variants={navVariants}
       style={{ 
         perspective: "1000px",
         transformStyle: "preserve-3d"
@@ -113,7 +86,7 @@ export default function Navbar() {
         {/* Desktop navigation - centered */}
         <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
           {navLinks.map((link, index) => (
-            <motion.li key={link.path} variants={itemVariants}>
+            <li key={link.path}>
               <Link
                 to={link.path}
                 className={cn(
@@ -134,9 +107,9 @@ export default function Navbar() {
                   />
                 )}
               </Link>
-            </motion.li>
+            </li>
           ))}
-          <motion.li variants={itemVariants}>
+          <li>
             <Link 
               to="/book" 
               className="ml-2 px-5 py-2.5 bg-yellow-400/90 text-black font-bold rounded-lg border border-yellow-600/20 hover:bg-yellow-300 transition-all shadow-md hover:shadow-yellow-400/20 relative overflow-hidden group"
@@ -145,26 +118,20 @@ export default function Navbar() {
               <span className="relative z-10">Book Now</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-300 to-yellow-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
             </Link>
-          </motion.li>
+          </li>
         </ul>
       </div>
       
       {/* Mobile navigation */}
       {menuOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-black/95 backdrop-blur-lg border-t border-yellow-400/20 animate-fade-in">
-          <motion.ul 
+          <ul 
             className="flex flex-col py-3"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ staggerChildren: 0.05, delayChildren: 0.05 }}
           >
             {navLinks.map((link) => (
-              <motion.li 
+              <li 
                 key={link.path} 
                 className="border-b border-yellow-400/10 last:border-b-0"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
               >
                 <Link
                   to={link.path}
@@ -179,13 +146,10 @@ export default function Navbar() {
                 >
                   {link.name}
                 </Link>
-              </motion.li>
+              </li>
             ))}
-            <motion.li 
+            <li 
               className="px-6 py-3"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2, delay: 0.3 }}
             >
               <Link 
                 to="/book" 
@@ -197,10 +161,10 @@ export default function Navbar() {
               >
                 Book Now
               </Link>
-            </motion.li>
-          </motion.ul>
+            </li>
+          </ul>
         </div>
       )}
-    </motion.nav>
+    </nav>
   );
 }
