@@ -16,6 +16,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [isInitialPageLoad, setIsInitialPageLoad] = useState(true);
   const lastScrollPositionRef = useRef(0);
 
+  // Ajouter une classe permettant le scroll à l'élément body
+  useEffect(() => {
+    document.body.classList.add('allow-scroll');
+    return () => {
+      document.body.classList.remove('allow-scroll');
+    };
+  }, []);
+
   useEffect(() => {
     // Sauvegarder la position de défilement actuelle
     lastScrollPositionRef.current = window.scrollY;
@@ -52,7 +60,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           // Ne pas remonter en haut pour les transitions entre pages
           // sauf si c'est explicitement demandé
           if (!window.scrollToTopRequested) {
-            window.scrollTo(0, lastScrollPositionRef.current);
+            window.scrollTo(0, 0); // Toujours remonter en haut lors des changements de page
           } else {
             // Réinitialiser le flag après utilisation
             window.scrollToTopRequested = false;
@@ -60,7 +68,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         }, 100);
       }, 0);
       
-    }, 3000);
+    }, 300); // Réduit le temps de transition pour une meilleure expérience
 
     return () => clearTimeout(timer);
   }, [children, location, isInitialPageLoad]);
@@ -70,8 +78,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Initial est soit un fondu simple, soit un effet plus complexe selon le contexte
     initial: (isInitial: boolean) => ({
       opacity: 0,
-      y: isInitial ? 0 : "100vh", // Pas de mouvement vertical au chargement initial
-      filter: isInitial ? "blur(0px)" : "blur(12px)" // Pas de flou au chargement initial
+      y: isInitial ? 0 : "10vh", // Réduction du mouvement vertical
+      filter: isInitial ? "blur(0px)" : "blur(5px)" // Réduction de l'effet de flou
     }),
     animate: {
       opacity: 1,
@@ -79,30 +87,30 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { 
-          duration: isInitialPageLoad ? 1.0 : 3.0, 
+          duration: isInitialPageLoad ? 0.5 : 1.0, // Transitions plus rapides
           ease: "easeOut" 
         },
         y: { 
-          duration: isInitialPageLoad ? 0 : 3.5, 
+          duration: isInitialPageLoad ? 0 : 1.0, // Transitions plus rapides
           ease: [0.05, 0.2, 0.2, 1.0] 
         },
         filter: { 
-          duration: isInitialPageLoad ? 0 : 3.0, 
+          duration: isInitialPageLoad ? 0 : 0.8, // Transitions plus rapides
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
     },
     exit: {
       opacity: 0,
-      y: "-100vh",
-      filter: "blur(12px)",
+      y: "-10vh", // Réduction du mouvement vertical
+      filter: "blur(5px)", // Réduction de l'effet de flou
       transition: {
-        opacity: { duration: 4.1, ease: [0.33, 1, 0.68, 1] },
+        opacity: { duration: 0.8, ease: [0.33, 1, 0.68, 1] }, // Transitions plus rapides
         y: { 
-          duration: 3.5,
+          duration: 0.8, // Transitions plus rapides
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 2.9, ease: [0.33, 1, 0.68, 1] }
+        filter: { duration: 0.8, ease: [0.33, 1, 0.68, 1] } // Transitions plus rapides
       }
     }
   };
@@ -116,7 +124,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         initial={isInitialPageLoad ? { opacity: 0 } : "initial"}
         animate={contentVisible ? "animate" : "initial"}
         exit={isInitialPageLoad ? { opacity: 0 } : "exit"}
-        className="relative min-h-screen w-full"
+        className="relative min-h-screen w-full overflow-visible"
         style={{
           paddingTop: "64px",
           zIndex: 10,

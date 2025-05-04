@@ -25,7 +25,7 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
     const bottomDeadZoneLimit = centerY + deadZone / 2;
     
     // Vitesse maximale réduite pour un défilement plus doux
-    const maxSpeed = isMobile ? 4 : 6;
+    const maxSpeed = isMobile ? 2 : 3; // Réduit pour une expérience plus fluide
     
     if (posY < topDeadZoneLimit) {
       // Défilement vers le haut
@@ -65,7 +65,7 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
       const speed = calculateScrollSpeed(mousePosition.y);
       
       // N'appliquer le défilement que si la vitesse est significative
-      if (Math.abs(speed) > 0.5) {
+      if (Math.abs(speed) > 0.1) {
         // Utiliser scrollBy au lieu de scrollTo pour éviter de revenir en haut
         window.scrollBy({
           top: speed,
@@ -79,7 +79,7 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
     // Démarrer l'animation avec un délai plus court
     const timeoutId = setTimeout(() => {
       scrollAnimationRef.current = requestAnimationFrame(scrollAnimation);
-    }, 100);
+    }, 50);
     
     // Nettoyer l'animation et le timeout lors du démontage ou des changements de dépendances
     return () => {

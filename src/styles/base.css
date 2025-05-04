@@ -9,7 +9,7 @@
     @apply h-full bg-black text-white antialiased;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
-    /* Forcer le scroll vertical pour éviter les rebonds/sauts */
+    /* Activer le scroll vertical */
     overflow-y: auto;
     /* Désactiver le pull-to-refresh sur mobile */
     overscroll-behavior-y: none;
@@ -61,8 +61,9 @@
   /* Rendre les conteneurs de contenu scrollables */
   .content-container {
     position: relative;
+    height: auto;
     min-height: 100vh;
-    overflow-y: auto;
+    overflow-y: visible;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
   }
@@ -76,14 +77,14 @@
   
   /* Optimisations de scroll pour mobile */
   html, body {
-    position: fixed;
+    position: relative; /* Changé de fixed à relative pour permettre le défilement */
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow-y: auto; /* Permettre le scroll vertical */
   }
   
   .content-container {
-    position: absolute;
+    position: relative; /* Changé de absolute à relative */
     top: 0;
     left: 0;
     right: 0;
@@ -91,4 +92,14 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* Styles pour les modes de défilement */
+body.allow-scroll {
+  overflow-y: auto !important;
+  position: relative !important;
+}
+
+.content-scrollable {
+  overflow-y: auto !important;
 }

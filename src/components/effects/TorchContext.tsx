@@ -67,6 +67,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     if (isTorchActive) {
       document.body.classList.add('torch-active');
+      document.body.classList.add('allow-scroll'); // Toujours permettre le défilement
       
       // Préserver la position de défilement existante
       const currentScrollY = window.scrollY;
@@ -80,18 +81,18 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       window.scrollTo(0, currentScrollY);
     } else {
       document.body.classList.remove('torch-active');
+      document.body.classList.add('allow-scroll'); // Toujours permettre le défilement
       
-      // Supprimer la classe content-scrollable
+      // Conserver la classe content-scrollable pour permettre le défilement
       document.querySelectorAll('.content-container').forEach(el => {
-        el.classList.remove('content-scrollable');
+        el.classList.add('content-scrollable');
       });
     }
     
     return () => {
       document.body.classList.remove('torch-active');
-      document.querySelectorAll('.content-container').forEach(el => {
-        el.classList.remove('content-scrollable');
-      });
+      document.body.classList.add('allow-scroll');
+      // Ne pas supprimer content-scrollable pour préserver le défilement
     };
   }, [isTorchActive]);
 
@@ -111,7 +112,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     <TorchContext.Provider value={contextValue}>
       <div
         ref={containerRef}
-        className="relative w-full h-full overflow-hidden"
+        className="relative w-full h-full overflow-visible" // Permettre le scroll
         style={{ position: "relative", zIndex: 0 }}
       >
         {children}
