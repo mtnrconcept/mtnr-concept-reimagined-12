@@ -50,4 +50,24 @@
     text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF !important;
     letter-spacing: 0.08em;
   }
+  
+  /* Rendre le cadre invisible en mode UV mais garder le texte visible */
+  .uv-mode-active .neon-text-container {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  .uv-mode-active .bg-black/80,
+  .uv-mode-active .paper-texture,
+  .uv-mode-active .border-yellow-400/25 {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  /* S'assurer que le contenu est visible mais le cadre invisible */
+  .uv-mode-active .neon-text {
+    background-color: transparent !important;
+  }
 }
