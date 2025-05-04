@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import { useUVMode } from "./UVModeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TorchContextType {
   isTorchActive: boolean;
@@ -32,6 +33,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
 
@@ -43,16 +45,51 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  // Mouse tracking
+  // Mouse tracking for desktop
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isTorchActive) {
         updateMousePosition({ x: e.clientX, y: e.clientY });
       }
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isTorchActive]);
+    
+    if (!isMobile) {
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
+    }
+  }, [isTorchActive, isMobile]);
+
+  // Touch tracking for mobile
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isTorchActive && e.touches.length > 0) {
+        e.preventDefault(); // Prevent scrolling when torch is active
+        updateMousePosition({ 
+          x: e.touches[0].clientX, 
+          y: e.touches[0].clientY 
+        });
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (isTorchActive && e.touches.length > 0) {
+        updateMousePosition({ 
+          x: e.touches[0].clientX, 
+          y: e.touches[0].clientY 
+        });
+      }
+    };
+
+    if (isMobile) {
+      window.addEventListener("touchmove", handleTouchMove, { passive: false });
+      window.addEventListener("touchstart", handleTouchStart);
+      
+      return () => {
+        window.removeEventListener("touchmove", handleTouchMove);
+        window.removeEventListener("touchstart", handleTouchStart);
+      };
+    }
+  }, [isTorchActive, isMobile]);
 
   // UV logic
   useEffect(() => {
@@ -97,7 +134,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 rgba(0,0,0,0.7) 80%,
                 rgba(0,0,0,0.9) 100%)`,
               mixBlendMode: 'normal',
-              transition: 'all 0.05s ease-out',
+              transition: isMobile ? 'none' : 'all 0.05s ease-out',
             }}
           >
             {/* Halo lumineux au centre */}
@@ -113,6 +150,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 100%)',
                 filter: 'blur(15px)',
                 mixBlendMode: 'screen',
+                transition: isMobile ? 'none' : 'all 0.05s ease-out',
               }}
             />
           </div>,

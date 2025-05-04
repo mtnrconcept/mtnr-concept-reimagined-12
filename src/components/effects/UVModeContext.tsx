@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { useTorch } from "./TorchContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UVModeContextType {
   uvMode: boolean;
@@ -23,6 +24,7 @@ export const useUVMode = () => useContext(UVModeContext);
 export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [uvMode, setUVMode] = useState(false);
   const uvCircleRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   const toggleUVMode = () => {
     setUVMode(prev => !prev);
@@ -34,6 +36,10 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       circle.className = 'uv-light-circle active';
       circle.style.left = `${mousePosition.x}px`;
       circle.style.top = `${mousePosition.y}px`;
+      // Désactiver les transitions sur mobile pour un suivi instantané
+      if (isMobile) {
+        circle.style.transition = 'none';
+      }
       document.body.appendChild(circle);
       uvCircleRef.current = circle;
     }
