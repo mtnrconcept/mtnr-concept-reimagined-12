@@ -36,9 +36,9 @@ export default function ContactPageSecrets() {
       />
       
       <div className="absolute" style={{ 
-        top: '50%', 
-        right: '15%',
-        transform: 'translateY(-50%)',
+        top: '40%', 
+        left: '65%', 
+        transform: 'translate(-50%, -50%)',
         zIndex: 100,
         backgroundColor: 'rgba(0, 10, 30, 0.75)',
         padding: '15px',
@@ -49,12 +49,10 @@ export default function ContactPageSecrets() {
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
-        maxWidth: '250px',
-        opacity: 0, /* Commence invisible */
-        transition: 'opacity 0.3s ease-out'
-      }} id="uv-auth-block">
+        maxWidth: '250px'
+      }}>
         <p style={{ color: "#D2FF3F", fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
-          TEL: +33 6 ** ** ** 42
+          Secret Mixtape Access
         </p>
         <p style={{ color: "#fff", fontSize: "12px", marginBottom: "5px" }}>
           Remplis le code
@@ -102,16 +100,6 @@ export default function ContactPageSecrets() {
         position={{ x: 75, y: 80 }}
         fontSize="0.7rem"
         color="#D946EF"
-      />
-      
-      {/* Script pour rendre visible le bloc d'authentification quand il est illuminé par la torche UV */}
-      <UVSecretMessage
-        message=""
-        position={{ x: 85, y: 50 }}
-        depth="0.2"
-        color="transparent"
-        size="1.5rem"
-        rotation={0}
       />
     </>
   );
