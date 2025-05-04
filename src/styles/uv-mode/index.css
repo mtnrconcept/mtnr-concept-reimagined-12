@@ -1,5 +1,6 @@
 
 /* Main UV mode stylesheet - imports all UV mode style modules */
+@import '../base.css';
 @import './base.css';
 @import './animations.css';
 @import './text.css';
@@ -9,4 +10,3 @@
 @import './visual-effects.css';
 @import './electric-text.css';
 @import '../effects/electric-effects.css';
-

@@ -1,3 +1,4 @@
+
 @layer components {
   /** Flashlight overlay */
   .flashlight {
@@ -63,7 +64,7 @@
       rgba(210, 255, 63, 0) 20%,
       rgba(15, 4, 48, 0.05) 40%,
       rgba(10, 0, 60, 0.4) 70%,
-      rgba(0, 0, 0, 0.85) 90%
+      rgba(10, 0, 60, 0.85) 90%
     );
     filter: blur(15px); /* Flou gaussien augmenté pour adoucir les bords */
     will-change: transform, left, top; /* Optimisation pour les animations sur mobile */

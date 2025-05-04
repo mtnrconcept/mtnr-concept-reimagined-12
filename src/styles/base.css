@@ -1,13 +1,48 @@
 
+/* Base styles for Lovable app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/**
- * Global resets and base styles
- */
 @layer base {
-  html, body, #root {
-    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
+  html, body {
+    @apply h-full bg-black text-white antialiased;
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+  }
+  
+  #root {
+    @apply h-full;
+  }
+  
+  * {
+    @apply box-border;
+  }
+  
+  /* Améliorer la visibilité des sélections de texte */
+  ::selection {
+    @apply bg-yellow-400/30 text-white;
+  }
+  
+  /* Personnaliser la barre de défilement */
+  ::-webkit-scrollbar {
+    @apply w-1;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-black/50;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-yellow-400/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-yellow-400/80;
+  }
+
+  /* Suppression des styles par défaut des boutons et inputs */
+  button, input, textarea, select {
+    @apply outline-none;
   }
 }
