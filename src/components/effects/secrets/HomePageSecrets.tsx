@@ -26,7 +26,7 @@ export default function HomePageSecrets() {
         message="ACCESS CODE: 7139" 
         position={{ x: 85, y: 15 }}
         color="#4FA9FF"
-        depth="0.05"
+        depth="0"
         rotation={-3}
       />
       
