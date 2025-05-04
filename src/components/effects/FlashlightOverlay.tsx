@@ -15,11 +15,8 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
   mousePosition
 }) => {
   const isMobile = useIsMobile();
-
-  // Ne rien rendre si les conditions ne sont pas remplies
-  if (!isTorchActive || uvMode) return null;
   
-  // Utiliser useMemo pour calculer les styles basés sur la position de la souris
+  // Préparer les styles en utilisant useMemo peu importe si le composant sera rendu ou non
   const overlayStyle = useMemo(() => ({
     background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
       rgba(0,0,0,0) 0%, 
@@ -43,6 +40,12 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
     mixBlendMode: 'screen' as const,
     transition: isMobile ? 'none' : 'all 0.05s ease-out',
   }), [mousePosition.x, mousePosition.y, isMobile]);
+
+  // Ne pas retourner prématurément, mais conditionnez le rendu du portail
+  if (!isTorchActive || uvMode) {
+    // Renvoyer un fragment vide plutôt que null
+    return <></>;
+  }
 
   return createPortal(
     <div className="fixed inset-0 z-[99] pointer-events-none" style={overlayStyle}>

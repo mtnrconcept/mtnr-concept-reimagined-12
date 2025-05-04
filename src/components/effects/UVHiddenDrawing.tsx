@@ -36,10 +36,7 @@ const UVHiddenDrawing = memo(({
   const { uvMode } = useUVMode();
   const [isVisible, setIsVisible] = useState(false);
   
-  // Return null immediately if conditions are not met
-  if (!uvMode || !isTorchActive) return null;
-  
-  // Memoize container style for better performance
+  // Définir les styles avec useMemo avant toute condition de retour
   const containerStyle = useMemo(() => ({
     left: typeof position.x === 'number' ? `${position.x}%` : position.x,
     top: typeof position.y === 'number' ? `${position.y}%` : position.y,
@@ -48,7 +45,6 @@ const UVHiddenDrawing = memo(({
     zIndex: 50
   }), [position.x, position.y, rotation, scale, isVisible]);
   
-  // Memoize image style for better performance
   const imageStyle = useMemo(() => ({
     width,
     height,
@@ -82,6 +78,11 @@ const UVHiddenDrawing = memo(({
       setIsVisible(false);
     };
   }, [uvMode, isTorchActive, glowColor]);
+
+  // Conditionnez le rendu après avoir défini tous les hooks
+  if (!uvMode || !isTorchActive) {
+    return <></>;
+  }
 
   return (
     <div
