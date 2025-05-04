@@ -85,7 +85,7 @@ function AppContent() {
         {/* Une seule vidéo de fond au niveau de l'application */}
         <BackgroundVideo 
           videoUrl="/lovable-uploads/videofondnormale.mp4"
-          videoUrlUV="/lovable-uploads/videofonduv.mp4"
+          videoUrlUV="/lovable-uploads/videouv.mp4"
         />
         
         {/* Ajout du ParallaxScene au niveau de l'App pour qu'il soit disponible sur toutes les pages */}
