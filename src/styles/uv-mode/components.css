@@ -37,11 +37,6 @@
     background-color: rgba(10, 0, 40, 0.7) !important;
     box-shadow: 0 0 20px rgba(0, 170, 255, 0.3) !important;
     backdrop-filter: blur(10px);
-    height: 90px !important; /* Assure une hauteur cohérente en mode UV */
-  }
-  
-  .uv-mode-active nav .container {
-    height: 90px !important; /* Assure une hauteur cohérente du conteneur en mode UV */
   }
   
   .uv-mode-active nav a {

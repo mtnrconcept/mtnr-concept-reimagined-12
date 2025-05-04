@@ -22,7 +22,6 @@ import { checkFeatureSupport } from "@/lib/feature-detection";
 import BackgroundVideoController from "./components/effects/BackgroundVideoController";
 import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import ParallaxScene from "./components/ParallaxScene";
 import UVPageSecrets from "./components/effects/UVPageSecrets";
 
@@ -98,9 +97,6 @@ function AppContent() {
         </PageTransition>
         <UVCornerLabel />
       </div>
-      
-      {/* Ajout du Footer ici pour qu'il soit présent sur toutes les pages */}
-      <Footer />
     </div>
   );
 }

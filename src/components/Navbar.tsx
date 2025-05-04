@@ -31,11 +31,11 @@ export default function Navbar() {
         top: 0,
         left: 0,
         right: 0,
-        height: '90px', // Augmenté de 80px à 90px (10 pixels de plus)
+        height: '80px',
         pointerEvents: 'all',
       }}
     >
-      <div className="container mx-auto flex items-center h-[90px] px-4 sm:px-6"> {/* Également augmenté ici */}
+      <div className="container mx-auto flex items-center h-20 px-4 sm:px-6">
         {/* Logo dans son propre conteneur */}
         <div className="mr-8 flex-shrink-0">
           <Link to="/" className="flex items-center">
@@ -62,7 +62,7 @@ export default function Navbar() {
         
         {/* Mobile menu toggle - positionné correctement */}
         <button 
-          className="md:hidden absolute right-4 top-[25px] flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
+          className="md:hidden absolute right-4 top-6 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
           onClick={() => setMenuOpen(!menuOpen)} 
           aria-label="Menu"
         >
