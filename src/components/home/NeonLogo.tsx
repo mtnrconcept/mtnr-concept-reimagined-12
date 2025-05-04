@@ -36,10 +36,10 @@ export const NeonLogo = () => {
   };
   
   return (
-    <div className="w-full flex justify-center items-center py-12 relative z-30">
+    <div className="w-full flex justify-center items-center py-6 relative z-30">
       <div 
         className={cn(
-          "relative w-[500px] max-w-[90vw]",
+          "relative w-[300px] max-w-[80vw]", // Taille réduite de logo
           "transition-all duration-50 ease-in-out"
         )}
         style={{
