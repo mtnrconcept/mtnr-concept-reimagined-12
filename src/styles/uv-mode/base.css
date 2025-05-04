@@ -3,7 +3,7 @@
   /** UV Mode Base Styles */
   .uv-mode-active {
     color: #4FA9FF;
-    background-color: rgba(10, 0, 60, 0.3) !important; /* Opacité réduite de 0.5 à 0.3 */
+    background-color: rgba(10, 0, 60, 0.98) !important;
     transition: background-color 0.6s ease-out, color 0.6s ease-out;
   }
   
@@ -34,8 +34,8 @@
       radial-gradient(circle at 20% 30%, rgba(79, 169, 255, 0.1) 0%, transparent 15%),
       radial-gradient(circle at 80% 60%, rgba(210, 255, 63, 0.1) 0%, transparent 20%);
     pointer-events: none;
-    z-index: 3; /* Réduire le z-index pour être sous la vidéo UV */
-    opacity: 0.2; /* Opacité réduite de 0.3 à 0.2 */
+    z-index: 2;
+    opacity: 0.7;
     animation: uvPulse 8s infinite;
   }
 }

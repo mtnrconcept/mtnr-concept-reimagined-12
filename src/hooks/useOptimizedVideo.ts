@@ -23,20 +23,10 @@ export function useOptimizedVideo(
   // Optimiser les gestionnaires d'événements vidéo avec useCallback
   const handleCanPlay = useCallback(() => {
     console.log('Vidéo prête à être lue:', videoRef.current?.src);
-    setLoadingStatus('ready');
-    setVideoReady(true);
-    
-    // Tenter la lecture automatique encore une fois
-    if (videoRef.current) {
-      videoRef.current.play()
-        .then(() => console.log('Lecture automatique réussie après canplay'))
-        .catch(e => console.log('Échec de lecture automatique après canplay', e));
-    }
   }, []);
   
   const handlePlaying = useCallback(() => {
     console.log('Lecture vidéo démarrée:', videoRef.current?.src);
-    setLoadingStatus('ready');
   }, []);
   
   const handlePause = useCallback(() => {
@@ -70,27 +60,9 @@ export function useOptimizedVideo(
     // Configuration initiale de la vidéo
     const setupVideo = async () => {
       try {
-        const currentSrc = uvMode ? videoUrlUV : videoUrl;
-        console.log(`Configuration initiale de la vidéo: ${currentSrc}`);
-        
-        video.src = currentSrc;
-        
-        // S'assurer que l'élément vidéo est visible
-        video.style.opacity = "1";
-        video.style.visibility = "visible";
-        video.style.zIndex = uvMode ? "5" : "0";
-        
+        video.src = uvMode ? videoUrlUV : videoUrl;
         video.load();
-        
-        // Tenter de lire la vidéo
-        try {
-          await video.play();
-          console.log("Lecture vidéo démarrée automatiquement");
-        } catch (playError) {
-          // La lecture auto n'a pas fonctionné, ce n'est pas grave
-          console.log("Lecture auto non autorisée, vidéo mise en pause");
-          video.pause();
-        }
+        video.pause();
         
         setLoadingStatus('ready');
         setVideoReady(true);
@@ -111,29 +83,17 @@ export function useOptimizedVideo(
     
     setVideoReady(false);
     
-    // Définir la source en fonction du mode UV
-    const newVideoSrc = uvMode ? videoUrlUV : videoUrl;
-    console.log(`Changement de mode UV, nouvelle source: ${newVideoSrc}`);
+    video.src = uvMode ? videoUrlUV : videoUrl;
+    video.load();
     
-    if (video.src !== newVideoSrc) {
-      console.log(`Changement de vidéo: ${newVideoSrc}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
-      video.src = newVideoSrc;
-      
-      // S'assurer que l'élément vidéo est visible et avec le bon z-index
-      video.style.opacity = "1";
-      video.style.visibility = "visible";
-      video.style.zIndex = uvMode ? "5" : "0";
-      
-      video.load();
-      
-      // Tenter de lire la vidéo
-      video.play()
-        .then(() => console.log("Lecture vidéo démarrée après changement UV"))
-        .catch(err => {
-          console.log("Lecture auto non autorisée après changement UV");
-          video.pause(); // Mettre en pause si la lecture auto échoue
-        });
-    }
+    setTimeout(() => {
+      if (video) {
+        video.pause();
+        setVideoReady(true);
+      }
+    }, 100);
+    
+    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée`);
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Gestion des changements de page
@@ -148,17 +108,12 @@ export function useOptimizedVideo(
       setVideoReady(false);
       setIsTransitioning(true);
       
-      // S'assurer que la vidéo est visible
-      video.style.opacity = "1";
-      video.style.visibility = "visible";
-      video.style.zIndex = uvMode ? "5" : "0";
-      
       video.currentTime = 0;
       video.play()
         .then(() => console.log('Lecture vidéo démarrée pour transition'))
         .catch(err => console.error('Erreur lecture:', err));
     }
-  }, [location.pathname, uvMode]);
+  }, [location.pathname]);
 
   // Écouter les événements de navigation
   useEffect(() => {
@@ -169,11 +124,6 @@ export function useOptimizedVideo(
       setVideoReady(false);
       setIsTransitioning(true);
       
-      // S'assurer que la vidéo est visible
-      video.style.opacity = "1";
-      video.style.visibility = "visible";
-      video.style.zIndex = uvMode ? "5" : "0";
-      
       video.currentTime = 0;
       video.play()
         .catch(err => console.error('Erreur lecture vidéo:', err));
@@ -181,7 +131,7 @@ export function useOptimizedVideo(
     
     const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
-  }, [navigation, uvMode]);
+  }, [navigation]);
 
   // Gestion des événements vidéo
   useEffect(() => {

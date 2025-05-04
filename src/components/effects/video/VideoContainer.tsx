@@ -88,13 +88,7 @@ const VideoContainer: React.FC<VideoContainerProps> = memo(({
   }, []);
 
   return (
-    <div 
-      ref={videoContainerRef} 
-      className="fixed inset-0 w-full h-full overflow-hidden z-[-1]" // Réduire le z-index de base à -1
-      style={{ 
-        zIndex: uvMode ? 5 : -1 // Augmenter le z-index du conteneur en mode UV
-      }}
-    >
+    <div ref={videoContainerRef} className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">
       {/* Status indicators for debug/development */}
       <VideoStatusIndicators 
         loadingStatus={loadingStatus} 

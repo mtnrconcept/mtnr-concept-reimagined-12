@@ -49,6 +49,9 @@ export default function UVMessage({
   
   const scrambleChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
   
+  // Ne pas rendre si pas en mode UV ou torche inactive
+  if (!uvMode || !isTorchActive) return null;
+
   // Style de base selon le type
   const getBaseStyle = () => {
     const isPositionAbsolute = position !== null;
@@ -109,7 +112,6 @@ export default function UVMessage({
 
   // Effet de visibilité basé sur la proximité de la souris
   useEffect(() => {
-    // Skip this effect if the main conditions don't apply, but DON'T return early from the component
     if (!messageRef.current || !isTorchActive || !uvMode) return;
 
     const handleVisibility = () => {
@@ -263,18 +265,16 @@ export default function UVMessage({
     };
   }, [isVisible, content, decryptSpeed, decryptProgress, type]);
 
-  // Prepare content based on UV mode and torch state
-  // Instead of returning early, we'll prepare the content conditionally
-  let renderedContent = null;
-  
-  if (uvMode && isTorchActive) {
-    // Only render content when both UV mode and torch are active
+  // Contenu affiché selon le type
+  const getDisplayContent = () => {
     if (type === "decrypt") {
-      renderedContent = decryptedText || content.replace(/./g, (c) => 
+      return decryptedText || content.replace(/./g, (c) => 
         c === ' ' ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
       );
-    } else if (type === "code") {
-      renderedContent = (
+    }
+    
+    if (type === "code") {
+      return (
         <pre style={{
           whiteSpace: 'pre',
           lineHeight: 1.2,
@@ -285,15 +285,10 @@ export default function UVMessage({
           {content}
         </pre>
       );
-    } else {
-      renderedContent = content;
     }
-  }
-  
-  // If nothing to render, return null
-  if (renderedContent === null) {
-    return null;
-  }
+    
+    return content;
+  };
 
   return (
     <div
@@ -303,7 +298,7 @@ export default function UVMessage({
       data-depth={depth}
       data-uv-type={type}
     >
-      {renderedContent}
+      {getDisplayContent()}
     </div>
   );
 }

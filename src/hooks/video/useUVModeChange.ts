@@ -8,7 +8,7 @@ interface UseUVModeChangeProps {
   videoUrl: string;
   videoUrlUV: string;
   videoState: Pick<VideoState, "currentVideo">;
-  videoActions: Pick<VideoActions, "setCurrentVideo" | "playVideoTransition">;
+  videoActions: Pick<VideoActions, "setCurrentVideo">;
 }
 
 export function useUVModeChange({
@@ -20,36 +20,25 @@ export function useUVModeChange({
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   const { currentVideo } = videoState;
-  const { setCurrentVideo, playVideoTransition } = videoActions;
+  const { setCurrentVideo } = videoActions;
   const previousUVModeRef = useRef(uvMode);
-  const transitionRequestedRef = useRef(false);
 
-  // Gestion du changement de vidéo lorsque le mode UV change
+  // Gestion du changement de mode UV
   useEffect(() => {
     // Vérifier si le mode UV a réellement changé
     if (previousUVModeRef.current !== uvMode) {
       previousUVModeRef.current = uvMode;
       
-      // Sélectionner la bonne vidéo selon le mode UV
+      // Mettre à jour la source vidéo en fonction du mode UV
       const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
       
-      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo sélectionnée: ${newVideoUrl}`);
-      setCurrentVideo(newVideoUrl);
-      
-      // Toujours jouer la transition vidéo quand le mode UV change, que la torche soit active ou non
-      if (!transitionRequestedRef.current) {
-        transitionRequestedRef.current = true;
-        setTimeout(() => {
-          playVideoTransition();
-          console.log(`Lancement de la transition vidéo pour: ${newVideoUrl}`);
-          // Réinitialisation après un délai
-          setTimeout(() => {
-            transitionRequestedRef.current = false;
-          }, 1000);
-        }, 50);
+      if (currentVideo !== newVideoUrl) {
+        console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
+        setCurrentVideo(newVideoUrl);
+        // Note: Nous ne déclenchons plus de lecture vidéo ici, la vidéo reste en pause
       }
     }
-  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition, isTorchActive]);
+  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo]);
 
   return { uvMode, isTorchActive };
 }
