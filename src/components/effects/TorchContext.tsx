@@ -123,7 +123,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     <div
       className="fixed inset-0 z-[99] pointer-events-none"
       style={{
-        background: `radial-gradient(ellipse 35px 55px at ${mousePosition.x}px ${mousePosition.y}px, 
+        background: `radial-gradient(ellipse 55px 55px at ${mousePosition.x}px ${mousePosition.y}px, 
           rgba(128,0,255,0.0) 0%, 
           rgba(128,0,255,0.25) 40%, 
           rgba(128,0,255,0.35) 60%,
