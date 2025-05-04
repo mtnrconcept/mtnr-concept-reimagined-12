@@ -25,8 +25,8 @@ const Footer = () => {
     name: "Contact",
     path: "/contact"
   }];
-  return <footer className="w-full bg-black text-white py-12 mt-10 font-inter my-0">
-      <div className="container mx-auto px-4">
+  return <footer className="w-full bg-black text-white py-12 mt-10 font-inter my-0 px-[60px]">
+      <div className="container mx-auto px-[55px]">
         {/* Structure en trois colonnes pour desktop, colonne unique pour mobile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Colonne du logo et copyright */}
