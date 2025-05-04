@@ -40,11 +40,11 @@ const Footer = () => {
           </div>
           
           {/* Colonne des liens de navigation */}
-          <div className="flex flex-col gap-2 text-center md:text-center px-[139px]">
+          <div className="flex flex-col gap-2 text-center md:text-center px-[115px]">
             <h3 className="font-bold text-lg mb-2">Navigation</h3>
             {navLinks.map(link => <Link key={link.path} to={link.path} className={`relative overflow-hidden group hover:text-yellow-400 transition-colors ${link.name === "Réservation" ? "hover:text-black px-2 py-0.5 inline-block w-auto max-w-[120px]" : ""}`}>
-                {link.name === "Réservation" && <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0 text-center px-0"></span>}
-                <span className="relative z-10 text-center">{link.name}</span>
+                {link.name === "Réservation" && <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0 px-[48px] mx-0 my-0 text-center"></span>}
+                <span className="relative z-10 text-base px-0 font-normal text-center mx-0">{link.name}</span>
               </Link>)}
           </div>
           
