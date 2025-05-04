@@ -90,7 +90,7 @@ export default function WhatWeDo() {
                   </AccordionItem>
 
                   <AccordionItem value="prod" className="border-yellow-400/30">
-                    <AccordionTrigger className="text-xl font-bold">
+                    <AccordionTrigger className="text-xl font-bold px-[18px]">
                       <UVText text="Production musicale" hiddenText="CODES SOURCES" uvColor="#D946EF" />
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-300">
