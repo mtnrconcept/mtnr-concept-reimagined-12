@@ -39,12 +39,6 @@ export default function PageTransition({
       setIsTransitioning(true);
       setFromPath(prevPathRef.current);
       prevPathRef.current = location.pathname;
-      
-      // Défiler vers le haut de la page lors d'un changement de route
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
     }
   }, [location.pathname]);
 

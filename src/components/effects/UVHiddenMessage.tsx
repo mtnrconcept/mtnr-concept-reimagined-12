@@ -24,7 +24,10 @@ const UVHiddenMessage = memo(({
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
   
-  // Style de base mémorisé avant toute condition de retour
+  // Retourner null immédiatement si les conditions ne sont pas remplies
+  if (!isTorchActive || !uvMode) return null;
+  
+  // Style de base mémorisé
   const baseStyle = useMemo(() => ({
     position: 'absolute' as const,
     color,
@@ -98,11 +101,6 @@ const UVHiddenMessage = memo(({
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY]);
-
-  // Condition de rendu après tous les hooks
-  if (!isTorchActive || !uvMode) {
-    return <></>;
-  }
 
   return (
     <div

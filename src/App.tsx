@@ -24,7 +24,6 @@ import BackgroundVideo from "./components/effects/BackgroundVideo";
 import Navbar from "./components/Navbar";
 import ParallaxScene from "./components/ParallaxScene";
 import UVPageSecrets from "./components/effects/UVPageSecrets";
-import { LoadingApp } from "./components/loaders/LoadingApp";
 
 // Initialize query client outside of component for stability
 const queryClient = new QueryClient();
@@ -48,9 +47,6 @@ const RouteTracker = () => {
   useEffect(() => {
     // Enregistrer la visite de la page Artists
     recordArtistsVisit(location.pathname);
-    
-    // Remonter au haut de la page à chaque changement de route
-    window.scrollTo(0, 0);
   }, [location.pathname]);
   
   return null;
@@ -115,11 +111,9 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Suspense fallback={null}>
-                <LoadingApp>
-                  <RouteTracker />
-                  <BackgroundVideoController />
-                  <AppContent />
-                </LoadingApp>
+                <RouteTracker />
+                <BackgroundVideoController />
+                <AppContent />
               </Suspense>
               <TorchToggle />
             </BrowserRouter>
