@@ -11,8 +11,7 @@ export default function HomePageSecrets() {
         message="BIENVENUE AU STUDIO SECRET" 
         color="#D2FF3F" 
         className="text-3xl font-bold" 
-        offsetX={20}
-        offsetY={20}
+        position={{ x: 85, y: 15 }}
       />
       
       <UVHiddenMessage 
