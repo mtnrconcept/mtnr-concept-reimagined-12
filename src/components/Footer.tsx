@@ -1,18 +1,14 @@
-
 import { Link } from "react-router-dom";
 import LogoWithEffect from "./effects/LogoWithEffect";
 import { useRef, useState, useEffect } from "react";
-
 const Footer = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const logoRef = useRef<HTMLImageElement>(null);
-
   useEffect(() => {
     const img = new Image();
     img.src = "/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png";
     img.onload = () => setImageLoaded(true);
   }, []);
-
   const navLinks = [{
     name: "Accueil",
     path: "/"
@@ -29,7 +25,6 @@ const Footer = () => {
     name: "Contact",
     path: "/contact"
   }];
-
   return <footer className="w-full bg-black text-white py-12 mt-10 font-inter my-0 px-[60px]">
       <div className="container mx-auto px-[55px]">
         {/* Structure en trois colonnes pour desktop, colonne unique pour mobile */}
@@ -38,36 +33,19 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-start px-[10px]">
             {/* Conteneur du logo avec marges */}
             <div className="mb-4 flex items-center justify-center md:justify-start">
-              <LogoWithEffect
-                src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-                alt="Logo MTNR"
-                width="140px"
-                glowEffect={true}
-                glowColor="255, 221, 0"
-                isVisible={true}
-                logoRef={logoRef}
-                className="h-auto w-auto object-contain max-h-20"
-              />
+              <LogoWithEffect src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png" alt="Logo MTNR" width="140px" glowEffect={true} glowColor="255, 221, 0" isVisible={true} logoRef={logoRef} className="h-auto w-auto object-contain max-h-20" />
             </div>
             <span className="font-playfair text-xl font-bold mt-2">MTNR Concept</span>
             <p className="text-sm text-gray-400 mt-2">© {new Date().getFullYear()} MTNR Concept. Tous droits réservés.</p>
           </div>
           
           {/* Colonne des liens de navigation */}
-          <div className="flex flex-col gap-2 text-center md:text-center">
+          <div className="flex flex-col gap-2 text-center md:text-center px-[139px]">
             <h3 className="font-bold text-lg mb-2">Navigation</h3>
-            {navLinks.map(link => (
-              <Link 
-                key={link.path} 
-                to={link.path} 
-                className={`relative overflow-hidden group hover:text-yellow-400 transition-colors ${link.name === "Réservation" ? "hover:text-black px-2 py-0.5 inline-block w-auto max-w-[120px]" : ""}`}
-              >
-                {link.name === "Réservation" && (
-                  <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0"></span>
-                )}
-                <span className="relative z-10">{link.name}</span>
-              </Link>
-            ))}
+            {navLinks.map(link => <Link key={link.path} to={link.path} className={`relative overflow-hidden group hover:text-yellow-400 transition-colors ${link.name === "Réservation" ? "hover:text-black px-2 py-0.5 inline-block w-auto max-w-[120px]" : ""}`}>
+                {link.name === "Réservation" && <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0 text-center px-0"></span>}
+                <span className="relative z-10 text-center">{link.name}</span>
+              </Link>)}
           </div>
           
           {/* Colonne des réseaux sociaux */}
@@ -98,5 +76,4 @@ const Footer = () => {
       </div>
     </footer>;
 };
-
 export default Footer;
