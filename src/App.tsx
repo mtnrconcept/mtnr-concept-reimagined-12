@@ -8,7 +8,7 @@ import { Suspense, useEffect } from "react";
 import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
-import { TorchToggle } from "./components/effects/TorchToggle";
+import { TorchToggle, recordArtistsVisit } from "./components/effects/TorchToggle";
 import { NavigationProvider } from "./components/effects/NavigationContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
@@ -38,6 +38,18 @@ const UVCornerLabel = () => {
   return (
     <div className="uv-corner-label">UV</div>
   );
+};
+
+// Composant pour suivre les visites de pages
+const RouteTracker = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Enregistrer la visite de la page Artists
+    recordArtistsVisit(location.pathname);
+  }, [location.pathname]);
+  
+  return null;
 };
 
 // Séparation de la structure pour isoler la Navbar des animations
@@ -99,12 +111,13 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Suspense fallback={null}>
+                <RouteTracker />
                 <BackgroundVideoController />
                 <AppContent />
               </Suspense>
+              <TorchToggle />
             </BrowserRouter>
             <ParticleEffect />
-            <TorchToggle />
           </NavigationProvider>
         </TorchProvider>
       </UVModeProvider>

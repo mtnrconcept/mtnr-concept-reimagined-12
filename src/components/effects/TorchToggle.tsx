@@ -4,22 +4,21 @@ import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 import { Flashlight, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "react-router-dom";
 
 export const TorchToggle = () => {
   const { isTorchActive, setIsTorchActive } = useTorch();
   const { uvMode, toggleUVMode } = useUVMode();
-  const location = useLocation();
   
-  // Vérifier et enregistrer la visite de la page Artists
-  useEffect(() => {
-    if (location.pathname === "/artists") {
-      localStorage.setItem('hasVisitedArtistsPage', 'true');
-    }
-  }, [location.pathname]);
-
   // Vérifier si l'utilisateur a déjà visité la page Artists
   const hasVisitedArtistsPage = localStorage.getItem('hasVisitedArtistsPage') === 'true';
+
+  // Fonction pour suivre la visite de la page Artists
+  // Cette fonction sera appelée ailleurs, dans le composant approprié
+  const checkAndRecordArtistsVisit = (pathname: string) => {
+    if (pathname === "/artists") {
+      localStorage.setItem('hasVisitedArtistsPage', 'true');
+    }
+  };
 
   const handleToggleTorch = () => {
     // Activer/désactiver uniquement la torche classique
@@ -99,4 +98,11 @@ export const TorchToggle = () => {
       )}
     </div>
   );
+};
+
+// Exporter cette fonction pour l'utiliser dans les composants qui ont accès au router
+export const recordArtistsVisit = (pathname: string) => {
+  if (pathname === "/artists") {
+    localStorage.setItem('hasVisitedArtistsPage', 'true');
+  }
 };
