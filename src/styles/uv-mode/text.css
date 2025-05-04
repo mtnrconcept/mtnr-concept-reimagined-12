@@ -8,13 +8,17 @@
   
   .uv-mode-active h1, 
   .uv-mode-active h2, 
-  .uv-mode-active h3 {
+  .uv-mode-active h3,
+  .uv-mode-active .page-title,
+  .uv-mode-active .font-playfair.text-4xl,
+  .uv-mode-active .font-playfair.text-5xl {
     color: #D2FF3F;
     text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
     transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    animation: uvPulse 3s infinite;
   }
   
   .uv-mode-active .section-title,
@@ -100,3 +104,4 @@
     box-shadow: none !important;
   }
 }
+

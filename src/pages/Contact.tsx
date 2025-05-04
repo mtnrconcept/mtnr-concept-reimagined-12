@@ -25,7 +25,7 @@ export default function Contact() {
       
       <div className="relative z-10 min-h-screen">
         <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
-          <h1 className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4 animate-wiggle">
+          <h1 className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4">
             Contact
           </h1>
           <p className="text-base xs:text-lg text-gray-100 mb-6 text-center font-grunge max-w-md">

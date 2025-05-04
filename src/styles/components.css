@@ -149,4 +149,46 @@
     border: none !important;
     box-shadow: none !important;
   }
+  
+  /* Effet néon global pour tous les titres de page */
+  .page-title, 
+  h1.text-primary,
+  h1.text-center,
+  h1.section-title,
+  .font-playfair.text-4xl,
+  .font-playfair.text-5xl {
+    color: #eedd44;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 900;
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5),
+      0 0 15px rgba(255, 221, 0, 0.3),
+      0 0 20px rgba(255, 221, 0, 0.2),
+      0 0 40px rgba(255, 221, 0, 0.1);
+    animation: neon-pulse 3s infinite;
+  }
+}
+
+/* Animation de pulsation pour l'effet néon */
+@keyframes neon-pulse {
+  0% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5);
+  }
+  50% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5),
+      0 0 15px rgba(255, 221, 0, 0.3),
+      0 0 30px rgba(255, 221, 0, 0.2),
+      0 0 60px rgba(255, 221, 0, 0.1);
+  }
+  100% {
+    text-shadow: 
+      0 0 5px rgba(255, 221, 0, 0.8),
+      0 0 10px rgba(255, 221, 0, 0.5);
+  }
 }
