@@ -96,7 +96,7 @@ const VideoContainer: React.FC<VideoContainerProps> = memo(({
         isTransitioning={isTransitioning} 
       />
       
-      {/* The actual video element */}
+      {/* The actual video element with improved z-index */}
       <VideoElement 
         videoRef={videoRef}
         videoUrl={videoUrl}

@@ -4,7 +4,7 @@
   .uv-mode-active .bg-black\/80,
   .uv-mode-active .bg-gray-800,
   .uv-mode-active .bg-gray-900 {
-    background-color: rgba(15, 0, 70, 0.8) !important;
+    background-color: rgba(15, 0, 70, 0.5) !important; /* Réduit de 0.8 à 0.5 */
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 15px rgba(0, 102, 255, 0.3) !important;
     transition: all 0.5s ease-out;

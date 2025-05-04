@@ -3,7 +3,7 @@
   /** UV Mode Base Styles */
   .uv-mode-active {
     color: #4FA9FF;
-    background-color: rgba(10, 0, 60, 0.98) !important;
+    background-color: rgba(10, 0, 60, 0.4) !important; /* Réduction de l'opacité de 0.98 à 0.4 */
     transition: background-color 0.6s ease-out, color 0.6s ease-out;
   }
   
