@@ -35,12 +35,13 @@ const SCREEN_POSITION = {
 export default function TVVideoPlayer() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [tvLoaded, setTVLoaded] = useState(false);
   const currentVideo = videos[currentVideoIndex];
 
   // Réinitialiser le chargement lorsque la vidéo change
   useEffect(() => {
     setIsLoading(true);
-    // Le délai est maintenant de 1.5 secondes (1500ms)
+    // Le délai est de 1.5 secondes (1500ms)
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
   }, [currentVideoIndex]);
@@ -55,6 +56,12 @@ export default function TVVideoPlayer() {
 
   const goToVideo = (index: number) => {
     setCurrentVideoIndex(index);
+  };
+
+  // Gérer le chargement de l'image TV
+  const handleTVImageLoad = () => {
+    setTVLoaded(true);
+    console.log("Image TV chargée");
   };
 
   // Calcul des pourcentages pour le positionnement relatif
@@ -74,7 +81,7 @@ export default function TVVideoPlayer() {
           {/* La position relative du lecteur vidéo par rapport à la TV */}
           <div className="absolute overflow-hidden" style={screenPositionStyle}>
             {/* Lecteur YouTube - Positionné pour permettre l'interaction avec z-index inférieur à l'animation */}
-            <div className="absolute inset-0 w-full h-full z-20">
+            <div className={`absolute inset-0 w-full h-full z-20 ${tvLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
               <iframe
                 className="absolute inset-0 w-full h-full"
                 src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
@@ -86,7 +93,7 @@ export default function TVVideoPlayer() {
             
             {/* Animation de chargement - Masquée par le conteneur parent avec overflow-hidden */}
             {isLoading && (
-              <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center z-30">
+              <div className={`absolute inset-0 w-full h-full bg-black flex items-center justify-center z-30 ${tvLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
                 <div className="absolute inset-0 w-[150%] h-[150%] opacity-30" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
                   animation: 'noise 0.2s infinite',
@@ -107,6 +114,7 @@ export default function TVVideoPlayer() {
               src="/lovable-uploads/74a3fc95-3585-4ec5-83d9-080e4dffabb7.png" 
               alt="TV Frame" 
               className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              onLoad={handleTVImageLoad}
             />
           </div>
         </div>
