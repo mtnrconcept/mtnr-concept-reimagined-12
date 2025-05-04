@@ -50,3 +50,15 @@
   position: relative;
   z-index: 31 !important;
 }
+
+/* Classe spéciale pour la page What We Do */
+.page-what-we-do {
+  position: relative;
+  z-index: 30 !important;
+}
+
+/* S'assurer que le contenu de la page what-we-do est visible */
+.page-what-we-do * {
+  position: relative;
+  z-index: 31 !important;
+}

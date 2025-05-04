@@ -1,5 +1,27 @@
-
 @layer components {
+  /** Flashlight overlay */
+  .flashlight-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    pointer-events: none;
+    z-index: 40;
+    opacity: 1 !important;
+    visibility: visible !important;
+    will-change: background; /* Optimisation pour les animations */
+  }
+
+  .flashlight-mask {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 1) !important;
+    background-color: transparent !important;
+    mix-blend-mode: overlay;
+    z-index: 41;
+  }
+
   /** Flashlight overlay */
   .flashlight-overlay {
     position: fixed;

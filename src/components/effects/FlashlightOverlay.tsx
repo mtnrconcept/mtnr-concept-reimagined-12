@@ -39,34 +39,37 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = ({
     
   }, [isTorchActive, mousePosition.x, mousePosition.y, uvMode, isMobile]);
   
-  // Préparation du contenu à rendre
+  // Ne pas retourner null prématurément pour éviter les erreurs de hooks
+  // Calculer le contenu à rendre en fonction des conditions
   let content = null;
   
-  // Don't render anything if torch is not active or UV mode is active
-  if (!isTorchActive || uvMode) {
-    return null;
-  }
-
-  // Render the flashlight overlay with its mask
-  return (
-    <div 
-      ref={overlayRef}
-      className="flashlight-overlay fixed inset-0 pointer-events-none z-10 bg-black bg-opacity-70"
-      style={{ mixBlendMode: 'normal' }}
-    >
+  // Rendre le contenu de la torche seulement si les conditions sont remplies
+  if (isTorchActive && !uvMode) {
+    content = (
       <div 
-        ref={maskRef}
-        className="flashlight-mask"
-        style={{
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-          boxShadow: '0 0 0 2000px rgba(0,0,0,1)',
-          backgroundColor: 'transparent',
-          mixBlendMode: 'overlay',
+        ref={overlayRef}
+        className="flashlight-overlay fixed inset-0 pointer-events-none z-40"
+        style={{ 
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          mixBlendMode: 'normal'
         }}
-      ></div>
-    </div>
-  );
+      >
+        <div 
+          ref={maskRef}
+          className="flashlight-mask"
+          style={{
+            position: 'absolute',
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+            boxShadow: '0 0 0 2000px rgba(0, 0, 0, 1)',
+            backgroundColor: 'transparent',
+            mixBlendMode: 'overlay',
+          }}
+        ></div>
+      </div>
+    );
+  }
+  
+  return content;
 };

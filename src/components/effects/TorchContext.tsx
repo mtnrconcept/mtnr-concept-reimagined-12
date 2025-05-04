@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useRef, ReactNode, useMemo, useCallback, useEffect } from "react";
 import { useUVMode } from "./UVModeContext";
 import { FlashlightOverlay } from "./FlashlightOverlay";
@@ -141,14 +140,12 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Afficher l'overlay de la torche normale uniquement en mode non-UV */}
-      {isTorchActive && !uvMode && (
-        <FlashlightOverlay 
-          isTorchActive={isTorchActive}
-          uvMode={uvMode}
-          mousePosition={mousePosition}
-        />
-      )}
+      {/* Afficher l'overlay de la torche normale seulement en mode normal */}
+      <FlashlightOverlay 
+        isTorchActive={isTorchActive}
+        uvMode={uvMode}
+        mousePosition={mousePosition}
+      />
   
       {/* Toujours montrer l'icône de la lampe torche quand elle est active */}
       {isTorchActive && (
