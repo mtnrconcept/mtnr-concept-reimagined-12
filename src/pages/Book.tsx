@@ -115,7 +115,7 @@ export default function Book() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <TabsContent value="infos" className="mt-0">
                     <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-0 mx-0">
                         <FormField control={form.control} name="blaze" render={({
                         field
                       }) => <FormItem>
@@ -131,7 +131,7 @@ export default function Book() {
                         <FormField control={form.control} name="email" render={({
                         field
                       }) => <FormItem>
-                              <FormLabel className="text-yellow-400">Email</FormLabel>
+                              <FormLabel className="text-yellow-400 py-0 my-0">Email</FormLabel>
                               <FormControl>
                                 <Input placeholder="email@exemple.com" type="email" {...field} className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" />
                               </FormControl>
