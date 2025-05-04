@@ -12,7 +12,7 @@ interface VideoContainerProps {
 
 const VideoContainer: React.FC<VideoContainerProps> = memo(({ 
   videoUrl = "/lovable-uploads/videonormale.mp4", 
-  videoUrlUV = "/lovable-uploads/videouv.mp4"
+  videoUrlUV = "/lovable-uploads/videouv.mp4",
 }) => {
   // Use our optimized hook instead of useVideoStatus
   const {
