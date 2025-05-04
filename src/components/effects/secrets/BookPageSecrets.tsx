@@ -14,9 +14,10 @@ export default function BookPageSecrets() {
       />
       
       <UVSecretMessage 
-        message="RENDS-TOI à LA PAGE CONTACTS" 
-        position={{ x: 20, y: 10 }}
+        message="RENDS-TOI À LA PAGE CONTACTS" 
+        position={{ x: 50, y: 75 }}
         color="#D2FF3F"
+        size="1.8rem"
       />
       
       <UVHiddenCode
