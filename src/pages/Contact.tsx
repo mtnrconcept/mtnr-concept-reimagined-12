@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { PageSplashes } from "@/components/effects/PageSplashes";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
+import Footer from "@/components/Footer";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -68,6 +69,7 @@ export default function Contact() {
             <div className="mb-3">Instagram : <a href="https://www.instagram.com/" target="_blank" className="underline text-yellow-400">@mtnr_concept</a></div>
           </div>
         </div>
+        <Footer />
       </div>
     </ParallaxBackground>
   );

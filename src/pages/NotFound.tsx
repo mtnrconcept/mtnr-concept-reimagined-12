@@ -1,5 +1,11 @@
+
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import ParallaxBackground from "@/components/ParallaxBackground";
+import { PageSplashes } from "@/components/effects/PageSplashes";
+import Footer from "@/components/Footer";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,15 +18,25 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <ParallaxBackground>
+      <PageSplashes pageVariant="notFound" />
+      
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center bg-black/70 backdrop-blur-sm p-10 rounded-xl shadow-xl">
+            <div className="relative mb-6">
+              <NeonText text="404" className="text-6xl font-bold mb-4" color="yellow" flicker={true} />
+              <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={8} />
+            </div>
+            <p className="text-xl text-yellow-400 mb-6">Cette page n'existe pas dans notre dimension</p>
+            <a href="/" className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-2 px-6 rounded-full transition-colors">
+              Retour à l'accueil
+            </a>
+          </div>
+        </div>
+        <Footer />
       </div>
-    </div>
+    </ParallaxBackground>
   );
 };
 

@@ -10,6 +10,7 @@ import { useTorch } from "@/components/effects/TorchContext";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import ElectricText from "@/components/effects/ElectricText";
 import FlickeringNeonText from "@/components/effects/FlickeringNeonText";
+import Footer from "@/components/Footer";
 
 const artists = [
   {
@@ -135,6 +136,7 @@ export default function Artists() {
             </div>
           </div>
         </main>
+        <Footer />
       </div>
     </ParallaxBackground>
   );
