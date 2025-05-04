@@ -1,0 +1,167 @@
+
+@layer components {
+  /* Effet de décharge électrique autour du texte */
+  .electric-spark-container {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+  }
+  
+  /* Points d'étincelle */
+  .electric-spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: #D2FF3F;
+    filter: blur(1px);
+    box-shadow: 
+      0 0 5px #D2FF3F,
+      0 0 10px #D2FF3F,
+      0 0 15px #D2FF3F;
+    animation: sparkAnimate 2s infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+  
+  @keyframes sparkAnimate {
+    0%, 100% { 
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(2);
+    }
+    60% {
+      opacity: 0.8;
+      transform: scale(1.5);
+    }
+    70% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    80% {
+      opacity: 0.4;
+      transform: scale(0.5);
+    }
+    90% {
+      opacity: 0.2;
+      transform: scale(0.2);
+    }
+  }
+  
+  /* Arc électrique entre deux points */
+  .electric-arc {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      #D2FF3F 20%,
+      #FFFFFF 50%,
+      #D2FF3F 80%,
+      transparent 100%
+    );
+    animation: arcFlash 3s infinite;
+    transform-origin: left center;
+    opacity: 0;
+    filter: blur(1px);
+    box-shadow: 0 0 10px #D2FF3F;
+    z-index: 9;
+  }
+  
+  @keyframes arcFlash {
+    0%, 100% {
+      opacity: 0;
+      filter: blur(3px);
+    }
+    10%, 90% {
+      opacity: 0.1;
+      filter: blur(2px);
+    }
+    50% {
+      opacity: 1;
+      filter: blur(1px);
+    }
+  }
+  
+  /* Amélioration de l'effet de texte électrique */
+  @keyframes enhancedElectricText {
+    0% {
+      text-shadow: 
+        0 0 5px #D2FF3F,
+        0 0 10px #D2FF3F;
+      color: #D2FF3F;
+    }
+    25% {
+      text-shadow:
+        0 0 5px #D2FF3F,
+        0 0 10px #D2FF3F,
+        0 0 15px #D2FF3F,
+        0 0 30px #D2FF3F;
+      color: #FFFFFF;
+    }
+    26% {
+      text-shadow: none;
+      color: #D2FF3F;
+    }
+    27% {
+      text-shadow:
+        0 0 5px #D2FF3F,
+        0 0 10px #D2FF3F,
+        0 0 15px #D2FF3F;
+      color: #EEFF8A;
+    }
+    70% {
+      text-shadow:
+        0 0 5px #D2FF3F,
+        0 0 10px #D2FF3F;
+      color: #D2FF3F;
+    }
+    85% {
+      text-shadow:
+        0 0 10px #D2FF3F,
+        0 0 20px #D2FF3F,
+        0 0 30px #D2FF3F;
+      color: #FFFFFF;
+    }
+    86% {
+      text-shadow: none;
+      color: #D2FF3F;
+    }
+    87%, 100% {
+      text-shadow:
+        0 0 5px #D2FF3F,
+        0 0 10px #D2FF3F;
+      color: #D2FF3F;
+    }
+  }
+  
+  /* Vibration plus intense et aléatoire */
+  @keyframes intenseVibration {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-2px, -1px); }
+    20% { transform: translate(2px, 1px); }
+    30% { transform: translate(-1px, 2px); }
+    40% { transform: translate(1px, -1px); }
+    50% { transform: translate(-2px, 1px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 2px); }
+    90% { transform: translate(-2px, -2px); }
+  }
+  
+  /* Classe électrique améliorée */
+  .enhanced-electric-text {
+    position: relative;
+    display: inline-block;
+    animation: 
+      enhancedElectricText 3s infinite,
+      intenseVibration 0.1s infinite;
+    color: #D2FF3F;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    z-index: 5;
+  }
+}

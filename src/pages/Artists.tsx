@@ -8,6 +8,8 @@ import { PageSplashes } from "@/components/effects/PageSplashes";
 import TVVideoPlayer from "@/components/video/TVVideoPlayer";
 import { useTorch } from "@/components/effects/TorchContext";
 import { useUVMode } from "@/components/effects/UVModeContext";
+import ElectricText from "@/components/effects/ElectricText";
+import FlickeringNeonText from "@/components/effects/FlickeringNeonText";
 
 const artists = [
   {
@@ -90,22 +92,34 @@ export default function Artists() {
                   </div>
                   <div className="mt-4 font-black text-lg xs:text-xl text-yellow-400 uppercase text-center tracking-wide">
                     {index === 1 && isTorchActive && !uvMode ? (
-                      <span className="uv-electric-text animate-[electricText_3s_infinite]">
-                        {a.displayName || a.name}
-                      </span>
+                      <ElectricText 
+                        text={a.displayName || a.name}
+                        color="#D2FF3F"
+                        intensity="high"
+                        size="lg"
+                      />
                     ) : (
                       a.name
                     )}
                   </div>
                   <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
                     {index === 1 ? (
-                      <UVText 
-                        text={isTorchActive ? a.descWithTorch : a.descWithoutTorch} 
-                        hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`} 
-                        uvColor="#D946EF" 
-                        textSize="text-xs xs:text-sm" 
-                        opacity={0.01} 
-                      />
+                      isTorchActive && !uvMode ? (
+                        <FlickeringNeonText 
+                          text={a.descWithTorch}
+                          color="#D946EF"
+                          intensity="medium"
+                          fontSize="0.875rem"
+                        />
+                      ) : (
+                        <UVText 
+                          text={isTorchActive ? a.descWithTorch : a.descWithoutTorch} 
+                          hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`} 
+                          uvColor="#D946EF" 
+                          textSize="text-xs xs:text-sm" 
+                          opacity={0.01} 
+                        />
+                      )
                     ) : (
                       <UVText 
                         text={a.desc} 
