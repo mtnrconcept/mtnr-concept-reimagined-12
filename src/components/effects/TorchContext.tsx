@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useRef, ReactNode, useMemo, useCallback } from "react";
+import React, { createContext, useContext, useState, useRef, ReactNode, useMemo, useCallback, useEffect } from "react";
 import { useUVMode } from "./UVModeContext";
 import { FlashlightOverlay } from "./FlashlightOverlay";
 import { useTorchPosition } from "@/hooks/useTorchPosition";
