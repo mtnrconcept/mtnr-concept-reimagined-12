@@ -19,8 +19,8 @@ export default function WhatWeDoPageSecrets() {
       />
       
       <UVSecretMessage 
-        message="NIVEAU D'ACCÈS: ALPHA" 
-        position={{ x: 20, y: 20 }}
+        message="Cherche Encore" 
+        position={{ x: 20, y: 10 }}
         color="#D2FF3F"
       />
       
