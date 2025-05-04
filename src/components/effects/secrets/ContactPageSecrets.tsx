@@ -7,11 +7,29 @@ import UVDecryptMessage from '../UVDecryptMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 export default function ContactPageSecrets() {
   const [codeInput, setCodeInput] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [showSecretPage, setShowSecretPage] = useState(false);
+  const [isLoadingVideo, setIsLoadingVideo] = useState(true);
+  
+  // Timer pour l'écran de chargement (8-10 secondes)
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
+    if (showSecretPage) {
+      // Démarre le timer pour le chargement de 8-10 secondes
+      timer = setTimeout(() => {
+        setIsLoadingVideo(false);
+      }, 9000); // 9 secondes de chargement
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [showSecretPage]);
   
   const handleVerification = () => {
     if (codeInput === "7139") {
@@ -21,7 +39,8 @@ export default function ContactPageSecrets() {
       });
     } else if (codeInput === "MTNR") {
       setShowSecretPage(true);
-      toast.success("Code secret activé! Bienvenue dans la zone cachée.", {
+      setIsLoadingVideo(true);
+      toast.success("Code secret activé! Chargement de la vidéo confidentielle...", {
         duration: 3000
       });
     } else {
@@ -88,81 +107,120 @@ export default function ContactPageSecrets() {
         )}
       </div>
       
-      {/* Page secrète qui apparaît uniquement lorsque le code MTNR est saisi */}
+      {/* Page secrète avec la vidéo YouTube en plein écran */}
       {showSecretPage && (
-        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
-             style={{
-               backdropFilter: 'blur(8px)',
-               border: '2px solid #D2FF3F',
-               animation: 'fadeIn 0.5s ease-out forwards'
-             }}>
-          {/* Vidéo en plein écran */}
-          <div className="absolute inset-0 bg-black w-full h-full z-0">
-            <video
-              autoPlay
-              muted
-              loop
-              className="absolute inset-0 w-full h-full object-cover opacity-60"
-              style={{ filter: 'contrast(1.1) saturate(1.2)' }}
-            >
-              <source src="/lovable-uploads/Composition_1.mp4" type="video/mp4" />
-              Votre navigateur ne prend pas en charge les vidéos.
-            </video>
-            {/* Overlay pour assombrir légèrement la vidéo */}
-            <div className="absolute inset-0 bg-black/40 z-10"></div>
-          </div>
-          
-          {/* Contenu sur la vidéo */}
-          <div className="relative z-20 w-full h-full overflow-y-auto px-8 py-12">
-            <h2 className="text-3xl font-bold text-[#D2FF3F] mb-6 text-center glow-text">
-              ZONE SECRÈTE MTNR
-            </h2>
-            
-            <div className="max-w-3xl mx-auto w-full bg-black/80 border border-[#4FA9FF] rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Manifeste Underground</h3>
-              <p className="text-white mb-4">
-                La Cave n'est pas juste un lieu, c'est un mouvement. Nous existons dans les interstices, 
-                où l'art véritable prend forme loin des regards standardisés. Chaque seconde passée 
-                à créer est une rébellion contre la médiocrité ambiante.
-              </p>
-              <p className="text-[#D2FF3F] mb-4">
-                Coordonnées des prochains événements secrets disponibles uniquement pour les initiés.
-                Contactez-nous avec le code: <span className="font-mono font-bold">NEBULA-7X</span> pour recevoir le lieu exact.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div className="border border-[#D2FF3F] p-4 rounded">
-                  <h4 className="text-[#D2FF3F] font-bold">Session Underground #42</h4>
-                  <p className="text-white text-sm">21 juin 2025 • 23h00</p>
-                  <p className="text-gray-400 text-xs">Paris • Zone industrielle</p>
-                </div>
-                <div className="border border-[#D2FF3F] p-4 rounded">
-                  <h4 className="text-[#D2FF3F] font-bold">Exposition Secrète</h4>
-                  <p className="text-white text-sm">15 juillet 2025 • 22h00</p>
-                  <p className="text-gray-400 text-xs">Marseille • Tunnels</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="max-w-3xl mx-auto w-full bg-black/80 border border-[#4FA9FF] rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Message Crypté</h3>
-              <div className="font-mono text-sm text-[#D2FF3F] bg-black/90 p-4 rounded">
-                <p>01001100 01000101 00100000 01000011 01001111 01000100 01000101 00100000</p>
-                <p>01000110 01001001 01001110 01000001 01001100 00111010 00100000 01000010</p>
-                <p>01001100 01000001 01000011 01001011 01001100 01001001 01000111 01001000</p>
-                <p>01010100 00101101 00110111 00111001 00110101</p>
-              </div>
-              <p className="text-white text-sm mt-4">Ce message contient les instructions pour l'événement spécial du 31 octobre.</p>
-            </div>
-            
-            <div className="flex justify-center mt-8 mb-4">
-              <Button 
-                onClick={() => setShowSecretPage(false)}
-                className="bg-[#D2FF3F] hover:bg-[#A0FF00] text-black font-bold"
+        <div className="fixed inset-0 z-[200] bg-black overflow-hidden">
+          {/* Écran de chargement (affiché pendant 8-10 secondes) */}
+          {isLoadingVideo ? (
+            <div className="absolute inset-0 bg-black flex flex-col items-center justify-center">
+              {/* Animation de chargement stylisée */}
+              <motion.div 
+                className="relative w-32 h-32"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
               >
-                Retourner à la page
-              </Button>
+                {/* Cercles animés */}
+                <motion.div 
+                  className="absolute inset-0 border-4 border-t-yellow-400 border-r-yellow-400 border-b-transparent border-l-transparent rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                />
+                
+                <motion.div 
+                  className="absolute inset-2 border-4 border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent rounded-full"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+                
+                <motion.div 
+                  className="absolute inset-4 border-4 border-t-transparent border-r-magenta-500 border-b-transparent border-l-magenta-500 rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                />
+              </motion.div>
+              
+              {/* Texte clignotant */}
+              <motion.div 
+                className="mt-8 text-center" 
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <h3 className="text-xl font-mono text-green-400 mb-2">DÉCHIFFRAGE EN COURS</h3>
+                <div className="flex items-center justify-center space-x-2">
+                  <motion.div 
+                    className="h-2 w-2 bg-green-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 0.2 }}
+                  />
+                  <motion.div 
+                    className="h-2 w-2 bg-green-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 0.4 }}
+                  />
+                  <motion.div 
+                    className="h-2 w-2 bg-green-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 0.6 }}
+                  />
+                </div>
+              </motion.div>
+              
+              {/* Progression animée */}
+              <motion.div 
+                className="mt-6 w-64 h-2 bg-gray-800 rounded-full overflow-hidden"
+              >
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-green-400"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 8.5, ease: "linear" }}
+                />
+              </motion.div>
+              
+              {/* Mots de passe aléatoires qui défilent */}
+              <motion.div 
+                className="mt-4 font-mono text-xs text-green-500"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <motion.p
+                  animate={{ opacity: [0, 1, 1, 0], y: [-5, 0, 0, 5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop" }}
+                >
+                  ACCESS CODE: FD7X-99RT-HJ2L
+                </motion.p>
+                <motion.p
+                  animate={{ opacity: [0, 1, 1, 0], y: [-5, 0, 0, 5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop", delay: 0.5 }}
+                >
+                  BYPASS SEQUENCE: INITIATED
+                </motion.p>
+              </motion.div>
             </div>
-          </div>
+          ) : (
+            // La vidéo YouTube en plein écran après le chargement
+            <div className="relative w-full h-full flex items-center justify-center bg-black">
+              <iframe
+                className="absolute w-full h-full"
+                src="https://www.youtube.com/embed/RXOCewCjn70?autoplay=1&controls=1&showinfo=0&rel=0&fs=1"
+                title="Vidéo secrète"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                frameBorder="0"
+                allowFullScreen
+              ></iframe>
+              
+              {/* Bouton pour retourner à la page précédente placé en bas à droite */}
+              <div className="absolute bottom-5 right-5 z-10">
+                <Button 
+                  onClick={() => setShowSecretPage(false)}
+                  className="bg-black/60 hover:bg-black/80 text-white border border-white/20"
+                >
+                  Retour
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
       
