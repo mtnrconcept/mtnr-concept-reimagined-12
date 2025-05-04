@@ -15,7 +15,7 @@ export default function BookPageSecrets() {
       
       <UVSecretMessage 
         message="RENDS-TOI À LA PAGE CONTACTS" 
-        position={{ x: 50, y: 75 }}
+        position={{ x: 50, y: 60 }}
         color="#D2FF3F"
         size="1.8rem"
       />
