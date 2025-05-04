@@ -17,39 +17,53 @@ export default function UVPageSecrets() {
   const { isTorchActive } = useTorch();
   const { uvMode } = useUVMode();
   
-  // Ne rien afficher si le mode UV n'est pas activé ou si la torche est désactivée
-  if (!uvMode || !isTorchActive) return null;
-  
-  // Render page-specific secrets based on the current route
+  // Only log when the component actually tries to render page-specific content
   const path = location.pathname;
   
-  // Ajouter un log pour voir quel chemin est actuellement actif
-  console.log("UVPageSecrets: current path is", path);
-  
-  // Render page-specific secrets based on the current route
-  switch (path) {
-    case '/':
-      return <HomePageSecrets />;
-      
-    case '/artists':
-      return <ArtistsPageSecrets />;
-      
-    case '/contact':
-      return <ContactPageSecrets />;
-      
-    case '/what-we-do':
-      console.log("Rendering WhatWeDoPageSecrets");
-      return <WhatWeDoPageSecrets />;
-      
-    case '/book':
-      return <BookPageSecrets />;
-      
-    default:
-      // Handle 404 and unknown paths
-      if (path.includes('404')) {
-        return <NotFoundPageSecrets />;
-      }
-      console.log("No secrets for path:", path);
-      return null;
+  // Prepare content based on path, but don't return early
+  let PageSecretsComponent = null;
+
+  // Select the appropriate component based on current path
+  if (uvMode && isTorchActive) {
+    console.log("UVPageSecrets: current path is", path);
+    
+    switch (path) {
+      case '/':
+        PageSecretsComponent = HomePageSecrets;
+        break;
+        
+      case '/artists':
+        PageSecretsComponent = ArtistsPageSecrets;
+        break;
+        
+      case '/contact':
+        PageSecretsComponent = ContactPageSecrets;
+        break;
+        
+      case '/what-we-do':
+        console.log("Rendering WhatWeDoPageSecrets");
+        PageSecretsComponent = WhatWeDoPageSecrets;
+        break;
+        
+      case '/book':
+        PageSecretsComponent = BookPageSecrets;
+        break;
+        
+      default:
+        // Handle 404 and unknown paths
+        if (path.includes('404')) {
+          PageSecretsComponent = NotFoundPageSecrets;
+        } else {
+          console.log("No secrets for path:", path);
+        }
+    }
   }
+  
+  // If no component selected or conditions not met, return empty div to maintain consistent component structure
+  if (PageSecretsComponent === null) {
+    return <div id="no-uv-secrets" className="hidden"></div>;
+  }
+  
+  // Render the selected component
+  return <PageSecretsComponent />;
 }

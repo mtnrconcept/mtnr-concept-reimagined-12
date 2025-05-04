@@ -109,6 +109,7 @@ export default function UVMessage({
 
   // Effet de visibilité basé sur la proximité de la souris
   useEffect(() => {
+    // Skip this effect if the main conditions don't apply, but DON'T return early from the component
     if (!messageRef.current || !isTorchActive || !uvMode) return;
 
     const handleVisibility = () => {
@@ -262,15 +263,12 @@ export default function UVMessage({
     };
   }, [isVisible, content, decryptSpeed, decryptProgress, type]);
 
-  // IMPORTANT: Déplacer le return conditionnel après la définition de tous les hooks
-  // Utiliser une variable pour stocker le contenu à afficher en fonction des conditions
+  // Prepare content based on UV mode and torch state
+  // Instead of returning early, we'll prepare the content conditionally
   let renderedContent = null;
   
-  // Ne pas rendre si pas en mode UV ou torche inactive
-  if (!uvMode || !isTorchActive) {
-    renderedContent = null;
-  } else {
-    // Contenu affiché selon le type
+  if (uvMode && isTorchActive) {
+    // Only render content when both UV mode and torch are active
     if (type === "decrypt") {
       renderedContent = decryptedText || content.replace(/./g, (c) => 
         c === ' ' ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
@@ -291,8 +289,8 @@ export default function UVMessage({
       renderedContent = content;
     }
   }
-
-  // Retourner null si pas de contenu à afficher
+  
+  // If nothing to render, return null
   if (renderedContent === null) {
     return null;
   }

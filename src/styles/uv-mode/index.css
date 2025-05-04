@@ -27,3 +27,14 @@
 .torch-active.uv-mode-active .flashlight-overlay {
   display: none !important; 
 }
+
+/* Ensure UV elements are always visible in UV mode */
+.uv-mode-active [data-uv-type] {
+  z-index: 100 !important; /* Ensure UV messages are above video */
+}
+
+/* Ensure proper stacking context in UV mode */
+.torch-active.uv-mode-active #uv-page-secrets-container {
+  position: relative;
+  z-index: 50 !important;
+}
