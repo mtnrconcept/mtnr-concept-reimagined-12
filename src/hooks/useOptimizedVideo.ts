@@ -25,6 +25,13 @@ export function useOptimizedVideo(
     console.log('Vidéo prête à être lue:', videoRef.current?.src);
     setLoadingStatus('ready');
     setVideoReady(true);
+    
+    // Tenter la lecture automatique encore une fois
+    if (videoRef.current) {
+      videoRef.current.play()
+        .then(() => console.log('Lecture automatique réussie après canplay'))
+        .catch(e => console.log('Échec de lecture automatique après canplay', e));
+    }
   }, []);
   
   const handlePlaying = useCallback(() => {
@@ -63,12 +70,15 @@ export function useOptimizedVideo(
     // Configuration initiale de la vidéo
     const setupVideo = async () => {
       try {
-        video.src = uvMode ? videoUrlUV : videoUrl;
+        const currentSrc = uvMode ? videoUrlUV : videoUrl;
+        console.log(`Configuration initiale de la vidéo: ${currentSrc}`);
+        
+        video.src = currentSrc;
         
         // S'assurer que l'élément vidéo est visible
         video.style.opacity = "1";
         video.style.visibility = "visible";
-        video.style.zIndex = "0";
+        video.style.zIndex = uvMode ? "5" : "0";
         
         video.load();
         
@@ -103,15 +113,16 @@ export function useOptimizedVideo(
     
     // Définir la source en fonction du mode UV
     const newVideoSrc = uvMode ? videoUrlUV : videoUrl;
+    console.log(`Changement de mode UV, nouvelle source: ${newVideoSrc}`);
     
     if (video.src !== newVideoSrc) {
       console.log(`Changement de vidéo: ${newVideoSrc}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
       video.src = newVideoSrc;
       
-      // S'assurer que l'élément vidéo est visible
+      // S'assurer que l'élément vidéo est visible et avec le bon z-index
       video.style.opacity = "1";
       video.style.visibility = "visible";
-      video.style.zIndex = "0";
+      video.style.zIndex = uvMode ? "5" : "0";
       
       video.load();
       
@@ -140,14 +151,14 @@ export function useOptimizedVideo(
       // S'assurer que la vidéo est visible
       video.style.opacity = "1";
       video.style.visibility = "visible";
-      video.style.zIndex = "0";
+      video.style.zIndex = uvMode ? "5" : "0";
       
       video.currentTime = 0;
       video.play()
         .then(() => console.log('Lecture vidéo démarrée pour transition'))
         .catch(err => console.error('Erreur lecture:', err));
     }
-  }, [location.pathname]);
+  }, [location.pathname, uvMode]);
 
   // Écouter les événements de navigation
   useEffect(() => {
@@ -161,7 +172,7 @@ export function useOptimizedVideo(
       // S'assurer que la vidéo est visible
       video.style.opacity = "1";
       video.style.visibility = "visible";
-      video.style.zIndex = "0";
+      video.style.zIndex = uvMode ? "5" : "0";
       
       video.currentTime = 0;
       video.play()
@@ -170,7 +181,7 @@ export function useOptimizedVideo(
     
     const unregister = navigation.registerVideoTransitionListener(handleTransition);
     return unregister;
-  }, [navigation]);
+  }, [navigation, uvMode]);
 
   // Gestion des événements vidéo
   useEffect(() => {

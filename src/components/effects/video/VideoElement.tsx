@@ -21,11 +21,16 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
   useEffect(() => {
     if (videoRef.current) {
       console.log(`Chargement de la vidéo: ${currentVideoUrl}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
-      // S'assurer que l'élément vidéo est visible
+      // S'assurer que l'élément vidéo est visible avec une z-index élevée en mode UV
       videoRef.current.style.opacity = "1";
       videoRef.current.style.visibility = "visible";
-      videoRef.current.style.zIndex = "0"; 
+      videoRef.current.style.zIndex = uvMode ? "5" : "0"; // Augmenter le z-index en mode UV
       videoRef.current.load();
+      
+      // Tenter la lecture automatique
+      videoRef.current.play()
+        .then(() => console.log("Lecture vidéo démarrée"))
+        .catch(err => console.log("Lecture auto non autorisée", err));
     }
   }, [currentVideoUrl, videoRef, uvMode]);
   
@@ -43,7 +48,7 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
         transformStyle: 'preserve-3d',
         opacity: 1,
         visibility: 'visible',
-        zIndex: 0
+        zIndex: uvMode ? 5 : 0  // Augmenter le z-index en mode UV
       }}
     >
       <source src={currentVideoUrl} type="video/mp4" />

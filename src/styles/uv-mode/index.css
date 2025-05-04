@@ -12,3 +12,18 @@
 @import '../effects/electric-effects.css';
 @import '../flashlight.css';
 
+/* Ajustements supplémentaires pour assurer la visibilité vidéo UV */
+.uv-mode-active .fixed.inset-0.w-full.h-full.overflow-hidden {
+  z-index: 2 !important;
+}
+
+.uv-mode-active video {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 5 !important;
+}
+
+/* Désactiver le masquage flashlight en mode UV */
+.torch-active.uv-mode-active .flashlight-overlay {
+  display: none !important; 
+}
