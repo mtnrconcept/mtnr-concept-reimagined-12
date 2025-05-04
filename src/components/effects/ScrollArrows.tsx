@@ -24,7 +24,7 @@ const ScrollArrows: React.FC<ScrollArrowsProps> = ({ className }) => {
 
   return (
     <div className={cn(
-      "fixed z-[200] right-4 flex flex-col items-center gap-4",
+      "fixed z-[250] right-4 flex flex-col items-center gap-4", // z-index augmenté à 250
       className
     )}>
       <button

@@ -84,11 +84,11 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Masque de la torche */}
+      {/* Masque de la torche - z-index réduit à 80 pour être sous les contrôles */}
       {isTorchActive && !uvMode &&
         createPortal(
           <div 
-            className="fixed inset-0 z-[99] pointer-events-none"
+            className="fixed inset-0 z-[80] pointer-events-none"
             style={{
               background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
                 rgba(0,0,0,0) 0%, 
@@ -119,37 +119,37 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           document.body
         )}
       {isTorchActive && uvMode &&
-  createPortal(
-    <div
-      className="fixed inset-0 z-[99] pointer-events-none"
-      style={{
-        background: `radial-gradient(ellipse 100px 100px at ${mousePosition.x}px ${mousePosition.y}px, 
-          rgba(128,0,255,0.0) 0%, 
-          rgba(128,0,255,0.25) 40%, 
-          rgba(128,0,255,0.35) 60%,
-          rgba(128,0,255,0.5) 80%, 
-          rgba(0,0,0,0.7) 100%)`,
-        mixBlendMode: 'screen',
-        transition: 'all 0.05s ease-out',
-      }}
-    >
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: '65px',
-          height: '65px',
-          borderRadius: '50%',
-          transform: 'translate(-50%, -50%)',
-          left: `${mousePosition.x}px`,
-          top: `${mousePosition.y}px`,
-          background: 'radial-gradient(circle, rgba(186,85,211,0.5) 0%, rgba(138,43,226,0.25) 60%, transparent 100%)',
-          filter: 'blur(25px)',
-          mixBlendMode: 'screen',
-        }}
-      />
-    </div>,
-    document.body
-  )}
+        createPortal(
+          <div
+            className="fixed inset-0 z-[80] pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse 100px 100px at ${mousePosition.x}px ${mousePosition.y}px, 
+                rgba(128,0,255,0.0) 0%, 
+                rgba(128,0,255,0.25) 40%, 
+                rgba(128,0,255,0.35) 60%,
+                rgba(128,0,255,0.5) 80%, 
+                rgba(0,0,0,0.7) 100%)`,
+              mixBlendMode: 'screen',
+              transition: 'all 0.05s ease-out',
+            }}
+          >
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                width: '65px',
+                height: '65px',
+                borderRadius: '50%',
+                transform: 'translate(-50%, -50%)',
+                left: `${mousePosition.x}px`,
+                top: `${mousePosition.y}px`,
+                background: 'radial-gradient(circle, rgba(186,85,211,0.5) 0%, rgba(138,43,226,0.25) 60%, transparent 100%)',
+                filter: 'blur(25px)',
+                mixBlendMode: 'screen',
+              }}
+            />
+          </div>,
+          document.body
+        )}
 
     </TorchContext.Provider>
   );

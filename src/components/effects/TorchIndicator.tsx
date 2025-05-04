@@ -17,10 +17,15 @@ export default function TorchIndicator({ className }: TorchIndicatorProps) {
   return (
     <div 
       className={cn(
-        "fixed z-[199] bottom-20 left-4 flex flex-col items-center", // Changé de right-4 à left-4
+        "fixed z-[250] bottom-24 right-4 flex flex-col items-center", // Positionné au-dessus du bouton (bottom-24) et z-index augmenté
         "animate-bounce",
         className
       )}
+      style={{
+        transform: 'translateX(-50%)',
+        left: '50%',              // Centré horizontalement
+        right: 'auto'             // Annule right-4
+      }}
     >
       <span
         className="text-yellow-400 font-bold mb-2 whitespace-nowrap"

@@ -53,7 +53,7 @@ export const TorchToggle = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[200] flex gap-2">
+    <div className="fixed bottom-4 right-4 z-[250] flex gap-2">
       {/* Bouton Torche classique */}
       <Button
         onClick={handleToggleTorch}
