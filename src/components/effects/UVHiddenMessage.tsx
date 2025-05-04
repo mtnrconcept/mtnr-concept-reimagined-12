@@ -1,5 +1,5 @@
 
-import { useRef, useEffect, memo, useMemo } from "react";
+import React, { useRef, useEffect, memo, useMemo } from "react";
 import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 
