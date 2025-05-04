@@ -16,13 +16,13 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [isInitialPageLoad, setIsInitialPageLoad] = useState(true);
 
   useEffect(() => {
-    // Pour le chargement initial ou rafraîchissement, utiliser une simple animation de fondu
+    // Pour le rafraîchissement ou premier chargement
     if (isInitialPageLoad) {
-      // Rendre le contenu immédiatement visible avec une animation de fondu
-      setContentVisible(true);
+      // Rendre le contenu immédiatement visible
       setDisplayChildren(children);
+      setContentVisible(true);
       
-      // Marquer que le premier chargement est terminé
+      // Marquer que le premier chargement est terminé après un court délai
       setTimeout(() => {
         setIsInitialPageLoad(false);
       }, 100);
@@ -30,7 +30,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       return;
     }
     
-    // Pour les changements de route normaux, utiliser l'animation complète
+    // Cette partie ne s'exécute que pour les navigations via liens
+    // après le chargement initial
     setIsTransitioning(true);
     setContentVisible(false);
 
@@ -49,10 +50,11 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
 
   // Variantes d'animation différentes selon le type de chargement
   const contentVariants = {
+    // Initial est soit un fondu simple, soit un effet plus complexe selon le contexte
     initial: (isInitial: boolean) => ({
-      opacity: isInitial ? 0 : 0,
+      opacity: 0,
       y: isInitial ? 0 : "100vh", // Pas de mouvement vertical au chargement initial
-      filter: isInitial ? "blur(0px)" : "blur(12px)"
+      filter: isInitial ? "blur(0px)" : "blur(12px)" // Pas de flou au chargement initial
     }),
     animate: {
       opacity: 1,
@@ -68,7 +70,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           ease: [0.05, 0.2, 0.2, 1.0] 
         },
         filter: { 
-          duration: isInitialPageLoad ? 1.0 : 3.0, 
+          duration: isInitialPageLoad ? 0 : 3.0, 
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
@@ -94,9 +96,9 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         key={location.pathname}
         custom={isInitialPageLoad}
         variants={contentVariants}
-        initial="initial"
+        initial={isInitialPageLoad ? { opacity: 0 } : "initial"}
         animate={contentVisible ? "animate" : "initial"}
-        exit="exit"
+        exit={isInitialPageLoad ? { opacity: 0 } : "exit"}
         className="relative min-h-screen w-full"
         style={{
           paddingTop: "64px",
