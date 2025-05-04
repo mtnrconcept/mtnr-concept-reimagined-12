@@ -15,30 +15,25 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { fr } from 'date-fns/locale';
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
+import { Clock, Headphones, MessageSquare, User } from "lucide-react";
 
 const bookingFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Le nom doit contenir au moins 2 caractères.",
+  blaze: z.string().min(2, {
+    message: "Votre blaze doit contenir au moins 2 caractères.",
   }),
   email: z.string().email({
     message: "Adresse email invalide.",
   }),
-  phone: z.string().min(10, {
-    message: "Numéro de téléphone invalide.",
-  }),
-  date: z.date({
-    required_error: "Veuillez sélectionner une date.",
-  }),
   service: z.string({
-    required_error: "Veuillez sélectionner un service.",
+    required_error: "Veuillez sélectionner un type de prestation.",
   }),
-  message: z.string().optional(),
+  duration: z.number().min(1, {
+    message: "Veuillez indiquer une durée approximative.",
+  }),
+  description: z.string().min(10, {
+    message: "Veuillez ajouter une description d'au moins 10 caractères.",
+  }),
 });
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
@@ -48,10 +43,10 @@ export default function Book() {
 
   // Valeurs par défaut du formulaire
   const defaultValues: Partial<BookingFormValues> = {
-    name: "",
+    blaze: "",
     email: "",
-    phone: "",
-    message: "",
+    duration: 60,
+    description: "",
   };
 
   const form = useForm<BookingFormValues>({
@@ -60,8 +55,8 @@ export default function Book() {
   });
 
   function onSubmit(data: BookingFormValues) {
-    toast.success("Votre réservation a bien été prise en compte !", {
-      description: `Nous vous contacterons prochainement pour confirmer votre réservation du ${format(data.date, 'PPP', { locale: fr })}.`,
+    toast.success("Votre projet a bien été enregistré !", {
+      description: `Nous vous contacterons prochainement pour discuter de votre projet de ${data.service}.`,
       duration: 5000,
     });
     form.reset();
@@ -80,7 +75,7 @@ export default function Book() {
           
           <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10">
             <p className="text-lg text-center mb-8">
-              Réservez votre session photo avec MTNR Studio.
+              Réservez votre session studio ou votre prestation musicale.
             </p>
             
             <Form {...form}>
@@ -88,13 +83,15 @@ export default function Book() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="blaze"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-yellow-400">Nom et prénom</FormLabel>
+                        <FormLabel className="text-yellow-400 flex items-center gap-2">
+                          <User className="h-4 w-4" /> Votre blaze
+                        </FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Votre nom" 
+                            placeholder="Nom d'artiste ou pseudo" 
                             {...field} 
                             className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
                           />
@@ -124,74 +121,14 @@ export default function Book() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-yellow-400">Téléphone</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Votre numéro de téléphone" 
-                            type="tel" 
-                            {...field}
-                            className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel className="text-yellow-400">Date souhaitée</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal bg-transparent border-yellow-400/50 hover:bg-yellow-400/10 text-white",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: fr })
-                                ) : (
-                                  <span>Sélectionnez une date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              initialFocus
-                              locale={fr}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
                 <FormField
                   control={form.control}
                   name="service"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-400">Type de prestation</FormLabel>
+                      <FormLabel className="text-yellow-400 flex items-center gap-2">
+                        <Headphones className="h-4 w-4" /> Type de prestation
+                      </FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-transparent border-yellow-400/50 text-white focus:border-yellow-400">
@@ -199,9 +136,11 @@ export default function Book() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-black/90 border-yellow-400/50 text-white">
-                          <SelectItem value="portrait">Portrait studio</SelectItem>
-                          <SelectItem value="mode">Shooting Mode / Book</SelectItem>
-                          <SelectItem value="event">Événementiel / Reportage</SelectItem>
+                          <SelectItem value="recording">Enregistrement studio</SelectItem>
+                          <SelectItem value="mixage">Mixage</SelectItem>
+                          <SelectItem value="mastering">Mastering</SelectItem>
+                          <SelectItem value="production">Production musicale</SelectItem>
+                          <SelectItem value="beatmaking">Beatmaking</SelectItem>
                           <SelectItem value="location">Location du studio</SelectItem>
                         </SelectContent>
                       </Select>
@@ -212,14 +151,47 @@ export default function Book() {
                 
                 <FormField
                   control={form.control}
-                  name="message"
+                  name="duration"
+                  render={({ field: { value, onChange, ...fieldProps } }) => (
+                    <FormItem>
+                      <FormLabel className="text-yellow-400 flex items-center gap-2">
+                        <Clock className="h-4 w-4" /> Durée estimée (minutes)
+                      </FormLabel>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4">
+                          <FormControl>
+                            <Slider
+                              min={30}
+                              max={240}
+                              step={15}
+                              value={[value || 60]}
+                              onValueChange={(vals) => onChange(vals[0])}
+                              className="py-4"
+                              {...fieldProps}
+                            />
+                          </FormControl>
+                          <span className="w-16 text-center font-mono bg-black/30 py-1 px-2 rounded border border-yellow-400/30">
+                            {value || 60}m
+                          </span>
+                        </div>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-400">Message (facultatif)</FormLabel>
+                      <FormLabel className="text-yellow-400 flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" /> Description du projet
+                      </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Des précisions sur votre demande..."
-                          className="resize-none min-h-[100px] bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
+                          placeholder="Décrivez votre projet musical, vos influences, vos besoins spécifiques..."
+                          className="resize-none min-h-[120px] bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
                           {...field}
                         />
                       </FormControl>
