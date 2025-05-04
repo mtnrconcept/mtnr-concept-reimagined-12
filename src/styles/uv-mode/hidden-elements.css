@@ -111,4 +111,20 @@
     width: 100%;
     height: 100%;
   }
+
+  /* Style pour la page secrète */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
+    animation: glowPulse 2s infinite alternate;
+  }
+
+  @keyframes glowPulse {
+    from { text-shadow: 0 0 5px #D2FF3F, 0 0 10px #D2FF3F; }
+    to { text-shadow: 0 0 15px #D2FF3F, 0 0 30px #D2FF3F; }
+  }
 }
