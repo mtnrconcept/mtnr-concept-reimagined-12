@@ -52,7 +52,8 @@
   }
   
   /* Electric reservation button hover effect */
-  nav a:has(span:contains("Réservation")):hover span.absolute {
+  nav a:has(span:contains("Réservation")):hover span.absolute,
+  footer a.group:hover span.absolute {
     box-shadow: 0 0 15px #D2FF3F, inset 0 0 10px #D2FF3F;
   }
   
