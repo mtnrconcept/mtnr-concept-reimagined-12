@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
 export default function HeroSection() {
@@ -7,12 +8,12 @@ export default function HeroSection() {
       <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 px-[25px] mx-0 py-[25px]">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
-        <h1 className="font-display sm:text-5xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)] mx-0 px-0 text-base md:text-base">
-          <span className="block text-center font-thin my-0 mx-[24px] px-0 text-8xl">BIENVENUE au</span>
-          <span className="block mt-2 text-center mx-0 px-0 font-normal text-6xl">MTNR CONCEPT STUDIO</span>
+        <h1 className="font-display text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)] mx-0 px-0">
+          <span className="block text-center font-thin text-4xl sm:text-6xl md:text-7xl lg:text-8xl">BIENVENUE au</span>
+          <span className="block mt-2 text-center mx-0 px-0 font-normal text-3xl sm:text-4xl md:text-5xl lg:text-6xl">MTNR CONCEPT STUDIO</span>
         </h1>
         
-        <div className="text-white text-xl sm:text-2xl mb-8 font-medium tracking-wide">
+        <div className="text-white text-lg sm:text-xl md:text-2xl mb-8 font-medium tracking-wide">
           Dans la cave du <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 bg-clip-text text-transparent bg-[size:200%_auto] animate-text-shimmer font-bold">son underground</span>
         </div>
         
@@ -23,7 +24,7 @@ export default function HeroSection() {
           <p>
             Ramène ton flow, laisse une empreinte. La famille MTNR c'est : beatmakers mutants, MC brut, groove crasseux, et vision d'auteur.
           </p>
-          <p className="mt-6 text-yellow-300 font-display text-xl uppercase tracking-wider">
+          <p className="mt-6 text-yellow-300 font-display text-lg sm:text-xl uppercase tracking-wider">
             Underground ou rien.
           </p>
         </div>
