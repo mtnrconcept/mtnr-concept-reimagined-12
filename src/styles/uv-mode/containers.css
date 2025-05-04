@@ -8,7 +8,7 @@
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 15px rgba(0, 102, 255, 0.3) !important;
     transition: all 0.5s ease-out;
-    z-index: -5 !important; /* Assure que le fond est derrière le texte */
+    z-index: 0 !important;
     position: relative;
   }
   
@@ -26,13 +26,15 @@
     background-color: #D2FF3F !important;
     box-shadow: 0 0 12px rgba(210, 255, 63, 0.6) !important;
     transition: all 0.5s ease-out;
-    z-index: 0 !important;
+    z-index: 5 !important;
+    position: relative;
   }
   
   .uv-mode-active .border-yellow-400 {
     border-color: #4FA9FF !important;
     box-shadow: 0 0 15px #00AAFF;
     transition: all 0.5s ease-out;
+    z-index: 5 !important;
   }
 
   /* Styles spécifiques pour paper-texture et grunge-border */
@@ -42,7 +44,13 @@
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
     background-color: rgba(15, 0, 70, 0.8) !important;
     position: relative;
-    z-index: -20 !important; /* Mettre encore plus en arrière-plan */
+  }
+  
+  /* S'assurer que les contenus dans ces conteneurs sont au premier plan */
+  .uv-mode-active [class*="paper-texture"] > *,
+  .uv-mode-active [class*="grunge-border"] > * {
+    position: relative;
+    z-index: 10 !important;
   }
   
   /* Effet de bordure lumineuse pour les cartes en mode UV */
@@ -51,6 +59,14 @@
     border: 1px solid #4FA9FF !important;
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
     z-index: 0 !important;
+    position: relative;
+  }
+  
+  /* S'assurer que le contenu des cartes est au premier plan */
+  .uv-mode-active .card > *,
+  .uv-mode-active [class*="border"] > * {
+    position: relative;
+    z-index: 10 !important;
   }
   
   /* Les conteneurs avec du contenu en mode UV */
@@ -60,6 +76,13 @@
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 20px rgba(0, 102, 255, 0.2) !important;
     z-index: 0 !important;
+    position: relative;
+  }
+  
+  /* S'assurer que le contenu des conteneurs est au premier plan */
+  .uv-mode-active .container > * {
+    position: relative;
+    z-index: 10 !important;
   }
   
   /* Isolation des textures et empêcher l'effet sur le texte */
