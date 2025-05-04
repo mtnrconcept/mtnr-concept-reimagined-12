@@ -51,41 +51,6 @@
     }
   }
   
-  /* Arc électrique entre deux points */
-  .electric-arc {
-    position: absolute;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      #D2FF3F 20%,
-      #FFFFFF 50%,
-      #D2FF3F 80%,
-      transparent 100%
-    );
-    animation: arcFlash 3s infinite;
-    transform-origin: left center;
-    opacity: 0;
-    filter: blur(1px);
-    box-shadow: 0 0 10px #D2FF3F;
-    z-index: 9;
-  }
-  
-  @keyframes arcFlash {
-    0%, 100% {
-      opacity: 0;
-      filter: blur(3px);
-    }
-    10%, 90% {
-      opacity: 0.1;
-      filter: blur(2px);
-    }
-    50% {
-      opacity: 1;
-      filter: blur(1px);
-    }
-  }
-  
   /* Amélioration de l'effet de texte électrique */
   @keyframes enhancedElectricText {
     0% {
@@ -163,5 +128,110 @@
     font-weight: bold;
     letter-spacing: 0.1em;
     z-index: 5;
+  }
+  
+  .enhanced-electric-text-high {
+    position: relative;
+    display: inline-block;
+    animation: 
+      enhancedElectricText 2s infinite,
+      intenseVibration 0.05s infinite;
+    color: #D2FF3F;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    z-index: 5;
+  }
+  
+  .enhanced-electric-text-low {
+    position: relative;
+    display: inline-block;
+    animation: 
+      enhancedElectricText 4s infinite,
+      intenseVibration 0.15s infinite;
+    color: #D2FF3F;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    z-index: 5;
+  }
+  
+  /* Styles de FlickeringNeonText */
+  @keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      text-shadow: 
+        0 0 5px currentColor,
+        0 0 10px currentColor,
+        0 0 20px currentColor;
+      opacity: 0.8;
+    }
+    20%, 24%, 55% {
+      text-shadow: none;
+      opacity: 0.3;
+    }
+  }
+  
+  @keyframes staticEffect {
+    0% { clip-path: inset(10% 0 80% 0); }
+    5% { clip-path: inset(30% 0 50% 0); }
+    10% { clip-path: inset(80% 0 5% 0); }
+    15% { clip-path: inset(50% 0 40% 0); }
+    20% { clip-path: inset(15% 0 65% 0); }
+    25% { clip-path: inset(5% 0 95% 0); }
+    30% { clip-path: inset(50% 0 30% 0); }
+    35% { clip-path: inset(80% 0 15% 0); }
+    40% { clip-path: inset(30% 0 50% 0); }
+    45% { clip-path: inset(70% 0 40% 0); }
+    50% { clip-path: inset(10% 0 60% 0); }
+    55% { clip-path: inset(40% 0 30% 0); }
+    60% { clip-path: inset(5% 0 70% 0); }
+    65% { clip-path: inset(80% 0 10% 0); }
+    70% { clip-path: inset(25% 0 50% 0); }
+    75% { clip-path: inset(45% 0 35% 0); }
+    80% { clip-path: inset(5% 0 70% 0); }
+    85% { clip-path: inset(40% 0 60% 0); }
+    90% { clip-path: inset(60% 0 10% 0); }
+    95% { clip-path: inset(30% 0 20% 0); }
+    100% { clip-path: inset(15% 0 80% 0); }
+  }
+  
+  @keyframes buzzEffect {
+    0% { transform: translateX(0); }
+    1% { transform: translateX(1px); }
+    2% { transform: translateX(-1px); }
+    3% { transform: translateX(1px); }
+    4% { transform: translateX(-1px); }
+    5% { transform: translateX(0); }
+    100% { transform: translateX(0); }
+  }
+  
+  .flickering-neon-text {
+    position: relative;
+    display: inline-block;
+    animation: neonFlicker 3s infinite;
+  }
+  
+  .flickering-neon-text::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    opacity: 0.2;
+    animation: staticEffect 0.2s infinite steps(1);
+    z-index: -1;
+  }
+  
+  .flicker-low {
+    animation-duration: 4s;
+  }
+  
+  .flicker-medium {
+    animation-duration: 3s;
+  }
+  
+  .flicker-high {
+    animation-duration: 2s;
+    animation: neonFlicker 2s infinite, buzzEffect 5s infinite;
   }
 }
