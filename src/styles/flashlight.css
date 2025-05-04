@@ -205,14 +205,15 @@
   
   /* Améliorer l'interactivité de la torche */
   .torch-active {
-    touch-action: pan-y !important; /* Permettre le défilement vertical */
+    touch-action: auto !important; /* Permettre le défilement vertical */
     user-select: none; /* Empêcher la sélection de texte */
+    overscroll-behavior: contain; /* Eviter les rebonds de défilement */
   }
   
   /* Permettre le scroll normal dans les conteneurs de contenu même avec torche active */
   .content-scrollable {
-    touch-action: pan-y !important; /* Autoriser uniquement le défilement vertical */
-    pointer-events: auto;
+    touch-action: auto !important; /* Autoriser le défilement vertical */
+    pointer-events: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch; /* Pour une meilleure inertie sur iOS */
   }
@@ -220,7 +221,7 @@
   /* Empêcher le corps de la page de se déplacer pendant le défilement avec la torche */
   body.torch-active {
     overflow-y: auto !important;
-    overscroll-behavior: none; /* Empêcher le rebond de défilement */
+    overscroll-behavior: contain; /* Empêcher le rebond de défilement */
   }
   
   /* Assurez-vous que les conteneurs de contenu peuvent défiler normalement */

@@ -64,7 +64,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useTorchScroll({ isTorchActive, mousePosition, isFingerDown });
   
   // Effet pour ajouter/supprimer la classe torch-active au body
-  React.useEffect(() => {
+  useEffect(() => {
     if (isTorchActive) {
       document.body.classList.add('torch-active');
       

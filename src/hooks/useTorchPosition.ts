@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useIsMobile } from "./use-mobile";
 
 export interface MousePosition {
@@ -16,6 +16,7 @@ export function useTorchPosition(
   const isMobile = useIsMobile();
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollPositionRef = useRef(0);
+  const isScrollingRef = useRef(false);
   
   // Se souvenir de la position de défilement actuelle
   useEffect(() => {
@@ -41,7 +42,6 @@ export function useTorchPosition(
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isTorchActive && e.touches.length > 0) {
       // Ne pas empêcher le comportement par défaut pour permettre le défilement natif
-      // mais empêcher les autres gestionnaires d'événements
       e.stopPropagation();
       
       updateMousePosition({ 
@@ -63,10 +63,12 @@ export function useTorchPosition(
   
   const handleTouchEnd = useCallback(() => {
     if (setIsFingerDown) setIsFingerDown(false);
+    isScrollingRef.current = false;
   }, [setIsFingerDown]);
   
   const handleScrollTouchMove = useCallback((e: TouchEvent) => {
     if (isTorchActive && e.touches.length > 0) {
+      isScrollingRef.current = true;
       updateMousePosition({ 
         x: e.touches[0].clientX, 
         y: e.touches[0].clientY 
@@ -84,6 +86,7 @@ export function useTorchPosition(
       
       scrollTimeoutRef.current = setTimeout(() => {
         document.removeEventListener("touchmove", handleScrollTouchMove);
+        isScrollingRef.current = false;
       }, 150);
     }
   }, [isTorchActive, handleScrollTouchMove]);
@@ -92,7 +95,7 @@ export function useTorchPosition(
   useEffect(() => {
     if (isMobile) return;
     
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
     
@@ -108,15 +111,15 @@ export function useTorchPosition(
     if (!isMobile) return;
     
     // Utiliser { passive: true } pour permettre le défilement natif
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchend", handleTouchEnd);
-    window.addEventListener("scroll", handleScroll);
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+    document.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     
     return () => {
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("touchmove", handleScrollTouchMove);
       
@@ -126,5 +129,5 @@ export function useTorchPosition(
     };
   }, [isMobile, handleTouchMove, handleTouchStart, handleTouchEnd, handleScroll, handleScrollTouchMove]);
   
-  return { scrollTimeoutRef, lastScrollPositionRef };
+  return { scrollTimeoutRef, lastScrollPositionRef, isScrollingRef };
 }

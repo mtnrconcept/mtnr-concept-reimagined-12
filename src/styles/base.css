@@ -8,7 +8,7 @@
   html, body {
     @apply h-full bg-black text-white antialiased;
     scroll-behavior: smooth;
-    overscroll-behavior: none;
+    overscroll-behavior: contain;
   }
   
   #root {
@@ -44,5 +44,18 @@
   /* Suppression des styles par défaut des boutons et inputs */
   button, input, textarea, select {
     @apply outline-none;
+  }
+
+  /* S'assurer que la hauteur du contenu est au moins égale à la hauteur de la fenêtre */
+  .min-h-screen {
+    min-height: 100vh; /* fallback */
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+}
+
+/* Script pour corriger la hauteur sur mobile */
+@media (max-width: 768px) {
+  :root {
+    --vh: calc(1vh);
   }
 }
