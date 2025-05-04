@@ -17,7 +17,7 @@ export default function TorchIndicator({ className }: TorchIndicatorProps) {
   return (
     <div 
       className={cn(
-        "fixed z-[199] bottom-20 right-4 flex flex-col items-center", 
+        "fixed z-[199] bottom-20 left-4 flex flex-col items-center", // Changé de right-4 à left-4
         "animate-bounce",
         className
       )}

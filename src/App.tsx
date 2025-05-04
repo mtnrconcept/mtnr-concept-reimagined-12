@@ -10,6 +10,7 @@ import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle, recordArtistsVisit } from "./components/effects/TorchToggle";
 import TorchIndicator from "./components/effects/TorchIndicator";
+import ScrollArrows from "./components/effects/ScrollArrows";
 import { NavigationProvider } from "./components/effects/NavigationContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
@@ -118,6 +119,7 @@ const App = () => (
               </Suspense>
               <TorchToggle />
               <TorchIndicator />
+              <ScrollArrows className="top-1/2 -translate-y-1/2" />
             </BrowserRouter>
             <ParticleEffect />
           </NavigationProvider>
