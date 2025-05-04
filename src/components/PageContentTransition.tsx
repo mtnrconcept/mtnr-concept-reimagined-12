@@ -13,48 +13,54 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [displayChildren, setDisplayChildren] = useState(children);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    // Lorsque la route change, initialiser la transition
-    setIsTransitioning(true);
-    setContentVisible(false);
-
-    // Garder l'ancien contenu pendant la transition de sortie
-    // Pour que l'animation se termine exactement à 6500ms (durée réduite de 0.5s),
-    // et commence à apparaître à 3000ms
-    const timer = setTimeout(() => {
-      setDisplayChildren(children);
-      
-      // Afficher le contenu 3.5 secondes avant la fin de la vidéo
+    // Marquer le premier rendu comme chargement initial
+    if (isInitialLoad) {
+      setContentVisible(true);
+      // Attendre un peu pour s'assurer que le DOM est ready
       setTimeout(() => {
-        setContentVisible(true);
-      }, 0); // Pas d'attente supplémentaire
-      
-    }, 3000); // Démarrer exactement à 3000ms
+        setIsInitialLoad(false);
+      }, 100);
+    } else {
+      // Pour les changements de route suivants, utiliser la transition complète
+      setIsTransitioning(true);
+      setContentVisible(false);
 
-    return () => clearTimeout(timer);
-  }, [children, location]);
+      const timer = setTimeout(() => {
+        setDisplayChildren(children);
+        
+        setTimeout(() => {
+          setContentVisible(true);
+        }, 0);
+        
+      }, 3000);
 
-  // Configuration des variantes pour l'effet d'accélération et de flou
+      return () => clearTimeout(timer);
+    }
+  }, [children, location, isInitialLoad]);
+
+  // Configuration des variantes avec condition pour le chargement initial
   const contentVariants = {
-    initial: {
+    initial: (isInitial: boolean) => ({
       opacity: 0,
-      y: "100vh", // Commence complètement en dehors de l'écran (bas)
-      filter: "blur(12px)"
-    },
+      y: isInitial ? 0 : "100vh", // Pas de mouvement vertical au chargement initial
+      filter: isInitial ? "blur(0px)" : "blur(12px)"
+    }),
     animate: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: 3.0, ease: [0.05, 0.2, 0.2, 1.0] }, // 3.0s au lieu de 3.5s
-        y: { duration: 3.5, ease: [0.05, 0.2, 0.2, 1.0] }, // 3.5s au lieu de 4.0s
-        filter: { duration: 3.0, ease: [0.1, 0.4, 0.2, 1.0] } // Synchronisé avec l'opacité
+        opacity: { duration: isInitialLoad ? 1.0 : 3.0, ease: [0.05, 0.2, 0.2, 1.0] },
+        y: { duration: isInitialLoad ? 0 : 3.5, ease: [0.05, 0.2, 0.2, 1.0] },
+        filter: { duration: isInitialLoad ? 1.0 : 3.0, ease: [0.1, 0.4, 0.2, 1.0] }
       }
     },
     exit: {
       opacity: 0,
-      y: "-100vh", // Disparaît complètement vers le haut de l'écran
+      y: "-100vh",
       filter: "blur(12px)",
       transition: {
         opacity: { duration: 4.1, ease: [0.33, 1, 0.68, 1] },
@@ -71,15 +77,14 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     <AnimatePresence mode="wait" onExitComplete={() => setIsTransitioning(false)}>
       <motion.div
         key={location.pathname}
+        custom={isInitialLoad}
         variants={contentVariants}
         initial="initial"
         animate={contentVisible ? "animate" : "initial"}
         exit="exit"
         className="relative min-h-screen w-full"
         style={{
-          // Ajouter un padding-top pour le contenu afin qu'il ne soit pas sous la navbar
-          paddingTop: "64px", // Hauteur de la navbar
-          // Garantir que l'animation reste sous la navbar
+          paddingTop: "64px",
           zIndex: 10,
         }}
       >
