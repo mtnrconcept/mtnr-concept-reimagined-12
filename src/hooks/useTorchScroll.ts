@@ -5,9 +5,10 @@ import { useIsMobile } from './use-mobile';
 interface UseTorchScrollProps {
   isTorchActive: boolean;
   mousePosition: { x: number; y: number };
+  isFingerDown?: boolean; // Nouvelle prop pour détecter si le doigt est en contact avec l'écran
 }
 
-export function useTorchScroll({ isTorchActive, mousePosition }: UseTorchScrollProps) {
+export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = true }: UseTorchScrollProps) {
   const scrollAnimationRef = useRef<number | null>(null);
   const isMobile = useIsMobile();
   
@@ -44,7 +45,7 @@ export function useTorchScroll({ isTorchActive, mousePosition }: UseTorchScrollP
     
     // Fonction d'animation pour le défilement
     const scrollAnimation = () => {
-      if (isTorchActive) {
+      if (isTorchActive && isFingerDown) {
         const speed = calculateScrollSpeed(mousePosition.y);
         if (speed !== 0) {
           window.scrollBy(0, speed);
@@ -53,19 +54,25 @@ export function useTorchScroll({ isTorchActive, mousePosition }: UseTorchScrollP
       }
     };
     
-    // Démarrer l'animation si la torche est active
-    if (isTorchActive) {
+    // Démarrer l'animation si la torche est active ET que le doigt est sur l'écran
+    if (isTorchActive && isFingerDown) {
       scrollAnimationRef.current = requestAnimationFrame(scrollAnimation);
+    } else {
+      // Arrêter l'animation si le doigt n'est plus sur l'écran
+      if (scrollAnimationRef.current !== null) {
+        cancelAnimationFrame(scrollAnimationRef.current);
+        scrollAnimationRef.current = null;
+      }
     }
     
-    // Nettoyer l'animation lors de la désactivation de la torche
+    // Nettoyer l'animation lors de la désactivation de la torche ou lorsque le doigt est retiré
     return () => {
       if (scrollAnimationRef.current !== null) {
         cancelAnimationFrame(scrollAnimationRef.current);
         scrollAnimationRef.current = null;
       }
     };
-  }, [isTorchActive, mousePosition.y]);
+  }, [isTorchActive, mousePosition.y, isFingerDown]);
   
   return { scrollAnimationRef };
 }

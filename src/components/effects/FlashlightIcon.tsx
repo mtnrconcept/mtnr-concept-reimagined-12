@@ -7,18 +7,23 @@ interface FlashlightIconProps {
   isTorchActive: boolean;
   mousePosition: { x: number; y: number };
   uvMode: boolean;
+  isFingerDown?: boolean;
 }
 
 export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
   isTorchActive,
   mousePosition,
-  uvMode
+  uvMode,
+  isFingerDown = true
 }) => {
   const isMobile = useIsMobile();
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
   
   useEffect(() => {
-    if (!isTorchActive) return;
+    if (!isTorchActive || !isFingerDown) {
+      setScrollDirection(null);
+      return;
+    }
     
     const windowHeight = window.innerHeight;
     const centerY = windowHeight / 2;
@@ -33,7 +38,7 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
     } else {
       setScrollDirection(null);
     }
-  }, [isTorchActive, mousePosition.y]);
+  }, [isTorchActive, mousePosition.y, isFingerDown]);
 
   if (!isTorchActive) return null;
 
@@ -45,6 +50,7 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
         top: `${mousePosition.y}px`,
         transform: 'translate(-50%, -80%)',
         transition: isMobile ? 'none' : 'left 0.05s ease-out, top 0.05s ease-out',
+        opacity: isFingerDown ? 1 : 0.7, // Légèrement transparent quand le doigt n'est pas sur l'écran
       }}
     >
       <Flashlight 
@@ -53,15 +59,15 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
         strokeWidth={1.5}
       />
       
-      {/* Indicateur de direction de défilement */}
-      {scrollDirection === 'up' && (
+      {/* Indicateur de direction de défilement - visible seulement si le doigt est sur l'écran */}
+      {isFingerDown && scrollDirection === 'up' && (
         <ChevronUp 
           size={16} 
           className={`absolute -top-4 left-1/2 transform -translate-x-1/2 ${uvMode ? 'text-purple-300' : 'text-yellow-200'} animate-bounce opacity-80`}
         />
       )}
       
-      {scrollDirection === 'down' && (
+      {isFingerDown && scrollDirection === 'down' && (
         <ChevronDown 
           size={16} 
           className={`absolute -bottom-5 left-1/2 transform -translate-x-1/2 ${uvMode ? 'text-purple-300' : 'text-yellow-200'} animate-bounce opacity-80`}

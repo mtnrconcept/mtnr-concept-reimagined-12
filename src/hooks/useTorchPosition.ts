@@ -10,7 +10,8 @@ export interface MousePosition {
 export function useTorchPosition(
   isTorchActive: boolean,
   updateMousePosition: (position: MousePosition) => void,
-  initialPosition: MousePosition = { x: 0, y: 0 }
+  initialPosition: MousePosition = { x: 0, y: 0 },
+  setIsFingerDown?: (isDown: boolean) => void
 ) {
   const isMobile = useIsMobile();
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -23,11 +24,26 @@ export function useTorchPosition(
       }
     };
     
+    const handleMouseDown = () => {
+      if (setIsFingerDown) setIsFingerDown(true);
+    };
+    
+    const handleMouseUp = () => {
+      if (setIsFingerDown) setIsFingerDown(false);
+    };
+    
     if (!isMobile) {
       window.addEventListener("mousemove", handleMouseMove);
-      return () => window.removeEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mousedown", handleMouseDown);
+      window.addEventListener("mouseup", handleMouseUp);
+      
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mousedown", handleMouseDown);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
     }
-  }, [isTorchActive, isMobile, updateMousePosition]);
+  }, [isTorchActive, isMobile, updateMousePosition, setIsFingerDown]);
 
   // Touch tracking for mobile
   useEffect(() => {
@@ -43,11 +59,16 @@ export function useTorchPosition(
 
     const handleTouchStart = (e: TouchEvent) => {
       if (isTorchActive && e.touches.length > 0) {
+        if (setIsFingerDown) setIsFingerDown(true);
         updateMousePosition({ 
           x: e.touches[0].clientX, 
           y: e.touches[0].clientY 
         });
       }
+    };
+    
+    const handleTouchEnd = () => {
+      if (setIsFingerDown) setIsFingerDown(false);
     };
 
     // Nouveau gestionnaire pour capturer tous les événements tactiles pendant le défilement
@@ -81,6 +102,7 @@ export function useTorchPosition(
       // Écouter les événements tactiles standards
       window.addEventListener("touchmove", handleTouchMove, { passive: false });
       window.addEventListener("touchstart", handleTouchStart);
+      window.addEventListener("touchend", handleTouchEnd);
       
       // Écouter également l'événement de défilement
       window.addEventListener("scroll", handleScroll);
@@ -88,6 +110,7 @@ export function useTorchPosition(
       return () => {
         window.removeEventListener("touchmove", handleTouchMove);
         window.removeEventListener("touchstart", handleTouchStart);
+        window.removeEventListener("touchend", handleTouchEnd);
         window.removeEventListener("scroll", handleScroll);
         document.removeEventListener("touchmove", handleScrollTouchMove);
         if (scrollTimeoutRef.current) {
@@ -95,7 +118,7 @@ export function useTorchPosition(
         }
       };
     }
-  }, [isTorchActive, isMobile, updateMousePosition]);
+  }, [isTorchActive, isMobile, updateMousePosition, setIsFingerDown]);
   
   return { scrollTimeoutRef };
 }

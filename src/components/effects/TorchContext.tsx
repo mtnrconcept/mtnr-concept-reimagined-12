@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useContext,
@@ -18,6 +19,8 @@ interface TorchContextType {
   mousePosition: { x: number; y: number };
   updateMousePosition: (position: { x: number; y: number }) => void;
   containerRef: React.RefObject<HTMLDivElement>;
+  isFingerDown: boolean;
+  setIsFingerDown: (isDown: boolean) => void;
 }
 
 const TorchContext = createContext<TorchContextType>({
@@ -26,6 +29,8 @@ const TorchContext = createContext<TorchContextType>({
   mousePosition: { x: 0, y: 0 },
   updateMousePosition: () => {},
   containerRef: { current: null },
+  isFingerDown: true,
+  setIsFingerDown: () => {},
 });
 
 export const useTorch = () => useContext(TorchContext);
@@ -33,6 +38,7 @@ export const useTorch = () => useContext(TorchContext);
 export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isFingerDown, setIsFingerDown] = useState(true); // Par défaut à true pour la compatibilité desktop
   const containerRef = useRef<HTMLDivElement>(null);
   const { uvMode, uvCircleRef } = useUVMode();
   
@@ -45,11 +51,11 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // Use our extracted hooks
-  useTorchPosition(isTorchActive, updateMousePosition, mousePosition);
+  useTorchPosition(isTorchActive, updateMousePosition, mousePosition, setIsFingerDown);
   useUVEffects(isTorchActive, mousePosition);
   
-  // Intégration du nouveau hook de défilement basé sur la position de la torche
-  useTorchScroll({ isTorchActive, mousePosition });
+  // Intégration du hook de défilement avec le nouvel état isFingerDown
+  useTorchScroll({ isTorchActive, mousePosition, isFingerDown });
 
   const contextValue: TorchContextType = {
     isTorchActive,
@@ -57,6 +63,8 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     mousePosition,
     updateMousePosition,
     containerRef,
+    isFingerDown,
+    setIsFingerDown,
   };
 
   return (
@@ -81,6 +89,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         isTorchActive={isTorchActive}
         mousePosition={mousePosition}
         uvMode={uvMode}
+        isFingerDown={isFingerDown}
       />
     </TorchContext.Provider>
   );
