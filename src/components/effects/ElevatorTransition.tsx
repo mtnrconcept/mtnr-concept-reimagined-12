@@ -36,7 +36,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     setPrevPath(location.pathname);
   }, [isActive, location.pathname, prevPath]);
 
-  // Créer les variantes pour l'animation d'ascenseur
+  // Créer les variantes pour l'animation d'ascenseur - durée augmentée pour être plus lente
   const elevatorVariants = {
     initial: (direction: 'up' | 'down' | null) => ({
       y: direction === 'down' ? '-100%' : direction === 'up' ? '100%' : 0,
@@ -44,14 +44,14 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     animate: {
       y: 0,
       transition: {
-        duration: 5,
+        duration: 8, // Augmenté de 5 à 8 secondes
         ease: [0.16, 1, 0.3, 1], // Ease-out quint - un bon easing pour simulation d'ascenseur
       },
     },
     exit: (direction: 'up' | 'down' | null) => ({
       y: direction === 'down' ? '100%' : direction === 'up' ? '-100%' : 0,
       transition: {
-        duration: 5,
+        duration: 8, // Augmenté de 5 à 8 secondes
         ease: [0.7, 0, 0.84, 0], // Ease-in quint - départ progressif
       },
     }),
@@ -84,7 +84,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
             y: direction === 'up' ? '-200vh' : '-100vh'
           }}
           transition={{
-            duration: 5,
+            duration: 8, // Augmenté de 5 à 8 secondes
             ease: [0.16, 1, 0.3, 1],
             repeat: 0,
           }}
@@ -95,7 +95,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
     );
   };
 
-  // Composant pour l'effet de flou de mouvement
+  // Composant pour l'effet de flou de mouvement - durée augmentée
   const BlurMotionEffect = ({ children }: { children: React.ReactNode }) => {
     return (
       <motion.div
@@ -110,7 +110,7 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
           ]
         }}
         transition={{
-          duration: 5,
+          duration: 8, // Augmenté de 5 à 8 secondes
           times: [0, 0.2, 0.5, 0.8, 1],
           ease: [0.16, 1, 0.3, 1]
         }}

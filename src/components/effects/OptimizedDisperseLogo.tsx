@@ -51,14 +51,14 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     console.log('Démarrage de l\'effet de dispersion du logo');
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 2000, // Augmenté significativement pour un effet très visible
-      dispersionStrength: 3.2, // Augmenté pour une dispersion plus spectaculaire
-      duration: 1000, // Durée de dispersion d'une seconde
-      colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
+      particleCount: 2000, // Inchangé
+      dispersionStrength: 3.2, // Inchangé
+      duration: 1800, // Durée augmentée de 1000ms à 1800ms
+      colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Inchangé
       onComplete: () => {
         console.log('Animation de dispersion terminée');
         
-        // Attendre 500ms après la dispersion avant de naviguer
+        // Attendre plus longtemps après la dispersion avant de naviguer (800ms au lieu de 500ms)
         setTimeout(() => {
           if (pendingNavigation) {
             console.log('Navigation vers:', pendingNavigation);
@@ -72,7 +72,7 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
           
           // Appeler le callback de fin si fourni
           onTransitionComplete?.();
-        }, 500);
+        }, 800); // Délai augmenté de 500ms à 800ms
       }
     });
 
@@ -88,7 +88,7 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
       className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
       style={{
         opacity: isDisperseActive ? 1 : 0,
-        transition: 'opacity 0.3s ease',
+        transition: 'opacity 0.8s ease', // Transition plus lente: de 0.3s à 0.8s
         visibility: isDisperseActive ? 'visible' : 'hidden'
       }}
     >

@@ -65,10 +65,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             // Réinitialiser le flag après utilisation
             window.scrollToTopRequested = false;
           }
-        }, 100);
-      }, 0);
+        }, 300); // Temps d'attente augmenté pour une transition plus progressive
+      }, 100); // Délai légèrement augmenté
       
-    }, 300); // Réduit le temps de transition pour une meilleure expérience
+    }, 600); // Transition plus longue pour laisser le temps aux animations visuelles
 
     return () => clearTimeout(timer);
   }, [children, location, isInitialPageLoad]);
@@ -78,8 +78,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Initial est soit un fondu simple, soit un effet plus complexe selon le contexte
     initial: (isInitial: boolean) => ({
       opacity: 0,
-      y: isInitial ? 0 : "10vh", // Réduction du mouvement vertical
-      filter: isInitial ? "blur(0px)" : "blur(5px)" // Réduction de l'effet de flou
+      y: isInitial ? 0 : "10vh", // Mouvement vertical conservé
+      filter: isInitial ? "blur(0px)" : "blur(5px)" // Effet de flou conservé
     }),
     animate: {
       opacity: 1,
@@ -87,30 +87,30 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { 
-          duration: isInitialPageLoad ? 0.5 : 1.0, // Transitions plus rapides
+          duration: isInitialPageLoad ? 0.8 : 1.6, // Animation plus lente pour les transitions
           ease: "easeOut" 
         },
         y: { 
-          duration: isInitialPageLoad ? 0 : 1.0, // Transitions plus rapides
+          duration: isInitialPageLoad ? 0 : 1.8, // Animation plus lente pour les mouvements
           ease: [0.05, 0.2, 0.2, 1.0] 
         },
         filter: { 
-          duration: isInitialPageLoad ? 0 : 0.8, // Transitions plus rapides
+          duration: isInitialPageLoad ? 0 : 1.5, // Animation plus lente pour l'effet de flou
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
     },
     exit: {
       opacity: 0,
-      y: "-10vh", // Réduction du mouvement vertical
-      filter: "blur(5px)", // Réduction de l'effet de flou
+      y: "-10vh", // Mouvement vertical conservé
+      filter: "blur(5px)", // Effet de flou conservé
       transition: {
-        opacity: { duration: 0.8, ease: [0.33, 1, 0.68, 1] }, // Transitions plus rapides
+        opacity: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }, // Exit plus lent
         y: { 
-          duration: 0.8, // Transitions plus rapides
+          duration: 1.5, // Exit plus lent
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 0.8, ease: [0.33, 1, 0.68, 1] } // Transitions plus rapides
+        filter: { duration: 1.4, ease: [0.33, 1, 0.68, 1] } // Exit plus lent
       }
     }
   };
