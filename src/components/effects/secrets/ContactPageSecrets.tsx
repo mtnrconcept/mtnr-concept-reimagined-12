@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UVHiddenMessage from '../UVHiddenMessage';
 import UVHiddenCode from '../UVHiddenCode';
 import UVSecretMessage from '../UVSecretMessage';
@@ -90,58 +90,79 @@ export default function ContactPageSecrets() {
       
       {/* Page secrète qui apparaît uniquement lorsque le code MTNR est saisi */}
       {showSecretPage && (
-        <div className="fixed inset-0 z-[200] bg-black/90 flex flex-col items-center justify-center p-8 overflow-y-auto"
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
              style={{
                backdropFilter: 'blur(8px)',
                border: '2px solid #D2FF3F',
                animation: 'fadeIn 0.5s ease-out forwards'
              }}>
-          <h2 className="text-3xl font-bold text-[#D2FF3F] mb-6 text-center glow-text">
-            ZONE SECRÈTE MTNR
-          </h2>
-          
-          <div className="max-w-3xl w-full bg-black/60 border border-[#4FA9FF] rounded-lg p-6 mb-8">
-            <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Manifeste Underground</h3>
-            <p className="text-white mb-4">
-              La Cave n'est pas juste un lieu, c'est un mouvement. Nous existons dans les interstices, 
-              où l'art véritable prend forme loin des regards standardisés. Chaque seconde passée 
-              à créer est une rébellion contre la médiocrité ambiante.
-            </p>
-            <p className="text-[#D2FF3F] mb-4">
-              Coordonnées des prochains événements secrets disponibles uniquement pour les initiés.
-              Contactez-nous avec le code: <span className="font-mono font-bold">NEBULA-7X</span> pour recevoir le lieu exact.
-            </p>
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="border border-[#D2FF3F] p-4 rounded">
-                <h4 className="text-[#D2FF3F] font-bold">Session Underground #42</h4>
-                <p className="text-white text-sm">21 juin 2025 • 23h00</p>
-                <p className="text-gray-400 text-xs">Paris • Zone industrielle</p>
-              </div>
-              <div className="border border-[#D2FF3F] p-4 rounded">
-                <h4 className="text-[#D2FF3F] font-bold">Exposition Secrète</h4>
-                <p className="text-white text-sm">15 juillet 2025 • 22h00</p>
-                <p className="text-gray-400 text-xs">Marseille • Tunnels</p>
-              </div>
-            </div>
+          {/* Vidéo en plein écran */}
+          <div className="absolute inset-0 bg-black w-full h-full z-0">
+            <video
+              autoPlay
+              muted
+              loop
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+              style={{ filter: 'contrast(1.1) saturate(1.2)' }}
+            >
+              <source src="/lovable-uploads/Composition_1.mp4" type="video/mp4" />
+              Votre navigateur ne prend pas en charge les vidéos.
+            </video>
+            {/* Overlay pour assombrir légèrement la vidéo */}
+            <div className="absolute inset-0 bg-black/40 z-10"></div>
           </div>
           
-          <div className="max-w-3xl w-full bg-black/60 border border-[#4FA9FF] rounded-lg p-6 mb-8">
-            <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Message Crypté</h3>
-            <div className="font-mono text-sm text-[#D2FF3F] bg-black/80 p-4 rounded">
-              <p>01001100 01000101 00100000 01000011 01001111 01000100 01000101 00100000</p>
-              <p>01000110 01001001 01001110 01000001 01001100 00111010 00100000 01000010</p>
-              <p>01001100 01000001 01000011 01001011 01001100 01001001 01000111 01001000</p>
-              <p>01010100 00101101 00110111 00111001 00110101</p>
+          {/* Contenu sur la vidéo */}
+          <div className="relative z-20 w-full h-full overflow-y-auto px-8 py-12">
+            <h2 className="text-3xl font-bold text-[#D2FF3F] mb-6 text-center glow-text">
+              ZONE SECRÈTE MTNR
+            </h2>
+            
+            <div className="max-w-3xl mx-auto w-full bg-black/80 border border-[#4FA9FF] rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Manifeste Underground</h3>
+              <p className="text-white mb-4">
+                La Cave n'est pas juste un lieu, c'est un mouvement. Nous existons dans les interstices, 
+                où l'art véritable prend forme loin des regards standardisés. Chaque seconde passée 
+                à créer est une rébellion contre la médiocrité ambiante.
+              </p>
+              <p className="text-[#D2FF3F] mb-4">
+                Coordonnées des prochains événements secrets disponibles uniquement pour les initiés.
+                Contactez-nous avec le code: <span className="font-mono font-bold">NEBULA-7X</span> pour recevoir le lieu exact.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="border border-[#D2FF3F] p-4 rounded">
+                  <h4 className="text-[#D2FF3F] font-bold">Session Underground #42</h4>
+                  <p className="text-white text-sm">21 juin 2025 • 23h00</p>
+                  <p className="text-gray-400 text-xs">Paris • Zone industrielle</p>
+                </div>
+                <div className="border border-[#D2FF3F] p-4 rounded">
+                  <h4 className="text-[#D2FF3F] font-bold">Exposition Secrète</h4>
+                  <p className="text-white text-sm">15 juillet 2025 • 22h00</p>
+                  <p className="text-gray-400 text-xs">Marseille • Tunnels</p>
+                </div>
+              </div>
             </div>
-            <p className="text-white text-sm mt-4">Ce message contient les instructions pour l'événement spécial du 31 octobre.</p>
+            
+            <div className="max-w-3xl mx-auto w-full bg-black/80 border border-[#4FA9FF] rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-bold text-[#4FA9FF] mb-4">Message Crypté</h3>
+              <div className="font-mono text-sm text-[#D2FF3F] bg-black/90 p-4 rounded">
+                <p>01001100 01000101 00100000 01000011 01001111 01000100 01000101 00100000</p>
+                <p>01000110 01001001 01001110 01000001 01001100 00111010 00100000 01000010</p>
+                <p>01001100 01000001 01000011 01001011 01001100 01001001 01000111 01001000</p>
+                <p>01010100 00101101 00110111 00111001 00110101</p>
+              </div>
+              <p className="text-white text-sm mt-4">Ce message contient les instructions pour l'événement spécial du 31 octobre.</p>
+            </div>
+            
+            <div className="flex justify-center mt-8 mb-4">
+              <Button 
+                onClick={() => setShowSecretPage(false)}
+                className="bg-[#D2FF3F] hover:bg-[#A0FF00] text-black font-bold"
+              >
+                Retourner à la page
+              </Button>
+            </div>
           </div>
-          
-          <Button 
-            onClick={() => setShowSecretPage(false)}
-            className="mt-6 bg-[#D2FF3F] hover:bg-[#A0FF00] text-black font-bold"
-          >
-            Retourner à la page
-          </Button>
         </div>
       )}
       
