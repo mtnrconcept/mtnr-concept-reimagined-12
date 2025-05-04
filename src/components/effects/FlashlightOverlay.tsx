@@ -33,7 +33,7 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         mixBlendMode: 'normal' as const,
         transition: 'none', // Supprimé la transition pour un suivi immédiat
         willChange: 'background', // Optimisation pour le rendu
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
         zIndex: 99
       };
     } else {
@@ -48,7 +48,7 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         mixBlendMode: 'normal' as const,
         transition: 'none', // Supprimé la transition pour un suivi immédiat
         willChange: 'background', // Optimisation pour le rendu
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
         zIndex: 99
       };
     }
@@ -70,7 +70,7 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         transition: 'none', // Supprimé la transition pour un suivi immédiat
         willChange: 'left, top', // Optimisation pour le rendu
         position: 'absolute' as const,
-        pointerEvents: 'none'
+        pointerEvents: 'none' as const
       };
     } else {
       // Style de halo pour le mode torche normale
@@ -87,7 +87,7 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         transition: 'none', // Supprimé la transition pour un suivi immédiat
         willChange: 'left, top', // Optimisation pour le rendu
         position: 'absolute' as const,
-        pointerEvents: 'none'
+        pointerEvents: 'none' as const
       };
     }
   }, [mousePosition.x, mousePosition.y, uvMode, isMobile]);
