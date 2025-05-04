@@ -19,7 +19,7 @@ export default function WhatWeDo() {
       <div className="relative z-10 min-h-screen">
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
-            <div className="relative px-[103px]">
+            <div className="relative">
               <NeonText text="Notre Vibe" className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center" color="yellow" flicker={true} />
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
             </div>

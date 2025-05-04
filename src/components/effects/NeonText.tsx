@@ -21,7 +21,6 @@ export default function NeonText({
   startOn = false,
 }: NeonTextProps) {
   const [isOn, setIsOn] = useState(startOn);
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Turn on the neon effect after a delay
   useEffect(() => {
@@ -38,18 +37,16 @@ export default function NeonText({
   const colorClass = `neon-glow-${color}`;
   
   return (
-    <div className="relative neon-text-container" ref={containerRef}>
-      <h2
-        className={cn(
-          "neon-text",
-          colorClass,
-          isOn && "neon-on",
-          flicker && isOn && "neon-flicker",
-          className
-        )}
-      >
-        {text}
-      </h2>
-    </div>
+    <h2
+      className={cn(
+        "neon-text",
+        colorClass,
+        isOn && "neon-on",
+        flicker && isOn && "neon-flicker",
+        className
+      )}
+    >
+      {text}
+    </h2>
   );
 }

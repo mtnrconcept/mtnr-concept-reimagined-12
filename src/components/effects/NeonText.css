@@ -7,6 +7,9 @@
   font-weight: 900;
   transition: text-shadow 0.3s, color 0.3s;
   will-change: text-shadow, color;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* État éteint par défaut */
@@ -93,7 +96,7 @@
   }
 }
 
-/* Effet de charge électrique autour du texte */
+/* Effet de charge électrique autour du texte (uniquement sur le texte, pas de cadre) */
 .neon-text.neon-on::before {
   content: '';
   position: absolute;
