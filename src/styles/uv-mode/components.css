@@ -24,7 +24,7 @@
   
   /* Halo effect around "Book" buttons */
   .uv-mode-active a[href*="book"], 
-  .uv-mode-active button:has(span:contains("Book")) {
+  .uv-mode-active button[data-book-button] {
     background-color: transparent !important;
     border: 1px solid #D2FF3F !important;
     color: #D2FF3F !important;
@@ -58,9 +58,9 @@
     box-shadow: none !important;
   }
   
-  .uv-mode-active .bg-black/80,
+  .uv-mode-active .bg-black\/80,
   .uv-mode-active .paper-texture,
-  .uv-mode-active .border-yellow-400/25 {
+  .uv-mode-active .border-yellow-400\/25 {
     background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
