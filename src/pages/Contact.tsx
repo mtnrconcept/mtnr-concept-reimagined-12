@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -10,6 +10,10 @@ import UVText from "@/components/effects/UVText";
 import { PageSplashes } from "@/components/effects/PageSplashes";
 import Footer from "@/components/Footer";
 import { useScroll } from "@/hooks/useScroll";
+import { toast } from "@/hooks/use-toast";
+import ParallaxBackground from "@/components/ParallaxBackground";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
