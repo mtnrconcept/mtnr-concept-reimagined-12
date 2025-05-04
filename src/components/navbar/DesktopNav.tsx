@@ -16,7 +16,7 @@ export function DesktopNav({ navLinks, currentPath }: DesktopNavProps) {
   };
   
   return (
-    <ul className="hidden md:flex items-center space-x-1 lg:space-x-4">
+    <ul className="flex items-center space-x-1 lg:space-x-4">
       {navLinks.map((link) => (
         <li key={link.path}>
           <NavLink 

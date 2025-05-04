@@ -4,7 +4,8 @@ import { useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { DesktopNav } from "./navbar/DesktopNav";
 import { MobileNav } from "./navbar/MobileNav";
-// Nous n'utilisons plus vraiment l'effet de mouvement, mais on garde l'import pour compatibilité
+import LogoWithEffect from "./effects/LogoWithEffect";
+import { Link } from "react-router-dom";
 import { useNavbarEffect } from "@/hooks/useNavbarEffect";
 
 const navLinks = [
@@ -25,19 +26,33 @@ export default function Navbar() {
       style={{ 
         position: 'fixed',
         isolation: 'isolate',
-        zIndex: 100000, // Nombre encore plus élevé pour garantir qu'il est vraiment au-dessus
+        zIndex: 100000,
         width: '100%',
         top: 0,
         left: 0,
         right: 0,
         height: '64px',
-        pointerEvents: 'all', // Important pour que la navbar reste interactive
+        pointerEvents: 'all',
       }}
     >
-      <div className="container mx-auto flex justify-center h-16 px-4 sm:px-6">
+      <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6">
+        {/* Logo */}
+        <Link to="/" className="h-10 w-28 shrink-0 relative z-10">
+          <LogoWithEffect
+            src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+            alt="MTNR Logo"
+            width="112px"
+            glowEffect={true}
+            glowColor="255, 221, 0"
+            isVisible={true}
+            logoRef={null}
+            className="h-full w-full object-contain"
+          />
+        </Link>
+        
         {/* Mobile menu toggle */}
         <button 
-          className="md:hidden absolute left-4 top-4 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
+          className="md:hidden absolute right-4 top-4 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
           onClick={() => setMenuOpen(!menuOpen)} 
           aria-label="Menu"
         >
@@ -49,7 +64,9 @@ export default function Navbar() {
         </button>
         
         {/* Desktop navigation - centered */}
-        <DesktopNav navLinks={navLinks} currentPath={pathname} />
+        <div className="hidden md:block">
+          <DesktopNav navLinks={navLinks} currentPath={pathname} />
+        </div>
       </div>
       
       {/* Mobile navigation */}
