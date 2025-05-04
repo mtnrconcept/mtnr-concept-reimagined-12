@@ -72,7 +72,7 @@ export default function TVVideoPlayer() {
         {/* Conteneur pour maintenir le ratio et positionner les éléments */}
         <div className="absolute inset-0">
           {/* La position relative du lecteur vidéo par rapport à la TV */}
-          <div className="absolute" style={screenPositionStyle}>
+          <div className="absolute overflow-hidden" style={screenPositionStyle}>
             {/* Lecteur YouTube - Positionné pour permettre l'interaction avec z-index inférieur à l'animation */}
             <div className="absolute inset-0 w-full h-full z-20">
               <iframe
@@ -84,15 +84,17 @@ export default function TVVideoPlayer() {
               ></iframe>
             </div>
             
-            {/* Animation de chargement - Par-dessus la vidéo avec z-index supérieur */}
+            {/* Animation de chargement - Masquée par le conteneur parent avec overflow-hidden */}
             {isLoading && (
               <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center z-30">
-                <div className="w-full h-full opacity-30" style={{
+                <div className="absolute inset-0 w-[150%] h-[150%] opacity-30" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22a%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23a)%22/%3E%3C/svg%3E")',
-                  animation: 'noise 0.2s infinite'
+                  animation: 'noise 0.2s infinite',
+                  top: '-25%',
+                  left: '-25%'
                 }}>
                 </div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-mono z-40">
                   Chargement...
                 </div>
               </div>
