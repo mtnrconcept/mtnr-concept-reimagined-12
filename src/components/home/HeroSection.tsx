@@ -4,7 +4,7 @@ export default function HeroSection() {
   return <section id="hero-section" className="container mx-auto sm:px-6 lg:px-8 flex flex-col items-center justify-center px-0 py-0 my-0">
       <NeonLogo className="my-[55px]" />
       
-      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 py-0 my-[47px]">
+      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 my-[47px] py-[15px] px-[33px]">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
@@ -23,15 +23,15 @@ export default function HeroSection() {
           <p>
             Ramène ton flow, laisse une empreinte. La famille MTNR c'est : beatmakers mutants, MC brut, groove crasseux, et vision d'auteur.
           </p>
-          <p className="mt-6 text-yellow-300 font-display text-xl uppercase tracking-wider text-center">
+          <p className="mt-6 text-yellow-300 font-display text-xl uppercase tracking-wider text-center my-[18px]">
             Underground ou rien.
           </p>
         </div>
         
-        <div className="mt-10 flex flex-wrap gap-4 justify-center my-[11px]">
+        <div className="mt-10 flex flex-wrap gap-4 justify-center my-0">
           <Link to="/book" className="relative px-8 py-3 bg-yellow-400 text-black font-bold rounded-lg overflow-hidden group hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all duration-300">
             <span className="relative z-10">Book ta session</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 my-0" />
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 my-[6px]" />
           </Link>
           <Link to="/what-we-do" className="px-8 py-3 bg-black/60 border border-yellow-400/50 text-white font-bold rounded-lg shadow-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] hover:bg-black/80 hover:border-yellow-400 transition-all duration-300">
             En savoir plus
