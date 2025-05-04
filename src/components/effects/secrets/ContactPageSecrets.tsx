@@ -54,7 +54,7 @@ export default function ContactPageSecrets() {
         transition: 'opacity 0.3s ease-out'
       }} id="uv-auth-block">
         <p style={{ color: "#D2FF3F", fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
-          TEL: +33 6 ** ** ** 42
+          Secret Mixtape Access 
         </p>
         <p style={{ color: "#fff", fontSize: "12px", marginBottom: "5px" }}>
           Remplis le code
