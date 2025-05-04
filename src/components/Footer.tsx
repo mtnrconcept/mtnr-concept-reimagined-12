@@ -13,11 +13,20 @@ const Footer = () => {
     img.onload = () => setImageLoaded(true);
   }, []);
 
+  const navLinks = [
+    { name: "Accueil", path: "/" },
+    { name: "What We Do", path: "/what-we-do" },
+    { name: "Artistes", path: "/artists" },
+    { name: "Book ta session", path: "/book" },
+    { name: "Contact", path: "/contact" },
+  ];
+
   return (
     <footer className="w-full bg-black text-white py-8 mt-10 font-inter">
       <div className="container mx-auto flex flex-col md:flex-row md:justify-between gap-6 items-center px-4">
         <div className="flex flex-col items-center md:items-start">
-          <div className="h-16 w-40 relative mb-2">
+          {/* Improved logo container with proper sizing */}
+          <div className="h-24 w-auto relative mb-2 flex items-center justify-center">
             <LogoWithEffect
               src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
               alt="Logo MTNR"
@@ -26,22 +35,24 @@ const Footer = () => {
               glowColor="255, 221, 0"
               isVisible={true}
               logoRef={logoRef}
-              className="h-full w-full object-contain"
+              className="h-auto w-auto object-contain max-h-24"
             />
           </div>
-          <span className="font-playfair text-xl font-bold">MTNR Concept</span>
+          <span className="font-playfair text-xl font-bold mt-2">MTNR Concept</span>
           <p className="text-sm text-gray-400 mt-2">© {new Date().getFullYear()} MTNR Concept. Tous droits réservés.</p>
         </div>
         
+        {/* Navigation links aligned with navbar */}
         <div className="flex flex-col gap-2 text-center md:text-right">
-          <Link to="/" className="hover:underline hover:text-yellow-400 transition-colors">Accueil</Link>
-          <Link to="/what-we-do" className="hover:underline hover:text-yellow-400 transition-colors">What We Do</Link>
-          <Link to="/artists" className="hover:underline hover:text-yellow-400 transition-colors">Artistes</Link>
-          <Link to="/book" className="hover:underline hover:text-yellow-400 transition-colors">Book ta session</Link>
-          <Link to="/contact" className="hover:underline hover:text-yellow-400 transition-colors">Contact</Link>
-          <Link to="/portfolio" className="hover:underline hover:text-yellow-400 transition-colors">Portfolio</Link>
-          <Link to="/about" className="hover:underline hover:text-yellow-400 transition-colors">À propos</Link>
-          <Link to="/services" className="hover:underline hover:text-yellow-400 transition-colors">Services</Link>
+          {navLinks.map((link) => (
+            <Link 
+              key={link.path}
+              to={link.path} 
+              className="hover:underline hover:text-yellow-400 transition-colors"
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
         
         <div className="flex gap-4 mt-4 md:mt-0 text-xl">

@@ -31,28 +31,28 @@ export default function Navbar() {
         top: 0,
         left: 0,
         right: 0,
-        height: '64px',
+        height: '80px', // Increased height to ensure logo fits
         pointerEvents: 'all',
       }}
     >
-      <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6">
-        {/* Logo */}
-        <Link to="/" className="h-10 w-28 shrink-0 relative z-10">
+      <div className="container mx-auto flex justify-between items-center h-20 px-4 sm:px-6"> {/* Increased height */}
+        {/* Logo with proper spacing and container */}
+        <Link to="/" className="h-16 w-auto shrink-0 relative z-10 flex items-center">
           <LogoWithEffect
             src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
             alt="MTNR Logo"
-            width="112px"
+            width="120px"
             glowEffect={true}
             glowColor="255, 221, 0"
             isVisible={true}
             logoRef={null}
-            className="h-full w-full object-contain"
+            className="h-auto w-auto object-contain max-h-16"
           />
         </Link>
         
-        {/* Mobile menu toggle */}
+        {/* Mobile menu toggle - positioned correctly */}
         <button 
-          className="md:hidden absolute right-4 top-4 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
+          className="md:hidden absolute right-4 top-6 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
           onClick={() => setMenuOpen(!menuOpen)} 
           aria-label="Menu"
         >
