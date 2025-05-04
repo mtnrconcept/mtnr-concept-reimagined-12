@@ -39,6 +39,7 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Désactiver les transitions sur mobile pour un suivi instantané
       if (isMobile) {
         circle.style.transition = 'none';
+        circle.style.willChange = 'left, top'; // Optimisation pour le rendu
       }
       document.body.appendChild(circle);
       uvCircleRef.current = circle;
