@@ -25,7 +25,7 @@ const Footer = () => {
     name: "Contact",
     path: "/contact"
   }];
-  return <footer className="w-full bg-black text-white py-12 mt-10 font-inter my-0">
+  return <footer className="w-full bg-black text-white mt-10 font-inter my-0 py-[17px]">
       <div className="container mx-auto py-0 my-0 rounded-full px-[152px]">
         {/* Structure en trois colonnes pour desktop, colonne unique pour mobile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -49,8 +49,8 @@ const Footer = () => {
           </div>
           
           {/* Colonne des réseaux sociaux */}
-          <div className="flex flex-col items-center md:items-end mx-[158px]">
-            <h3 className="font-bold text-lg mb-2 mx-[30px] my-0 text-left px-[188px] py-[7px]">Suivez-nous</h3>
+          <div className="flex flex-col items-center md:items-end mx-0 px-0 py-[45px]">
+            <h3 className="font-bold text-lg mb-2 mx-[30px] my-0 py-[7px] text-center px-[17px]">Suivez-nous</h3>
             <div className="flex gap-4 mt-2 text-xl">
               <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#c13584] transition">
                 <svg width="24" height="24" fill="currentColor" className="inline"><use href="#icon-instagram" /></svg>
