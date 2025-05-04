@@ -4,12 +4,12 @@ import React, {
   useContext,
   useState,
   useRef,
-  useEffect,
   ReactNode,
 } from "react";
-import { createPortal } from "react-dom";
 import { useUVMode } from "./UVModeContext";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { FlashlightOverlay } from "./FlashlightOverlay";
+import { useTorchPosition } from "@/hooks/useTorchPosition";
+import { useUVEffects } from "@/hooks/useUVEffects";
 
 interface TorchContextType {
   isTorchActive: boolean;
@@ -33,146 +33,19 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const neonEffectRef = useRef<HTMLDivElement | null>(null);
-
-  const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
-
+  const { uvMode, uvCircleRef } = useUVMode();
+  
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
     if (uvCircleRef.current && uvMode) {
       uvCircleRef.current.style.left = `${position.x}px`;
       uvCircleRef.current.style.top = `${position.y}px`;
     }
-    // Mettre à jour la position de l'effet néon UV
-    if (neonEffectRef.current && uvMode) {
-      neonEffectRef.current.style.left = `${position.x}px`;
-      neonEffectRef.current.style.top = `${position.y}px`;
-    }
   };
 
-  // Mouse tracking for desktop
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isTorchActive) {
-        updateMousePosition({ x: e.clientX, y: e.clientY });
-      }
-    };
-    
-    if (!isMobile) {
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => window.removeEventListener("mousemove", handleMouseMove);
-    }
-  }, [isTorchActive, isMobile]);
-
-  // Touch tracking for mobile
-  useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        e.preventDefault(); // Prevent scrolling when torch is active
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-
-    // Nouveau gestionnaire pour capturer tous les événements tactiles pendant le défilement
-    const handleScrollTouchMove = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        // Ne pas empêcher le défilement ici, mais mettre à jour la position
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-
-    // Gestion des événements tactiles pendant le défilement
-    const handleScroll = () => {
-      if (isTorchActive) {
-        // Ajouter temporairement un écouteur non-passif qui capture les mouvements pendant le défilement
-        document.addEventListener("touchmove", handleScrollTouchMove, { passive: true });
-        
-        // Nettoyer l'écouteur après un court délai après la fin du défilement
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-        }
-        scrollTimeoutRef.current = setTimeout(() => {
-          document.removeEventListener("touchmove", handleScrollTouchMove);
-        }, 150);
-      }
-    };
-
-    if (isMobile) {
-      // Écouter les événements tactiles standards
-      window.addEventListener("touchmove", handleTouchMove, { passive: false });
-      window.addEventListener("touchstart", handleTouchStart);
-      
-      // Écouter également l'événement de défilement
-      window.addEventListener("scroll", handleScroll);
-      
-      return () => {
-        window.removeEventListener("touchmove", handleTouchMove);
-        window.removeEventListener("touchstart", handleTouchStart);
-        window.removeEventListener("scroll", handleScroll);
-        document.removeEventListener("touchmove", handleScrollTouchMove);
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-        }
-      };
-    }
-  }, [isTorchActive, isMobile]);
-
-  // UV logic - Création de l'effet de néon violet
-  useEffect(() => {
-    // Créer ou enlever l'effet de cercle UV
-    if (isTorchActive && uvMode) {
-      createUVCircle(mousePosition);
-      
-      // Créer l'effet néon violet
-      if (!neonEffectRef.current) {
-        const neonEffect = document.createElement('div');
-        neonEffect.className = 'uv-neon-effect';
-        neonEffect.style.left = `${mousePosition.x}px`;
-        neonEffect.style.top = `${mousePosition.y}px`;
-        
-        // Désactiver les transitions sur mobile pour un suivi instantané
-        if (isMobile) {
-          neonEffect.style.transition = 'none';
-        }
-        
-        document.body.appendChild(neonEffect);
-        neonEffectRef.current = neonEffect;
-      }
-    } else {
-      removeUVCircle();
-      
-      // Supprimer l'effet néon violet
-      if (neonEffectRef.current) {
-        neonEffectRef.current.remove();
-        neonEffectRef.current = null;
-      }
-    }
-    
-    return () => {
-      removeUVCircle();
-      if (neonEffectRef.current) {
-        neonEffectRef.current.remove();
-        neonEffectRef.current = null;
-      }
-    };
-  }, [isTorchActive, uvMode, mousePosition]);
+  // Use our extracted hooks
+  useTorchPosition(isTorchActive, updateMousePosition, mousePosition);
+  useUVEffects(isTorchActive, mousePosition);
 
   const contextValue: TorchContextType = {
     isTorchActive,
@@ -192,41 +65,12 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Masque de la torche */}
-      {isTorchActive && !uvMode &&
-        createPortal(
-          <div 
-            className="fixed inset-0 z-[99] pointer-events-none"
-            style={{
-              background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
-                rgba(0,0,0,0) 0%, 
-                rgba(0,0,0,0.6) 40%, 
-                rgba(0,0,0,0.7) 60%,
-                rgba(0,0,0,0.7) 80%,
-                rgba(0,0,0,0.9) 100%)`,
-              mixBlendMode: 'normal',
-              transition: isMobile ? 'none' : 'all 0.05s ease-out',
-            }}
-          >
-            {/* Halo lumineux au centre */}
-            <div 
-              className="absolute pointer-events-none"
-              style={{
-                width: '650px',
-                height: '650px',
-                borderRadius: '50%',
-                transform: 'translate(-50%, -50%)',
-                left: `${mousePosition.x}px`,
-                top: `${mousePosition.y}px`,
-                background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 100%)',
-                filter: 'blur(15px)',
-                mixBlendMode: 'screen',
-                transition: isMobile ? 'none' : 'all 0.05s ease-out',
-              }}
-            />
-          </div>,
-          document.body
-        )}
+      {/* Flashlight mask overlay */}
+      <FlashlightOverlay 
+        isTorchActive={isTorchActive}
+        uvMode={uvMode}
+        mousePosition={mousePosition}
+      />
     </TorchContext.Provider>
   );
 };
