@@ -4,12 +4,10 @@ import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 import { Flashlight, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export const TorchToggle = () => {
   const { isTorchActive, setIsTorchActive } = useTorch();
   const { uvMode, toggleUVMode } = useUVMode();
-  const isMobile = useIsMobile();
   
   // Vérifier si l'utilisateur a déjà visité la page Artists
   const hasVisitedArtistsPage = localStorage.getItem('hasVisitedArtistsPage') === 'true';
@@ -54,13 +52,8 @@ export const TorchToggle = () => {
     }
   };
 
-  // Ne pas rendre les boutons ici en mode mobile, ils seront dans la navbar
-  if (isMobile) {
-    return null;
-  }
-
   return (
-    <div className="fixed bottom-4 right-4 z-[250] flex gap-2">
+    <div className="fixed bottom-4 right-4 z-[200] flex gap-2">
       {/* Bouton Torche classique */}
       <Button
         onClick={handleToggleTorch}
@@ -97,83 +90,6 @@ export const TorchToggle = () => {
             <>
               <span className="absolute inset-0 rounded-full bg-blue-500 opacity-30 animate-ping scale-110"></span>
               <span className="absolute text-[8px] font-bold -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow">
-                UV
-              </span>
-            </>
-          )}
-        </Button>
-      )}
-    </div>
-  );
-};
-
-// Composants de boutons à utiliser dans la navbar
-export const MobileTorchButtons = () => {
-  const { isTorchActive, setIsTorchActive } = useTorch();
-  const { uvMode, toggleUVMode } = useUVMode();
-  const hasVisitedArtistsPage = localStorage.getItem('hasVisitedArtistsPage') === 'true';
-  
-  const handleToggleTorch = () => {
-    setIsTorchActive(!isTorchActive);
-    
-    if (isTorchActive && uvMode) {
-      toggleUVMode();
-    }
-  };
-
-  const handleToggleUV = () => {
-    if ("vibrate" in navigator) {
-      try {
-        navigator.vibrate(50);
-      } catch (e) {
-        console.warn("Vibration non supportée :", e);
-      }
-    }
-
-    if (uvMode) {
-      setIsTorchActive(false);
-      toggleUVMode();
-    } else {
-      setIsTorchActive(true);
-      toggleUVMode();
-    }
-  };
-  
-  return (
-    <div className="flex items-center justify-center gap-2 mx-auto">
-      <Button
-        onClick={handleToggleTorch}
-        className={`p-2 rounded-full shadow-lg transition-all hover:scale-105 ${
-          isTorchActive && !uvMode
-            ? "bg-yellow-400 text-black shadow-yellow-400/50"
-            : "bg-gray-800 text-yellow-400"
-        }`}
-        aria-label="Activer/désactiver la lampe torche"
-        variant="outline"
-        size="icon"
-        id="mobile-torch-button"
-      >
-        <Flashlight className="w-5 h-5" />
-      </Button>
-
-      {hasVisitedArtistsPage && (
-        <Button
-          onClick={handleToggleUV}
-          className={`p-2 rounded-full shadow-lg transition-all hover:scale-105 relative ${
-            isTorchActive && uvMode
-              ? "bg-blue-600 text-white shadow-blue-600/50"
-              : "bg-gray-800 text-purple-400"
-          }`}
-          aria-label="Activer/désactiver le mode UV"
-          variant="outline"
-          size="icon"
-        >
-          <Eye className={`w-5 h-5 ${uvMode ? 'animate-pulse' : ''}`} />
-          
-          {uvMode && isTorchActive && (
-            <>
-              <span className="absolute inset-0 rounded-full bg-blue-500 opacity-30 animate-ping scale-110"></span>
-              <span className="absolute text-[8px] font-bold -top-1 -right-1 bg-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center shadow">
                 UV
               </span>
             </>
