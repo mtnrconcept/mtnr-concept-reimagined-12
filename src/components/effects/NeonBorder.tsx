@@ -19,6 +19,11 @@ export default function NeonBorder({
 }: NeonBorderProps) {
   const [isActive, setIsActive] = useState(false);
   
+  // Désactivation complète du border pour se conformer à la demande utilisateur
+  return <div className={className}>{children}</div>;
+  
+  // Code original commenté ci-dessous
+  /*
   useEffect(() => {
     // Petit délai avant activation pour permettre au composant de se rendre complètement
     const timer = setTimeout(() => {
@@ -112,5 +117,6 @@ export default function NeonBorder({
         {children}
       </div>
     </div>
-  );
+  */
 }
+

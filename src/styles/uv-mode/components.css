@@ -52,10 +52,14 @@
   }
   
   /* Rendre le cadre invisible en mode UV mais garder le texte visible */
-  .uv-mode-active .neon-text-container {
+  .uv-mode-active .neon-text-container,
+  .uv-mode-active .neon-border-container,
+  .uv-mode-active .neon-text.neon-on::before {
     background-color: transparent !important;
     border-color: transparent !important;
+    border: none !important;
     box-shadow: none !important;
+    display: none !important; /* Force hide the container itself */
   }
   
   .uv-mode-active .bg-black\/80,
@@ -86,5 +90,16 @@
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+  }
+  
+  /* Supprimer spécifiquement les effets de néon border */
+  .neon-border-container,
+  .neon-border-container::before,
+  .neon-border-container.active::before {
+    display: none !important;
+    opacity: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 }

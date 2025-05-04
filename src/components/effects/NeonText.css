@@ -96,7 +96,12 @@
   }
 }
 
-/* Effet de charge électrique autour du texte (uniquement sur le texte, pas de cadre) */
+/* Suppression complète de l'effet de charge électrique autour du texte */
+.neon-text.neon-on::before {
+  display: none !important;
+}
+
+/* Ancien effet (supprimé)
 .neon-text.neon-on::before {
   content: '';
   position: absolute;
@@ -110,6 +115,7 @@
   opacity: 0;
   animation: electric-border 4s ease-in-out infinite;
 }
+*/
 
 @keyframes electric-border {
   0%, 100% {
