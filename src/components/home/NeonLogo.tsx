@@ -1,61 +1,65 @@
-
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
-import { DispersingLogo } from './DispersingLogo';
-import { useLocation } from 'react-router-dom';
 
-export const NeonLogo = () => {
-  const [glowIntensity, setGlowIntensity] = useState(1);
-  const [shouldDisperse, setShouldDisperse] = useState(false);
-  const location = useLocation();
-  
-  // Effet de scintillement du néon
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGlowIntensity(Math.random() * 0.4 + 0.8); // Variation entre 0.8 et 1.2
-    }, 50); // Scintillement rapide
+// Update the component to accept className as a prop
+interface NeonLogoProps {
+  className?: string;
+}
 
-    return () => clearInterval(interval);
-  }, []);
-
-  // Déclenchement automatique de l'effet de dispersion après un délai
-  useEffect(() => {
-    const disperseTimeout = setTimeout(() => {
-      setShouldDisperse(true);
-    }, 3500); // Attendre 3.5 secondes avant de disperser
-    
-    return () => clearTimeout(disperseTimeout);
-  }, []);
-  
-  // Gérer la fin de l'animation de dispersion
-  const handleDispersionComplete = () => {
-    // Réinitialiser l'effet après un délai
-    setTimeout(() => {
-      setShouldDisperse(false);
-    }, 2000);
-  };
-  
+export const NeonLogo: React.FC<NeonLogoProps> = ({ className }) => {
   return (
-    <div className="w-full flex justify-center items-center py-6 relative z-30">
-      <div 
-        className={cn(
-          "relative w-[300px] max-w-[80vw]", // Taille réduite de logo
-          "transition-all duration-50 ease-in-out"
-        )}
-        style={{
-          filter: `drop-shadow(0 0 5px rgba(255, 221, 0, ${glowIntensity * 0.5}))
-                  drop-shadow(0 0 10px rgba(255, 221, 0, ${glowIntensity * 0.3}))
-                  drop-shadow(0 0 15px rgba(255, 221, 0, ${glowIntensity * 0.2}))`
-        }}
+    <div className={cn("logo-container relative", className)}>
+      <svg
+        width="200"
+        height="200"
+        viewBox="0 0 200 200"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]"
       >
-        <DispersingLogo
-          imageSrc="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-          triggerDispersion={shouldDisperse}
-          onDispersionComplete={handleDispersionComplete}
-          fromPath={location.pathname}
-          toPath={location.pathname}
+        <path
+          d="M41 40L41 160"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
         />
-      </div>
+        <path
+          d="M41 40L159 40"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M159 40L159 160"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M159 100L100 100"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M100 160L41 160"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M100 100L100 160"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M100 100L80 75"
+          stroke="#FFDD00"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+      </svg>
     </div>
   );
 };
