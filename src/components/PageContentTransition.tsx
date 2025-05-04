@@ -13,38 +13,44 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [displayChildren, setDisplayChildren] = useState(children);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isInitialPageLoad, setIsInitialPageLoad] = useState(true);
 
   useEffect(() => {
-    // Marquer le premier rendu comme chargement initial
-    if (isInitialLoad) {
+    // Pour le chargement initial ou rafraîchissement, utiliser une simple animation de fondu
+    if (isInitialPageLoad) {
+      // Rendre le contenu immédiatement visible avec une animation de fondu
       setContentVisible(true);
-      // Attendre un peu pour s'assurer que le DOM est ready
+      setDisplayChildren(children);
+      
+      // Marquer que le premier chargement est terminé
       setTimeout(() => {
-        setIsInitialLoad(false);
+        setIsInitialPageLoad(false);
       }, 100);
-    } else {
-      // Pour les changements de route suivants, utiliser la transition complète
-      setIsTransitioning(true);
-      setContentVisible(false);
-
-      const timer = setTimeout(() => {
-        setDisplayChildren(children);
-        
-        setTimeout(() => {
-          setContentVisible(true);
-        }, 0);
-        
-      }, 3000);
-
-      return () => clearTimeout(timer);
+      
+      return;
     }
-  }, [children, location, isInitialLoad]);
+    
+    // Pour les changements de route normaux, utiliser l'animation complète
+    setIsTransitioning(true);
+    setContentVisible(false);
 
-  // Configuration des variantes avec condition pour le chargement initial
+    // Délai pour changer le contenu pendant la transition
+    const timer = setTimeout(() => {
+      setDisplayChildren(children);
+      
+      setTimeout(() => {
+        setContentVisible(true);
+      }, 0);
+      
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [children, location, isInitialPageLoad]);
+
+  // Variantes d'animation différentes selon le type de chargement
   const contentVariants = {
     initial: (isInitial: boolean) => ({
-      opacity: 0,
+      opacity: isInitial ? 0 : 0,
       y: isInitial ? 0 : "100vh", // Pas de mouvement vertical au chargement initial
       filter: isInitial ? "blur(0px)" : "blur(12px)"
     }),
@@ -53,9 +59,18 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: 0,
       filter: "blur(0px)",
       transition: {
-        opacity: { duration: isInitialLoad ? 1.0 : 3.0, ease: [0.05, 0.2, 0.2, 1.0] },
-        y: { duration: isInitialLoad ? 0 : 3.5, ease: [0.05, 0.2, 0.2, 1.0] },
-        filter: { duration: isInitialLoad ? 1.0 : 3.0, ease: [0.1, 0.4, 0.2, 1.0] }
+        opacity: { 
+          duration: isInitialPageLoad ? 1.0 : 3.0, 
+          ease: "easeOut" 
+        },
+        y: { 
+          duration: isInitialPageLoad ? 0 : 3.5, 
+          ease: [0.05, 0.2, 0.2, 1.0] 
+        },
+        filter: { 
+          duration: isInitialPageLoad ? 1.0 : 3.0, 
+          ease: [0.1, 0.4, 0.2, 1.0] 
+        }
       }
     },
     exit: {
@@ -77,7 +92,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     <AnimatePresence mode="wait" onExitComplete={() => setIsTransitioning(false)}>
       <motion.div
         key={location.pathname}
-        custom={isInitialLoad}
+        custom={isInitialPageLoad}
         variants={contentVariants}
         initial="initial"
         animate={contentVisible ? "animate" : "initial"}
