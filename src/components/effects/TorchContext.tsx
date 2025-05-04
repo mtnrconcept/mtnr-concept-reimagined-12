@@ -15,6 +15,7 @@ interface TorchContextType {
   containerRef: React.RefObject<HTMLDivElement>;
   isFingerDown: boolean;
   setIsFingerDown: (isDown: boolean) => void;
+  scrollPosition: number;
 }
 
 const TorchContext = createContext<TorchContextType>({
@@ -25,6 +26,7 @@ const TorchContext = createContext<TorchContextType>({
   containerRef: { current: null },
   isFingerDown: true,
   setIsFingerDown: () => {},
+  scrollPosition: 0
 });
 
 export const useTorch = () => useContext(TorchContext);
@@ -33,6 +35,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isFingerDown, setIsFingerDown] = useState(true);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { uvMode, uvCircleRef } = useUVMode();
   
@@ -45,6 +48,16 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [uvMode, uvCircleRef]);
 
+  // Suivre la position de défilement actuelle
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Utiliser nos hooks optimisés
   useTorchPosition(isTorchActive, updateMousePosition, mousePosition, setIsFingerDown);
   useUVEffects(isTorchActive, mousePosition);
@@ -55,10 +68,16 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (isTorchActive) {
       document.body.classList.add('torch-active');
       
+      // Préserver la position de défilement existante
+      const currentScrollY = window.scrollY;
+      
       // Ajouter la classe content-scrollable aux conteneurs de contenu principaux
       document.querySelectorAll('.content-container').forEach(el => {
         el.classList.add('content-scrollable');
       });
+      
+      // S'assurer que la page ne remonte pas en haut
+      window.scrollTo(0, currentScrollY);
     } else {
       document.body.classList.remove('torch-active');
       
@@ -85,7 +104,8 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     containerRef,
     isFingerDown,
     setIsFingerDown,
-  }), [isTorchActive, mousePosition, updateMousePosition, isFingerDown]);
+    scrollPosition
+  }), [isTorchActive, mousePosition, updateMousePosition, isFingerDown, scrollPosition]);
 
   return (
     <TorchContext.Provider value={contextValue}>

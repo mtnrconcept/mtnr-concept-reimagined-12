@@ -11,6 +11,7 @@ interface UseTorchScrollProps {
 export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = true }: UseTorchScrollProps) {
   const scrollAnimationRef = useRef<number | null>(null);
   const isMobile = useIsMobile();
+  const lastScrollPositionRef = useRef(0);
   
   // Optimisation : mémoisation du calcul de vitesse de défilement
   const calculateScrollSpeed = useCallback((posY: number): number => {
@@ -18,13 +19,13 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
     const centerY = windowHeight / 2;
     
     // Zone morte au centre (30% de la hauteur de l'écran pour plus de confort)
-    const deadZonePercentage = isMobile ? 0.3 : 0.25;
+    const deadZonePercentage = isMobile ? 0.35 : 0.3;
     const deadZone = windowHeight * deadZonePercentage;
     const topDeadZoneLimit = centerY - deadZone / 2;
     const bottomDeadZoneLimit = centerY + deadZone / 2;
     
     // Vitesse maximale réduite pour un défilement plus doux
-    const maxSpeed = isMobile ? 12 : 15;
+    const maxSpeed = isMobile ? 8 : 10;
     
     if (posY < topDeadZoneLimit) {
       // Défilement vers le haut
@@ -45,6 +46,9 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
   }, [isMobile]);
   
   useEffect(() => {
+    // Stocker la position de défilement actuelle avant d'activer/désactiver la torche
+    lastScrollPositionRef.current = window.scrollY;
+    
     // Nettoyage de l'animation précédente
     if (scrollAnimationRef.current !== null) {
       cancelAnimationFrame(scrollAnimationRef.current);
@@ -66,7 +70,8 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
       const speed = calculateScrollSpeed(mousePosition.y);
       
       // N'appliquer le défilement que si la vitesse est significative (éviter les micro-déplacements)
-      if (Math.abs(speed) > 0.5) {
+      if (Math.abs(speed) > 0.8) {
+        // Utiliser scrollBy au lieu de scrollTo pour éviter de revenir en haut
         window.scrollBy({
           top: speed,
           behavior: 'auto'  // 'auto' au lieu de 'smooth' pour éviter l'accumulation d'inertie
@@ -79,7 +84,7 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
     // Démarrer l'animation avec un délai pour éviter les déclenchements accidentels
     const timeoutId = setTimeout(() => {
       scrollAnimationRef.current = requestAnimationFrame(scrollAnimation);
-    }, 100);
+    }, 200);
     
     // Nettoyer l'animation et le timeout lors du démontage ou des changements de dépendances
     return () => {
@@ -90,6 +95,18 @@ export function useTorchScroll({ isTorchActive, mousePosition, isFingerDown = tr
       }
     };
   }, [isTorchActive, mousePosition.y, isFingerDown, calculateScrollSpeed, isMobile]);
+  
+  // Effet pour restaurer la position de défilement lors de la désactivation de la torche
+  useEffect(() => {
+    if (!isTorchActive && lastScrollPositionRef.current > 0) {
+      // Petite temporisation pour éviter le retour brutal
+      const timeoutId = setTimeout(() => {
+        // Ne rien faire, laisser l'utilisateur à sa position actuelle
+      }, 50);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isTorchActive]);
   
   return { scrollAnimationRef };
 }

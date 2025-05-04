@@ -15,6 +15,12 @@ export function useTorchPosition(
 ) {
   const isMobile = useIsMobile();
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollPositionRef = useRef(0);
+  
+  // Se souvenir de la position de défilement actuelle
+  useEffect(() => {
+    lastScrollPositionRef.current = window.scrollY;
+  }, []);
   
   // Optimiser les gestionnaires pour qu'ils ne soient pas recréés à chaque render
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -34,7 +40,10 @@ export function useTorchPosition(
   // Optimiser les gestionnaires tactiles pour qu'ils ne soient pas recréés à chaque render
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (isTorchActive && e.touches.length > 0) {
-      e.preventDefault();
+      // Ne pas empêcher le comportement par défaut pour permettre le défilement natif
+      // mais empêcher les autres gestionnaires d'événements
+      e.stopPropagation();
+      
       updateMousePosition({ 
         x: e.touches[0].clientX, 
         y: e.touches[0].clientY 
@@ -98,7 +107,8 @@ export function useTorchPosition(
   useEffect(() => {
     if (!isMobile) return;
     
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    // Utiliser { passive: true } pour permettre le défilement natif
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchend", handleTouchEnd);
     window.addEventListener("scroll", handleScroll);
@@ -116,5 +126,5 @@ export function useTorchPosition(
     };
   }, [isMobile, handleTouchMove, handleTouchStart, handleTouchEnd, handleScroll, handleScrollTouchMove]);
   
-  return { scrollTimeoutRef };
+  return { scrollTimeoutRef, lastScrollPositionRef };
 }
