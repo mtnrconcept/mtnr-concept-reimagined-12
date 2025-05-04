@@ -21,27 +21,15 @@ export function MobileNav({ isOpen, navLinks, currentPath, onLinkClick }: Mobile
             key={link.path} 
             className="border-b border-yellow-400/10 last:border-b-0"
           >
-            <Link
+            <NavLink
               to={link.path}
-              onClick={() => onLinkClick()}
-              className={cn(
-                "block px-6 py-3 font-medium transition-all",
-                currentPath === link.path ? "text-primary" : "text-white/80"
-              )}
+              isActive={currentPath === link.path}
+              onClick={onLinkClick}
             >
               {link.name}
-            </Link>
+            </NavLink>
           </li>
         ))}
-        <li className="px-6 py-3">
-          <Link 
-            to="/book" 
-            onClick={() => onLinkClick()}
-            className="block w-full py-2 bg-yellow-400/90 text-black font-bold text-center rounded-lg hover:bg-yellow-300 transition-all"
-          >
-            Book Now
-          </Link>
-        </li>
       </ul>
     </div>
   );
