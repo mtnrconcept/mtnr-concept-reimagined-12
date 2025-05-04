@@ -102,15 +102,15 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     },
     exit: {
       opacity: 0,
-      y: "-10vh", // Mouvement vertical conservé
+      y: "-50vh", // Mouvement vertical conservé
       filter: "blur(5px)", // Effet de flou conservé
       transition: {
-        opacity: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }, // Exit plus lent
+        opacity: { duration: 2.2, ease: [0.33, 1, 0.68, 1] }, // Exit plus lent
         y: { 
-          duration: 1.5, // Exit plus lent
+          duration: 2.5, // Exit plus lent
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 1.4, ease: [0.33, 1, 0.68, 1] } // Exit plus lent
+        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Exit plus lent
       }
     }
   };
