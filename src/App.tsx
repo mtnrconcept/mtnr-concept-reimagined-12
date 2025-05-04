@@ -84,8 +84,8 @@ function AppContent() {
       <div className="content-container overflow-visible">
         {/* Une seule vidéo de fond au niveau de l'application */}
         <BackgroundVideo 
-          videoUrl="/lovable-uploads/video-fond-normale.mp4"
-          videoUrlUV="/lovable-uploads/video-fond-uv.mp4"
+          videoUrl="/lovable-uploads/videofondnormale.mp4"
+          videoUrlUV="/lovable-uploads/videofonduv.mp4"
         />
         
         {/* Ajout du ParallaxScene au niveau de l'App pour qu'il soit disponible sur toutes les pages */}
