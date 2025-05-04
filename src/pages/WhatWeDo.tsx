@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
@@ -21,13 +22,13 @@ export default function WhatWeDo() {
       <div className="relative z-10 min-h-screen">
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
-            <div className="relative">
+            <div className="relative" style={{ position: 'relative', zIndex: 50 }}>
               <NeonText text="Notre Vibe" className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center" color="yellow" flicker={true} />
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
             </div>
             
-            <div className="bg-black/80 grunge-border px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl" style={{ position: 'relative', zIndex: 5 }}>
-              <div style={{ position: 'relative', zIndex: 20 }}>
+            <div className="bg-black/80 px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl" style={{ position: 'relative', zIndex: 30 }}>
+              <div style={{ position: 'relative', zIndex: 50 }}>
                 <UVText 
                   text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
                   hiddenText="MTNR - CODE SECRET"
@@ -37,7 +38,7 @@ export default function WhatWeDo() {
                 On crée sans limite, on enregistre dans la sueur, on partage la ride.
               </div>
               
-              <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400 mt-4" style={{ position: 'relative', zIndex: 20 }}>
+              <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400 mt-4" style={{ position: 'relative', zIndex: 50 }}>
                 <li>
                   <UVText 
                     text="Studio accessible à tous, on casse les codes : no bling, que du vrai."
@@ -57,10 +58,10 @@ export default function WhatWeDo() {
               </ul>
               
               {/* Nouvelles sections avec accordéons */}
-              <div className="mt-12 space-y-8" style={{ position: 'relative', zIndex: 20 }}>
+              <div className="mt-12 space-y-8" style={{ position: 'relative', zIndex: 50 }}>
                 <h2 className="text-2xl xs:text-3xl font-bold text-yellow-400 mb-4">Ce qu'on propose</h2>
                 
-                <Accordion type="single" collapsible className="w-full" style={{ position: 'relative', zIndex: 20 }}>
+                <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="enregistrement" className="border-yellow-400/30">
                     <AccordionTrigger className="text-xl font-bold">
                       <UVText 
@@ -139,9 +140,9 @@ export default function WhatWeDo() {
                 </Accordion>
 
                 {/* Notre approche */}
-                <div className="mt-12" style={{ position: 'relative', zIndex: 20 }}>
+                <div className="mt-12">
                   <h2 className="text-2xl xs:text-3xl font-bold text-yellow-400 mb-4">Notre approche</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4" style={{ position: 'relative', zIndex: 20 }}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                     <div className="bg-black/60 p-4 rounded border border-yellow-400/25">
                       <h3 className="text-xl font-bold mb-2 text-white">Authenticité</h3>
                       <p>On défend l'honnêteté artistique avant tout. Pas de formules préfabriquées, chaque projet évolue selon sa propre nature.</p>
@@ -162,7 +163,7 @@ export default function WhatWeDo() {
                 </div>
               </div>
               
-              <span className="block font-black text-white mt-10 text-xl xs:text-2xl" style={{ position: 'relative', zIndex: 20 }}>
+              <span className="block font-black text-white mt-10 text-xl xs:text-2xl" style={{ position: 'relative', zIndex: 50 }}>
                 <UVText 
                   text="Rejoignez la ride. Le son prend vie dans la cave."
                   hiddenText="REJOINS-NOUS DANS L'OMBRE - 23H30 - SOUS-SOL - CODE: MTNR"

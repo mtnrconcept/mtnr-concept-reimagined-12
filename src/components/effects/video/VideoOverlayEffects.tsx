@@ -13,7 +13,7 @@ const VideoOverlayEffects: React.FC = () => {
           transform: 'translateZ(-50px)',
           mixBlendMode: 'overlay',
           pointerEvents: 'none',
-          zIndex: -5
+          zIndex: -50
         }}
       />
       
@@ -23,7 +23,7 @@ const VideoOverlayEffects: React.FC = () => {
         style={{
           background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%)',
           pointerEvents: 'none',
-          zIndex: -2
+          zIndex: -20
         }}
       />
     </>
