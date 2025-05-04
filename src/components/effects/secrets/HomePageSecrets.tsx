@@ -24,7 +24,7 @@ export default function HomePageSecrets() {
       />
       
       <UVSecretMessage 
-        message="ACCESS CODE: 7139" 
+        message="ACCESS CODE: MTNR" 
         position={{ x: 85, y: 15 }}
         color="#4FA9FF"
         depth="0"
