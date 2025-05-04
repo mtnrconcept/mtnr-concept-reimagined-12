@@ -88,7 +88,7 @@ const VideoContainer: React.FC<VideoContainerProps> = memo(({
   }, []);
 
   return (
-    <div ref={videoContainerRef} className="fixed inset-0 w-full h-full overflow-hidden z-0 bg-black">
+    <div ref={videoContainerRef} className="fixed inset-0 w-full h-full overflow-hidden z-[-10] bg-black">
       {/* Status indicators for debug/development */}
       <VideoStatusIndicators 
         loadingStatus={loadingStatus} 

@@ -21,6 +21,10 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
   useEffect(() => {
     if (videoRef.current) {
       console.log(`Chargement de la vidéo: ${currentVideoUrl}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
+      // S'assurer que l'élément vidéo est visible
+      videoRef.current.style.opacity = "1";
+      videoRef.current.style.visibility = "visible";
+      videoRef.current.style.zIndex = "0"; 
       videoRef.current.load();
     }
   }, [currentVideoUrl, videoRef, uvMode]);
@@ -36,7 +40,10 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
         transform: 'translate3d(0, 0, 0) scale(1.1)',
         backfaceVisibility: 'hidden',
         willChange: 'transform',
-        transformStyle: 'preserve-3d'
+        transformStyle: 'preserve-3d',
+        opacity: 1,
+        visibility: 'visible',
+        zIndex: 0
       }}
     >
       <source src={currentVideoUrl} type="video/mp4" />

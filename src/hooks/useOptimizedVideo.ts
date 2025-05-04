@@ -23,10 +23,13 @@ export function useOptimizedVideo(
   // Optimiser les gestionnaires d'événements vidéo avec useCallback
   const handleCanPlay = useCallback(() => {
     console.log('Vidéo prête à être lue:', videoRef.current?.src);
+    setLoadingStatus('ready');
+    setVideoReady(true);
   }, []);
   
   const handlePlaying = useCallback(() => {
     console.log('Lecture vidéo démarrée:', videoRef.current?.src);
+    setLoadingStatus('ready');
   }, []);
   
   const handlePause = useCallback(() => {
@@ -61,8 +64,23 @@ export function useOptimizedVideo(
     const setupVideo = async () => {
       try {
         video.src = uvMode ? videoUrlUV : videoUrl;
+        
+        // S'assurer que l'élément vidéo est visible
+        video.style.opacity = "1";
+        video.style.visibility = "visible";
+        video.style.zIndex = "0";
+        
         video.load();
-        video.pause();
+        
+        // Tenter de lire la vidéo
+        try {
+          await video.play();
+          console.log("Lecture vidéo démarrée automatiquement");
+        } catch (playError) {
+          // La lecture auto n'a pas fonctionné, ce n'est pas grave
+          console.log("Lecture auto non autorisée, vidéo mise en pause");
+          video.pause();
+        }
         
         setLoadingStatus('ready');
         setVideoReady(true);
@@ -83,17 +101,28 @@ export function useOptimizedVideo(
     
     setVideoReady(false);
     
-    video.src = uvMode ? videoUrlUV : videoUrl;
-    video.load();
+    // Définir la source en fonction du mode UV
+    const newVideoSrc = uvMode ? videoUrlUV : videoUrl;
     
-    setTimeout(() => {
-      if (video) {
-        video.pause();
-        setVideoReady(true);
-      }
-    }, 100);
-    
-    console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée`);
+    if (video.src !== newVideoSrc) {
+      console.log(`Changement de vidéo: ${newVideoSrc}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
+      video.src = newVideoSrc;
+      
+      // S'assurer que l'élément vidéo est visible
+      video.style.opacity = "1";
+      video.style.visibility = "visible";
+      video.style.zIndex = "0";
+      
+      video.load();
+      
+      // Tenter de lire la vidéo
+      video.play()
+        .then(() => console.log("Lecture vidéo démarrée après changement UV"))
+        .catch(err => {
+          console.log("Lecture auto non autorisée après changement UV");
+          video.pause(); // Mettre en pause si la lecture auto échoue
+        });
+    }
   }, [uvMode, videoUrl, videoUrlUV]);
 
   // Gestion des changements de page
@@ -107,6 +136,11 @@ export function useOptimizedVideo(
       
       setVideoReady(false);
       setIsTransitioning(true);
+      
+      // S'assurer que la vidéo est visible
+      video.style.opacity = "1";
+      video.style.visibility = "visible";
+      video.style.zIndex = "0";
       
       video.currentTime = 0;
       video.play()
@@ -123,6 +157,11 @@ export function useOptimizedVideo(
       
       setVideoReady(false);
       setIsTransitioning(true);
+      
+      // S'assurer que la vidéo est visible
+      video.style.opacity = "1";
+      video.style.visibility = "visible";
+      video.style.zIndex = "0";
       
       video.currentTime = 0;
       video.play()

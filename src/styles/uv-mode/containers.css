@@ -4,7 +4,7 @@
   .uv-mode-active .bg-black\/80,
   .uv-mode-active .bg-gray-800,
   .uv-mode-active .bg-gray-900 {
-    background-color: rgba(15, 0, 70, 0.5) !important; /* Opacité réduite de 0.8 à 0.5 */
+    background-color: rgba(15, 0, 70, 0.4) !important; /* Opacité réduite de 0.5 à 0.4 */
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 15px rgba(0, 102, 255, 0.3) !important;
     transition: all 0.5s ease-out;
@@ -41,7 +41,7 @@
   .uv-mode-active [class*="grunge-border"] {
     border: 1px solid #4FA9FF !important;
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
-    background-color: rgba(15, 0, 70, 0.6) !important; /* Opacité réduite de 0.8 à 0.6 */
+    background-color: rgba(15, 0, 70, 0.4) !important; /* Opacité réduite de 0.6 à 0.4 */
     position: relative;
   }
   
@@ -69,7 +69,7 @@
   
   /* Les conteneurs avec du contenu en mode UV */
   .uv-mode-active .container {
-    background-color: rgba(10, 0, 60, 0.4) !important;
+    background-color: rgba(10, 0, 60, 0.3) !important; /* Opacité réduite de 0.4 à 0.3 */
     border-radius: 12px;
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 20px rgba(0, 102, 255, 0.2) !important;
