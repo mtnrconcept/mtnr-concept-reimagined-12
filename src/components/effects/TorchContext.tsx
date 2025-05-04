@@ -112,7 +112,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 top: `${mousePosition.y}px`,
                 background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 50%)',
                 filter: 'blur(15px)',
-                mixBlendMode: 'overlay',
+                mixBlendMode: 'normal',
               }}
             />
           </div>,
