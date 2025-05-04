@@ -30,6 +30,11 @@
     color: #D2FF3F !important;
     text-shadow: 0 0 5px #D2FF3F !important;
     box-shadow: 0 0 15px rgba(210, 255, 63, 0.6) !important;
+    /* Préserver dimensions originales */
+    padding: inherit !important;
+    margin: inherit !important;
+    width: auto !important;
+    height: auto !important;
   }
 
   /* Navbar style in UV mode */
@@ -44,40 +49,17 @@
     text-shadow: 0 0 5px #00AAFF !important;
     letter-spacing: 0.05em;
     transition: letter-spacing 0.3s ease-out;
+    /* Préserver les dimensions */
+    padding: inherit !important;
+    margin: inherit !important;
   }
   
   .uv-mode-active nav a:hover {
     text-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF !important;
     letter-spacing: 0.08em;
   }
-  
-  /* Rendre le cadre invisible en mode UV mais garder le texte visible */
-  .uv-mode-active .neon-text-container,
-  .uv-mode-active .neon-border-container,
-  .uv-mode-active .neon-text.neon-on::before {
-    background-color: transparent !important;
-    border-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    display: none !important; /* Force hide the container itself */
-  }
-  
-  .uv-mode-active .bg-black\/80,
-  .uv-mode-active .paper-texture,
-  .uv-mode-active .border-yellow-400\/25 {
-    background-color: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-  }
-  
-  /* S'assurer que le contenu est visible mais le cadre invisible */
-  .uv-mode-active .neon-text {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
 
-  /* S'assurer que tous les titres sont sans cadre en mode UV */
+  /* S'assurer que tous les titres sont sans cadre en mode UV mais gardent leurs dimensions */
   .uv-mode-active .section-title,
   .uv-mode-active .page-title,
   .uv-mode-active h1,
@@ -89,17 +71,16 @@
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    /* Ne pas modifier les paddings existants */
   }
   
-  /* Supprimer spécifiquement les effets de néon border */
-  .neon-border-container,
-  .neon-border-container::before,
-  .neon-border-container.active::before {
-    display: none !important;
-    opacity: 0 !important;
-    background: none !important;
-    box-shadow: none !important;
-    border: none !important;
+  /* Amélioration pour les sections et conteneurs */
+  .uv-mode-active section,
+  .uv-mode-active div[class*="container"] {
+    /* Préserver dimensions et espacements */
+    padding: inherit !important;
+    margin: inherit !important;
+    width: inherit !important;
+    height: inherit !important;
   }
 }

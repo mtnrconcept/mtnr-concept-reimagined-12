@@ -11,7 +11,8 @@
   .uv-mode-active h3,
   .uv-mode-active .page-title,
   .uv-mode-active .font-playfair.text-4xl,
-  .uv-mode-active .font-playfair.text-5xl {
+  .uv-mode-active .font-playfair.text-5xl,
+  .uv-mode-active .section-title {
     color: #D2FF3F;
     text-shadow: 0 0 10px #D2FF3F, 0 0 20px #D2FF3F;
     transition: color 0.5s ease-out, text-shadow 0.5s ease-out;
@@ -19,6 +20,11 @@
     border: none !important;
     box-shadow: none !important;
     animation: uvPulse 3s infinite;
+    /* Préserver les espacements et tailles */
+    margin: inherit !important;
+    padding: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
   }
   
   .uv-mode-active .section-title,
@@ -104,4 +110,3 @@
     box-shadow: none !important;
   }
 }
-

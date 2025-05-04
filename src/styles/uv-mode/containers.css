@@ -44,7 +44,7 @@
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
   }
   
-  /* Les conteneurs avec du contenu en mode UV */
+  /* Les conteneurs avec du contenu en mode UV - préservation des dimensions */
   .uv-mode-active .container {
     background-color: rgba(10, 0, 60, 0.4) !important;
     border-radius: 12px;
