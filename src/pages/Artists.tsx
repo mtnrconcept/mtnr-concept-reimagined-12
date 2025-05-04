@@ -20,7 +20,8 @@ const artists = [
     name: "Mairo",
     displayName: "Hidden Code",
     img: "/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png",
-    desc: "Trouve le code secret en enclanchant la lampe UV.",
+    descWithTorch: "Trouve le code secret en enclanchant la lampe UV.",
+    descWithoutTorch: "Producteur de Talent, artiste au multiple casquettes, pas là pour rigoler.",
     secretCode: "FANTOME-2"
   },
   {
@@ -97,13 +98,23 @@ export default function Artists() {
                     )}
                   </div>
                   <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
-                    <UVText 
-                      text={a.desc} 
-                      hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`} 
-                      uvColor="#D946EF" 
-                      textSize="text-xs xs:text-sm" 
-                      opacity={0.01} 
-                    />
+                    {index === 1 ? (
+                      <UVText 
+                        text={isTorchActive ? a.descWithTorch : a.descWithoutTorch} 
+                        hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`} 
+                        uvColor="#D946EF" 
+                        textSize="text-xs xs:text-sm" 
+                        opacity={0.01} 
+                      />
+                    ) : (
+                      <UVText 
+                        text={a.desc} 
+                        hiddenText={`CODE SECRET: ${a.secretCode} • ACCÈS NIVEAU OMEGA • ARCHIVES CONFIDENTIELLES`} 
+                        uvColor="#D946EF" 
+                        textSize="text-xs xs:text-sm" 
+                        opacity={0.01} 
+                      />
+                    )}
                   </div>
                 </div>
               ))}
