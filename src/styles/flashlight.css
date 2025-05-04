@@ -1,4 +1,3 @@
-
 @layer components {
   /** Flashlight overlay */
   .flashlight {
@@ -68,6 +67,7 @@
     );
     filter: blur(15px); /* Flou gaussien augmenté pour adoucir les bords */
     will-change: transform, left, top; /* Optimisation pour les animations sur mobile */
+    touch-action: none; /* Désactiver les gestes par défaut sur mobile */
   }
 
   /* Taille adaptée pour mobile */
@@ -118,6 +118,7 @@
     filter: blur(5px);
     opacity: 0.9;
     will-change: transform, left, top;
+    touch-action: none; /* Désactiver les gestes par défaut sur mobile */
   }
 
   /* Animation de pulsation pour l'effet néon */
@@ -199,5 +200,16 @@
   
   .scroll-indicator {
     animation: indicator-pulse 1.5s infinite ease-in-out;
+  }
+  
+  /* Améliorer l'interactivité de la torche */
+  .torch-active {
+    touch-action: none !important; /* Priorité élevée pour désactiver les gestes de navigation */
+  }
+  
+  /* Permettre le scroll normal dans les conteneurs de contenu même avec torche active */
+  .content-scrollable {
+    touch-action: pan-y; /* Autoriser uniquement le défilement vertical */
+    pointer-events: auto;
   }
 }

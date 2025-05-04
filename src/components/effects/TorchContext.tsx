@@ -49,6 +49,32 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useTorchPosition(isTorchActive, updateMousePosition, mousePosition, setIsFingerDown);
   useUVEffects(isTorchActive, mousePosition);
   useTorchScroll({ isTorchActive, mousePosition, isFingerDown });
+  
+  // Effet pour ajouter/supprimer la classe torch-active au body
+  React.useEffect(() => {
+    if (isTorchActive) {
+      document.body.classList.add('torch-active');
+      
+      // Ajouter la classe content-scrollable aux conteneurs de contenu principaux
+      document.querySelectorAll('.content-container').forEach(el => {
+        el.classList.add('content-scrollable');
+      });
+    } else {
+      document.body.classList.remove('torch-active');
+      
+      // Supprimer la classe content-scrollable
+      document.querySelectorAll('.content-container').forEach(el => {
+        el.classList.remove('content-scrollable');
+      });
+    }
+    
+    return () => {
+      document.body.classList.remove('torch-active');
+      document.querySelectorAll('.content-container').forEach(el => {
+        el.classList.remove('content-scrollable');
+      });
+    };
+  }, [isTorchActive]);
 
   // Optimiser le contexte avec useMemo pour réduire les recréations
   const contextValue = useMemo(() => ({
