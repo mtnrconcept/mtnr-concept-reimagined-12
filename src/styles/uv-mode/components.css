@@ -19,7 +19,7 @@
   }
   
   .uv-mode-active .tv-frame {
-    filter: hue-rotate(180deg) brightness(10.2) saturate(10.5);
+    filter: hue-rotate(180deg) brightness(1.2) saturate(10.5);
   }
   
   /* Halo effect around "Book" buttons */
