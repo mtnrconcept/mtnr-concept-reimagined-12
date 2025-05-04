@@ -51,6 +51,11 @@
     letter-spacing: 0.08em;
   }
   
+  /* Electric reservation button hover effect */
+  nav a:has(span:contains("Réservation")):hover span.absolute {
+    box-shadow: 0 0 15px #D2FF3F, inset 0 0 10px #D2FF3F;
+  }
+  
   /* Rendre le cadre invisible en mode UV mais garder le texte visible */
   .uv-mode-active .neon-text-container,
   .uv-mode-active .neon-border-container,

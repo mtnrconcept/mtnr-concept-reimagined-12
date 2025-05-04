@@ -13,6 +13,7 @@ interface NavLinkProps {
 
 export function NavLink({ to, isActive, children, onClick }: NavLinkProps) {
   const navigation = useNavigation();
+  const isReservation = children === "Réservation";
   
   const handleClick = (e: React.MouseEvent) => {
     // Si on clique sur le lien de la page actuelle, ne rien faire
@@ -32,10 +33,14 @@ export function NavLink({ to, isActive, children, onClick }: NavLinkProps) {
         "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
         isActive 
           ? "text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-yellow-400" 
-          : "text-white/80"
+          : "text-white/80",
+        isReservation && "hover:text-black"
       )}
       onClick={handleClick}
     >
+      {isReservation && (
+        <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0"></span>
+      )}
       <span className="relative z-10">{children}</span>
       {isActive && (
         <motion.span 
