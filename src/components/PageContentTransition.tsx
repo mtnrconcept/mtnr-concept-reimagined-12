@@ -77,7 +77,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Initial est soit un fondu simple, soit un effet plus complexe selon le contexte
     initial: (isInitial: boolean) => ({
       opacity: 0,
-      y: isInitial ? 0 : "15vh", // Augmentation du décalage vertical initial
+      y: isInitial ? 0 : "100vh", // Départ depuis le bas de l'écran (100vh)
       filter: isInitial ? "blur(0px)" : "blur(5px)" // Effet de flou conservé
     }),
     animate: {
@@ -91,7 +91,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
         },
         y: { 
           duration: isInitialPageLoad ? 0 : 6.0, // Durée de 6 secondes pour que l'animation se termine exactement à la fin de la vidéo (7s - 1s de délai)
-          ease: [0.05, 0.2, 0.2, 1.0] 
+          ease: [0.16, 0.42, 0.05, 1.0] // Courbe d'accélération modifiée: rapide au début, très lente à la fin
         },
         filter: { 
           duration: isInitialPageLoad ? 0 : 5.5, // Durée réduite pour l'effet de flou
