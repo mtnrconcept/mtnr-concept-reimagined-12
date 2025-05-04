@@ -1,11 +1,30 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import UVHiddenMessage from '../UVHiddenMessage';
 import UVHiddenCode from '../UVHiddenCode';
 import UVSecretMessage from '../UVSecretMessage';
 import UVDecryptMessage from '../UVDecryptMessage';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export default function ContactPageSecrets() {
+  const [codeInput, setCodeInput] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+  
+  const handleVerification = () => {
+    if (codeInput === "7139") {
+      setIsVerified(true);
+      toast.success("Code correct! Accès autorisé.", {
+        duration: 3000
+      });
+    } else {
+      toast.error("Code incorrect. Accès refusé.", {
+        duration: 3000
+      });
+    }
+  };
+
   return (
     <>
       <UVHiddenMessage 
@@ -16,11 +35,49 @@ export default function ContactPageSecrets() {
         offsetY={30}
       />
       
-      <UVSecretMessage 
-        message="TEL: +33 6 ** ** ** 42" 
-        position={{ x: 65, y: 40 }}
-        color="#D2FF3F"
-      />
+      <div className="absolute" style={{ 
+        top: '40%', 
+        left: '65%', 
+        transform: 'translate(-50%, -50%)',
+        zIndex: 100,
+        backgroundColor: 'rgba(0, 10, 30, 0.75)',
+        padding: '15px',
+        borderRadius: '8px',
+        border: '1px solid #D2FF3F',
+        boxShadow: '0 0 15px rgba(210, 255, 63, 0.5)',
+        backdropFilter: 'blur(3px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        maxWidth: '250px'
+      }}>
+        <p style={{ color: "#D2FF3F", fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
+          TEL: +33 6 ** ** ** 42
+        </p>
+        <p style={{ color: "#fff", fontSize: "12px", marginBottom: "5px" }}>
+          Remplis le code
+        </p>
+        <Input 
+          type="text"
+          value={codeInput}
+          onChange={(e) => setCodeInput(e.target.value)}
+          className="h-8 text-sm bg-black/50 border-yellow-400 text-white"
+          placeholder="Enter code"
+          maxLength={4}
+        />
+        <Button 
+          onClick={handleVerification}
+          className="h-8 bg-yellow-400 hover:bg-yellow-500 text-black text-xs font-bold"
+        >
+          Vérification
+        </Button>
+        
+        {isVerified && (
+          <p style={{ color: "#4FA9FF", fontSize: "12px", marginTop: "5px" }}>
+            Code d'accès: NEBULA-7X
+          </p>
+        )}
+      </div>
       
       <UVDecryptMessage
         message="ACCÈS SÉCURISÉ: CODE 8734-XD29-M71R"
