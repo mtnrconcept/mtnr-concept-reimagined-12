@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import "./NeonText.css";
 
@@ -9,43 +9,47 @@ interface NeonTextProps {
   color?: "yellow" | "white" | "black";
   flicker?: boolean;
   delay?: number;
+  startOn?: boolean;
 }
 
-export default function NeonText({ 
-  text, 
-  className, 
-  color = "yellow", 
-  flicker = true,
-  delay = 0
+export default function NeonText({
+  text,
+  className,
+  color = "yellow",
+  flicker = false,
+  delay = 0,
+  startOn = false,
 }: NeonTextProps) {
-  const [isOn, setIsOn] = useState(false);
+  const [isOn, setIsOn] = useState(startOn);
+  const containerRef = useRef<HTMLDivElement>(null);
   
+  // Turn on the neon effect after a delay
   useEffect(() => {
-    // Délai pour l'effet d'allumage progressif
+    if (startOn) return;
+    
     const timer = setTimeout(() => {
       setIsOn(true);
     }, delay);
+    
     return () => clearTimeout(timer);
-  }, [delay]);
-
-  // Détermine les couleurs de lueur en fonction de la propriété color
-  const glowColors = {
-    yellow: "neon-glow-yellow",
-    white: "neon-glow-white",
-    black: "neon-glow-black"
-  };
-
+  }, [delay, startOn]);
+  
+  // Add the appropriate glow color class based on the color prop
+  const colorClass = `neon-glow-${color}`;
+  
   return (
-    <h1 
-      className={cn(
-        "neon-text transition-all duration-700", 
-        isOn && "neon-on",
-        flicker && "neon-flicker",
-        glowColors[color],
-        className
-      )}
-    >
-      {text}
-    </h1>
+    <div className="relative neon-text-container" ref={containerRef}>
+      <h2
+        className={cn(
+          "neon-text",
+          colorClass,
+          isOn && "neon-on",
+          flicker && isOn && "neon-flicker",
+          className
+        )}
+      >
+        {text}
+      </h2>
+    </div>
   );
 }

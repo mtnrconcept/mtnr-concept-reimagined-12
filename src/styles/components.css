@@ -140,4 +140,13 @@
     animation: page-transition-splash 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     z-index: 110 !important;
   }
+  
+  /* Suppression des cadres autour des titres */
+  .section-title,
+  .page-title,
+  h1, h2, h3, h4, h5, h6 {
+    background-color: transparent;
+    border: none !important;
+    box-shadow: none !important;
+  }
 }
