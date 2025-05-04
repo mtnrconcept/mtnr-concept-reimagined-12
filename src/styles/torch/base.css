@@ -1,0 +1,56 @@
+
+@layer components {
+  /** Flashlight overlay */
+  .flashlight {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at var(--cursor-x) var(--cursor-y), 
+      rgba(0,0,0,0) 10%, 
+      rgba(0,0,0,0.05) 20%, 
+      rgba(0,0,0,0.3) 40%, 
+      rgba(0,0,0,0.7) 70%, 
+      rgba(0,0,0,0.9) 90%);
+    pointer-events: none;
+    z-index: 50;
+    will-change: background; /* Optimisation pour les animations */
+  }
+
+  /* UV mode ne doit pas avoir de masque d'assombrissement */
+  .uv-mode-active .flashlight {
+    background: none; /* Suppression du masque d'assombrissement en mode UV */
+  }
+
+  .flashlight-3d {
+    position: fixed;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, 
+      rgba(255,255,255,0.6) 0%,
+      rgba(255,255,255,0.4) 40%, 
+      rgba(255,255,255,0.15) 70%,
+      transparent 100%);
+    pointer-events: none;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    left: var(--cursor-x);
+    top: var(--cursor-y);
+    filter: blur(12px);
+    will-change: transform, left, top; /* Optimisation pour les animations */
+  }
+
+  /** Neon cursor effect */
+  .neon-cursor {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,0,0.3);
+    box-shadow: 0 0 10px rgba(255,255,0,0.8);
+    pointer-events: none;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+    transition: none; /* Réactivité immédiate */
+    will-change: transform, left, top; /* Optimisation pour les animations */
+  }
+}

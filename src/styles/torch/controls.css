@@ -1,0 +1,69 @@
+
+@layer components {
+  /* Effet de lueur autour de la lampe */
+  .flashlight-icon {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 150, 0.7));
+    animation: flashlight-bounce 2s ease-in-out infinite;
+  }
+  
+  /* Version UV de l'effet de lueur */
+  .flashlight-icon.uv-mode {
+    filter: drop-shadow(0 0 3px rgba(153, 0, 255, 0.8));
+  }
+  
+  /* Isoler les contrôles de torche */
+  .torch-controls {
+    isolation: isolate;
+    z-index: 200;
+  }
+  
+  /* Améliorer l'interactivité de la torche */
+  .torch-active {
+    touch-action: auto !important; /* Permettre le défilement vertical */
+    user-select: none; /* Empêcher la sélection de texte */
+    overscroll-behavior: contain; /* Eviter les rebonds de défilement */
+  }
+  
+  /* Permettre le scroll normal dans les conteneurs de contenu même avec torche active */
+  .content-scrollable {
+    touch-action: auto !important; /* Autoriser le défilement vertical */
+    pointer-events: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch; /* Pour une meilleure inertie sur iOS */
+  }
+  
+  /* Empêcher le corps de la page de se déplacer pendant le défilement avec la torche */
+  body.torch-active {
+    overflow-y: auto !important;
+    overscroll-behavior: contain; /* Empêcher le rebond de défilement */
+  }
+  
+  /* Assurez-vous que les conteneurs de contenu peuvent défiler normalement */
+  .content-container {
+    position: relative;
+    z-index: 20;
+  }
+  
+  /* S'assurer que les contenus de pages spécifiques ne sont pas masqués par les effets de torche */
+  .page-content {
+    position: relative;
+    z-index: 25; /* Au-dessus de la plupart des effets mais sous les contrôles de navigation */
+    pointer-events: auto !important;
+  }
+  
+  /* Corrections pour les pages spécifiques */
+  .page-book,
+  .page-contact,
+  .page-what-we-do {
+    position: relative;
+    z-index: 30; /* Plus élevé pour être au-dessus des effets de torche */
+  }
+  
+  /* Augmenter la visibilité du texte dans ces pages */
+  .page-book *,
+  .page-contact *,
+  .page-what-we-do * {
+    position: relative;
+    z-index: 31; /* Encore plus haut pour le texte et les éléments interactifs */
+  }
+}

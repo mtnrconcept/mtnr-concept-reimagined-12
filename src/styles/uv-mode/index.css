@@ -10,5 +10,5 @@
 @import './visual-effects.css';
 @import './electric-text.css';
 @import '../effects/electric-effects.css';
-@import '../flashlight.css';
+@import '../torch/index.css';
 
