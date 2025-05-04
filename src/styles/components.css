@@ -29,7 +29,7 @@
   }
 
   .animate-smoke-in {
-    animation: smokeIn 1.8s ease-out forwards;
+    animation: smokeIn 0.8s ease-out forwards;
     will-change: opacity, transform, filter;
   }
 
@@ -69,7 +69,7 @@
 
   .smoke-particle {
     @apply absolute rounded-full;
-    animation: smoke-float 1.2s ease-out forwards;
+    animation: smoke-float 2.2s ease-out forwards;
     will-change: transform, opacity, filter;
   }
 
@@ -77,7 +77,7 @@
   .reveal {
     opacity: 0;
     transform: translateY(1rem);
-    transition: transform 1.5s ease-out, opacity 1.5s ease-out;
+    transition: transform 1.5s ease-out, opacity 0.5s ease-out;
   }
 
   .reveal.active {
