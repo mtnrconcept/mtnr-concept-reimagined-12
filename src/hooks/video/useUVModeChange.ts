@@ -8,7 +8,7 @@ interface UseUVModeChangeProps {
   videoUrl: string;
   videoUrlUV: string;
   videoState: Pick<VideoState, "currentVideo">;
-  videoActions: Pick<VideoActions, "setCurrentVideo">;
+  videoActions: Pick<VideoActions, "setCurrentVideo" | "playVideoTransition">;
 }
 
 export function useUVModeChange({
@@ -20,25 +20,36 @@ export function useUVModeChange({
   const { uvMode } = useUVMode();
   const { isTorchActive } = useTorch();
   const { currentVideo } = videoState;
-  const { setCurrentVideo } = videoActions;
+  const { setCurrentVideo, playVideoTransition } = videoActions;
   const previousUVModeRef = useRef(uvMode);
+  const transitionRequestedRef = useRef(false);
 
-  // Gestion du changement de mode UV
+  // Gestion du changement de vidéo lorsque le mode UV change
   useEffect(() => {
     // Vérifier si le mode UV a réellement changé
     if (previousUVModeRef.current !== uvMode) {
       previousUVModeRef.current = uvMode;
       
-      // Mettre à jour la source vidéo en fonction du mode UV
+      // Sélectionner la bonne vidéo selon le mode UV
       const newVideoUrl = uvMode ? videoUrlUV : videoUrl;
       
-      if (currentVideo !== newVideoUrl) {
-        console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
-        setCurrentVideo(newVideoUrl);
-        // Note: Nous ne déclenchons plus de lecture vidéo ici, la vidéo reste en pause
+      console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo sélectionnée: ${newVideoUrl}`);
+      setCurrentVideo(newVideoUrl);
+      
+      // Jouer la transition vidéo immédiatement quand le mode UV change
+      // mais uniquement si la torche est active et qu'une transition n'est pas déjà en cours
+      if (isTorchActive && !transitionRequestedRef.current) {
+        transitionRequestedRef.current = true;
+        setTimeout(() => {
+          playVideoTransition();
+          // Réinitialisation après un délai
+          setTimeout(() => {
+            transitionRequestedRef.current = false;
+          }, 1000);
+        }, 50);
       }
     }
-  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo]);
+  }, [uvMode, videoUrl, videoUrlUV, currentVideo, setCurrentVideo, playVideoTransition, isTorchActive]);
 
   return { uvMode, isTorchActive };
 }

@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 
 interface VideoElementProps {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -16,6 +16,14 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
 }) => {
   // La source est calculée directement dans l'attribut pour éviter un re-render
   const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
+  
+  // Effect pour recharger la vidéo quand l'URL change
+  useEffect(() => {
+    if (videoRef.current) {
+      console.log(`Chargement de la vidéo: ${currentVideoUrl}, Mode UV: ${uvMode ? 'activé' : 'désactivé'}`);
+      videoRef.current.load();
+    }
+  }, [currentVideoUrl, videoRef, uvMode]);
   
   return (
     <video
