@@ -8,8 +8,8 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
-          <span className="block text-center font-thin px-0 mx-0 text-5xl">BIENVENUE au</span>
-          <span className="block mt-2 text-center font-normal text-3xl">MTNR CONCEPTSTUDIO</span>
+          <span className="block text-center font-thin px-0 mx-0 text-8xl">BIENVENUE au</span>
+          <span className="block mt-2 text-center font-normal text-6xl">MTNR CONCEPT STUDIO</span>
         </h1>
         
         <div className="text-white text-xl sm:text-2xl mb-8 font-medium tracking-wide">
