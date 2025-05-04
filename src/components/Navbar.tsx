@@ -31,26 +31,36 @@ export default function Navbar() {
         top: 0,
         left: 0,
         right: 0,
-        height: '80px', // Increased height to ensure logo fits
+        height: '80px',
         pointerEvents: 'all',
       }}
     >
-      <div className="container mx-auto flex justify-between items-center h-20 px-4 sm:px-6"> {/* Increased height */}
-        {/* Logo with proper spacing and container */}
-        <Link to="/" className="h-16 w-auto shrink-0 relative z-10 flex items-center">
-          <LogoWithEffect
-            src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-            alt="MTNR Logo"
-            width="120px"
-            glowEffect={true}
-            glowColor="255, 221, 0"
-            isVisible={true}
-            logoRef={null}
-            className="h-auto w-auto object-contain max-h-16"
-          />
-        </Link>
+      <div className="container mx-auto flex items-center h-20 px-4 sm:px-6">
+        {/* Logo dans son propre conteneur */}
+        <div className="mr-8 flex-shrink-0">
+          <Link to="/" className="flex items-center">
+            <LogoWithEffect
+              src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+              alt="MTNR Logo"
+              width="100px"
+              glowEffect={true}
+              glowColor="255, 221, 0"
+              isVisible={true}
+              logoRef={null}
+              className="h-auto w-auto object-contain max-h-14"
+            />
+          </Link>
+        </div>
         
-        {/* Mobile menu toggle - positioned correctly */}
+        {/* Menu principal centré */}
+        <div className="flex-grow hidden md:flex justify-center">
+          <DesktopNav navLinks={navLinks} currentPath={pathname} />
+        </div>
+        
+        {/* Espace pour équilibrer la mise en page */}
+        <div className="flex-shrink-0 w-[100px] hidden md:block"></div>
+        
+        {/* Mobile menu toggle - positionné correctement */}
         <button 
           className="md:hidden absolute right-4 top-6 flex items-center p-2 rounded-full bg-black/60 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300" 
           onClick={() => setMenuOpen(!menuOpen)} 
@@ -62,11 +72,6 @@ export default function Navbar() {
             <Menu className="w-5 h-5 text-yellow-400" />
           )}
         </button>
-        
-        {/* Desktop navigation - centered */}
-        <div className="hidden md:block">
-          <DesktopNav navLinks={navLinks} currentPath={pathname} />
-        </div>
       </div>
       
       {/* Mobile navigation */}

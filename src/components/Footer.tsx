@@ -22,46 +22,55 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-black text-white py-8 mt-10 font-inter">
-      <div className="container mx-auto flex flex-col md:flex-row md:justify-between gap-6 items-center px-4">
-        <div className="flex flex-col items-center md:items-start">
-          {/* Improved logo container with proper sizing */}
-          <div className="h-24 w-auto relative mb-2 flex items-center justify-center">
-            <LogoWithEffect
-              src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
-              alt="Logo MTNR"
-              width="160px"
-              glowEffect={true}
-              glowColor="255, 221, 0"
-              isVisible={true}
-              logoRef={logoRef}
-              className="h-auto w-auto object-contain max-h-24"
-            />
+    <footer className="w-full bg-black text-white py-12 mt-10 font-inter">
+      <div className="container mx-auto px-4">
+        {/* Structure en trois colonnes pour desktop, colonne unique pour mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Colonne du logo et copyright */}
+          <div className="flex flex-col items-center md:items-start">
+            {/* Conteneur du logo avec marges */}
+            <div className="mb-4 flex items-center justify-center md:justify-start">
+              <LogoWithEffect
+                src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
+                alt="Logo MTNR"
+                width="140px"
+                glowEffect={true}
+                glowColor="255, 221, 0"
+                isVisible={true}
+                logoRef={logoRef}
+                className="h-auto w-auto object-contain max-h-20"
+              />
+            </div>
+            <span className="font-playfair text-xl font-bold mt-2">MTNR Concept</span>
+            <p className="text-sm text-gray-400 mt-2">© {new Date().getFullYear()} MTNR Concept. Tous droits réservés.</p>
           </div>
-          <span className="font-playfair text-xl font-bold mt-2">MTNR Concept</span>
-          <p className="text-sm text-gray-400 mt-2">© {new Date().getFullYear()} MTNR Concept. Tous droits réservés.</p>
-        </div>
-        
-        {/* Navigation links aligned with navbar */}
-        <div className="flex flex-col gap-2 text-center md:text-right">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.path}
-              to={link.path} 
-              className="hover:underline hover:text-yellow-400 transition-colors"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-        
-        <div className="flex gap-4 mt-4 md:mt-0 text-xl">
-          <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#c13584] transition">
-            <svg width="24" height="24" fill="currentColor" className="inline"><use href="#icon-instagram"/></svg>
-          </a>
-          <a href="mailto:contact@mtnrconcept.fr" className="hover:text-primary transition">
-            <svg width="24" height="24" fill="currentColor" className="inline"><use href="#icon-mail"/></svg>
-          </a>
+          
+          {/* Colonne des liens de navigation */}
+          <div className="flex flex-col gap-2 text-center md:text-center">
+            <h3 className="font-bold text-lg mb-2">Navigation</h3>
+            {navLinks.map((link) => (
+              <Link 
+                key={link.path}
+                to={link.path} 
+                className="hover:underline hover:text-yellow-400 transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+          
+          {/* Colonne des réseaux sociaux */}
+          <div className="flex flex-col items-center md:items-end">
+            <h3 className="font-bold text-lg mb-2">Suivez-nous</h3>
+            <div className="flex gap-4 mt-2 text-xl">
+              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#c13584] transition">
+                <svg width="24" height="24" fill="currentColor" className="inline"><use href="#icon-instagram"/></svg>
+              </a>
+              <a href="mailto:contact@mtnrconcept.fr" className="hover:text-primary transition">
+                <svg width="24" height="24" fill="currentColor" className="inline"><use href="#icon-mail"/></svg>
+              </a>
+            </div>
+          </div>
         </div>
         
         {/* SVG icons hidden */}
