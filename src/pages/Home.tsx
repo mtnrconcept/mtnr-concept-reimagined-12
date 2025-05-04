@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import StudioSection from "@/components/home/StudioSection";
@@ -8,17 +7,14 @@ import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
 import { PageSplashes } from "@/components/effects/PageSplashes";
-
 export default function Home() {
   const {
     uvMode
   } = useUVMode();
   const observerRef = useRef<IntersectionObserver | null>(null);
-  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -38,7 +34,6 @@ export default function Home() {
     });
     return () => observerRef.current?.disconnect();
   }, []);
-  
   return <div className="relative min-h-screen w-full overflow-x-hidden">
       {/* Intégration des éclaboussures de peinture spécifiques à la page d'accueil */}
       <PageSplashes pageVariant="home" />
@@ -50,7 +45,7 @@ export default function Home() {
           <ServicesSection />
           <ArtistsSection />
 
-          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative">
+          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative my-[16px]">
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
             
             {/* UV-only text that appears when UV mode is active */}

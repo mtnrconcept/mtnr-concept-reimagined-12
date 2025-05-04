@@ -1,7 +1,7 @@
 import { studioImages } from './data';
 export default function StudioSection() {
-  return <section className="container mx-auto py-16 px-4 sm:px-6" data-animate>
-      <h2 className="section-title text-center font-extrabold text-5xl py-[22px]">
+  return <section data-animate className="container mx-auto px-4 sm:px-6 py-[28px]">
+      <h2 className="section-title text-center font-extrabold text-5xl my-[17px] py-0">
         Notre Studio
       </h2>
       

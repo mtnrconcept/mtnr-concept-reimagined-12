@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
 export default function HeroSection() {
-  return <section id="hero-section" className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+  return <section id="hero-section" className="container mx-auto sm:px-6 lg:px-8 flex flex-col items-center justify-center px-0 py-0 my-[35px]">
       <NeonLogo className="my-[55px]" />
       
-      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 py-[21px] my-0">
+      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 py-[21px] my-[44px]">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">

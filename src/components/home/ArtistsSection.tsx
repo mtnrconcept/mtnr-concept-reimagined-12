@@ -1,7 +1,7 @@
 import { artistImages } from './data';
 export default function ArtistsSection() {
-  return <section className="container mx-auto py-16 px-4 sm:px-6" data-animate>
-      <h2 className="section-title py-[22px] text-5xl text-center font-extrabold">
+  return <section data-animate className="container mx-auto px-4 sm:px-6 py-[4px]">
+      <h2 className="section-title text-5xl text-center font-extrabold py-[2px] my-[29px]">
         Artistes de la cave
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">

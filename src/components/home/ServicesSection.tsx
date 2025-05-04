@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 export default function ServicesSection() {
-  return <section data-animate className="container mx-auto py-16 px-4 sm:px-6 backdrop-blur-sm rounded-3xl my-16 max-w-6xl">
-      <h2 className="section-title text-center text-5xl font-extrabold py-[22px]">
+  return <section data-animate className="container mx-auto px-4 sm:px-6 backdrop-blur-sm rounded-3xl max-w-6xl my-[66px] py-[26px]">
+      <h2 className="section-title text-center text-5xl font-extrabold my-[25px] py-[10px]">
         Nos Services
       </h2>
       
