@@ -49,7 +49,7 @@ export const LoadingScreen = () => {
     
     switch (soundType) {
       case 'glitch':
-        audioRef.current.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAFhpbmcAAAAPAAAAAwAAA3YAlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW9/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3////////////////////////////////////////////AAAAAExhdmM1OC4xMwAAAAAAAAAAAAAAACQDgAAAAAAAAAB2VS+N2QAAAAAAAAAAAAAAAAAAAAAA/+OAwAFkZoXiAmmMbWm71JMZNM8xMDkxVTEwMDGqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/jgMCZM8GHvAGPnComxeLe9JpG5MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMw=';
+        audioRef.current.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAFhpbmcAAAAPAAAAAwAAA3YAlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaW9/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3////////////////////////////////////////////AAAAAExhdmM1OC4xMwAAAAAAAAAAAAAAACQDgAAAAAAAAAB2VS+N2QAAAAAAAAAAAAAAAAAAAAAA/+OAwAFkZoXiAmmMbWm71JMZNM8xMDkxVTEwMDGqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqV/jgMCZM8GHvAGPnComxeLe9JpG5MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMw=';
         break;
       case 'beam':
         audioRef.current.src = 'data:audio/mp3;base64,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';
@@ -138,56 +138,59 @@ export const LoadingScreen = () => {
       // Attendre que toutes les ressources soient chargées
       await Promise.all(preloadPromises);
       
-      // Simuler un délai pour l'effet visuel
+      // Animer la séquence complète en 5 secondes exactement
+      const startTime = performance.now();
+      const totalDuration = 5000; // 5 secondes en millisecondes
+      
+      // Phase 1: Afficher l'effet Matrix (0.5s)
+      setShowMatrixEffect(true);
+      playSound('beam');
+      
       setTimeout(() => {
-        if (mounted) {
-          // Montrer l'effet Matrix
-          setShowMatrixEffect(true);
-          playSound('beam');
+        if (!mounted) return;
+        
+        // Phase 2: Effet de glitch et passage en mode UV (1s)
+        setGlitchEffect(true);
+        playSound('glitch');
+        
+        setTimeout(() => {
+          if (!mounted) return;
+          
+          // Phase 3: Activer le mode UV complet (0.5s)
+          setPhase('uv');
+          toggleUVMode();
+          setIsTorchActive(true);
           
           setTimeout(() => {
-            if (mounted) {
-              // Passer au mode UV avec effet de glitch
-              setGlitchEffect(true);
-              playSound('glitch');
+            if (!mounted) return;
+            
+            // Phase 4: Afficher le texte déchiffré (1s)
+            setShowDecryptMessage(true);
+            playSound('decrypt');
+            decryptText();
+            
+            setTimeout(() => {
+              if (!mounted) return;
               
+              // Phase 5: Finalisation et son de complétion (0.5s)
+              setPhase('complete');
+              playSound('complete');
+              
+              // Calculer le temps restant pour atteindre exactement 5 secondes au total
+              const elapsed = performance.now() - startTime;
+              const remainingTime = Math.max(0, totalDuration - elapsed);
+              
+              // Redirection après exactement 5 secondes depuis le début
               setTimeout(() => {
-                if (mounted) {
-                  setPhase('uv');
-                  toggleUVMode();
-                  setIsTorchActive(true);
-                  
-                  // Montrer le texte de déchiffrement après un court délai
-                  setTimeout(() => {
-                    if (mounted) {
-                      setShowDecryptMessage(true);
-                      playSound('decrypt');
-                      decryptText();
-                    }
-                  }, 1000);
-                  
-                  // Passer à la phase finale après une animation complète
-                  setTimeout(() => {
-                    if (mounted) {
-                      setPhase('complete');
-                      playSound('complete');
-                      
-                      // Redirection après la fin du chargement
-                      setTimeout(() => {
-                        if (mounted) {
-                          setLoading(false);
-                          // Naviguer vers la page d'accueil
-                          navigate('/', { replace: true });
-                        }
-                      }, 1500);
-                    }
-                  }, 4500);
-                }
-              }, 1000);
-            }
-          }, 2000);
-        }
-      }, 1000);
+                if (!mounted) return;
+                setLoading(false);
+                navigate('/', { replace: true });
+              }, remainingTime);
+              
+            }, 1500); // 1.5s pour phase 4
+          }, 500); // 0.5s pour phase 3
+        }, 1000); // 1s pour phase 2
+      }, 500); // 0.5s pour phase 1
     };
     
     // Démarrer le préchargement
@@ -250,12 +253,12 @@ export const LoadingScreen = () => {
           <LogoWithEffect
             src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
             alt="MTNR Studio"
-            width="400px"
+            width="80%"
             glowEffect={true}
             glowColor={phase === 'uv' ? '210, 255, 63' : '255, 221, 0'}
             isVisible={isLogoVisible}
             logoRef={logoRef}
-            className={`transform-gpu ${glitchEffect ? 'glitch-logo' : ''}`}
+            className={`transform-gpu max-w-full ${glitchEffect ? 'glitch-logo' : ''}`}
           />
           
           {/* Effet de glitch sur le logo */}
