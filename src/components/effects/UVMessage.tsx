@@ -262,19 +262,21 @@ export default function UVMessage({
     };
   }, [isVisible, content, decryptSpeed, decryptProgress, type]);
 
+  // IMPORTANT: Déplacer le return conditionnel après la définition de tous les hooks
+  // Utiliser une variable pour stocker le contenu à afficher en fonction des conditions
+  let renderedContent = null;
+  
   // Ne pas rendre si pas en mode UV ou torche inactive
-  if (!uvMode || !isTorchActive) return null;
-
-  // Contenu affiché selon le type
-  const getDisplayContent = () => {
+  if (!uvMode || !isTorchActive) {
+    renderedContent = null;
+  } else {
+    // Contenu affiché selon le type
     if (type === "decrypt") {
-      return decryptedText || content.replace(/./g, (c) => 
+      renderedContent = decryptedText || content.replace(/./g, (c) => 
         c === ' ' ? c : scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
       );
-    }
-    
-    if (type === "code") {
-      return (
+    } else if (type === "code") {
+      renderedContent = (
         <pre style={{
           whiteSpace: 'pre',
           lineHeight: 1.2,
@@ -285,10 +287,15 @@ export default function UVMessage({
           {content}
         </pre>
       );
+    } else {
+      renderedContent = content;
     }
-    
-    return content;
-  };
+  }
+
+  // Retourner null si pas de contenu à afficher
+  if (renderedContent === null) {
+    return null;
+  }
 
   return (
     <div
@@ -298,7 +305,7 @@ export default function UVMessage({
       data-depth={depth}
       data-uv-type={type}
     >
-      {getDisplayContent()}
+      {renderedContent}
     </div>
   );
 }

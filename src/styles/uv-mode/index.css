@@ -14,13 +14,13 @@
 
 /* Ajustements supplémentaires pour assurer la visibilité vidéo UV */
 .uv-mode-active .fixed.inset-0.w-full.h-full.overflow-hidden {
-  z-index: 2 !important;
+  z-index: 5 !important;
 }
 
 .uv-mode-active video {
   opacity: 1 !important;
   visibility: visible !important;
-  z-index: 5 !important;
+  z-index: 30 !important;
 }
 
 /* Désactiver le masquage flashlight en mode UV */
