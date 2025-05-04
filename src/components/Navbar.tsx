@@ -7,6 +7,8 @@ import { MobileNav } from "./navbar/MobileNav";
 import LogoWithEffect from "./effects/LogoWithEffect";
 import { Link } from "react-router-dom";
 import { useNavbarEffect } from "@/hooks/useNavbarEffect";
+import { MobileTorchButtons } from "./effects/TorchToggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navLinks = [
   { name: "Accueil", path: "/" },
@@ -19,6 +21,7 @@ const navLinks = [
 export default function Navbar() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   return (
     <nav 
@@ -37,12 +40,12 @@ export default function Navbar() {
     >
       <div className="container mx-auto flex items-center h-20 px-4 sm:px-6">
         {/* Logo dans son propre conteneur */}
-        <div className="mr-8 flex-shrink-0">
+        <div className={`${isMobile ? "mr-4" : "mr-8"} flex-shrink-0`}>
           <Link to="/" className="flex items-center">
             <LogoWithEffect
               src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png"
               alt="MTNR Logo"
-              width="100px"
+              width={isMobile ? "80px" : "100px"}
               glowEffect={true}
               glowColor="255, 221, 0"
               isVisible={true}
@@ -52,7 +55,14 @@ export default function Navbar() {
           </Link>
         </div>
         
-        {/* Menu principal centré */}
+        {/* Boutons de torche pour mobile, centrés dans la navbar */}
+        {isMobile && (
+          <div className="flex-grow flex justify-center">
+            <MobileTorchButtons />
+          </div>
+        )}
+        
+        {/* Menu principal centré - seulement sur desktop */}
         <div className="flex-grow hidden md:flex justify-center">
           <DesktopNav navLinks={navLinks} currentPath={pathname} />
         </div>

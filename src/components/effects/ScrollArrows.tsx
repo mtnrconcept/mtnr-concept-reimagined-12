@@ -3,6 +3,7 @@ import React from "react";
 import { useTorch } from "./TorchContext";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ScrollArrowsProps {
   className?: string;
@@ -10,6 +11,7 @@ interface ScrollArrowsProps {
 
 const ScrollArrows: React.FC<ScrollArrowsProps> = ({ className }) => {
   const { isTorchActive } = useTorch();
+  const isMobile = useIsMobile();
   
   if (!isTorchActive) return null;
   
@@ -22,9 +24,13 @@ const ScrollArrows: React.FC<ScrollArrowsProps> = ({ className }) => {
     });
   };
 
+  // Sur mobile, positionner les flèches sur le côté droit mais plus bas pour éviter la navbar
+  const mobilePositionClass = "fixed z-[250] right-4 flex flex-col items-center gap-4 top-[120px]";
+  const desktopPositionClass = "fixed z-[250] right-4 flex flex-col items-center gap-4";
+
   return (
     <div className={cn(
-      "fixed z-[250] right-4 flex flex-col items-center gap-4", // z-index augmenté à 250
+      isMobile ? mobilePositionClass : desktopPositionClass,
       className
     )}>
       <button
