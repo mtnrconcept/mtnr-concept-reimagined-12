@@ -1,4 +1,5 @@
 
+
 @layer components {
   .uv-button {
     background: transparent !important;
@@ -44,6 +45,14 @@
   .uv-mode-active button[type="submit"] span.absolute,
   .uv-mode-active button[type="button"] span.absolute {
     background-color: #D2FF3F !important;
+  }
+
+  /* Nouveau style pour les textes sur les boutons au hover */
+  .uv-mode-active button[type="submit"]:hover span.relative,
+  .uv-mode-active button[type="button"]:hover span.relative,
+  .uv-mode-active a.group:hover span.relative {
+    color: #000000 !important;
+    text-shadow: none !important;
   }
 
   .uv-mode-active button[type="submit"]:hover,
@@ -128,3 +137,4 @@
     border: none !important;
   }
 }
+
