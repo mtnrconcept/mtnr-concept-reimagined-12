@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { PaintSplash } from '@/components/parallax/PaintSplash';
@@ -6,7 +5,7 @@ import { useNavigation } from '@/components/effects/NavigationContext';
 import { useUVMode } from '@/components/effects/UVModeContext';
 
 interface PageSplashesProps {
-  pageVariant?: 'home' | 'about' | 'services' | 'portfolio' | 'contact' | 'artists' | 'whatwedo' | 'book' | 'default';
+  pageVariant?: 'home' | 'about' | 'services' | 'portfolio' | 'contact' | 'artists' | 'whatwedo' | 'book' | 'notFound' | 'default';
 }
 
 export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => {
@@ -140,9 +139,19 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
             src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'opacity-10', blendMode: 'screen' as const },
         ];
         break;
+      case 'notFound':
+        splashes = [
+          ...splashes,
+          // Éclaboussures spécifiques pour la page 404
+          { x: 60, y: 40, depth: -0.9, scale: 0.7, rotation: 15, blur: 0,
+            src: '/lovable-uploads/yellow-watercolor-splatter-3.png', className: 'opacity-60', blendMode: 'screen' as const },
+          { x: 30, y: 70, depth: 0.99, scale: 3.4, rotation: -20, blur: 10,
+            src: '/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png', className: 'opacity-15', blendMode: 'overlay' as const },
+        ];
+        break;
       // Autres configurations de page selon les besoins
       default:
-        // Utiliser la configuration par défaut
+        // Use default configuration
         break;
     }
     
