@@ -90,7 +90,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           ease: "easeOut" 
         },
         y: { 
-          duration: isInitialPageLoad ? 0 : 6.0, // Durée de 6 secondes pour que l'animation se termine exactement à la fin de la vidéo (7s - 1s de délai)
+          duration: isInitialPageLoad ? 0 : 4.0, // Durée de 6 secondes pour que l'animation se termine exactement à la fin de la vidéo (7s - 1s de délai)
           ease: [0.16, 0.42, 0.05, 1.0] // Courbe d'accélération modifiée: rapide au début, très lente à la fin
         },
         filter: { 
