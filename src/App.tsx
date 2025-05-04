@@ -9,6 +9,7 @@ import { ParticleEffect } from "./components/effects/ParticleEffect";
 import { TorchProvider, useTorch } from "./components/effects/TorchContext";
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
 import { TorchToggle, recordArtistsVisit } from "./components/effects/TorchToggle";
+import TorchIndicator from "./components/effects/TorchIndicator";
 import { NavigationProvider } from "./components/effects/NavigationContext";
 import Home from "./pages/Home";
 import Artists from "./pages/Artists";
@@ -116,6 +117,7 @@ const App = () => (
                 <AppContent />
               </Suspense>
               <TorchToggle />
+              <TorchIndicator />
             </BrowserRouter>
             <ParticleEffect />
           </NavigationProvider>
