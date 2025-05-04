@@ -21,13 +21,14 @@ export const TorchToggle = () => {
   };
 
   const handleToggleTorch = () => {
-    // Si le mode UV est actif, le désactiver d'abord
-    if (uvMode) {
+    // Activer/désactiver uniquement la torche classique
+    // La torche UV reste inchangée
+    setIsTorchActive(!isTorchActive);
+    
+    // Si le mode UV est activé, le désactiver quand on éteint la torche
+    if (isTorchActive && uvMode) {
       toggleUVMode();
     }
-    
-    // Activer/désactiver la torche classique
-    setIsTorchActive(!isTorchActive);
   };
 
   const handleToggleUV = () => {
