@@ -14,8 +14,8 @@ export default function BookPageSecrets() {
       />
       
       <UVSecretMessage 
-        message="ACCÈS RESTREINT" 
-        position={{ x: 75, y: 10 }}
+        message="ACCÈS RESTREINT, rends toi à la page "Contacts""" 
+        position={{ x: 20, y: 5 }}
         color="#FF00DD"
       />
       
