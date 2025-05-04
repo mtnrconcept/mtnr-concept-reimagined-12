@@ -4,7 +4,7 @@ export default function HeroSection() {
   return <section id="hero-section" className="container mx-auto sm:px-6 lg:px-8 flex flex-col items-center justify-center px-0 py-0 my-0">
       <NeonLogo className="my-[55px]" />
       
-      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 px-[33px] py-[10px] my-0">
+      <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] rounded-2xl p-8 sm:p-10 py-[7px] px-[46px] my-0">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-purple-500/5 pointer-events-none opacity-50" />
         
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl text-yellow-400 mb-6 neon-text uppercase tracking-tighter drop-shadow-[0_0_8px_rgba(255,215,0,0.3)]">
@@ -12,7 +12,7 @@ export default function HeroSection() {
           <span className="block mt-2 font-normal text-center">MTNR Studio</span>
         </h1>
         
-        <div className="text-white text-xl sm:text-2xl mb-8 font-medium tracking-wide px-[12px]">
+        <div className="text-white text-xl sm:text-2xl mb-8 font-medium tracking-wide px-0">
           Dans la cave du <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 bg-clip-text text-transparent bg-[size:200%_auto] animate-text-shimmer font-bold">son underground</span>
         </div>
         
