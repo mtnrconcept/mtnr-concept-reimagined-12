@@ -88,10 +88,11 @@ export default function UVSecretMessage({
           const vibrationY = Math.cos(time * 1.8) * 0.7;
           messageRef.current.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) translate(${vibrationX}px, ${vibrationY}px)`;
           
-          // Rendre visible le bloc d'authentification
+          // Rendre visible et interactif le bloc d'authentification
           const authBlock = document.getElementById('uv-auth-block');
           if (authBlock) {
             authBlock.style.opacity = intensity.toFixed(2);
+            authBlock.style.pointerEvents = 'auto';
           }
         }
       } else {
@@ -103,10 +104,11 @@ export default function UVSecretMessage({
           messageRef.current.style.textShadow = 'none';
           messageRef.current.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
           
-          // Masquer le bloc d'authentification quand on s'éloigne
+          // Masquer le bloc d'authentification quand on s'éloigne mais garder interactive
           const authBlock = document.getElementById('uv-auth-block');
           if (authBlock) {
             authBlock.style.opacity = '0';
+            // On laisse pointerEvents à 'auto' pour permettre l'interaction même quand invisible
           }
         }
       }

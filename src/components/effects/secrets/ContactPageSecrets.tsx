@@ -57,7 +57,8 @@ export default function ContactPageSecrets() {
         gap: '8px',
         maxWidth: '250px',
         opacity: 0, /* Commence invisible */
-        transition: 'opacity 0.3s ease-out'
+        transition: 'opacity 0.3s ease-out',
+        pointerEvents: 'auto' /* Permettre l'interaction avec le bloc */
       }} id="uv-auth-block">
         <p style={{ color: "#D2FF3F", fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
           Secret Mixtape Access 
