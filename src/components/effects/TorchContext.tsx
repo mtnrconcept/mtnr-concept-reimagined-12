@@ -84,7 +84,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Masque de la torche - ne modifie pas les dimensions des éléments */}
+      {/* Masque de la torche */}
       {isTorchActive && !uvMode &&
         createPortal(
           <div 
