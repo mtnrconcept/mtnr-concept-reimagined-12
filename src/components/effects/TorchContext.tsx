@@ -64,7 +64,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return () => {
       removeUVCircle();
     };
-  }, [isTorchActive, uvMode, mousePosition]);
+  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle]);
 
   const contextValue: TorchContextType = {
     isTorchActive,

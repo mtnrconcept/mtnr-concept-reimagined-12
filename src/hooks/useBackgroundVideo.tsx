@@ -2,7 +2,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { useVideoErrorHandling } from './video/useVideoErrorHandling';
 import { useVideoTransition } from './video/useVideoTransition';
-import { useUVModeChange } from './video/useUVModeChange';
+import { useUVModeChange } from './useUVModeChange';
 import { useNavigationHandler } from './video/useNavigation';
 import { useTorchHandler } from './video/useTorchHandler';
 import { useDurationChange } from './video/useDurationChange';
@@ -29,16 +29,6 @@ export function useBackgroundVideo({
     retryCount
   };
   
-  // Création d'une fonction playVideoTransition memoizée
-  const playVideoTransitionCallback = useCallback((): void => {
-    // Cette fonction sera remplacée par l'implémentation de useVideoTransition
-  }, []);
-  
-  // Création d'une fonction handleVideoDurationChange memoizée
-  const handleVideoDurationChangeCallback = useCallback(() => {
-    // Cette fonction sera remplacée par l'implémentation de useDurationChange
-  }, []);
-  
   // Actions pour manipuler l'état de la vidéo
   const videoActions = {
     setIsFirstLoad,
@@ -46,8 +36,8 @@ export function useBackgroundVideo({
     setCurrentVideo,
     setVideoError,
     setRetryCount,
-    playVideoTransition: playVideoTransitionCallback,
-    handleVideoDurationChange: handleVideoDurationChangeCallback
+    playVideoTransition: () => {}, // Will be replaced
+    handleVideoDurationChange: () => {} // Will be replaced
   };
   
   // Hook pour gérer la transition vidéo

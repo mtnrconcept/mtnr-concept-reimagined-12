@@ -1,6 +1,5 @@
 
-import React, { createContext, useContext, useState, useRef, useEffect } from "react";
-import { useTorch } from "./TorchContext";
+import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
 
 interface UVModeContextType {
   uvMode: boolean;
@@ -24,11 +23,11 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [uvMode, setUVMode] = useState(false);
   const uvCircleRef = useRef<HTMLDivElement>(null);
   
-  const toggleUVMode = () => {
+  const toggleUVMode = useCallback(() => {
     setUVMode(prev => !prev);
-  };
+  }, []);
 
-  const createUVCircle = (mousePosition: { x: number; y: number }) => {
+  const createUVCircle = useCallback((mousePosition: { x: number; y: number }) => {
     if (!uvCircleRef.current) {
       const circle = document.createElement('div');
       circle.className = 'uv-light-circle active';
@@ -37,14 +36,14 @@ export const UVModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       document.body.appendChild(circle);
       uvCircleRef.current = circle;
     }
-  };
+  }, []);
 
-  const removeUVCircle = () => {
+  const removeUVCircle = useCallback(() => {
     if (uvCircleRef.current) {
       uvCircleRef.current.remove();
       uvCircleRef.current = null;
     }
-  };
+  }, []);
 
   // Apply global UV mode effects
   useEffect(() => {
