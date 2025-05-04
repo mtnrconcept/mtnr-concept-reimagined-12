@@ -33,7 +33,7 @@ export const useTorch = () => useContext(TorchContext);
 
 export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const [isFingerDown, setIsFingerDown] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,6 +77,19 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         el.classList.add('content-scrollable');
       });
       
+      // Ajouter une classe spécifique aux pages problématiques pour augmenter leur z-index
+      const currentPath = window.location.pathname;
+      if (['/book', '/contact', '/what-we-do'].includes(currentPath)) {
+        document.querySelectorAll('main > div').forEach(el => {
+          el.classList.add('page-content');
+          
+          // Ajouter une classe spécifique à la page
+          if (currentPath === '/book') el.classList.add('page-book');
+          else if (currentPath === '/contact') el.classList.add('page-contact');
+          else if (currentPath === '/what-we-do') el.classList.add('page-what-we-do');
+        });
+      }
+      
       // S'assurer que la page ne remonte pas en haut
       window.scrollTo(0, currentScrollY);
     } else {
@@ -87,12 +100,21 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       document.querySelectorAll('.content-container').forEach(el => {
         el.classList.add('content-scrollable');
       });
+      
+      // Retirer les classes spécifiques aux pages
+      document.querySelectorAll('.page-content').forEach(el => {
+        el.classList.remove('page-content', 'page-book', 'page-contact', 'page-what-we-do');
+      });
     }
     
     return () => {
       document.body.classList.remove('torch-active');
       document.body.classList.add('allow-scroll');
-      // Ne pas supprimer content-scrollable pour préserver le défilement
+      
+      // Retirer les classes spécifiques aux pages
+      document.querySelectorAll('.page-content').forEach(el => {
+        el.classList.remove('page-content', 'page-book', 'page-contact', 'page-what-we-do');
+      });
     };
   }, [isTorchActive]);
 

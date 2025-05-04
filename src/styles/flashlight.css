@@ -45,7 +45,7 @@
     pointer-events: none;
     z-index: 1000;
     transform: translate(-50%, -50%);
-    transition: transform 0.1s ease-out;
+    transition: none; /* Réactivité immédiate */
     will-change: transform, left, top; /* Optimisation pour les animations */
   }
   
@@ -69,6 +69,7 @@
     filter: blur(15px); /* Flou gaussien augmenté pour adoucir les bords */
     will-change: transform, left, top; /* Optimisation pour les animations sur mobile */
     touch-action: none; /* Désactiver les gestes par défaut sur mobile */
+    transition: none; /* Réactivité immédiate */
   }
 
   /* Taille adaptée pour mobile */
@@ -120,6 +121,7 @@
     opacity: 0.9;
     will-change: transform, left, top;
     touch-action: none; /* Désactiver les gestes par défaut sur mobile */
+    transition: none; /* Réactivité immédiate */
   }
 
   /* Animation de pulsation pour l'effet néon */
@@ -228,5 +230,28 @@
   .content-container {
     position: relative;
     z-index: 20;
+  }
+  
+  /* S'assurer que les contenus de pages spécifiques ne sont pas masqués par les effets de torche */
+  .page-content {
+    position: relative;
+    z-index: 25; /* Au-dessus de la plupart des effets mais sous les contrôles de navigation */
+    pointer-events: auto !important;
+  }
+  
+  /* Corrections pour les pages spécifiques */
+  .page-book,
+  .page-contact,
+  .page-what-we-do {
+    position: relative;
+    z-index: 30; /* Plus élevé pour être au-dessus des effets de torche */
+  }
+  
+  /* Augmenter la visibilité du texte dans ces pages */
+  .page-book *,
+  .page-contact *,
+  .page-what-we-do * {
+    position: relative;
+    z-index: 31; /* Encore plus haut pour le texte et les éléments interactifs */
   }
 }

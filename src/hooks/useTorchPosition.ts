@@ -17,6 +17,7 @@ export function useTorchPosition(
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollPositionRef = useRef(0);
   const isScrollingRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
   
   // Se souvenir de la position de défilement actuelle
   useEffect(() => {
@@ -26,7 +27,12 @@ export function useTorchPosition(
   // Optimiser les gestionnaires pour qu'ils ne soient pas recréés à chaque render
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isTorchActive) {
-      updateMousePosition({ x: e.clientX, y: e.clientY });
+      // Utiliser requestAnimationFrame pour optimiser les mises à jour
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      
+      rafRef.current = requestAnimationFrame(() => {
+        updateMousePosition({ x: e.clientX, y: e.clientY });
+      });
     }
   }, [isTorchActive, updateMousePosition]);
   
@@ -44,9 +50,14 @@ export function useTorchPosition(
       // Ne pas empêcher le comportement par défaut pour permettre le défilement natif
       e.stopPropagation();
       
-      updateMousePosition({ 
-        x: e.touches[0].clientX, 
-        y: e.touches[0].clientY 
+      // Utiliser requestAnimationFrame pour optimiser les mises à jour
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      
+      rafRef.current = requestAnimationFrame(() => {
+        updateMousePosition({ 
+          x: e.touches[0].clientX, 
+          y: e.touches[0].clientY 
+        });
       });
     }
   }, [isTorchActive, updateMousePosition]);
@@ -54,6 +65,8 @@ export function useTorchPosition(
   const handleTouchStart = useCallback((e: TouchEvent) => {
     if (isTorchActive && e.touches.length > 0) {
       if (setIsFingerDown) setIsFingerDown(true);
+      
+      // Mise à jour immédiate pour le premier contact
       updateMousePosition({ 
         x: e.touches[0].clientX, 
         y: e.touches[0].clientY 
@@ -69,9 +82,15 @@ export function useTorchPosition(
   const handleScrollTouchMove = useCallback((e: TouchEvent) => {
     if (isTorchActive && e.touches.length > 0) {
       isScrollingRef.current = true;
-      updateMousePosition({ 
-        x: e.touches[0].clientX, 
-        y: e.touches[0].clientY 
+      
+      // Utiliser requestAnimationFrame pour optimiser les mises à jour
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      
+      rafRef.current = requestAnimationFrame(() => {
+        updateMousePosition({ 
+          x: e.touches[0].clientX, 
+          y: e.touches[0].clientY 
+        });
       });
     }
   }, [isTorchActive, updateMousePosition]);
@@ -103,6 +122,11 @@ export function useTorchPosition(
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
+      
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
   }, [isMobile, handleMouseMove, handleMouseDown, handleMouseUp]);
 
@@ -125,6 +149,11 @@ export function useTorchPosition(
       
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
     };
   }, [isMobile, handleTouchMove, handleTouchStart, handleTouchEnd, handleScroll, handleScrollTouchMove]);

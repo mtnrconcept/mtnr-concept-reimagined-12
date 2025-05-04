@@ -49,8 +49,9 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = memo(({
         left: `${mousePosition.x}px`,
         top: `${mousePosition.y}px`,
         transform: 'translate(-50%, -80%)',
-        transition: isMobile ? 'none' : 'left 0.05s ease-out, top 0.05s ease-out',
+        transition: 'none', // Supprimé la transition pour un suivi immédiat
         opacity: isFingerDown ? 1 : 0.7,
+        willChange: 'left, top' // Optimisation pour le rendu
       }}
     >
       <Flashlight 

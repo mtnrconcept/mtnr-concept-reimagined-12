@@ -31,7 +31,10 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
           rgba(10,0,60,0.8) 80%,
           rgba(10,0,60,0.95) 100%)`,
         mixBlendMode: 'normal' as const,
-        transition: isMobile ? 'none' : 'all 0.05s ease-out',
+        transition: 'none', // Supprimé la transition pour un suivi immédiat
+        willChange: 'background', // Optimisation pour le rendu
+        pointerEvents: 'none',
+        zIndex: 99
       };
     } else {
       // Style pour le mode torche normale
@@ -43,7 +46,10 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
           rgba(0,0,0,0.7) 80%,
           rgba(0,0,0,0.9) 100%)`,
         mixBlendMode: 'normal' as const,
-        transition: isMobile ? 'none' : 'all 0.05s ease-out',
+        transition: 'none', // Supprimé la transition pour un suivi immédiat
+        willChange: 'background', // Optimisation pour le rendu
+        pointerEvents: 'none',
+        zIndex: 99
       };
     }
   }, [mousePosition.x, mousePosition.y, uvMode, isMobile]);
@@ -61,7 +67,10 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         background: 'radial-gradient(ellipse, rgba(210,255,63,0.2) 0%, rgba(153,0,255,0.1) 60%, transparent 100%)',
         filter: 'blur(15px)',
         mixBlendMode: 'screen' as const,
-        transition: isMobile ? 'none' : 'all 0.05s ease-out',
+        transition: 'none', // Supprimé la transition pour un suivi immédiat
+        willChange: 'left, top', // Optimisation pour le rendu
+        position: 'absolute' as const,
+        pointerEvents: 'none'
       };
     } else {
       // Style de halo pour le mode torche normale
@@ -75,15 +84,18 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
         background: 'radial-gradient(ellipse, rgba(255,255,200,0.4) 0%, rgba(255,248,150,0.15) 60%, transparent 100%)',
         filter: 'blur(15px)',
         mixBlendMode: 'screen' as const,
-        transition: isMobile ? 'none' : 'all 0.05s ease-out',
+        transition: 'none', // Supprimé la transition pour un suivi immédiat
+        willChange: 'left, top', // Optimisation pour le rendu
+        position: 'absolute' as const,
+        pointerEvents: 'none'
       };
     }
   }, [mousePosition.x, mousePosition.y, uvMode, isMobile]);
 
   return createPortal(
-    <div className="fixed inset-0 z-[99] pointer-events-none" style={overlayStyle}>
+    <div className="fixed inset-0 pointer-events-none" style={overlayStyle}>
       {/* Halo lumineux au centre */}
-      <div className="absolute pointer-events-none" style={haloStyle} />
+      <div style={haloStyle} />
     </div>,
     document.body
   );
