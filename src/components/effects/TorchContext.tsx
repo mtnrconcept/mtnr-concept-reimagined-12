@@ -35,6 +35,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const neonEffectRef = useRef<HTMLDivElement | null>(null);
 
   const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
 
@@ -43,6 +44,11 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (uvCircleRef.current && uvMode) {
       uvCircleRef.current.style.left = `${position.x}px`;
       uvCircleRef.current.style.top = `${position.y}px`;
+    }
+    // Mettre à jour la position de l'effet néon UV
+    if (neonEffectRef.current && uvMode) {
+      neonEffectRef.current.style.left = `${position.x}px`;
+      neonEffectRef.current.style.top = `${position.y}px`;
     }
   };
 
@@ -128,15 +134,43 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [isTorchActive, isMobile]);
 
-  // UV logic
+  // UV logic - Création de l'effet de néon violet
   useEffect(() => {
+    // Créer ou enlever l'effet de cercle UV
     if (isTorchActive && uvMode) {
       createUVCircle(mousePosition);
+      
+      // Créer l'effet néon violet
+      if (!neonEffectRef.current) {
+        const neonEffect = document.createElement('div');
+        neonEffect.className = 'uv-neon-effect';
+        neonEffect.style.left = `${mousePosition.x}px`;
+        neonEffect.style.top = `${mousePosition.y}px`;
+        
+        // Désactiver les transitions sur mobile pour un suivi instantané
+        if (isMobile) {
+          neonEffect.style.transition = 'none';
+        }
+        
+        document.body.appendChild(neonEffect);
+        neonEffectRef.current = neonEffect;
+      }
     } else {
       removeUVCircle();
+      
+      // Supprimer l'effet néon violet
+      if (neonEffectRef.current) {
+        neonEffectRef.current.remove();
+        neonEffectRef.current = null;
+      }
     }
+    
     return () => {
       removeUVCircle();
+      if (neonEffectRef.current) {
+        neonEffectRef.current.remove();
+        neonEffectRef.current = null;
+      }
     };
   }, [isTorchActive, uvMode, mousePosition]);
 
