@@ -37,7 +37,7 @@ export default function Navbar() {
     right: 0,
     height: '80px',
     pointerEvents: 'all'
-  }} className="w-full fixed top-0 left-0 bg-black/100 backdrop-blur-lg shadow-lg">
+  }} className="w-full fixed top-0 left-0 bg-black/100 backdrop-blur-lg shadow-lg py-[26px]">
       <div className="container mx-auto flex items-center h-20 px-4 sm:px-6">
         {/* Logo dans son propre conteneur */}
         <div className="mr-8 flex-shrink-0">
