@@ -1,12 +1,6 @@
-
-// Déclaration de variables globales pour TypeScript
+// Ajouter la propriété scrollToTopRequested au window
 interface Window {
-  pageTransitionInProgress: boolean;
-  requestIdleCallback(
-    callback: () => void,
-    options?: { timeout: number }
-  ): number;
-  cancelIdleCallback(handle: number): void;
-  __videoReady?: boolean; // Added declaration for video ready state
+  __videoReady?: boolean;
+  pageTransitionInProgress?: boolean;
+  scrollToTopRequested?: boolean;
 }
-

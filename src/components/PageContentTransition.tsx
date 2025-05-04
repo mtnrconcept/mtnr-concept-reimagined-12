@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { safeBlur } from "@/lib/animation-utils";
@@ -14,8 +14,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [isInitialPageLoad, setIsInitialPageLoad] = useState(true);
+  const lastScrollPositionRef = useRef(0);
 
   useEffect(() => {
+    // Sauvegarder la position de défilement actuelle
+    lastScrollPositionRef.current = window.scrollY;
+    
     // Pour le rafraîchissement ou premier chargement
     if (isInitialPageLoad) {
       // Rendre le contenu immédiatement visible
@@ -41,6 +45,19 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       
       setTimeout(() => {
         setContentVisible(true);
+        
+        // Restaurer la position de défilement précédente après un bref délai
+        // pour permettre au contenu de se rendre
+        setTimeout(() => {
+          // Ne pas remonter en haut pour les transitions entre pages
+          // sauf si c'est explicitement demandé
+          if (!window.scrollToTopRequested) {
+            window.scrollTo(0, lastScrollPositionRef.current);
+          } else {
+            // Réinitialiser le flag après utilisation
+            window.scrollToTopRequested = false;
+          }
+        }, 100);
       }, 0);
       
     }, 3000);

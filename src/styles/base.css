@@ -9,6 +9,12 @@
     @apply h-full bg-black text-white antialiased;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
+    /* Forcer le scroll vertical pour éviter les rebonds/sauts */
+    overflow-y: auto;
+    /* Désactiver le pull-to-refresh sur mobile */
+    overscroll-behavior-y: none;
+    /* Autoriser le scroll tactile */
+    touch-action: pan-y;
   }
   
   #root {
@@ -51,11 +57,38 @@
     min-height: 100vh; /* fallback */
     min-height: calc(var(--vh, 1vh) * 100);
   }
+  
+  /* Rendre les conteneurs de contenu scrollables */
+  .content-container {
+    position: relative;
+    min-height: 100vh;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Script pour corriger la hauteur sur mobile */
 @media (max-width: 768px) {
   :root {
     --vh: calc(1vh);
+  }
+  
+  /* Optimisations de scroll pour mobile */
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .content-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
