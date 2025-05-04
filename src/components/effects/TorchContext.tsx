@@ -10,6 +10,7 @@ import { useUVMode } from "./UVModeContext";
 import { FlashlightOverlay } from "./FlashlightOverlay";
 import { useTorchPosition } from "@/hooks/useTorchPosition";
 import { useUVEffects } from "@/hooks/useUVEffects";
+import { FlashlightIcon } from "./FlashlightIcon";
 
 interface TorchContextType {
   isTorchActive: boolean;
@@ -70,6 +71,13 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         isTorchActive={isTorchActive}
         uvMode={uvMode}
         mousePosition={mousePosition}
+      />
+
+      {/* New flashlight icon component */}
+      <FlashlightIcon
+        isTorchActive={isTorchActive}
+        mousePosition={mousePosition}
+        uvMode={uvMode}
       />
     </TorchContext.Provider>
   );

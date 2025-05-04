@@ -174,4 +174,22 @@
       transition: none !important;
     }
   }
+  
+  /* Animation de la lampe torche qui rebondit légèrement */
+  @keyframes flashlight-bounce {
+    0%, 100% { transform: translate(-50%, -80%); }
+    50% { transform: translate(-50%, -85%); }
+  }
+  
+  /* Effet de lueur autour de la lampe */
+  .flashlight-icon {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 150, 0.7));
+    animation: flashlight-bounce 2s ease-in-out infinite;
+  }
+  
+  /* Version UV de l'effet de lueur */
+  .flashlight-icon.uv-mode {
+    filter: drop-shadow(0 0 3px rgba(153, 0, 255, 0.8));
+  }
 }
+
