@@ -30,7 +30,7 @@ const Footer = () => {
         {/* Structure en trois colonnes pour desktop, colonne unique pour mobile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Colonne du logo et copyright */}
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center md:items-start px-[10px]">
             {/* Conteneur du logo avec marges */}
             <div className="mb-4 flex items-center justify-center md:justify-start">
               <LogoWithEffect src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png" alt="Logo MTNR" width="140px" glowEffect={true} glowColor="255, 221, 0" isVisible={true} logoRef={logoRef} className="h-auto w-auto object-contain max-h-20" />
@@ -48,7 +48,7 @@ const Footer = () => {
           </div>
           
           {/* Colonne des réseaux sociaux */}
-          <div className="flex flex-col items-center md:items-end">
+          <div className="flex flex-col items-center md:items-end px-[24px]">
             <h3 className="font-bold text-lg mb-2">Suivez-nous</h3>
             <div className="flex gap-4 mt-2 text-xl">
               <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#c13584] transition">

@@ -90,7 +90,7 @@ export default function Book() {
       <PageSplashes pageVariant="book" />
       
       <div className="relative z-10 min-h-screen">
-        <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content my-0 py-[213px]">
+        <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content my-0 py-[168px]">
           <div className="relative">
             <NeonText text="Réservation" className="text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
             <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
