@@ -1,5 +1,5 @@
 
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 interface VideoElementProps {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -14,6 +14,8 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
   videoUrlUV, 
   uvMode 
 }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   // Update the source when uvMode changes
   useEffect(() => {
     if (videoRef.current) {
@@ -21,23 +23,43 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
       if (videoRef.current.src !== newSrc) {
         videoRef.current.src = newSrc;
         videoRef.current.load();
+        setIsLoaded(false);
+        
+        // Déclencher la lecture après un court délai
+        const timer = setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.play()
+              .catch(err => console.warn('Lecture vidéo automatique impossible:', err));
+          }
+        }, 100);
+        
+        return () => clearTimeout(timer);
       }
     }
   }, [uvMode, videoUrl, videoUrlUV, videoRef]);
   
+  // Gérer l'événement canplay pour marquer la vidéo comme chargée
+  const handleCanPlay = () => {
+    setIsLoaded(true);
+    console.log("Vidéo prête à être lue:", videoRef.current?.src);
+  };
+  
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 w-full h-full object-cover"
+      className={`absolute inset-0 w-full h-full object-cover transition-opacity ${isLoaded ? 'opacity-100' : 'opacity-50'}`}
       playsInline
       muted
+      autoPlay
+      loop
       preload="auto"
+      onCanPlay={handleCanPlay}
       style={{
         transform: 'translate3d(0, 0, 0) scale(1.1)',
         backfaceVisibility: 'hidden',
         willChange: 'transform',
         transformStyle: 'preserve-3d',
-        zIndex: uvMode ? 1 : 0, // Augmenter le z-index en mode UV
+        zIndex: uvMode ? 5 : 0, // Augmenter le z-index en mode UV
         opacity: 1 // Assurer une pleine opacité
       }}
     >

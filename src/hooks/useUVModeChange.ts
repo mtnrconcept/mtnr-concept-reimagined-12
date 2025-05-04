@@ -37,17 +37,17 @@ export function useUVModeChange({
         console.log(`Mode UV ${uvMode ? 'activé' : 'désactivé'}, vidéo changée pour ${newVideoUrl}`);
         setCurrentVideo(newVideoUrl);
         
-        // Jouer la transition vidéo immédiatement quand le mode UV change
-        // mais uniquement si la torche est active et qu'une transition n'est pas déjà en cours
-        if (isTorchActive && !transitionRequestedRef.current) {
+        // Toujours jouer la transition vidéo quand le mode UV change
+        if (!transitionRequestedRef.current) {
           transitionRequestedRef.current = true;
+          
+          // Déclencher la transition immédiatement
+          playVideoTransition();
+          
+          // Réinitialisation après un délai
           setTimeout(() => {
-            playVideoTransition();
-            // Réinitialisation après un délai
-            setTimeout(() => {
-              transitionRequestedRef.current = false;
-            }, 1000);
-          }, 50);
+            transitionRequestedRef.current = false;
+          }, 1000);
         }
       }
     }
