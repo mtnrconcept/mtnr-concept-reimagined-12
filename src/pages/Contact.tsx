@@ -3,6 +3,8 @@ import ParallaxBackground from "@/components/ParallaxBackground";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageSplashes } from "@/components/effects/PageSplashes";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -25,9 +27,10 @@ export default function Contact() {
       
       <div className="relative z-10 min-h-screen">
         <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
-          <h1 className="section-title text-yellow-400 text-2xl xs:text-4xl md:text-6xl mb-4">
-            Contact
-          </h1>
+          <div className="relative">
+            <NeonText text="Contact" className="text-2xl xs:text-4xl md:text-6xl mb-4 uppercase text-center" color="yellow" flicker={true} />
+            <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
+          </div>
           <p className="text-base xs:text-lg text-gray-100 mb-6 text-center font-grunge max-w-md">
             Balance un coucou, une question, une collab'.<br />MTNR répond toujours à la vibe.
           </p>

@@ -1,15 +1,19 @@
 
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import { PageSplashes } from "@/components/effects/PageSplashes";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 const About = () => (
   <ParallaxBackground>
     <PageSplashes pageVariant="about" />
     
     <main className="pt-36 pb-24 min-h-screen max-w-3xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl my-8 px-7">
-      <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-center text-primary uppercase">À propos</h1>
+      <div className="relative">
+        <NeonText text="À propos" className="text-3xl xs:text-4xl md:text-5xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
+        <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
+      </div>
       <div className="flex flex-col md:flex-row items-center gap-10 mt-7">
         <img src="/lovable-uploads/photo-1486312338219-ce68d2c6f44d" alt="Portrait photographe" className="rounded-xl w-52 h-52 object-cover shadow-lg" />
         <div>

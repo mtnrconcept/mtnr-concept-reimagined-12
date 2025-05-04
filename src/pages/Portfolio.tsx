@@ -3,6 +3,8 @@ import Footer from "@/components/Footer";
 import ParallaxBackground from "@/components/ParallaxBackground";
 import GalleryGrid from "@/components/GalleryGrid";
 import { PageSplashes } from "@/components/effects/PageSplashes";
+import NeonText from "@/components/effects/NeonText";
+import ElectricParticles from "@/components/effects/ElectricParticles";
 
 const galleryImages = [
   { src: "/lovable-uploads/photo-1649972904349-6e44c42644a7", alt: "Portrait" },
@@ -22,7 +24,10 @@ const Portfolio = () => {
       <PageSplashes pageVariant="portfolio" />
       
       <main className="pt-36 pb-24 min-h-screen max-w-6xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl my-8">
-        <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-center text-primary uppercase">Portfolio</h1>
+        <div className="relative">
+          <NeonText text="Portfolio" className="text-3xl xs:text-4xl md:text-5xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
+          <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
+        </div>
         <p className="text-center font-inter text-lg mb-12 text-gray-700">
           Une sélection de nos réalisations : portraits, photos de mode, événements, paysages & créations artistiques.
         </p>
