@@ -1,36 +1,18 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ArrowDown } from 'lucide-react';
+import { useTorch } from './TorchContext';
 
 interface TorchIndicatorProps {
   className?: string;
 }
 
 export default function TorchIndicator({ className }: TorchIndicatorProps) {
-  const [visible, setVisible] = useState(true);
+  const { isTorchActive } = useTorch();
   
-  // Faire disparaître l'indicateur après une utilisation de la lampe torche
-  useEffect(() => {
-    const hasUsedTorch = localStorage.getItem('hasUsedTorch') === 'true';
-    
-    if (hasUsedTorch) {
-      setVisible(false);
-    }
-    
-    const handleTorchUsage = () => {
-      localStorage.setItem('hasUsedTorch', 'true');
-      setVisible(false);
-    };
-    
-    document.addEventListener('click', handleTorchUsage);
-    
-    return () => {
-      document.removeEventListener('click', handleTorchUsage);
-    };
-  }, []);
-  
-  if (!visible) return null;
+  // Afficher l'indicateur seulement quand la torche est désactivée
+  if (isTorchActive) return null;
   
   return (
     <div 
