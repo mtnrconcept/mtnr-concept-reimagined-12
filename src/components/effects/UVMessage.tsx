@@ -49,9 +49,6 @@ export default function UVMessage({
   
   const scrambleChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
   
-  // Ne pas rendre si pas en mode UV ou torche inactive
-  if (!uvMode || !isTorchActive) return null;
-
   // Style de base selon le type
   const getBaseStyle = () => {
     const isPositionAbsolute = position !== null;
@@ -264,6 +261,9 @@ export default function UVMessage({
       cancelAnimationFrame(animationFrame);
     };
   }, [isVisible, content, decryptSpeed, decryptProgress, type]);
+
+  // Ne pas rendre si pas en mode UV ou torche inactive
+  if (!uvMode || !isTorchActive) return null;
 
   // Contenu affiché selon le type
   const getDisplayContent = () => {
