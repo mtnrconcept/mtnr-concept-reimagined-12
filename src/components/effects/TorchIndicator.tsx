@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ArrowUp } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 interface TorchIndicatorProps {
   className?: string;
@@ -49,7 +49,7 @@ export default function TorchIndicator({ className }: TorchIndicatorProps) {
       >
         Active la lampe
       </span>
-      <ArrowUp 
+      <ArrowDown 
         className="text-yellow-400 w-8 h-8" 
         style={{
           filter: 'drop-shadow(0 0 5px rgba(255, 221, 0, 0.8)) drop-shadow(0 0 10px rgba(255, 221, 0, 0.5))',
