@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -11,6 +10,7 @@ import { FlashlightOverlay } from "./FlashlightOverlay";
 import { useTorchPosition } from "@/hooks/useTorchPosition";
 import { useUVEffects } from "@/hooks/useUVEffects";
 import { FlashlightIcon } from "./FlashlightIcon";
+import { useTorchScroll } from "@/hooks/useTorchScroll";
 
 interface TorchContextType {
   isTorchActive: boolean;
@@ -47,6 +47,9 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Use our extracted hooks
   useTorchPosition(isTorchActive, updateMousePosition, mousePosition);
   useUVEffects(isTorchActive, mousePosition);
+  
+  // Intégration du nouveau hook de défilement basé sur la position de la torche
+  useTorchScroll({ isTorchActive, mousePosition });
 
   const contextValue: TorchContextType = {
     isTorchActive,

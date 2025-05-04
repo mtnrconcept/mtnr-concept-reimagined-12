@@ -1,5 +1,3 @@
-
-
 @layer components {
   /** Flashlight overlay */
   .flashlight {
@@ -191,5 +189,14 @@
   .flashlight-icon.uv-mode {
     filter: drop-shadow(0 0 3px rgba(153, 0, 255, 0.8));
   }
+  
+  /* Animations pour les indicateurs de défilement */
+  @keyframes indicator-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  
+  .scroll-indicator {
+    animation: indicator-pulse 1.5s infinite ease-in-out;
+  }
 }
-
