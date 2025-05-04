@@ -23,7 +23,7 @@
   z-index: 30 !important;
 }
 
-/* Désactiver le masquage flashlight en mode UV */
+/* Ne pas désactiver le masquage flashlight en mode UV pour pouvoir revenir en mode normal */
 .torch-active.uv-mode-active .flashlight-overlay {
   display: none !important; 
 }
@@ -37,4 +37,16 @@
 .torch-active.uv-mode-active #uv-page-secrets-container {
   position: relative;
   z-index: 50 !important;
+}
+
+/* Classe spéciale pour la page Artists */
+.page-artists {
+  position: relative;
+  z-index: 30 !important;
+}
+
+/* S'assurer que le contenu de la page artists est visible */
+.page-artists * {
+  position: relative;
+  z-index: 31 !important;
 }

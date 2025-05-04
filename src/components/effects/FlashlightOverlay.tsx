@@ -18,8 +18,6 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = ({
   const maskRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
   
-  // IMPORTANT: Always call all hooks before any early returns
-  
   // Effect to update flashlight position
   useEffect(() => {
     // Skip effect if not needed
@@ -41,16 +39,20 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = ({
     
   }, [isTorchActive, mousePosition.x, mousePosition.y, uvMode, isMobile]);
   
-  // Don't render anything if torch is not active
-  if (!isTorchActive) return null;
+  // Préparation du contenu à rendre
+  let content = null;
   
-  // In UV mode, we don't need the flashlight overlay
-  if (uvMode) return null;
+  // Don't render anything if torch is not active or UV mode is active
+  if (!isTorchActive || uvMode) {
+    return null;
+  }
 
+  // Render the flashlight overlay with its mask
   return (
     <div 
       ref={overlayRef}
-      className="flashlight-overlay fixed inset-0 pointer-events-none z-10"
+      className="flashlight-overlay fixed inset-0 pointer-events-none z-10 bg-black bg-opacity-70"
+      style={{ mixBlendMode: 'normal' }}
     >
       <div 
         ref={maskRef}
@@ -60,6 +62,9 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = ({
           transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
           pointerEvents: 'none',
+          boxShadow: '0 0 0 2000px rgba(0,0,0,1)',
+          backgroundColor: 'transparent',
+          mixBlendMode: 'overlay',
         }}
       ></div>
     </div>

@@ -1,7 +1,7 @@
 
 @layer components {
   /** Flashlight overlay */
-  .flashlight {
+  .flashlight-overlay {
     position: fixed;
     inset: 0;
     background: radial-gradient(ellipse at var(--cursor-x) var(--cursor-y), 
@@ -12,6 +12,8 @@
       rgba(0,0,0,0.9) 90%);
     pointer-events: none;
     z-index: 50;
+    opacity: 1 !important;
+    visibility: visible !important;
     will-change: background; /* Optimisation pour les animations */
   }
 
@@ -253,5 +255,11 @@
   .page-what-we-do * {
     position: relative;
     z-index: 31; /* Encore plus haut pour le texte et les éléments interactifs */
+  }
+  
+  /* Styles spécifiques pour l'overlay de la lampe torche normale */
+  .flashlight-mask {
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.85) !important;
+    background-color: transparent !important;
   }
 }
