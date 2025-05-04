@@ -2,7 +2,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { useVideoErrorHandling } from './video/useVideoErrorHandling';
 import { useVideoTransition } from './video/useVideoTransition';
-import { useUVModeChange } from './video/useUVModeChange';
+import { useUVModeChange } from './useUVModeChange'; // Correction du chemin d'importation
 import { useNavigationHandler } from './video/useNavigation';
 import { useTorchHandler } from './video/useTorchHandler';
 import { useDurationChange } from './video/useDurationChange';
