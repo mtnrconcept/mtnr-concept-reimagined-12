@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
@@ -7,15 +6,12 @@ import { PageSplashes } from "@/components/effects/PageSplashes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Footer from "@/components/Footer";
-
 export default function WhatWeDo() {
   // Force scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  return (
-    <div className="relative min-h-screen w-full overflow-x-hidden">
+  return <div className="relative min-h-screen w-full overflow-x-hidden">
       {/* Splash spécifiques à la page "What We Do" */}
       <PageSplashes pageVariant="whatwedo" />
       
@@ -28,29 +24,17 @@ export default function WhatWeDo() {
             </div>
             
             <div className="bg-black/80 grunge-border paper-texture px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl">
-              <UVText 
-                text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
-                hiddenText="MTNR - CODE SECRET"
-                uvColor="#7E69AB"
-              />
+              <UVText text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>} hiddenText="MTNR - CODE SECRET" uvColor="#7E69AB" />
               , c'est le choix de la marge.<br />
               On crée sans limite, on enregistre dans la sueur, on partage la ride.<br /><br />
               
               <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400">
                 <li>
-                  <UVText 
-                    text="Studio accessible à tous, on casse les codes : no bling, que du vrai."
-                    hiddenText="ACCESS CODE 3472 - MEMBRES UNIQUEMENT"
-                    uvColor="#9b87f5"
-                  />
+                  <UVText text="Studio accessible à tous, on casse les codes : no bling, que du vrai." hiddenText="ACCESS CODE 3472 - MEMBRES UNIQUEMENT" uvColor="#9b87f5" />
                 </li>
                 <li>Ambiance home-made : murs rough, lampes chaudes, matos old-school tweaké à l'os.</li>
                 <li>
-                  <UVText 
-                    text="Crew fraternel : chacun amène sa folie et repart avec une vibe unique."
-                    hiddenText="LA FRATERNITÉ EST NOTRE ARME SECRÈTE"
-                    uvColor="#D946EF"
-                  />
+                  <UVText text="Crew fraternel : chacun amène sa folie et repart avec une vibe unique." hiddenText="LA FRATERNITÉ EST NOTRE ARME SECRÈTE" uvColor="#D946EF" />
                 </li>
                 <li>On valorise le process : l'art, c'est la trace qu'on laisse. Les erreurs font le style.</li>
               </ul>
@@ -61,12 +45,8 @@ export default function WhatWeDo() {
                 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="enregistrement" className="border-yellow-400/30">
-                    <AccordionTrigger className="text-xl font-bold">
-                      <UVText 
-                        text="Enregistrement"
-                        hiddenText="ENREGISTREMENT CRYPTÉ"
-                        uvColor="#4FA9FF"
-                      />
+                    <AccordionTrigger className="text-xl font-bold px-[18px]">
+                      <UVText text="Enregistrement" hiddenText="ENREGISTREMENT CRYPTÉ" uvColor="#4FA9FF" />
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-300">
                       <p className="mb-3">Notre cabine traitée acoustiquement capture chaque nuance de ta voix ou instrument. Micro Neumann TLM 103, préamp Neve, monitoring précis.</p>
@@ -80,12 +60,8 @@ export default function WhatWeDo() {
                   </AccordionItem>
 
                   <AccordionItem value="mixage" className="border-yellow-400/30">
-                    <AccordionTrigger className="text-xl font-bold">
-                      <UVText 
-                        text="Mixage"
-                        hiddenText="MIXAGE SUBLIMINALE"
-                        uvColor="#D2FF3F"
-                      />
+                    <AccordionTrigger className="text-xl font-bold px-[18px]">
+                      <UVText text="Mixage" hiddenText="MIXAGE SUBLIMINALE" uvColor="#D2FF3F" />
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-300">
                       <p className="mb-3">Ton son prend vie entre nos mains. On sculpte l'équilibre parfait, on creuse la stéréo, on injecte la chaleur analogique qui va faire la différence.</p>
@@ -99,12 +75,8 @@ export default function WhatWeDo() {
                   </AccordionItem>
 
                   <AccordionItem value="mastering" className="border-yellow-400/30">
-                    <AccordionTrigger className="text-xl font-bold">
-                      <UVText 
-                        text="Mastering"
-                        hiddenText="NIVEAU ULTIME"
-                        uvColor="#00FFBB"
-                      />
+                    <AccordionTrigger className="text-xl font-bold px-[18px]">
+                      <UVText text="Mastering" hiddenText="NIVEAU ULTIME" uvColor="#00FFBB" />
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-300">
                       <p className="mb-3">L'étape finale qui transcende ton mix. On optimise, on équilibre, on donne le volume et l'énergie nécessaires pour que ton track explose sur tous les systèmes.</p>
@@ -119,11 +91,7 @@ export default function WhatWeDo() {
 
                   <AccordionItem value="prod" className="border-yellow-400/30">
                     <AccordionTrigger className="text-xl font-bold">
-                      <UVText 
-                        text="Production musicale"
-                        hiddenText="CODES SOURCES"
-                        uvColor="#D946EF"
-                      />
+                      <UVText text="Production musicale" hiddenText="CODES SOURCES" uvColor="#D946EF" />
                     </AccordionTrigger>
                     <AccordionContent className="text-gray-300">
                       <p className="mb-3">On part de ton concept pour créer l'univers sonore qui t'appartient vraiment. Composition, arrangement, sound design - on plonge à fond dans ta vision.</p>
@@ -162,18 +130,12 @@ export default function WhatWeDo() {
               </div>
               
               <span className="block font-black text-white mt-10 text-xl xs:text-2xl">
-                <UVText 
-                  text="Rejoignez la ride. Le son prend vie dans la cave."
-                  hiddenText="REJOINS-NOUS DANS L'OMBRE - 23H30 - SOUS-SOL - CODE: MTNR"
-                  uvColor="#F97316"
-                  textSize="text-xl xs:text-2xl"
-                />
+                <UVText text="Rejoignez la ride. Le son prend vie dans la cave." hiddenText="REJOINS-NOUS DANS L'OMBRE - 23H30 - SOUS-SOL - CODE: MTNR" uvColor="#F97316" textSize="text-xl xs:text-2xl" />
               </span>
             </div>
           </div>
         </main>
         <Footer />
       </div>
-    </div>
-  );
+    </div>;
 }
