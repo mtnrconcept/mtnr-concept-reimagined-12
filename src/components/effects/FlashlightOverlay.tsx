@@ -22,22 +22,14 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
   // Utiliser useMemo pour calculer les styles basés sur la position de la souris et le mode
   const overlayStyle = useMemo(() => {
     if (uvMode) {
-      // Style pour le mode UV
+      // Style pour le mode UV - sans le masque d'assombrissement
       return {
-        background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
-          rgba(10,0,60,0) 0%, 
-          rgba(10,0,60,0.6) 40%, 
-          rgba(10,0,60,0.7) 60%,
-          rgba(10,0,60,0.8) 80%,
-          rgba(10,0,60,0.95) 100%)`,
-        mixBlendMode: 'normal' as const,
-        transition: 'none', // Supprimé la transition pour un suivi immédiat
-        willChange: 'background', // Optimisation pour le rendu
+        background: 'transparent', // Suppression du dégradé radial qui créait l'assombrissement
         pointerEvents: 'none' as const,
         zIndex: 99
       };
     } else {
-      // Style pour le mode torche normale
+      // Style pour le mode torche normale - conservation du masque d'assombrissement
       return {
         background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
           rgba(0,0,0,0) 0%, 
@@ -54,6 +46,7 @@ export const FlashlightOverlay: React.FC<FlashlightOverlayProps> = memo(({
     }
   }, [mousePosition.x, mousePosition.y, uvMode, isMobile]);
   
+  // Le halo lumineux reste identique pour les deux modes
   const haloStyle = useMemo(() => {
     if (uvMode) {
       // Style de halo pour le mode UV

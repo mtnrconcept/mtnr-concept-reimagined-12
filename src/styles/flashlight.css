@@ -15,6 +15,11 @@
     will-change: background; /* Optimisation pour les animations */
   }
 
+  /* UV mode ne doit pas avoir de masque d'assombrissement */
+  .uv-mode-active .flashlight {
+    background: none; /* Suppression du masque d'assombrissement en mode UV */
+  }
+
   .flashlight-3d {
     position: fixed;
     width: 650px;
