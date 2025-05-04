@@ -35,7 +35,8 @@
     position: relative;
   }
   
-  .uv-nav-link::after {
+  /* Supprimé la barre bleue sous les liens du menu en mode UV */
+  /* .uv-nav-link::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -45,7 +46,7 @@
     background-color: #00AAFF;
     box-shadow: 0 0 10px #00AAFF, 0 0 20px #00AAFF;
     opacity: 1;
-  }
+  } */
   
   /* UV glow for the texts */
   .uv-hidden-text {
@@ -104,4 +105,3 @@
     box-shadow: none !important;
   }
 }
-
