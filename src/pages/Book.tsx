@@ -96,7 +96,7 @@ export default function Book() {
             <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
           </div>
           
-          <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10 py-[51px]">
+          <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 text-white rounded-xl shadow-2xl mb-10 py-[51px] mx-0">
             <p className="text-lg text-center mb-8">
               Réservez votre session studio ou votre prestation musicale.
             </p>
@@ -114,8 +114,8 @@ export default function Book() {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <TabsContent value="infos" className="mt-0">
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-0 mx-0">
+                    <div className="space-y-6 mx-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-0 mx-0 px-0">
                         <FormField control={form.control} name="blaze" render={({
                         field
                       }) => <FormItem>
@@ -130,7 +130,7 @@ export default function Book() {
                         
                         <FormField control={form.control} name="email" render={({
                         field
-                      }) => <FormItem>
+                      }) => <FormItem className="mx-0 px-0">
                               <FormLabel className="text-yellow-400 py-0 my-0">Email</FormLabel>
                               <FormControl>
                                 <Input placeholder="email@exemple.com" type="email" {...field} className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" />
