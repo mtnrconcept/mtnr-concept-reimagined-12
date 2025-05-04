@@ -27,7 +27,7 @@ export default function WhatWeDo() {
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
             </div>
             
-            <div className="bg-black/80 grunge-border paper-texture px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl" style={{ isolation: 'isolate' }}>
+            <div className="bg-black/80 grunge-border px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl">
               <UVText 
                 text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
                 hiddenText="MTNR - CODE SECRET"

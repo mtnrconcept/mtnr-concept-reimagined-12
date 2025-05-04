@@ -26,7 +26,9 @@ export default function Contact() {
     e.preventDefault();
     // Simul: envoi, toast
     setSuccess(true);
-    toast("Message reçu, la Cave va répondre !", { duration: 2400 });
+    toast({
+      title: "Message reçu, la Cave va répondre !",
+    });
     setForm({ name: "", email: "", message: "" });
   }
 
@@ -45,7 +47,7 @@ export default function Contact() {
           </p>
           <form
             onSubmit={handleSubmit}
-            className="w-full max-w-lg bg-black/90 grunge-border paper-texture rounded-2xl px-4 xs:px-8 py-8 shadow-2xl flex flex-col gap-7"
+            className="w-full max-w-lg bg-black/90 grunge-border px-4 xs:px-8 py-8 shadow-2xl flex flex-col gap-7"
           >
             <div>
               <label className="font-grunge text-yellow-400 font-extrabold">Nom / Crew</label>
