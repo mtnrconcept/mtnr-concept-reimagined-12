@@ -22,6 +22,12 @@
     animation: uvPulse 2s infinite;
   }
 
+  /* Ensure UV video background is visible */
+  .uv-mode-active .video-background-uv {
+    opacity: 1;
+    visibility: visible;
+  }
+
   /* New hidden circuit pattern in UV mode */
   .uv-mode-active::before {
     content: '';

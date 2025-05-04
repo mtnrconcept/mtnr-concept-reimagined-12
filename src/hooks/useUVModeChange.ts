@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useUVMode } from "../components/effects/UVModeContext";
 import { useTorch } from "../components/effects/TorchContext";
 import { VideoState, VideoActions } from "./video/types";

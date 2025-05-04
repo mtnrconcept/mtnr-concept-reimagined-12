@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 
 interface VideoElementProps {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -14,8 +14,16 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
   videoUrlUV, 
   uvMode 
 }) => {
-  // La source est calculée directement dans l'attribut pour éviter un re-render
-  const currentVideoUrl = uvMode ? videoUrlUV : videoUrl;
+  // Update the source when uvMode changes
+  useEffect(() => {
+    if (videoRef.current) {
+      const newSrc = uvMode ? videoUrlUV : videoUrl;
+      if (videoRef.current.src !== newSrc) {
+        videoRef.current.src = newSrc;
+        videoRef.current.load();
+      }
+    }
+  }, [uvMode, videoUrl, videoUrlUV, videoRef]);
   
   return (
     <video
@@ -31,7 +39,7 @@ const VideoElement: React.FC<VideoElementProps> = memo(({
         transformStyle: 'preserve-3d'
       }}
     >
-      <source src={currentVideoUrl} type="video/mp4" />
+      <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />
     </video>
   );
 });

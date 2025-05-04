@@ -29,6 +29,9 @@ export function useVideoTransition({
     // Définir la durée de transition à 7000ms (7 secondes)
     const transitionDuration = window.videoTransitionDuration || 7000;
     
+    // S'assurer que la vidéo est chargée avant de lancer la lecture
+    videoElement.load();
+    
     // Lancer la lecture et mettre en place un gestionnaire pour mettre en pause à la fin
     videoElement.play()
       .then(() => {
