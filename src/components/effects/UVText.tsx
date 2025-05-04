@@ -154,6 +154,7 @@ export default function UVText({
       <div 
         ref={textRef} 
         className={cn("visible select-none transition-opacity", textSize)}
+        style={{ position: 'relative', zIndex: 5 }} // Assurer que le texte est au premier plan
       >
         {text}
       </div>
@@ -168,6 +169,8 @@ export default function UVText({
           opacity: 0, // Always start with opacity 0
           color: uvMode ? "#D2FF3F" : uvColor,
           backgroundColor: 'transparent', // Remove background
+          position: 'absolute',
+          zIndex: 10, // S'assurer que le texte caché est au premier plan quand visible
         }}
       >
         {hiddenText || (typeof text === 'string' ? text : null)}

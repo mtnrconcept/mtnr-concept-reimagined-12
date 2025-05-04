@@ -51,7 +51,7 @@
     letter-spacing: 0.08em;
   }
   
-  /* Rendre le cadre invisible en mode UV mais garder le texte visible */
+  /* Rendre le cadre invisible en mode UV mais garder le texte visible et au premier plan */
   .uv-mode-active .neon-text-container,
   .uv-mode-active .neon-border-container,
   .uv-mode-active .neon-text.neon-on::before {
@@ -60,24 +60,40 @@
     border: none !important;
     box-shadow: none !important;
     display: none !important; /* Force hide the container itself */
+    z-index: -1 !important; /* Déplacer en arrière-plan */
   }
   
+  /* S'assurer que le contenu textuel reste au premier plan mais les arrière-plans en arrière-plan */
   .uv-mode-active .bg-black\/80,
   .uv-mode-active .paper-texture,
   .uv-mode-active .border-yellow-400\/25 {
-    background-color: transparent !important;
+    background-color: rgba(10, 0, 40, 0.4) !important;
     border-color: transparent !important;
     box-shadow: none !important;
+    z-index: 0 !important; /* S'assurer que c'est en arrière-plan */
   }
   
-  /* S'assurer que le contenu est visible mais le cadre invisible */
+  /* S'assurer que le texte est visible et au premier plan */
+  .uv-mode-active .text-gray-200,
+  .uv-mode-active .text-white,
+  .uv-mode-active p,
+  .uv-mode-active ul,
+  .uv-mode-active li {
+    position: relative;
+    z-index: 5 !important; /* Mettre le texte au premier plan */
+    color: white !important;
+  }
+  
+  /* S'assurer que les textes sont sans cadre en mode UV et en premier plan */
   .uv-mode-active .neon-text {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    position: relative;
+    z-index: 5 !important;
   }
 
-  /* S'assurer que tous les titres sont sans cadre en mode UV */
+  /* S'assurer que tous les titres sont sans cadre en mode UV et au premier plan */
   .uv-mode-active .section-title,
   .uv-mode-active .page-title,
   .uv-mode-active h1,
@@ -90,6 +106,8 @@
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    position: relative;
+    z-index: 5 !important; /* Mettre les titres au premier plan */
   }
   
   /* Supprimer spécifiquement les effets de néon border */
@@ -101,5 +119,6 @@
     background: none !important;
     box-shadow: none !important;
     border: none !important;
+    z-index: -1 !important;
   }
 }
