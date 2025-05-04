@@ -1,6 +1,12 @@
+
+// Déclaration de variables globales pour TypeScript
 interface Window {
   pageTransitionInProgress: boolean;
-  scrollToTopRequested?: boolean;
-  __videoReady?: boolean;
-  videoTransitionDuration: number; // Durée de la transition vidéo en ms
+  requestIdleCallback(
+    callback: () => void,
+    options?: { timeout: number }
+  ): number;
+  cancelIdleCallback(handle: number): void;
+  __videoReady?: boolean; // Added declaration for video ready state
 }
+

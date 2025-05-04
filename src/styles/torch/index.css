@@ -1,8 +1,0 @@
-
-/* Main torch styles - imports all torch style modules */
-@import './base.css';
-@import './uv-light.css';
-@import './animations.css';
-@import './mobile.css';
-@import './controls.css';
-

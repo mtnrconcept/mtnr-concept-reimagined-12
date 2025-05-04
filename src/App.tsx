@@ -47,10 +47,6 @@ const RouteTracker = () => {
   useEffect(() => {
     // Enregistrer la visite de la page Artists
     recordArtistsVisit(location.pathname);
-    
-    // Activer le défilement sur chaque changement de page
-    document.body.classList.add('allow-scroll');
-    document.documentElement.classList.add('allow-scroll');
   }, [location.pathname]);
   
   return null;
@@ -66,23 +62,14 @@ function AppContent() {
     checkFeatureSupport('vr');
     checkFeatureSupport('ambient-light-sensor');
     checkFeatureSupport('battery');
-    
-    // Activer le défilement global
-    document.body.classList.add('allow-scroll');
-    document.documentElement.classList.add('allow-scroll');
-    
-    // S'assurer que les conteneurs de contenu sont scrollables
-    document.querySelectorAll('.content-container').forEach(el => {
-      el.classList.add('content-scrollable');
-    });
   }, []);
   
   return (
-    <div className="app-container overflow-visible">
+    <div className="app-container">
       {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
       
-      <div className="content-container overflow-visible">
+      <div className="content-container">
         {/* Une seule vidéo de fond au niveau de l'application */}
         <BackgroundVideo 
           videoUrl="/lovable-uploads/videonormale.mp4"

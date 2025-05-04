@@ -11,19 +11,16 @@ const VideoOverlayEffects: React.FC = () => {
           backgroundImage: 'linear-gradient(rgba(255, 221, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 221, 0, 0.15) 1px, transparent 1px)',
           backgroundSize: '35px 35px', 
           transform: 'translateZ(-50px)',
-          mixBlendMode: 'overlay',
-          pointerEvents: 'none',
-          zIndex: -50
+          mixBlendMode: 'overlay'
         }}
       />
       
-      {/* Vignette effect - pointerEvents: none empêche l'effet de bloquer les interactions */}
+      {/* Vignette effect */}
       <div 
         className="absolute inset-0"
         style={{
           background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.4) 100%)',
-          pointerEvents: 'none',
-          zIndex: -20
+          pointerEvents: 'none'
         }}
       />
     </>

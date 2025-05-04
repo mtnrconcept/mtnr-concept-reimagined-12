@@ -29,7 +29,7 @@
   }
 
   .animate-smoke-in {
-    animation: smokeIn 1.5s ease-out forwards; /* Durée augmentée de 0.8s à 1.5s */
+    animation: smokeIn 0.8s ease-out forwards;
     will-change: opacity, transform, filter;
   }
 
@@ -37,7 +37,7 @@
   .logo-particle {
     transform-origin: center;
     will-change: transform, opacity;
-    transition: transform 2.5s cubic-bezier(0.215,0.61,0.355,1), opacity 2.5s cubic-bezier(0.215,0.61,0.355,1); /* Durée augmentée de 1.8s à 2.5s */
+    transition: transform 1.8s cubic-bezier(0.215,0.61,0.355,1), opacity 1.8s cubic-bezier(0.215,0.61,0.355,1);
   }
 
   /** 3D logo container */
@@ -69,7 +69,7 @@
 
   .smoke-particle {
     @apply absolute rounded-full;
-    animation: smoke-float 3.5s ease-out forwards; /* Durée augmentée de 2.2s à 3.5s */
+    animation: smoke-float 2.2s ease-out forwards;
     will-change: transform, opacity, filter;
   }
 
@@ -77,7 +77,7 @@
   .reveal {
     opacity: 0;
     transform: translateY(1rem);
-    transition: transform 2.2s ease-out, opacity 1.2s ease-out; /* Durées augmentées */
+    transition: transform 1.5s ease-out, opacity 0.5s ease-out;
   }
 
   .reveal.active {
@@ -102,13 +102,13 @@
   }
   
   .route-change-transition {
-    animation: route-change-float 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; /* Durée augmentée de 1s à 1.8s */
+    animation: route-change-float 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: transform, filter, opacity;
     z-index: 100 !important;
   }
   
   .parallax-element {
-    transition: opacity 0.8s ease-out; /* Durée augmentée de 0.5s à 0.8s */
+    transition: opacity 0.5s ease-out;
     will-change: transform, opacity, filter;
   }
   
@@ -137,7 +137,7 @@
   }
   
   .page-transition {
-    animation: page-transition-splash 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; /* Durée augmentée de 3s à 5s */
+    animation: page-transition-splash 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     z-index: 110 !important;
   }
   

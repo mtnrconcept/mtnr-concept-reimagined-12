@@ -1,60 +1,13 @@
 
+/* Import base styles */
 @import './styles/base.css';
+
+/* Import component styles */
 @import './styles/components.css';
+
+/* Import flashlight effects */
+@import './styles/flashlight.css';
+
+/* Import UV mode styles */
 @import './styles/uv-mode/index.css';
-@import './styles/effects/electric-effects.css';
-@import './styles/torch/index.css';
 
-/* Styles globaux supplémentaires */
-.app-container {
-  @apply relative min-h-screen w-full overflow-x-hidden;
-}
-
-.content-container {
-  @apply relative z-10 w-full min-h-screen;
-}
-
-/* Utilities */
-.paper-texture {
-  background-image: none; /* Suppression de l'image de texture */
-  position: relative;
-}
-
-/* Texture placée en arrière-plan, contenu au premier plan */
-.paper-texture::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: none; /* Suppression de l'image de texture */
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Assurer que tout contenu est au premier plan */
-.paper-texture > * {
-  position: relative;
-  z-index: 10;
-}
-
-.grunge-border {
-  mask-image: none; /* Suppression du masque */
-  mask-mode: alpha;
-  mask-size: 400px 400px;
-}
-
-/* Page transition */
-.page-transition-enter {
-  @apply opacity-0;
-}
-.page-transition-enter-active {
-  @apply opacity-100 transition-opacity duration-500;
-}
-.page-transition-exit {
-  @apply opacity-100;
-}
-.page-transition-exit-active {
-  @apply opacity-0 transition-opacity duration-300;
-}

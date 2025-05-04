@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState, memo, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useTorch } from "./TorchContext";
 import { useUVMode } from "./UVModeContext";
 
@@ -19,7 +19,7 @@ interface UVHiddenDrawingProps {
   glowColor?: string;
 }
 
-const UVHiddenDrawing = memo(({
+export default function UVHiddenDrawing({
   src,
   alt,
   className = "",
@@ -30,77 +30,75 @@ const UVHiddenDrawing = memo(({
   scale = 1,
   depth = "0.2",
   glowColor = "#D2FF3F"
-}: UVHiddenDrawingProps) => {
+}: UVHiddenDrawingProps) {
   const drawingRef = useRef<HTMLImageElement>(null);
   const { isTorchActive, mousePosition } = useTorch();
   const { uvMode } = useUVMode();
   const [isVisible, setIsVisible] = useState(false);
-  
-  // Return null immediately if conditions are not met
-  if (!uvMode || !isTorchActive) return null;
-  
-  // Memoize container style for better performance
-  const containerStyle = useMemo(() => ({
-    left: typeof position.x === 'number' ? `${position.x}%` : position.x,
-    top: typeof position.y === 'number' ? `${position.y}%` : position.y,
-    transform: `rotate(${rotation}deg) scale(${scale})`,
-    opacity: isVisible ? 1 : 0,
-    zIndex: 50
-  }), [position.x, position.y, rotation, scale, isVisible]);
-  
-  // Memoize image style for better performance
-  const imageStyle = useMemo(() => ({
-    width,
-    height,
-    filter: `drop-shadow(0 0 8px ${glowColor})`,
-    transition: 'all 0.3s ease-out'
-  }), [width, height, glowColor]);
 
   useEffect(() => {
-    if (!drawingRef.current || !isTorchActive || !uvMode) return;
-    
-    // Set visibility to true when in UV mode with torch active
-    setIsVisible(true);
-    
-    // Add pulsing glow effect with efficient animation
-    let animationId: number;
-    
-    const animate = () => {
+    if (!drawingRef.current || !isTorchActive) return;
+
+    const handleVisibility = () => {
       if (!drawingRef.current) return;
-      const time = Date.now() / 1000;
-      const intensity = (Math.sin(time * 1.5) + 1) / 2; // 0 to 1
       
-      // Use requestAnimationFrame for smooth animation with least impact
-      drawingRef.current.style.filter = `drop-shadow(0 0 ${8 + (intensity * 15)}px ${glowColor})`;
-      animationId = requestAnimationFrame(animate);
+      if (uvMode && isTorchActive) {
+        // Activate the hidden drawing with animation
+        setIsVisible(true);
+        
+        // Add pulsing glow effect
+        const animate = () => {
+          if (!drawingRef.current) return;
+          const time = Date.now() / 1000;
+          const intensity = (Math.sin(time * 1.5) + 1) / 2; // 0 to 1
+          
+          // Dynamic glow effect
+          drawingRef.current.style.filter = `drop-shadow(0 0 ${8 + (intensity * 15)}px ${glowColor})`;
+          requestAnimationFrame(animate);
+        };
+        
+        const animationId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(animationId);
+      } else {
+        // Hide when UV mode is off
+        setIsVisible(false);
+      }
     };
     
-    animationId = requestAnimationFrame(animate);
+    handleVisibility();
+    window.addEventListener('mousemove', handleVisibility);
     
     return () => {
-      cancelAnimationFrame(animationId);
-      setIsVisible(false);
+      window.removeEventListener('mousemove', handleVisibility);
     };
-  }, [uvMode, isTorchActive, glowColor]);
+  }, [uvMode, isTorchActive, mousePosition, glowColor]);
+
+  if (!uvMode || !isTorchActive) return null;
 
   return (
     <div
       className={`absolute pointer-events-none select-none transition-all duration-700 ${className}`}
       data-depth={depth}
-      style={containerStyle}
+      style={{
+        left: typeof position.x === 'number' ? `${position.x}%` : position.x,
+        top: typeof position.y === 'number' ? `${position.y}%` : position.y,
+        transform: `rotate(${rotation}deg) scale(${scale})`,
+        opacity: isVisible ? 1 : 0,
+        zIndex: 50
+      }}
     >
       <img
         ref={drawingRef}
         src={src}
         alt={alt}
-        style={imageStyle}
+        style={{
+          width,
+          height,
+          filter: `drop-shadow(0 0 8px ${glowColor})`,
+          transition: 'all 0.3s ease-out',
+        }}
         className="animate-pulse"
-        loading="lazy" // Amélioration des performances de chargement
       />
     </div>
   );
-});
-
-UVHiddenDrawing.displayName = 'UVHiddenDrawing';
-
-export default UVHiddenDrawing;
+}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Footer from "@/components/Footer";
@@ -106,23 +107,23 @@ export default function Book() {
             <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
           </div>
           
-          <div className="w-full max-w-4xl bg-black/80 grunge-border p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10" style={{ position: 'relative', zIndex: 5 }}>
-            <p className="text-lg text-center mb-8" style={{ position: 'relative', zIndex: 20 }}>
+          <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10">
+            <p className="text-lg text-center mb-8">
               Réservez votre session studio ou votre prestation musicale.
             </p>
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" style={{ position: 'relative', zIndex: 20 }}>
-              <TabsList className="grid grid-cols-2 w-full mb-8 bg-black/50 border border-yellow-400/30" style={{ position: 'relative', zIndex: 20 }}>
-                <TabsTrigger value="infos" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black" style={{ position: 'relative', zIndex: 20 }}>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid grid-cols-2 w-full mb-8 bg-black/50 border border-yellow-400/30">
+                <TabsTrigger value="infos" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
                   Informations
                 </TabsTrigger>
-                <TabsTrigger value="details" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black" style={{ position: 'relative', zIndex: 20 }}>
+                <TabsTrigger value="details" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
                   Détails du projet
                 </TabsTrigger>
               </TabsList>
               
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" style={{ position: 'relative', zIndex: 20 }}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <TabsContent value="infos" className="mt-0">
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

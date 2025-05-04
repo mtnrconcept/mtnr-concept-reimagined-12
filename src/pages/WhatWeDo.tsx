@@ -22,23 +22,21 @@ export default function WhatWeDo() {
       <div className="relative z-10 min-h-screen">
         <main className="min-h-screen w-full flex flex-col items-center pt-20 xs:pt-24 md:pt-32 pb-16 px-3 xs:px-6 font-grunge">
           <div className="w-full max-w-4xl">
-            <div className="relative" style={{ position: 'relative', zIndex: 50 }}>
+            <div className="relative">
               <NeonText text="Notre Vibe" className="text-3xl xs:text-4xl md:text-6xl mb-6 xs:mb-10 text-center" color="yellow" flicker={true} />
               <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
             </div>
             
-            <div className="bg-black/80 px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl" style={{ position: 'relative', zIndex: 30 }}>
-              <div style={{ position: 'relative', zIndex: 50 }}>
-                <UVText 
-                  text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
-                  hiddenText="MTNR - CODE SECRET"
-                  uvColor="#7E69AB"
-                />
-                , c'est le choix de la marge.<br />
-                On crée sans limite, on enregistre dans la sueur, on partage la ride.
-              </div>
+            <div className="bg-black/80 grunge-border paper-texture px-5 xs:px-7 py-7 xs:py-8 md:py-10 mx-auto font-grunge text-gray-200 text-base xs:text-lg md:text-xl leading-relaxed shadow-xl">
+              <UVText 
+                text={<b className="text-yellow-400 font-extrabold">MTNR Studio</b>}
+                hiddenText="MTNR - CODE SECRET"
+                uvColor="#7E69AB"
+              />
+              , c'est le choix de la marge.<br />
+              On crée sans limite, on enregistre dans la sueur, on partage la ride.<br /><br />
               
-              <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400 mt-4" style={{ position: 'relative', zIndex: 50 }}>
+              <ul className="list-disc ml-6 space-y-3 font-bold text-yellow-400">
                 <li>
                   <UVText 
                     text="Studio accessible à tous, on casse les codes : no bling, que du vrai."
@@ -58,7 +56,7 @@ export default function WhatWeDo() {
               </ul>
               
               {/* Nouvelles sections avec accordéons */}
-              <div className="mt-12 space-y-8" style={{ position: 'relative', zIndex: 50 }}>
+              <div className="mt-12 space-y-8">
                 <h2 className="text-2xl xs:text-3xl font-bold text-yellow-400 mb-4">Ce qu'on propose</h2>
                 
                 <Accordion type="single" collapsible className="w-full">
@@ -163,7 +161,7 @@ export default function WhatWeDo() {
                 </div>
               </div>
               
-              <span className="block font-black text-white mt-10 text-xl xs:text-2xl" style={{ position: 'relative', zIndex: 50 }}>
+              <span className="block font-black text-white mt-10 text-xl xs:text-2xl">
                 <UVText 
                   text="Rejoignez la ride. Le son prend vie dans la cave."
                   hiddenText="REJOINS-NOUS DANS L'OMBRE - 23H30 - SOUS-SOL - CODE: MTNR"

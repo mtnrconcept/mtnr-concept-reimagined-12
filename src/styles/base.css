@@ -1,105 +1,13 @@
 
-/* Base styles for Lovable app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Global resets and base styles
+ */
 @layer base {
-  html, body {
-    @apply h-full bg-black text-white antialiased;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-    /* Activer le scroll vertical */
-    overflow-y: auto;
-    /* Désactiver le pull-to-refresh sur mobile */
-    overscroll-behavior-y: none;
-    /* Autoriser le scroll tactile */
-    touch-action: pan-y;
+  html, body, #root {
+    @apply m-0 p-0 min-h-screen overflow-x-hidden bg-black text-white;
   }
-  
-  #root {
-    @apply h-full;
-  }
-  
-  * {
-    @apply box-border;
-  }
-  
-  /* Améliorer la visibilité des sélections de texte */
-  ::selection {
-    @apply bg-yellow-400/30 text-white;
-  }
-  
-  /* Personnaliser la barre de défilement */
-  ::-webkit-scrollbar {
-    @apply w-1;
-  }
-  
-  ::-webkit-scrollbar-track {
-    @apply bg-black/50;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    @apply bg-yellow-400/50 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-yellow-400/80;
-  }
-
-  /* Suppression des styles par défaut des boutons et inputs */
-  button, input, textarea, select {
-    @apply outline-none;
-  }
-
-  /* S'assurer que la hauteur du contenu est au moins égale à la hauteur de la fenêtre */
-  .min-h-screen {
-    min-height: 100vh; /* fallback */
-    min-height: calc(var(--vh, 1vh) * 100);
-  }
-  
-  /* Rendre les conteneurs de contenu scrollables */
-  .content-container {
-    position: relative;
-    height: auto;
-    min-height: 100vh;
-    overflow-y: visible;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* Script pour corriger la hauteur sur mobile */
-@media (max-width: 768px) {
-  :root {
-    --vh: calc(1vh);
-  }
-  
-  /* Optimisations de scroll pour mobile */
-  html, body {
-    position: relative; /* Changé de fixed à relative pour permettre le défilement */
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; /* Permettre le scroll vertical */
-  }
-  
-  .content-container {
-    position: relative; /* Changé de absolute à relative */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* Styles pour les modes de défilement */
-body.allow-scroll {
-  overflow-y: auto !important;
-  position: relative !important;
-}
-
-.content-scrollable {
-  overflow-y: auto !important;
 }

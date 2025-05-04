@@ -8,25 +8,16 @@ import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
 import { useUVMode } from "@/components/effects/UVModeContext";
 import UVText from "@/components/effects/UVText";
 import { PageSplashes } from "@/components/effects/PageSplashes";
-import Footer from "@/components/Footer";
-import { useScroll } from "@/hooks/useScroll";
 
 export default function Home() {
-  const { uvMode } = useUVMode();
+  const {
+    uvMode
+  } = useUVMode();
   const observerRef = useRef<IntersectionObserver | null>(null);
   
-  // Utiliser notre hook de défilement
-  const { scrollPositionRef } = useScroll();
-  
   useEffect(() => {
-    // Permettre le défilement sur cette page
-    document.body.classList.add('allow-scroll');
-    
-    // Ne pas forcer le scroll vers le haut pour permettre de continuer à partir de la position actuelle
-    if (scrollPositionRef.current === 0) {
-      window.scrollTo(0, 0);
-    }
-  }, [scrollPositionRef]);
+    window.scrollTo(0, 0);
+  }, []);
   
   useEffect(() => {
     observerRef.current = new IntersectionObserver(entries => {
@@ -48,21 +39,33 @@ export default function Home() {
     return () => observerRef.current?.disconnect();
   }, []);
   
-  return (
-    <div className="relative min-h-screen w-full overflow-x-hidden overflow-y-visible">
+  return <div className="relative min-h-screen w-full overflow-x-hidden">
       {/* Intégration des éclaboussures de peinture spécifiques à la page d'accueil */}
       <PageSplashes pageVariant="home" />
       
       <div className="relative z-20 flex flex-col min-h-screen w-full">
-        <main id="main-content" className="flex-grow w-full">
+        <main id="main-content" className="flex-grow w-full rounded-full">
           <HeroSection />
           <StudioSection />
           <ServicesSection />
           <ArtistsSection />
 
-          <Footer />
+          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative">
+            © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
+            
+            {/* UV-only text that appears when UV mode is active */}
+            <UVText text="Powered by raw underground energy" hiddenText="ACCESS CODE: MTNR-2024" className="mt-4 block" uvColor="#D2FF3F" />
+            
+            {/* Hidden UV messages */}
+            <UVHiddenMessage message="CODES SECRETS: STUDIO 451 • CAVE 872 • MIXAGE 339" color="#9b87f5" className="top-2 left-1/2 transform -translate-x-1/2" />
+            
+            <UVHiddenMessage message="RENDEZ-VOUS LE 13 TOUS LES MOIS • MINUIT • CODE VESTIMENTAIRE: NOIR" color="#D946EF" className="bottom-1 left-1/2 transform -translate-x-1/2" fontSize="0.8rem" />
+            
+            {uvMode && <div className="absolute -bottom-8 right-4 text-[0.65rem] text-blue-400/70 font-mono tracking-widest animate-pulse">
+                UV_MODE_ACTIVE::SECRET_DISPLAY::ENABLED
+              </div>}
+          </footer>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 }
