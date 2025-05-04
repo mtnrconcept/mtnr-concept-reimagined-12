@@ -23,6 +23,14 @@ export default function BackgroundVideo({
       top: 0,
       behavior: 'auto' // Utilise 'auto' au lieu de 'smooth' pour un défilement instantané
     });
+    
+    // Définir une durée fixe de transition vidéo de 7000ms (7 secondes)
+    window.videoTransitionDuration = 7000;
+    
+    // Communiquer cette durée à travers une variable globale pour que d'autres composants puissent la synchroniser
+    if (typeof window !== 'undefined') {
+      window.videoTransitionDuration = 7000;
+    }
   }, [location.pathname]);
   
   return (

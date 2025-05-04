@@ -1,6 +1,6 @@
-// Ajouter la propriété scrollToTopRequested au window
 interface Window {
-  __videoReady?: boolean;
-  pageTransitionInProgress?: boolean;
+  pageTransitionInProgress: boolean;
   scrollToTopRequested?: boolean;
+  __videoReady?: boolean;
+  videoTransitionDuration: number; // Durée de la transition vidéo en ms
 }

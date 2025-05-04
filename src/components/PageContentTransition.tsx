@@ -51,11 +51,10 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
+      // Attendre 1 seconde avant de commencer l'animation du contenu
       setTimeout(() => {
         setContentVisible(true);
         
-        // Restaurer la position de défilement précédente après un bref délai
-        // pour permettre au contenu de se rendre
         setTimeout(() => {
           // Ne pas remonter en haut pour les transitions entre pages
           // sauf si c'est explicitement demandé
@@ -66,7 +65,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             window.scrollToTopRequested = false;
           }
         }, 300); // Temps d'attente augmenté pour une transition plus progressive
-      }, 100); // Délai légèrement augmenté
+      }, 1000); // Délai d'une seconde avant de démarrer l'animation
       
     }, 600); // Transition plus longue pour laisser le temps aux animations visuelles
 
@@ -78,7 +77,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Initial est soit un fondu simple, soit un effet plus complexe selon le contexte
     initial: (isInitial: boolean) => ({
       opacity: 0,
-      y: isInitial ? 0 : "10vh", // Mouvement vertical conservé
+      y: isInitial ? 0 : "15vh", // Augmentation du décalage vertical initial
       filter: isInitial ? "blur(0px)" : "blur(5px)" // Effet de flou conservé
     }),
     animate: {
@@ -87,15 +86,15 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { 
-          duration: isInitialPageLoad ? 0.8 : 1.6, // Animation plus lente pour les transitions
+          duration: isInitialPageLoad ? 0.8 : 1.4, // Durée ajustée
           ease: "easeOut" 
         },
         y: { 
-          duration: isInitialPageLoad ? 0 : 1.8, // Animation plus lente pour les mouvements
+          duration: isInitialPageLoad ? 0 : 6.0, // Durée de 6 secondes pour que l'animation se termine exactement à la fin de la vidéo (7s - 1s de délai)
           ease: [0.05, 0.2, 0.2, 1.0] 
         },
         filter: { 
-          duration: isInitialPageLoad ? 0 : 1.5, // Animation plus lente pour l'effet de flou
+          duration: isInitialPageLoad ? 0 : 5.5, // Durée réduite pour l'effet de flou
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
