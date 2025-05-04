@@ -51,7 +51,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     const timer = setTimeout(() => {
       setDisplayChildren(children);
       
-      // Attendre 1 seconde avant de commencer l'animation du contenu
+      // Attendre 1.5 seconde avant de commencer l'animation du contenu (augmenté de 1s à 1.5s)
       setTimeout(() => {
         setContentVisible(true);
         
@@ -65,7 +65,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
             window.scrollToTopRequested = false;
           }
         }, 300); // Temps d'attente augmenté pour une transition plus progressive
-      }, 1000); // Délai d'une seconde avant de démarrer l'animation
+      }, 1500); // Délai augmenté à 1.5 secondes avant de démarrer l'animation
       
     }, 600); // Transition plus longue pour laisser le temps aux animations visuelles
 
@@ -90,11 +90,11 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           ease: "easeOut" 
         },
         y: { 
-          duration: isInitialPageLoad ? 0 : 4.0, // Durée de 6 secondes pour que l'animation se termine exactement à la fin de la vidéo (7s - 1s de délai)
+          duration: isInitialPageLoad ? 0 : 4.0, // Réduit de 4.0 (précédemment 6.0)
           ease: [0.16, 0.42, 0.05, 1.0] // Courbe d'accélération modifiée: rapide au début, très lente à la fin
         },
         filter: { 
-          duration: isInitialPageLoad ? 0 : 4, // Durée réduite pour l'effet de flou
+          duration: isInitialPageLoad ? 0 : 2, // Réduit de 4 à 2
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
@@ -104,12 +104,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: "-50vh", // Mouvement vertical conservé
       filter: "blur(5px)", // Effet de flou conservé
       transition: {
-        opacity: { duration: 2.2, ease: [0.33, 1, 0.68, 1] }, // Exit plus lent
+        opacity: { duration: 1.2, ease: [0.33, 1, 0.68, 1] }, // Réduit de 2.2 à 1.2
         y: { 
-          duration: 2.5, // Exit plus lent
+          duration: 1.5, // Réduit de 2.5 à 1.5
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 2.4, ease: [0.33, 1, 0.68, 1] } // Exit plus lent
+        filter: { duration: 1.4, ease: [0.33, 1, 0.68, 1] } // Réduit de 2.4 à 1.4
       }
     }
   };
