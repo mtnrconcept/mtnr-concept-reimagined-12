@@ -1,11 +1,15 @@
 
-import ParallaxBackground from "@/components/ParallaxBackground";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useRef } from "react";
+import HeroSection from "@/components/home/HeroSection";
+import StudioSection from "@/components/home/StudioSection";
+import ServicesSection from "@/components/home/ServicesSection";
+import ArtistsSection from "@/components/home/ArtistsSection";
+import UVHiddenMessage from "@/components/effects/UVHiddenMessage";
+import { useUVMode } from "@/components/effects/UVModeContext";
+import UVText from "@/components/effects/UVText";
 import { PageSplashes } from "@/components/effects/PageSplashes";
-import NeonText from "@/components/effects/NeonText";
-import ElectricParticles from "@/components/effects/ElectricParticles";
 import Footer from "@/components/Footer";
+import { useScroll } from "@/hooks/useScroll";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
