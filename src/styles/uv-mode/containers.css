@@ -35,13 +35,14 @@
     transition: all 0.5s ease-out;
   }
 
+  /* Styles spécifiques pour paper-texture et grunge-border */
   .uv-mode-active [class*="paper-texture"],
   .uv-mode-active [class*="grunge-border"] {
     border: 1px solid #4FA9FF !important;
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
     background-color: rgba(15, 0, 70, 0.8) !important;
     position: relative;
-    z-index: 0 !important; /* Mettre en arrière-plan */
+    z-index: -2 !important; /* Mettre encore plus en arrière-plan */
   }
   
   /* Effet de bordure lumineuse pour les cartes en mode UV */
@@ -58,6 +59,26 @@
     border-radius: 12px;
     border: 1px solid #0066FF !important;
     box-shadow: 0 0 20px rgba(0, 102, 255, 0.2) !important;
+    z-index: 0 !important;
+  }
+  
+  /* Isolation des textures et empêcher l'effet sur le texte */
+  .paper-texture::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.09'/%3E%3C/svg%3E");
+    z-index: -1;
+    pointer-events: none;
+  }
+  
+  /* Spécifique à la page What We Do */
+  .uv-mode-active .grunge-border.paper-texture {
+    isolation: isolate;
+    position: relative;
     z-index: 0 !important;
   }
 }

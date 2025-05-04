@@ -70,7 +70,7 @@
     background-color: rgba(10, 0, 40, 0.4) !important;
     border-color: transparent !important;
     box-shadow: none !important;
-    z-index: 0 !important; /* S'assurer que c'est en arrière-plan */
+    z-index: -2 !important; /* S'assurer que c'est en arrière-plan */
   }
   
   /* S'assurer que le texte est visible et au premier plan */
@@ -80,8 +80,9 @@
   .uv-mode-active ul,
   .uv-mode-active li {
     position: relative;
-    z-index: 5 !important; /* Mettre le texte au premier plan */
+    z-index: 10 !important; /* Mettre le texte au premier plan avec z-index plus élevé */
     color: white !important;
+    isolation: isolate; /* Isoler le contexte d'empilement */
   }
   
   /* S'assurer que les textes sont sans cadre en mode UV et en premier plan */
@@ -90,7 +91,8 @@
     border: none !important;
     box-shadow: none !important;
     position: relative;
-    z-index: 5 !important;
+    z-index: 10 !important;
+    isolation: isolate;
   }
 
   /* S'assurer que tous les titres sont sans cadre en mode UV et au premier plan */
@@ -107,7 +109,8 @@
     box-shadow: none !important;
     padding: 0 !important;
     position: relative;
-    z-index: 5 !important; /* Mettre les titres au premier plan */
+    z-index: 10 !important; /* Mettre les titres au premier plan avec z-index plus élevé */
+    isolation: isolate;
   }
   
   /* Supprimer spécifiquement les effets de néon border */
@@ -119,6 +122,24 @@
     background: none !important;
     box-shadow: none !important;
     border: none !important;
-    z-index: -1 !important;
+    z-index: -10 !important;
+  }
+  
+  /* Style spécifique pour les éléments de la page "What We Do" */
+  .uv-mode-active .bg-black\/80.grunge-border.paper-texture {
+    position: relative;
+  }
+  
+  .uv-mode-active .bg-black\/80.grunge-border.paper-texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.09'/%3E%3C/svg%3E");
+    z-index: -1;
+  }
+  
+  .uv-mode-active .bg-black\/80.grunge-border.paper-texture > * {
+    position: relative;
+    z-index: 10;
   }
 }
