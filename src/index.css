@@ -3,6 +3,7 @@
 @import './styles/components.css';
 @import './styles/uv-mode/index.css';
 @import './styles/effects/electric-effects.css';
+@import './styles/torch/index.css';
 
 /* Styles globaux supplémentaires */
 .app-container {
