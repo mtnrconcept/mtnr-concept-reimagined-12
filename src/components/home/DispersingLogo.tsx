@@ -1,6 +1,7 @@
 
 import { useLayoutEffect, useEffect, useRef } from "react";
 import { createLogoDisperseEffect, DisperseOptions } from "@/lib/transitions/particle-effect";
+import { useUVMode } from "@/components/effects/UVModeContext";
 
 interface DispersingLogoProps {
   /** Indicateur de déclenchement externe */
@@ -33,6 +34,7 @@ export const DispersingLogo = ({
   const effectRef = useRef<{ cancel: () => void } | null>(null);
   const prevTriggerRef = useRef<boolean>(false);
   const isInitialMountRef = useRef<boolean>(true);
+  const { uvMode } = useUVMode();
 
   // Gestion du déclenchement de la dispersion
   useLayoutEffect(() => {
@@ -84,7 +86,15 @@ export const DispersingLogo = ({
         src={imageSrc}
         alt="logo"
         className="w-full h-auto"
-        style={{ willChange: "transform, opacity", opacity: 1 }}
+        style={{ 
+          willChange: "transform, opacity", 
+          opacity: 1,
+          filter: uvMode 
+            ? 'hue-rotate(120deg) brightness(1.5) saturate(1.5) contrast(1.2)' 
+            : 'none',
+          mixBlendMode: uvMode ? 'screen' : 'normal',
+          transition: 'filter 0.5s ease-out'
+        }}
         draggable={false}
       />
     </div>
