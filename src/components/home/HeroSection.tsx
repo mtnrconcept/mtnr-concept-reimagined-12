@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { NeonLogo } from "./NeonLogo";
 export default function HeroSection() {
-  return <section id="hero-section" className="container mx-auto sm:px-6 lg:px-8 flex flex-col items-center justify-center px-0 py-0 my-0">
+  return <section id="hero-section" className="container mx-auto sm:px-6 lg:px-8 flex flex-col items-center justify-center px-0 my-0 py-[15px]">
       <NeonLogo className="my-[55px]" />
       
       <div data-animate className="relative overflow-hidden mt-8 w-full max-w-3xl mx-auto backdrop-blur-xl bg-black/70 border border-yellow-400/30 shadow-[0_0_25px_rgba(255,215,0,0.15)] p-8 sm:p-10 py-[7px] px-[46px] rounded-3xl my-0">

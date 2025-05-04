@@ -7,9 +7,9 @@ export const NeonLogo: React.FC<NeonLogoProps> = ({
 }) => {
   return <div className={`logo-container relative ${className || ''}`}>
       <div className="flex justify-center items-center">
-        <img src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png" alt="MTNR Logo" className="w-[320px] max-w-full h-auto object-contain" style={{
+        <img src="/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png" alt="MTNR Logo" style={{
         filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.7))'
-      }} />
+      }} className="w-[320px] max-w-full h-auto object-contain" />
       </div>
       
     </div>;
