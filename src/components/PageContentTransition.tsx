@@ -94,7 +94,7 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
           ease: [0.16, 0.42, 0.05, 1.0] // Courbe d'accélération modifiée: rapide au début, très lente à la fin
         },
         filter: { 
-          duration: isInitialPageLoad ? 0 : 5.5, // Durée réduite pour l'effet de flou
+          duration: isInitialPageLoad ? 0 : 4, // Durée réduite pour l'effet de flou
           ease: [0.1, 0.4, 0.2, 1.0] 
         }
       }
