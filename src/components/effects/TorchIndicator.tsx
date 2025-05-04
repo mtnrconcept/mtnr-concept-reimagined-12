@@ -51,7 +51,7 @@ export default function TorchIndicator({ className }: TorchIndicatorProps) {
   
   // Position dynamique basée sur la position du bouton
   const indicatorStyle = {
-    position: 'fixed',
+    position: 'fixed' as const, // Utilisation de "as const" pour spécifier le type littéral
     zIndex: 250,
     top: `${torchButtonPosition.top}px`,
     left: `${torchButtonPosition.left}px`,
