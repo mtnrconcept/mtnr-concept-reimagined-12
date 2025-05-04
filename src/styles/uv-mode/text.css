@@ -93,12 +93,21 @@
     box-shadow: none !important;
   }
   
-  /* Nouveau style pour le texte sur fond vert en mode UV */
+  /* Style for text on green background in UV mode */
   .uv-mode-active button[type="submit"] span.relative,
   .uv-mode-active button[type="button"] span.relative,
   .uv-mode-active a.group:hover .relative,
   .uv-mode-active .bg-[#D2FF3F] *,
   .uv-mode-active [class*="hover:text-black"] .relative {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+  
+  /* Fix for tab headers with green background */
+  .uv-mode-active [data-state="active"].data-\[state\=active\]\:bg-yellow-400,
+  .uv-mode-active [data-state="active"].data-\[state\=active\]\:text-black,
+  .uv-mode-active .data-\[state\=active\]\:bg-yellow-400,
+  .uv-mode-active .data-\[state\=active\]\:text-black {
     color: #000000 !important;
     text-shadow: none !important;
   }

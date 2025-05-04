@@ -47,7 +47,7 @@
     background-color: #D2FF3F !important;
   }
 
-  /* Nouveau style pour les textes sur les boutons au hover */
+  /* Style for text on buttons when hovering */
   .uv-mode-active button[type="submit"]:hover span.relative,
   .uv-mode-active button[type="button"]:hover span.relative,
   .uv-mode-active a.group:hover span.relative {
@@ -135,6 +135,13 @@
     background: none !important;
     box-shadow: none !important;
     border: none !important;
+  }
+  
+  /* Fix for tab triggers in UV mode */
+  .uv-mode-active [class*="data-[state=active]:bg-yellow-400"],
+  .uv-mode-active [class*="data-[state=active]:text-black"] {
+    color: #000000 !important;
+    text-shadow: none !important;
   }
 }
 
