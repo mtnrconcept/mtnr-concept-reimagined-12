@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Footer from "@/components/Footer";
@@ -19,40 +18,37 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Clock, Headphones, MessageSquare, User, ChevronRight, ChevronLeft } from "lucide-react";
-
 const bookingFormSchema = z.object({
   // Informations personnelles
   blaze: z.string().min(2, {
-    message: "Votre blaze doit contenir au moins 2 caractères.",
+    message: "Votre blaze doit contenir au moins 2 caractères."
   }),
   email: z.string().email({
-    message: "Adresse email invalide.",
+    message: "Adresse email invalide."
   }),
-  
   // Informations du projet
   service: z.string({
-    required_error: "Veuillez sélectionner un type de prestation.",
+    required_error: "Veuillez sélectionner un type de prestation."
   }),
   duration: z.number().min(1, {
-    message: "Veuillez indiquer une durée approximative.",
+    message: "Veuillez indiquer une durée approximative."
   }),
   description: z.string().min(10, {
-    message: "Veuillez ajouter une description d'au moins 10 caractères.",
+    message: "Veuillez ajouter une description d'au moins 10 caractères."
   }),
-  
   // Options supplémentaires
   trackCount: z.number().optional(),
   additionalServices: z.array(z.string()).default([]),
   urgentDelivery: z.boolean().default(false),
-  extraRevisions: z.boolean().default(false),
+  extraRevisions: z.boolean().default(false)
 });
-
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
-
 export default function Book() {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const [activeTab, setActiveTab] = useState("infos");
-  
+
   // Valeurs par défaut du formulaire
   const defaultValues: Partial<BookingFormValues> = {
     blaze: "",
@@ -62,52 +58,45 @@ export default function Book() {
     trackCount: 1,
     additionalServices: [],
     urgentDelivery: false,
-    extraRevisions: false,
+    extraRevisions: false
   };
-
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
-    defaultValues,
+    defaultValues
   });
-
   const watchService = form.watch("service");
-
   function onSubmit(data: BookingFormValues) {
     toast.success("Votre projet a bien été enregistré !", {
       description: `Nous vous contacterons prochainement pour discuter de votre projet de ${data.service}.`,
-      duration: 5000,
+      duration: 5000
     });
     console.log("Données du formulaire soumises:", data);
     form.reset();
     setActiveTab("infos");
   }
-
   const handleNextStep = () => {
     const infoFields = ["blaze", "email", "service"];
     const isValid = infoFields.every(field => {
       const fieldState = form.getFieldState(field as any);
       return !fieldState.invalid;
     });
-
     if (isValid) {
       setActiveTab("details");
     } else {
       form.trigger(["blaze", "email", "service"]);
     }
   };
-  
-  return (
-    <ParallaxBackground>
+  return <ParallaxBackground>
       <PageSplashes pageVariant="book" />
       
       <div className="relative z-10 min-h-screen">
-        <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content">
+        <div className="min-h-screen pt-24 xs:pt-28 md:pt-36 px-2 xs:px-6 flex flex-col items-center font-grunge section-content my-0 py-[213px]">
           <div className="relative">
             <NeonText text="Réservation" className="text-3xl xs:text-4xl md:text-6xl mb-5 xs:mb-8 uppercase text-center" color="yellow" flicker={true} />
             <ElectricParticles targetSelector=".neon-text" color="#ffdd00" quantity={12} />
           </div>
           
-          <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10">
+          <div className="w-full max-w-4xl bg-black/80 grunge-border paper-texture p-6 xs:p-8 md:p-10 mx-auto text-white rounded-xl shadow-2xl mb-10 py-[51px]">
             <p className="text-lg text-center mb-8">
               Réservez votre session studio ou votre prestation musicale.
             </p>
@@ -127,51 +116,32 @@ export default function Book() {
                   <TabsContent value="infos" className="mt-0">
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField
-                          control={form.control}
-                          name="blaze"
-                          render={({ field }) => (
-                            <FormItem>
+                        <FormField control={form.control} name="blaze" render={({
+                        field
+                      }) => <FormItem>
                               <FormLabel className="text-yellow-400 flex items-center gap-2">
                                 <User className="h-4 w-4" /> Votre blaze
                               </FormLabel>
                               <FormControl>
-                                <Input 
-                                  placeholder="Nom d'artiste ou pseudo" 
-                                  {...field} 
-                                  className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
-                                />
+                                <Input placeholder="Nom d'artiste ou pseudo" {...field} className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" />
                               </FormControl>
                               <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            </FormItem>} />
                         
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
+                        <FormField control={form.control} name="email" render={({
+                        field
+                      }) => <FormItem>
                               <FormLabel className="text-yellow-400">Email</FormLabel>
                               <FormControl>
-                                <Input 
-                                  placeholder="email@exemple.com" 
-                                  type="email" 
-                                  {...field}
-                                  className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
-                                />
+                                <Input placeholder="email@exemple.com" type="email" {...field} className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" />
                               </FormControl>
                               <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            </FormItem>} />
                       </div>
                       
-                      <FormField
-                        control={form.control}
-                        name="service"
-                        render={({ field }) => (
-                          <FormItem>
+                      <FormField control={form.control} name="service" render={({
+                      field
+                    }) => <FormItem>
                             <FormLabel className="text-yellow-400 flex items-center gap-2">
                               <Headphones className="h-4 w-4" /> Type de prestation
                             </FormLabel>
@@ -191,16 +161,10 @@ export default function Book() {
                               </SelectContent>
                             </Select>
                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormItem>} />
                       
                       <div className="pt-4">
-                        <Button 
-                          type="button" 
-                          onClick={handleNextStep}
-                          className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-6 text-lg flex items-center justify-center gap-2"
-                        >
+                        <Button type="button" onClick={handleNextStep} className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-6 text-lg flex items-center justify-center gap-2">
                           Étape suivante <ChevronRight className="h-5 w-5" />
                         </Button>
                       </div>
@@ -209,48 +173,30 @@ export default function Book() {
                   
                   <TabsContent value="details" className="mt-0">
                     <div className="space-y-6">
-                      {watchService === "recording" && (
-                        <FormField
-                          control={form.control}
-                          name="trackCount"
-                          render={({ field }) => (
-                            <FormItem>
+                      {watchService === "recording" && <FormField control={form.control} name="trackCount" render={({
+                      field
+                    }) => <FormItem>
                               <FormLabel className="text-yellow-400">Nombre de morceaux à enregistrer</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min="1"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                                  className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
-                                />
+                                <Input type="number" min="1" {...field} onChange={e => field.onChange(parseInt(e.target.value) || 1)} className="bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" />
                               </FormControl>
                               <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
+                            </FormItem>} />}
                       
-                      <FormField
-                        control={form.control}
-                        name="duration"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                          <FormItem>
+                      <FormField control={form.control} name="duration" render={({
+                      field: {
+                        value,
+                        onChange,
+                        ...fieldProps
+                      }
+                    }) => <FormItem>
                             <FormLabel className="text-yellow-400 flex items-center gap-2">
                               <Clock className="h-4 w-4" /> Durée estimée (minutes)
                             </FormLabel>
                             <div className="space-y-2">
                               <div className="flex items-center gap-4">
                                 <FormControl>
-                                  <Slider
-                                    min={30}
-                                    max={240}
-                                    step={15}
-                                    value={[value || 60]}
-                                    onValueChange={(vals) => onChange(vals[0])}
-                                    className="py-4"
-                                    {...fieldProps}
-                                  />
+                                  <Slider min={30} max={240} step={15} value={[value || 60]} onValueChange={vals => onChange(vals[0])} className="py-4" {...fieldProps} />
                                 </FormControl>
                                 <span className="w-16 text-center font-mono bg-black/30 py-1 px-2 rounded border border-yellow-400/30">
                                   {value || 60}m
@@ -258,15 +204,9 @@ export default function Book() {
                               </div>
                             </div>
                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormItem>} />
                       
-                      <FormField
-                        control={form.control}
-                        name="additionalServices"
-                        render={() => (
-                          <FormItem>
+                      <FormField control={form.control} name="additionalServices" render={() => <FormItem>
                             <div className="mb-4">
                               <FormLabel className="text-yellow-400">Services supplémentaires</FormLabel>
                               <FormDescription className="text-gray-400 text-sm">
@@ -275,132 +215,75 @@ export default function Book() {
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {watchService !== "mixage" && (
-                                <FormField
-                                  control={form.control}
-                                  name="additionalServices"
-                                  render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              {watchService !== "mixage" && <FormField control={form.control} name="additionalServices" render={({
+                          field
+                        }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                       <FormControl>
-                                        <Checkbox
-                                          checked={field.value?.includes('mixage')}
-                                          onCheckedChange={(checked) => {
-                                            return checked
-                                              ? field.onChange([...field.value, 'mixage'])
-                                              : field.onChange(field.value?.filter((value) => value !== 'mixage'))
-                                          }}
-                                          className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                                        />
+                                        <Checkbox checked={field.value?.includes('mixage')} onCheckedChange={checked => {
+                              return checked ? field.onChange([...field.value, 'mixage']) : field.onChange(field.value?.filter(value => value !== 'mixage'));
+                            }} className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black" />
                                       </FormControl>
                                       <FormLabel className="text-sm font-normal">
                                         Mixage inclus
                                       </FormLabel>
-                                    </FormItem>
-                                  )}
-                                />
-                              )}
+                                    </FormItem>} />}
                               
-                              {watchService !== "mastering" && (
-                                <FormField
-                                  control={form.control}
-                                  name="additionalServices"
-                                  render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              {watchService !== "mastering" && <FormField control={form.control} name="additionalServices" render={({
+                          field
+                        }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                       <FormControl>
-                                        <Checkbox
-                                          checked={field.value?.includes('mastering')}
-                                          onCheckedChange={(checked) => {
-                                            return checked
-                                              ? field.onChange([...field.value, 'mastering'])
-                                              : field.onChange(field.value?.filter((value) => value !== 'mastering'))
-                                          }}
-                                          className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                                        />
+                                        <Checkbox checked={field.value?.includes('mastering')} onCheckedChange={checked => {
+                              return checked ? field.onChange([...field.value, 'mastering']) : field.onChange(field.value?.filter(value => value !== 'mastering'));
+                            }} className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black" />
                                       </FormControl>
                                       <FormLabel className="text-sm font-normal">
                                         Mastering inclus
                                       </FormLabel>
-                                    </FormItem>
-                                  )}
-                                />
-                              )}
+                                    </FormItem>} />}
                               
-                              <FormField
-                                control={form.control}
-                                name="urgentDelivery"
-                                render={({ field }) => (
-                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormField control={form.control} name="urgentDelivery" render={({
+                          field
+                        }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                     <FormControl>
-                                      <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                                      />
+                                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black" />
                                     </FormControl>
                                     <FormLabel className="text-sm font-normal">
                                       Livraison urgente (48h)
                                     </FormLabel>
-                                  </FormItem>
-                                )}
-                              />
+                                  </FormItem>} />
                               
-                              <FormField
-                                control={form.control}
-                                name="extraRevisions"
-                                render={({ field }) => (
-                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormField control={form.control} name="extraRevisions" render={({
+                          field
+                        }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                     <FormControl>
-                                      <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black"
-                                      />
+                                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="border-yellow-400/70 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-black" />
                                     </FormControl>
                                     <FormLabel className="text-sm font-normal">
                                       Révisions supplémentaires (+2)
                                     </FormLabel>
-                                  </FormItem>
-                                )}
-                              />
+                                  </FormItem>} />
                             </div>
                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormItem>} />
                       
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
+                      <FormField control={form.control} name="description" render={({
+                      field
+                    }) => <FormItem>
                             <FormLabel className="text-yellow-400 flex items-center gap-2">
                               <MessageSquare className="h-4 w-4" /> Description du projet
                             </FormLabel>
                             <FormControl>
-                              <Textarea
-                                placeholder="Décrivez votre projet musical, vos influences, vos besoins spécifiques..."
-                                className="resize-none min-h-[120px] bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white"
-                                {...field}
-                              />
+                              <Textarea placeholder="Décrivez votre projet musical, vos influences, vos besoins spécifiques..." className="resize-none min-h-[120px] bg-transparent border-yellow-400/50 focus:border-yellow-400 text-white" {...field} />
                             </FormControl>
                             <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormItem>} />
                       
                       <div className="flex flex-col xs:flex-row gap-4 pt-4">
-                        <Button 
-                          type="button"
-                          onClick={() => setActiveTab("infos")}
-                          className="bg-transparent border border-yellow-400/70 hover:bg-yellow-400/20 text-yellow-400 font-bold py-4 xs:flex-1"
-                        >
+                        <Button type="button" onClick={() => setActiveTab("infos")} className="bg-transparent border border-yellow-400/70 hover:bg-yellow-400/20 text-yellow-400 font-bold py-4 xs:flex-1">
                           <ChevronLeft className="h-5 w-5 inline mr-2" /> Retour
                         </Button>
                         
-                        <Button 
-                          type="submit" 
-                          className="bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-4 xs:flex-1"
-                        >
+                        <Button type="submit" className="bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-4 xs:flex-1">
                           Réserver maintenant
                         </Button>
                       </div>
@@ -413,6 +296,5 @@ export default function Book() {
         </div>
       </div>
       <Footer />
-    </ParallaxBackground>
-  );
+    </ParallaxBackground>;
 }
