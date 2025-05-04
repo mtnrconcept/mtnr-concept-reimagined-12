@@ -1,11 +1,5 @@
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useRef,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useRef, ReactNode, useMemo, useCallback } from "react";
 import { useUVMode } from "./UVModeContext";
 import { FlashlightOverlay } from "./FlashlightOverlay";
 import { useTorchPosition } from "@/hooks/useTorchPosition";
@@ -38,26 +32,26 @@ export const useTorch = () => useContext(TorchContext);
 export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isFingerDown, setIsFingerDown] = useState(true); // Par défaut à true pour la compatibilité desktop
+  const [isFingerDown, setIsFingerDown] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { uvMode, uvCircleRef } = useUVMode();
   
-  const updateMousePosition = (position: { x: number; y: number }) => {
+  // Optimiser avec un useCallback pour éviter les recréations inutiles
+  const updateMousePosition = useCallback((position: { x: number; y: number }) => {
     setMousePosition(position);
     if (uvCircleRef.current && uvMode) {
       uvCircleRef.current.style.left = `${position.x}px`;
       uvCircleRef.current.style.top = `${position.y}px`;
     }
-  };
+  }, [uvMode, uvCircleRef]);
 
-  // Use our extracted hooks
+  // Utiliser nos hooks optimisés
   useTorchPosition(isTorchActive, updateMousePosition, mousePosition, setIsFingerDown);
   useUVEffects(isTorchActive, mousePosition);
-  
-  // Intégration du hook de défilement avec le nouvel état isFingerDown
   useTorchScroll({ isTorchActive, mousePosition, isFingerDown });
 
-  const contextValue: TorchContextType = {
+  // Optimiser le contexte avec useMemo pour réduire les recréations
+  const contextValue = useMemo(() => ({
     isTorchActive,
     setIsTorchActive,
     mousePosition,
@@ -65,7 +59,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     containerRef,
     isFingerDown,
     setIsFingerDown,
-  };
+  }), [isTorchActive, mousePosition, updateMousePosition, isFingerDown]);
 
   return (
     <TorchContext.Provider value={contextValue}>
@@ -77,20 +71,23 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         {children}
       </div>
 
-      {/* Flashlight mask overlay */}
-      <FlashlightOverlay 
-        isTorchActive={isTorchActive}
-        uvMode={uvMode}
-        mousePosition={mousePosition}
-      />
-
-      {/* New flashlight icon component */}
-      <FlashlightIcon
-        isTorchActive={isTorchActive}
-        mousePosition={mousePosition}
-        uvMode={uvMode}
-        isFingerDown={isFingerDown}
-      />
+      {/* Optimize render with conditional code */}
+      {isTorchActive && (
+        <>
+          <FlashlightOverlay 
+            isTorchActive={isTorchActive}
+            uvMode={uvMode}
+            mousePosition={mousePosition}
+          />
+  
+          <FlashlightIcon
+            isTorchActive={isTorchActive}
+            mousePosition={mousePosition}
+            uvMode={uvMode}
+            isFingerDown={isFingerDown}
+          />
+        </>
+      )}
     </TorchContext.Provider>
   );
 };

@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useIsMobile } from "./use-mobile";
 
 export interface MousePosition {
@@ -16,109 +16,105 @@ export function useTorchPosition(
   const isMobile = useIsMobile();
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Mouse tracking for desktop
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isTorchActive) {
-        updateMousePosition({ x: e.clientX, y: e.clientY });
-      }
-    };
-    
-    const handleMouseDown = () => {
+  // Optimiser les gestionnaires pour qu'ils ne soient pas recréés à chaque render
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (isTorchActive) {
+      updateMousePosition({ x: e.clientX, y: e.clientY });
+    }
+  }, [isTorchActive, updateMousePosition]);
+  
+  const handleMouseDown = useCallback(() => {
+    if (setIsFingerDown) setIsFingerDown(true);
+  }, [setIsFingerDown]);
+  
+  const handleMouseUp = useCallback(() => {
+    if (setIsFingerDown) setIsFingerDown(false);
+  }, [setIsFingerDown]);
+  
+  // Optimiser les gestionnaires tactiles pour qu'ils ne soient pas recréés à chaque render
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (isTorchActive && e.touches.length > 0) {
+      e.preventDefault();
+      updateMousePosition({ 
+        x: e.touches[0].clientX, 
+        y: e.touches[0].clientY 
+      });
+    }
+  }, [isTorchActive, updateMousePosition]);
+  
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (isTorchActive && e.touches.length > 0) {
       if (setIsFingerDown) setIsFingerDown(true);
-    };
-    
-    const handleMouseUp = () => {
-      if (setIsFingerDown) setIsFingerDown(false);
-    };
-    
-    if (!isMobile) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mousedown", handleMouseDown);
-      window.addEventListener("mouseup", handleMouseUp);
-      
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mousedown", handleMouseDown);
-        window.removeEventListener("mouseup", handleMouseUp);
-      };
+      updateMousePosition({ 
+        x: e.touches[0].clientX, 
+        y: e.touches[0].clientY 
+      });
     }
-  }, [isTorchActive, isMobile, updateMousePosition, setIsFingerDown]);
+  }, [isTorchActive, updateMousePosition, setIsFingerDown]);
+  
+  const handleTouchEnd = useCallback(() => {
+    if (setIsFingerDown) setIsFingerDown(false);
+  }, [setIsFingerDown]);
+  
+  const handleScrollTouchMove = useCallback((e: TouchEvent) => {
+    if (isTorchActive && e.touches.length > 0) {
+      updateMousePosition({ 
+        x: e.touches[0].clientX, 
+        y: e.touches[0].clientY 
+      });
+    }
+  }, [isTorchActive, updateMousePosition]);
 
-  // Touch tracking for mobile
-  useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        e.preventDefault(); // Prevent scrolling when torch is active
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        if (setIsFingerDown) setIsFingerDown(true);
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-    
-    const handleTouchEnd = () => {
-      if (setIsFingerDown) setIsFingerDown(false);
-    };
-
-    // Nouveau gestionnaire pour capturer tous les événements tactiles pendant le défilement
-    const handleScrollTouchMove = (e: TouchEvent) => {
-      if (isTorchActive && e.touches.length > 0) {
-        // Ne pas empêcher le défilement ici, mais mettre à jour la position
-        updateMousePosition({ 
-          x: e.touches[0].clientX, 
-          y: e.touches[0].clientY 
-        });
-      }
-    };
-
-    // Gestion des événements tactiles pendant le défilement
-    const handleScroll = () => {
-      if (isTorchActive) {
-        // Ajouter temporairement un écouteur non-passif qui capture les mouvements pendant le défilement
-        document.addEventListener("touchmove", handleScrollTouchMove, { passive: true });
-        
-        // Nettoyer l'écouteur après un court délai après la fin du défilement
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-        }
-        scrollTimeoutRef.current = setTimeout(() => {
-          document.removeEventListener("touchmove", handleScrollTouchMove);
-        }, 150);
-      }
-    };
-
-    if (isMobile) {
-      // Écouter les événements tactiles standards
-      window.addEventListener("touchmove", handleTouchMove, { passive: false });
-      window.addEventListener("touchstart", handleTouchStart);
-      window.addEventListener("touchend", handleTouchEnd);
+  const handleScroll = useCallback(() => {
+    if (isTorchActive) {
+      document.addEventListener("touchmove", handleScrollTouchMove, { passive: true });
       
-      // Écouter également l'événement de défilement
-      window.addEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
       
-      return () => {
-        window.removeEventListener("touchmove", handleTouchMove);
-        window.removeEventListener("touchstart", handleTouchStart);
-        window.removeEventListener("touchend", handleTouchEnd);
-        window.removeEventListener("scroll", handleScroll);
+      scrollTimeoutRef.current = setTimeout(() => {
         document.removeEventListener("touchmove", handleScrollTouchMove);
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-        }
-      };
+      }, 150);
     }
-  }, [isTorchActive, isMobile, updateMousePosition, setIsFingerDown]);
+  }, [isTorchActive, handleScrollTouchMove]);
+
+  // Gestionnaires d'événements pour ordinateur
+  useEffect(() => {
+    if (isMobile) return;
+    
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isMobile, handleMouseMove, handleMouseDown, handleMouseUp]);
+
+  // Gestionnaires d'événements pour mobile
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("scroll", handleScroll);
+    
+    return () => {
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("touchmove", handleScrollTouchMove);
+      
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [isMobile, handleTouchMove, handleTouchStart, handleTouchEnd, handleScroll, handleScrollTouchMove]);
   
   return { scrollTimeoutRef };
 }

@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useIsMobile } from "./use-mobile";
 import { useUVMode } from "../components/effects/UVModeContext";
 
@@ -12,46 +12,61 @@ export function useUVEffects(isTorchActive: boolean, mousePosition: MousePositio
   const { uvMode, createUVCircle, removeUVCircle } = useUVMode();
   const neonEffectRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
-
-  // UV logic - Création de l'effet de néon violet
-  useEffect(() => {
-    // Créer ou enlever l'effet de cercle UV
-    if (isTorchActive && uvMode) {
-      createUVCircle(mousePosition);
-      
-      // Créer l'effet néon violet
-      if (!neonEffectRef.current) {
-        const neonEffect = document.createElement('div');
-        neonEffect.className = 'uv-neon-effect';
-        neonEffect.style.left = `${mousePosition.x}px`;
-        neonEffect.style.top = `${mousePosition.y}px`;
-        
-        // Désactiver les transitions sur mobile pour un suivi instantané
-        if (isMobile) {
-          neonEffect.style.transition = 'none';
-        }
-        
-        document.body.appendChild(neonEffect);
-        neonEffectRef.current = neonEffect;
-      }
-    } else {
-      removeUVCircle();
-      
-      // Supprimer l'effet néon violet
-      if (neonEffectRef.current) {
-        neonEffectRef.current.remove();
-        neonEffectRef.current = null;
-      }
+  
+  // Optimize with useCallback to prevent recreation on every render
+  const createNeonEffect = useCallback(() => {
+    if (neonEffectRef.current) return;
+    
+    const neonEffect = document.createElement('div');
+    neonEffect.className = 'uv-neon-effect';
+    neonEffect.style.left = `${mousePosition.x}px`;
+    neonEffect.style.top = `${mousePosition.y}px`;
+    
+    // Disable transitions on mobile for instant tracking
+    if (isMobile) {
+      neonEffect.style.transition = 'none';
     }
     
-    return () => {
-      removeUVCircle();
-      if (neonEffectRef.current) {
-        neonEffectRef.current.remove();
-        neonEffectRef.current = null;
-      }
-    };
-  }, [isTorchActive, uvMode, mousePosition, createUVCircle, removeUVCircle, isMobile]);
+    document.body.appendChild(neonEffect);
+    neonEffectRef.current = neonEffect;
+  }, [mousePosition.x, mousePosition.y, isMobile]);
+  
+  const updateNeonPosition = useCallback(() => {
+    if (!neonEffectRef.current) return;
+    
+    neonEffectRef.current.style.left = `${mousePosition.x}px`;
+    neonEffectRef.current.style.top = `${mousePosition.y}px`;
+  }, [mousePosition.x, mousePosition.y]);
+  
+  // Optimize cleanup with useCallback
+  const cleanupEffects = useCallback(() => {
+    removeUVCircle();
+    if (neonEffectRef.current) {
+      neonEffectRef.current.remove();
+      neonEffectRef.current = null;
+    }
+  }, [removeUVCircle]);
+
+  // Main effect for UV mode
+  useEffect(() => {
+    // Create or remove UV circle effect
+    if (isTorchActive && uvMode) {
+      createUVCircle(mousePosition);
+      createNeonEffect();
+      updateNeonPosition();
+    } else {
+      cleanupEffects();
+    }
+    
+    return cleanupEffects;
+  }, [isTorchActive, uvMode, mousePosition, createUVCircle, createNeonEffect, updateNeonPosition, cleanupEffects]);
+
+  // Separate effect for position updates only
+  useEffect(() => {
+    if (isTorchActive && uvMode && neonEffectRef.current) {
+      updateNeonPosition();
+    }
+  }, [isTorchActive, uvMode, mousePosition, updateNeonPosition]);
 
   return { neonEffectRef };
 }

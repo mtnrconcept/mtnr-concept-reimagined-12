@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef } from 'react';
-import { useVideoStatus } from './hooks/useVideoStatus';
+import React, { useEffect, useRef, memo } from 'react';
+import { useOptimizedVideo } from '@/hooks/useOptimizedVideo';
 import VideoElement from './VideoElement';
 import VideoStatusIndicators from './VideoStatusIndicators';
 import VideoOverlayEffects from './VideoOverlayEffects';
@@ -10,23 +10,22 @@ interface VideoContainerProps {
   videoUrlUV?: string;
 }
 
-const VideoContainer: React.FC<VideoContainerProps> = ({ 
+const VideoContainer: React.FC<VideoContainerProps> = memo(({ 
   videoUrl = "/lovable-uploads/videonormale.mp4", 
   videoUrlUV = "/lovable-uploads/videouv.mp4"
 }) => {
-  // Use our custom hook to handle video status and events
+  // Use our optimized hook instead of useVideoStatus
   const {
     videoRef,
     loadingStatus,
     videoError,
     isTransitioning,
     uvMode
-  } = useVideoStatus(videoUrl, videoUrlUV);
+  } = useOptimizedVideo(videoUrl, videoUrlUV);
   
-  // Référence pour le conteneur vidéo
   const videoContainerRef = useRef<HTMLDivElement>(null);
   
-  // Optimisation du parallaxe pour éviter les saccades
+  // Optimisation du parallaxe avec un RequestAnimationFrame optimisé
   useEffect(() => {
     let ticking = false;
     let lastKnownScrollPosition = 0;
@@ -37,16 +36,13 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
     const updateVideoPosition = () => {
       if (!videoRef.current) return;
       
-      // La vidéo se déplace dans la MÊME direction que le contenu mais plus lentement
-      // Le coefficient 0.15 crée un effet de profondeur (vidéo à 15% de la vitesse de défilement)
-      // IMPORTANT: Utiliser un nombre positif pour déplacer dans la même direction
       const scrollY = lastKnownScrollPosition;
-      const translateY = scrollY * -0.15; // Négatif pour inverser la direction et aller vers le HAUT en scrollant vers le bas
+      const translateY = scrollY * -0.15;
       
-      // Ajout d'un léger effet de parallaxe pour les mouvements de souris (réduit)
-      const mouseX = lastKnownMouseX * 3; // Effet plus subtil
+      const mouseX = lastKnownMouseX * 3;
       const mouseY = lastKnownMouseY * 3;
       
+      // Utiliser transform3d pour une meilleure performance
       videoRef.current.style.transform = `translate3d(${mouseX}px, ${translateY}px, 0) scale(1.1)`;
       
       ticking = false;
@@ -62,20 +58,26 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
     };
     
     const handleMouseMove = (e: MouseEvent) => {
-      lastKnownMouseX = (e.clientX / window.innerWidth - 0.5) * 2; // -1 à 1
-      lastKnownMouseY = (e.clientY / window.innerHeight - 0.5) * 2; // -1 à 1
+      // Limiter les mises à jour inutiles
+      const newX = (e.clientX / window.innerWidth - 0.5) * 2;
+      const newY = (e.clientY / window.innerHeight - 0.5) * 2;
       
-      if (!ticking) {
-        rafId = requestAnimationFrame(updateVideoPosition);
-        ticking = true;
+      // Seuil minimal de mouvement pour éviter des mises à jour trop fréquentes
+      const threshold = 0.01;
+      if (Math.abs(newX - lastKnownMouseX) > threshold || Math.abs(newY - lastKnownMouseY) > threshold) {
+        lastKnownMouseX = newX;
+        lastKnownMouseY = newY;
+        
+        if (!ticking) {
+          rafId = requestAnimationFrame(updateVideoPosition);
+          ticking = true;
+        }
       }
     };
     
-    // Utiliser passive: true pour améliorer les performances
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
-    // Exécuter immédiatement pour positionner la vidéo correctement
     updateVideoPosition();
     
     return () => {
@@ -106,6 +108,8 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
       <VideoOverlayEffects />
     </div>
   );
-};
+});
+
+VideoContainer.displayName = 'VideoContainer';
 
 export default VideoContainer;

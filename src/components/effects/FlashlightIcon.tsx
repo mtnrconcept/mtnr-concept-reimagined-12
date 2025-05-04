@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Flashlight, ChevronUp, ChevronDown } from 'lucide-react';
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -10,7 +10,7 @@ interface FlashlightIconProps {
   isFingerDown?: boolean;
 }
 
-export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
+export const FlashlightIcon: React.FC<FlashlightIconProps> = memo(({
   isTorchActive,
   mousePosition,
   uvMode,
@@ -50,7 +50,7 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
         top: `${mousePosition.y}px`,
         transform: 'translate(-50%, -80%)',
         transition: isMobile ? 'none' : 'left 0.05s ease-out, top 0.05s ease-out',
-        opacity: isFingerDown ? 1 : 0.7, // Légèrement transparent quand le doigt n'est pas sur l'écran
+        opacity: isFingerDown ? 1 : 0.7,
       }}
     >
       <Flashlight 
@@ -59,7 +59,6 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
         strokeWidth={1.5}
       />
       
-      {/* Indicateur de direction de défilement - visible seulement si le doigt est sur l'écran */}
       {isFingerDown && scrollDirection === 'up' && (
         <ChevronUp 
           size={16} 
@@ -74,7 +73,6 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
         />
       )}
       
-      {/* Lumière émise par la lampe */}
       <div 
         className={`absolute w-5 h-5 rounded-full blur-sm ${uvMode ? 'bg-purple-500/40' : 'bg-yellow-200/60'}`}
         style={{
@@ -85,4 +83,6 @@ export const FlashlightIcon: React.FC<FlashlightIconProps> = ({
       />
     </div>
   );
-};
+});
+
+FlashlightIcon.displayName = 'FlashlightIcon';
