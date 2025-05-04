@@ -164,8 +164,9 @@ export default function Book() {
                           </FormItem>} />
                       
                       <div className="pt-4">
-                        <Button type="button" onClick={handleNextStep} className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-6 text-lg flex items-center justify-center gap-2">
-                          Étape suivante <ChevronRight className="h-5 w-5" />
+                        <Button type="button" onClick={handleNextStep} className="w-full relative overflow-hidden group hover:text-black font-black tracking-wider py-6 text-lg flex items-center justify-center gap-2">
+                          <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0"></span>
+                          <span className="relative z-10">Étape suivante</span> <ChevronRight className="h-5 w-5 relative z-10" />
                         </Button>
                       </div>
                     </div>
@@ -279,12 +280,14 @@ export default function Book() {
                           </FormItem>} />
                       
                       <div className="flex flex-col xs:flex-row gap-4 pt-4">
-                        <Button type="button" onClick={() => setActiveTab("infos")} className="bg-transparent border border-yellow-400/70 hover:bg-yellow-400/20 text-yellow-400 font-bold py-4 xs:flex-1">
-                          <ChevronLeft className="h-5 w-5 inline mr-2" /> Retour
+                        <Button type="button" onClick={() => setActiveTab("infos")} className="relative overflow-hidden group hover:text-yellow-400 border border-yellow-400/70 font-bold py-4 xs:flex-1">
+                          <span className="absolute inset-0 bg-transparent group-hover:bg-yellow-400/10 transition-colors duration-300 z-0"></span>
+                          <span className="relative z-10"><ChevronLeft className="h-5 w-5 inline mr-2" /> Retour</span>
                         </Button>
                         
-                        <Button type="submit" className="bg-yellow-400 hover:bg-yellow-300 text-black font-black tracking-wider py-4 xs:flex-1">
-                          Réserver maintenant
+                        <Button type="submit" className="relative overflow-hidden group hover:text-black font-black tracking-wider py-4 xs:flex-1">
+                          <span className="absolute inset-0 bg-[#D2FF3F] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 z-0"></span>
+                          <span className="relative z-10">Réserver maintenant</span>
                         </Button>
                       </div>
                     </div>

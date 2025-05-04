@@ -32,6 +32,25 @@
     box-shadow: 0 0 15px rgba(210, 255, 63, 0.6) !important;
   }
 
+  /* Form buttons in UV mode */
+  .uv-mode-active button[type="submit"],
+  .uv-mode-active button[type="button"] {
+    background-color: transparent !important;
+    border: 1px solid #D2FF3F !important;
+    color: #D2FF3F !important;
+    text-shadow: 0 0 5px #D2FF3F !important;
+  }
+  
+  .uv-mode-active button[type="submit"] span.absolute,
+  .uv-mode-active button[type="button"] span.absolute {
+    background-color: #D2FF3F !important;
+  }
+
+  .uv-mode-active button[type="submit"]:hover,
+  .uv-mode-active button[type="button"]:hover {
+    box-shadow: 0 0 15px rgba(210, 255, 63, 0.6) !important;
+  }
+
   /* Navbar style in UV mode */
   .uv-mode-active nav {
     background-color: rgba(10, 0, 40, 0.7) !important;
