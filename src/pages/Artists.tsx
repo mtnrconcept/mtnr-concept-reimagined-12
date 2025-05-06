@@ -105,12 +105,14 @@ export default function Artists() {
                   <div className="text-xs xs:text-sm text-gray-300 italic mt-2 text-center">
                     {index === 1 ? (
                       isTorchActive && !uvMode ? (
-                        <FlickeringNeonText 
-                          text={a.descWithTorch}
-                          color="#D946EF"
-                          intensity="medium"
-                          fontSize="0.875rem"
-                        />
+                        <div className="relative z-[999]">
+                          <FlickeringNeonText 
+                            text={a.descWithTorch}
+                            color="#D946EF"
+                            intensity="low"
+                            fontSize="0.875rem"
+                          />
+                        </div>
                       ) : (
                         <UVText 
                           text={isTorchActive ? a.descWithTorch : a.descWithoutTorch} 

@@ -17,10 +17,21 @@ export default function TorchIndicator({ className }: TorchIndicatorProps) {
   return (
     <div 
       className={cn(
-        "fixed z-[199] bottom-20 right-4 flex flex-col items-center", 
+        "fixed z-[999] bottom-20 right-4 flex flex-col items-center", 
         "animate-bounce",
         className
       )}
+      style={{
+        position: 'fixed' as const,
+        zIndex: 999,
+        top: 'auto',
+        left: 'auto',
+        transform: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        animation: 'bounce 2s infinite'
+      }}
     >
       <span
         className="text-yellow-400 font-bold mb-2 whitespace-nowrap"

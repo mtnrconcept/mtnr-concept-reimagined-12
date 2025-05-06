@@ -88,8 +88,9 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       {isTorchActive && !uvMode &&
         createPortal(
           <div 
-            className="fixed inset-0 z-[99] pointer-events-none"
+            className="fixed inset-0 pointer-events-none"
             style={{
+              zIndex: 200,
               background: `radial-gradient(ellipse 350px 550px at ${mousePosition.x}px ${mousePosition.y}px, 
                 rgba(0,0,0,0) 0%, 
                 rgba(0,0,0,0.6) 40%, 
@@ -121,8 +122,9 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       {isTorchActive && uvMode &&
   createPortal(
     <div
-      className="fixed inset-0 z-[99] pointer-events-none"
+      className="fixed inset-0 pointer-events-none"
       style={{
+        zIndex: 200,
         background: `radial-gradient(ellipse 100px 100px at ${mousePosition.x}px ${mousePosition.y}px, 
           rgba(128,0,255,0.0) 0%, 
           rgba(128,0,255,0.25) 40%, 

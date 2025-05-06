@@ -25,7 +25,7 @@ export default function FlickeringNeonText({
   }[intensity];
   
   return (
-    <div className="relative">
+    <div className="relative z-[999]">
       <p
         className={cn(
           "flickering-neon-text",
@@ -35,7 +35,8 @@ export default function FlickeringNeonText({
         style={{
           fontSize,
           color,
-          textShadow: `0 0 5px ${color}, 0 0 10px ${color}, 0 0 20px ${color}`
+          textShadow: `0 0 5px ${color}, 0 0 10px ${color}`,
+          zIndex: 999
         }}
       >
         {text}
