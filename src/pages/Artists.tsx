@@ -27,13 +27,13 @@ const artists = [
     secretCode: "FANTOME-2"
   },
   {
-    name: "Aray",
+    name: "Nevzed",
     img: "/lovable-uploads/62a9a9d9-c7b1-4cce-b401-180c42e9a514.png",
     desc: "Rappeur, groove noir, punchlines crasses, flow toujours under.",
     secretCode: "FANTOME-3"
   },
   {
-    name: "Neverzed",
+    name: "Aray",
     img: "/lovable-uploads/07c10d93-651e-4ab2-a2d1-66268cbb231b.png",
     desc: "L'ombre du mic, plume acide, chronique la ruelle.",
     secretCode: "FANTOME-4"
