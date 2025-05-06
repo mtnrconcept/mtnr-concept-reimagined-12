@@ -9,10 +9,10 @@ interface Video {
 }
 
 const videos: Video[] = [
-  { id: "wQ4-2-Quhbw", title: "Unforgiven", artist: "U.D Sensei" },
-  { id: "OWnpKebQIYY", title: "Purgatoire", artist: "Mairo" },
-  { id: "5g4V0-Zt_9A", title: "Infernal", artist: "Aray" },
-  { id: "MdKeBpQrDv0", title: "Tourner La Page", artist: "Neverzed" },
+  { id: "wQ4-2-Quhbw", title: "La tête sous l'eau", artist: "Allsix feat Aray" },
+  { id: "OWnpKebQIYY", title: "L'élu", artist: "Aray" },
+  { id: "5g4V0-Zt_9A", title: "Perdu", artist: "Aray" },
+  { id: "MdKeBpQrDv0", title: "Si seulement", artist: "Allsix" },
   { id: "JAfLPn5Uj6g", title: "Démons", artist: "U.D Sensei" },
   { id: "2D2SSmbvGZI", title: "Virage", artist: "Mairo" },
   { id: "pgBjz5xn0lI", title: "Bourreau", artist: "Aray" }
