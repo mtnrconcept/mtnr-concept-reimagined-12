@@ -13,9 +13,9 @@ const videos: Video[] = [
   { id: "OWnpKebQIYY", title: "L'élu", artist: "Aray" },
   { id: "5g4V0-Zt_9A", title: "Perdu", artist: "Aray" },
   { id: "MdKeBpQrDv0", title: "Si seulement", artist: "Allsix" },
-  { id: "JAfLPn5Uj6g", title: "Démons", artist: "U.D Sensei" },
-  { id: "2D2SSmbvGZI", title: "Virage", artist: "Mairo" },
-  { id: "pgBjz5xn0lI", title: "Bourreau", artist: "Aray" }
+  { id: "JAfLPn5Uj6g", title: "DLa tête dans les nuages", artist: "Maler" },
+  { id: "2D2SSmbvGZI", title: "Tous les jours", artist: "Allsix" },
+  { id: "pgBjz5xn0lI", title: "Boom chaka llaka", artist: "Hary-B feat Maler" }
 ];
 
 // Dimensions réelles de la TV
