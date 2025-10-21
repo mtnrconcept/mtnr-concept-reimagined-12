@@ -1,85 +1,90 @@
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
+import { Suspense, useCallback, useEffect, type ReactNode } from "react"
+import { ParticleEffect } from "./components/effects/ParticleEffect"
+import { TorchProvider, useTorch } from "./components/effects/TorchContext"
+import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext"
+import { TorchToggle, recordArtistsVisit } from "./components/effects/TorchToggle"
+import TorchIndicator from "./components/effects/TorchIndicator"
+import { NavigationProvider } from "./components/effects/NavigationContext"
+import Home from "./pages/Home"
+import Artists from "./pages/Artists"
+import Contact from "./pages/Contact"
+import NotFound from "./pages/NotFound"
+import WhatWeDo from "./pages/WhatWeDo"
+import Book from "./pages/Book"
+import PageTransition from "./components/PageTransition"
+import PageTransitionEffect from "./components/PageTransitionEffect"
+import { checkFeatureSupport } from "@/lib/feature-detection"
+import Navbar from "./components/Navbar"
+import ParallaxScene from "./components/ParallaxScene"
+import UVPageSecrets from "./components/effects/UVPageSecrets"
+import VideoSplash from "./components/VideoSplash"
+import { NavigationEventsProvider } from "./providers/NavigationEvents"
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { Suspense, useEffect } from "react";
-import { ParticleEffect } from "./components/effects/ParticleEffect";
-import { TorchProvider, useTorch } from "./components/effects/TorchContext";
-import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext";
-import { TorchToggle, recordArtistsVisit } from "./components/effects/TorchToggle";
-import TorchIndicator from "./components/effects/TorchIndicator";
-import { NavigationProvider } from "./components/effects/NavigationContext";
-import Home from "./pages/Home";
-import Artists from "./pages/Artists";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import WhatWeDo from "./pages/WhatWeDo";
-import Book from "./pages/Book";
-import PageTransition from "./components/PageTransition";
-import PageTransitionEffect from "./components/PageTransitionEffect";
-import { checkFeatureSupport } from "@/lib/feature-detection";
-import BackgroundVideoController from "./components/effects/BackgroundVideoController";
-import BackgroundVideo from "./components/effects/BackgroundVideo";
-import Navbar from "./components/Navbar";
-import ParallaxScene from "./components/ParallaxScene";
-import UVPageSecrets from "./components/effects/UVPageSecrets";
+const queryClient = new QueryClient()
 
-// Initialize query client outside of component for stability
-const queryClient = new QueryClient();
+type RouteListener = (path: string) => void
+const routeListeners = new Set<RouteListener>()
 
-// Component to display UV label
+const subscribeToRouteChanges = (listener: RouteListener) => {
+  routeListeners.add(listener)
+  return () => routeListeners.delete(listener)
+}
+
+const emitRouteChange = (path: string) => {
+  routeListeners.forEach((listener) => listener(path))
+}
+
 const UVCornerLabel = () => {
-  const { uvMode } = useUVMode();
-  const { isTorchActive } = useTorch();
-  
-  if (!isTorchActive || !uvMode) return null;
-  
-  return (
-    <div className="uv-corner-label">UV</div>
-  );
-};
+  const { uvMode } = useUVMode()
+  const { isTorchActive } = useTorch()
 
-// Composant pour suivre les visites de pages
+  if (!isTorchActive || !uvMode) return null
+
+  return <div className="uv-corner-label">UV</div>
+}
+
 const RouteTracker = () => {
-  const location = useLocation();
-  
-  useEffect(() => {
-    // Enregistrer la visite de la page Artists
-    recordArtistsVisit(location.pathname);
-  }, [location.pathname]);
-  
-  return null;
-};
+  const location = useLocation()
 
-// Séparation de la structure pour isoler la Navbar des animations
-function AppContent() {
-  const location = useLocation();
-  
-  // Run feature detection once on component mount
   useEffect(() => {
-    // Pre-check common features to avoid console errors
-    checkFeatureSupport('vr');
-    checkFeatureSupport('ambient-light-sensor');
-    checkFeatureSupport('battery');
-  }, []);
-  
+    recordArtistsVisit(location.pathname)
+  }, [location.pathname])
+
+  return null
+}
+
+const RouteAnnouncer = () => {
+  const location = useLocation()
+
+  useEffect(() => {
+    emitRouteChange(location.pathname)
+  }, [location.pathname])
+
+  return null
+}
+
+function AppContent() {
+  const location = useLocation()
+
+  useEffect(() => {
+    checkFeatureSupport('vr')
+    checkFeatureSupport('ambient-light-sensor')
+    checkFeatureSupport('battery')
+  }, [])
+
   return (
     <div className="app-container">
-      {/* La navbar est maintenant à l'extérieur de toutes les transitions */}
       <Navbar />
-      
+
       <div className="content-container">
-        {/* Une seule vidéo de fond au niveau de l'application */}
-        <BackgroundVideo 
-          videoUrl="/lovable-uploads/videonormale.mp4"
-          videoUrlUV="/lovable-uploads/videouv.mp4"
-        />
-        
-        {/* Ajout du ParallaxScene au niveau de l'App pour qu'il soit disponible sur toutes les pages */}
+        <VideoSplash />
         <ParallaxScene />
-        
+
         <PageTransitionEffect />
         <PageTransition keyId={location.pathname}>
           <Routes location={location} key={location.pathname}>
@@ -90,8 +95,7 @@ function AppContent() {
             <Route path="/book" element={<Book />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          
-          {/* Le conteneur des secrets UV est maintenant dans le flux de la page */}
+
           <div id="uv-page-secrets-container" className="relative">
             <UVPageSecrets />
           </div>
@@ -99,7 +103,29 @@ function AppContent() {
         <UVCornerLabel />
       </div>
     </div>
-  );
+  )
+}
+
+function NavigationEventsBoundary({ children }: { children: ReactNode }) {
+  const { uvMode } = useUVMode()
+
+  const pickVideoSrc = useCallback(
+    (pathname: string) => {
+      if (uvMode) return "/lovable-uploads/videouv.mp4"
+      return pathname.startsWith("/artists")
+        ? "/lovable-uploads/videouv.mp4"
+        : "/lovable-uploads/videonormale.mp4"
+    },
+    [uvMode]
+  )
+
+  const subscribe = useCallback((listener: RouteListener) => subscribeToRouteChanges(listener), [])
+
+  return (
+    <NavigationEventsProvider pickVideoSrc={pickVideoSrc} subscribeToRoute={subscribe}>
+      {children}
+    </NavigationEventsProvider>
+  )
 }
 
 const App = () => (
@@ -108,23 +134,25 @@ const App = () => (
       <UVModeProvider>
         <TorchProvider>
           <NavigationProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={null}>
-                <RouteTracker />
-                <BackgroundVideoController />
-                <AppContent />
-              </Suspense>
-              <TorchToggle />
-              <TorchIndicator />
-            </BrowserRouter>
-            <ParticleEffect />
+            <NavigationEventsBoundary>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={null}>
+                  <RouteTracker />
+                  <RouteAnnouncer />
+                  <AppContent />
+                </Suspense>
+                <TorchToggle />
+                <TorchIndicator />
+              </BrowserRouter>
+              <ParticleEffect />
+            </NavigationEventsBoundary>
           </NavigationProvider>
         </TorchProvider>
       </UVModeProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+)
 
-export default App;
+export default App
