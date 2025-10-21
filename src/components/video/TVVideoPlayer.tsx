@@ -64,8 +64,6 @@ export default function TVVideoPlayer() {
     console.log("Image TV chargée");
   };
 
-  const originParam = typeof window !== 'undefined' ? `&origin=${encodeURIComponent(window.location.origin)}` : '';
-
   // Calcul des pourcentages pour le positionnement relatif
   const screenPositionStyle = {
     top: `${(SCREEN_POSITION.top / TV_DIMENSIONS.height) * 100}%`,
@@ -86,12 +84,9 @@ export default function TVVideoPlayer() {
             <div className={`absolute inset-0 w-full h-full z-20 ${tvLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1${originParam}`}
+                src={`https://www.youtube.com/embed/${currentVideo.id}?autoplay=1&controls=1&showinfo=0&rel=0&modestbranding=1`}
                 title={currentVideo.title}
-                loading="lazy"
-                allow="autoplay; picture-in-picture; encrypted-media"
-                sandbox="allow-scripts allow-same-origin allow-presentation"
-                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
             </div>

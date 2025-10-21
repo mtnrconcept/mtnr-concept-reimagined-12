@@ -14,7 +14,6 @@ export default function ContactPageSecrets() {
   const [isVerified, setIsVerified] = useState(false);
   const [showSecretPage, setShowSecretPage] = useState(false);
   const [isLoadingVideo, setIsLoadingVideo] = useState(true);
-  const originParam = typeof window !== 'undefined' ? `&origin=${encodeURIComponent(window.location.origin)}` : '';
   
   // Timer pour l'écran de chargement (8-10 secondes)
   useEffect(() => {
@@ -204,12 +203,9 @@ export default function ContactPageSecrets() {
             <div className="relative w-full h-full flex items-center justify-center bg-black">
               <iframe
                 className="absolute w-full h-full"
-                src={`https://www.youtube.com/embed/RXOCewCjn70?autoplay=1&controls=1&showinfo=0&rel=0&fs=1${originParam}`}
+                src="https://www.youtube.com/embed/RXOCewCjn70?autoplay=1&controls=1&showinfo=0&rel=0&fs=1"
                 title="Vidéo secrète"
-                loading="lazy"
-                allow="autoplay; picture-in-picture; encrypted-media"
-                sandbox="allow-scripts allow-same-origin allow-presentation"
-                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 frameBorder="0"
                 allowFullScreen
               ></iframe>

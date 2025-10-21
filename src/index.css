@@ -12,7 +12,3 @@
 @import './styles/uv-mode/index.css';
 
 /* Import any additional styles needed */
-
-.wc-armed {
-  will-change: transform;
-}
