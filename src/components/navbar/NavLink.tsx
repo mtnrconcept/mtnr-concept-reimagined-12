@@ -1,39 +1,34 @@
-
-import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { useNavigation } from "../effects/NavigationContext";
+import { Link } from "react-router-dom"
+import { type ReactNode } from "react"
+import { cn } from "@/lib/utils"
+import { useNavigation } from "../effects/NavigationContext"
 
 interface NavLinkProps {
-  to: string;
-  isActive: boolean;
-  children: React.ReactNode;
-  onClick?: () => void;
+  to: string
+  isActive: boolean
+  children: ReactNode
+  onClick?: () => void
 }
 
 export function NavLink({ to, isActive, children, onClick }: NavLinkProps) {
-  const navigation = useNavigation();
-  const isReservation = children === "Réservation";
-  
-  const handleClick = (e: React.MouseEvent) => {
-    // Si on clique sur le lien de la page actuelle, ne rien faire
-    if (isActive) return;
-    
-    // Déclencher l'événement de transition vidéo avant la navigation
-    console.log(`Navigation vers ${to}, déclenchement de la transition vidéo`);
-    navigation.triggerVideoTransition();
-    
-    if (onClick) onClick();
-  };
+  const navigation = useNavigation()
+  const isReservation = children === "Réservation"
+
+  const handleClick = () => {
+    if (isActive) return
+
+    console.log(`Navigation vers ${to}, déclenchement de la transition vidéo`)
+    navigation.triggerVideoTransition(to)
+
+    if (onClick) onClick()
+  }
 
   return (
     <Link
       to={to}
       className={cn(
         "px-3 py-2 rounded-lg font-medium transition-all duration-300 relative overflow-hidden group hover:text-yellow-300",
-        isActive 
-          ? "text-primary" 
-          : "text-white/80",
+        isActive ? "text-primary" : "text-white/80",
         isReservation && "hover:text-black"
       )}
       onClick={handleClick}
@@ -43,5 +38,5 @@ export function NavLink({ to, isActive, children, onClick }: NavLinkProps) {
       )}
       <span className="relative z-10">{children}</span>
     </Link>
-  );
+  )
 }
