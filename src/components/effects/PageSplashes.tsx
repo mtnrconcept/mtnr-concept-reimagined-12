@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { PaintSplash } from '@/components/parallax/PaintSplash';
-import { useNavigation } from '@/components/effects/NavigationContext';
+import { TransitionController } from '@/lib/TransitionController';
 import { useUVMode } from '@/components/effects/UVModeContext';
 
 interface PageSplashesProps {
@@ -12,7 +12,6 @@ interface PageSplashesProps {
 export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => {
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { registerVideoTransitionListener } = useNavigation();
   const { uvMode } = useUVMode();
   
   // Effet pour synchroniser avec les transitions de page
@@ -31,23 +30,20 @@ export const PageSplashes = ({ pageVariant = 'default' }: PageSplashesProps) => 
   
   // Synchroniser les transitions de splash avec les transitions vidéo
   useEffect(() => {
-    const unregister = registerVideoTransitionListener(() => {
-      console.log("Video transition triggered in PageSplashes");
+    const unsubscribe = TransitionController.i.on((state) => {
+      if (state !== 'playing') return;
       const paintElements = document.querySelectorAll('.parallax-element');
-      paintElements.forEach(el => {
-        // Animation plus intense pour les transitions vidéo
+      paintElements.forEach((el) => {
         el.classList.add('page-transition');
-        
-        // Retirer la classe après l'animation
         setTimeout(() => {
           el.classList.remove('page-transition');
         }, 3000);
       });
     });
-    
-    // Nettoyer l'écouteur lors du démontage
-    return () => unregister();
-  }, [registerVideoTransitionListener]);
+
+    return unsubscribe;
+  }, []);
+
 
   // Configurations des éclaboussures selon la page avec une distribution sur l'axe Z
   const getSplashConfigs = () => {
