@@ -6,7 +6,6 @@
   letter-spacing: 0.16em;
   font-weight: 900;
   transition: text-shadow 0.3s, color 0.3s;
-  will-change: text-shadow, color;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
