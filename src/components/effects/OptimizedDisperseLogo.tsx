@@ -51,8 +51,8 @@ export function OptimizedDisperseLogo({ onTransitionComplete }: OptimizedDispers
     console.log('Démarrage de l\'effet de dispersion du logo');
 
     const dispersionEffect = createLogoDisperseEffect(logoRef.current, {
-      particleCount: 2000, // Augmenté significativement pour un effet très visible
-      dispersionStrength: 3.2, // Augmenté pour une dispersion plus spectaculaire
+      particleCount: 240, // Maintenu relativement bas pour limiter les nœuds DOM
+      dispersionStrength: 2.6, // Ajusté pour conserver un effet visible avec moins de particules
       duration: 1000, // Durée de dispersion d'une seconde
       colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
       onComplete: () => {
