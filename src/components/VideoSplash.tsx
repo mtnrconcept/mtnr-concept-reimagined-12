@@ -11,7 +11,7 @@ export default function VideoSplash() {
 
     video.muted = true
     video.playsInline = true
-    video.preload = 'metadata'
+    video.preload = 'auto'
     video.autoplay = true
 
     TransitionController.instance.attach(video)
@@ -33,7 +33,7 @@ export default function VideoSplash() {
         ref={videoRef}
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
       />
       <VideoOverlayEffects />

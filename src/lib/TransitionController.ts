@@ -48,7 +48,7 @@ export class TransitionController {
       if (this.currentSrc !== src) {
         video.pause()
         video.src = src
-        video.preload = 'metadata'
+        video.preload = 'auto'
         this.currentSrc = src
         video.load()
       }
