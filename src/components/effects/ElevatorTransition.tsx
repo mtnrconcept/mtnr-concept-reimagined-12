@@ -61,13 +61,17 @@ const ElevatorTransition = ({ children, isActive, onAnimationComplete }: Elevato
   const InfiniteTileBackground = () => {
     // Référence à 3 éléments de tuile pour créer l'effet de défilement infini
     const tiles = Array.from({ length: 3 }, (_, i) => (
-      <div 
-        key={`tile-${i}`} 
+      <div
+        key={`tile-${i}`}
         className="absolute inset-x-0 h-screen bg-black"
         style={{
           top: `${i * 100}vh`,
-          backgroundImage: 'url("/lovable-uploads/5688334d-9fa2-4439-9453-5a5b9cde0c81.png")',
-          backgroundSize: 'cover',
+          backgroundImage: [
+            'radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.12), transparent 45%)',
+            'radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.08), transparent 55%)',
+            'linear-gradient(180deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.75))'
+          ].join(', '),
+          backgroundSize: '140% 140%, 160% 160%, cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           height: '100vh',

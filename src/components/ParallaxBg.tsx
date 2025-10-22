@@ -42,7 +42,7 @@ export default function ParallaxBg({ children }: { children?: React.ReactNode })
       {/* Parallax grunge backgrounds */}
       {bgLayers.map((layer, idx) => (
         <div
-          className={`absolute inset-0 layer-parallax pointer-events-none transition-transform duration-500 ease-out will-change-transform ${layer.blur} ${layer.opacity} ${layer.blend}`}
+          className={`absolute inset-0 layer-parallax pointer-events-none transition-transform duration-500 ease-out ${layer.blur} ${layer.opacity} ${layer.blend}`}
           style={{ zIndex: `${idx + 1}` }}
           key={layer.url}
         >

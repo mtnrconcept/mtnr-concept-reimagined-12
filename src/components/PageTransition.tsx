@@ -83,7 +83,6 @@ export default function PageTransition({
           className="page-content-wrapper"
           style={{
             perspective: "1400px",
-            willChange: "transform, opacity",
             position: "relative",
             zIndex: 10
           }}
