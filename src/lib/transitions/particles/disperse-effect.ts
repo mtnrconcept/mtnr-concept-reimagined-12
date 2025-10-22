@@ -33,7 +33,7 @@ export function createLogoDisperseEffect(
   }
 
   const {
-    particleCount = 220,
+    particleCount = 200,
     dispersionStrength = 2.2,
     duration = 1800,
     colorPalette = ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
@@ -107,8 +107,8 @@ export function createLogoDisperseEffect(
   particleContainer.appendChild(logoClone);
   
   // Échantillonner les pixels de l'image pour une meilleure couverture
-  const targetParticleCount = Math.max(60, Math.min(Math.floor(particleCount), 300));
-  const particleGap = Math.max(3, Math.floor(Math.sqrt((width * height) / targetParticleCount)));
+  const targetParticleCount = Math.max(80, Math.min(Math.floor(particleCount), 220));
+  const particleGap = Math.max(4, Math.floor(Math.sqrt((width * height) / targetParticleCount)));
   const particleSize = Math.max(2.5, Math.min(Math.floor(Math.sqrt(width * height) / 30), 4));
   
   console.log(`🔍 Taille des particules: ${particleSize}px, espace entre particules: ${particleGap}px`);
@@ -196,7 +196,7 @@ export function createLogoDisperseEffect(
   // Si pas assez de particules ont été créées, ajouter des particules supplémentaires
   if (particleCount2D < maxParticles) {
     const remaining = maxParticles - particleCount2D;
-    const additionalCount = Math.min(remaining, Math.max(0, Math.floor(maxParticles * 0.4)));
+    const additionalCount = Math.min(remaining, Math.max(0, Math.floor(maxParticles * 0.25)));
 
     if (additionalCount > 0) {
       console.log(`➕ Ajout de ${additionalCount} particules supplémentaires pour améliorer l'effet`);
