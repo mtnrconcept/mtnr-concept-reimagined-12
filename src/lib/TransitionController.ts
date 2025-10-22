@@ -71,12 +71,33 @@ export class TransitionController {
       await video.play().catch(() => undefined)
 
       await new Promise<void>((resolve) => {
-        const onEnd = () => {
-          video.removeEventListener('ended', onEnd)
+        let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+        const finish = () => {
+          video.removeEventListener('ended', handleEnded)
+          video.removeEventListener('error', handleError)
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId)
+          }
           resolve()
         }
-        video.addEventListener('ended', onEnd, { once: true })
-        setTimeout(resolve, 1200)
+
+        const handleEnded = () => {
+          finish()
+        }
+
+        const handleError = () => {
+          finish()
+        }
+
+        video.addEventListener('ended', handleEnded)
+        video.addEventListener('error', handleError)
+
+        const fallbackDelay = Number.isFinite(video.duration) && video.duration > 0
+          ? Math.ceil(video.duration * 1000) + 500
+          : 5000
+
+        timeoutId = setTimeout(finish, fallbackDelay)
       })
     } finally {
       if (this.videoEl) {

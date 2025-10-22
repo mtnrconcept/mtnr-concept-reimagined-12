@@ -16,7 +16,16 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (transitionInProgressRef.current) return
 
     transitionInProgressRef.current = true
-    requestTransitionForRoute(path ?? window.location.pathname).catch(() => undefined)
+
+    const targetPath = path ?? window.location.pathname
+
+    requestTransitionForRoute(targetPath)
+      .catch((error) => {
+        console.error("Erreur lors du déclenchement de la transition vidéo:", error)
+      })
+      .finally(() => {
+        transitionInProgressRef.current = false
+      })
 
     listenersRef.current.forEach((listener) => {
       try {
@@ -25,10 +34,6 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         console.error("Erreur lors de l'exécution d'un listener de navigation:", error)
       }
     })
-
-    setTimeout(() => {
-      transitionInProgressRef.current = false
-    }, 500)
   }, [])
 
   const registerVideoTransitionListener = useCallback((callback: () => void) => {
