@@ -38,12 +38,8 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
     // Délai pour changer le contenu pendant la transition
     const timer = setTimeout(() => {
       setDisplayChildren(children);
-      
-      setTimeout(() => {
-        setContentVisible(true);
-      }, 0);
-      
-    }, 3000);
+      setContentVisible(true);
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [children, location, isInitialPageLoad]);
@@ -62,16 +58,16 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       filter: "blur(0px)",
       transition: {
         opacity: { 
-          duration: isInitialPageLoad ? 1.0 : 3.0, 
-          ease: "easeOut" 
+          duration: isInitialPageLoad ? 0.4 : 0.45,
+          ease: "easeOut"
         },
-        y: { 
-          duration: isInitialPageLoad ? 0 : 3.5, 
-          ease: [0.05, 0.2, 0.2, 1.0] 
+        y: {
+          duration: isInitialPageLoad ? 0 : 0.5,
+          ease: [0.05, 0.2, 0.2, 1.0]
         },
-        filter: { 
-          duration: isInitialPageLoad ? 0 : 3.0, 
-          ease: [0.1, 0.4, 0.2, 1.0] 
+        filter: {
+          duration: isInitialPageLoad ? 0 : 0.45,
+          ease: [0.1, 0.4, 0.2, 1.0]
         }
       }
     },
@@ -80,12 +76,12 @@ const PageContentTransition: React.FC<PageContentTransitionProps> = ({ children 
       y: "-100vh",
       filter: "blur(12px)",
       transition: {
-        opacity: { duration: 4.1, ease: [0.33, 1, 0.68, 1] },
-        y: { 
-          duration: 3.5,
+        opacity: { duration: 0.4, ease: [0.33, 1, 0.68, 1] },
+        y: {
+          duration: 0.5,
           ease: [0.05, 0.1, 0.9, 1.0]
         },
-        filter: { duration: 2.9, ease: [0.33, 1, 0.68, 1] }
+        filter: { duration: 0.45, ease: [0.33, 1, 0.68, 1] }
       }
     }
   };
