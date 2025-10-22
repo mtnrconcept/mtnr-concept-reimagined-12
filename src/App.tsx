@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
-import { Suspense, useCallback, useEffect, type ReactNode } from "react"
+import { Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
 import { ParticleEffect } from "./components/effects/ParticleEffect"
 import { TorchProvider, useTorch } from "./components/effects/TorchContext"
 import { UVModeProvider, useUVMode } from "./components/effects/UVModeContext"
@@ -24,6 +24,9 @@ import ParallaxScene from "./components/ParallaxScene"
 import UVPageSecrets from "./components/effects/UVPageSecrets"
 import VideoSplash from "./components/VideoSplash"
 import { NavigationEventsProvider } from "./providers/NavigationEvents"
+import { CyberpunkLoader, LoaderScrim } from "./components/CyberpunkLoader"
+import { useAssetPreloader } from "./hooks/useAssetPreloader"
+import { cn } from "./lib/utils"
 
 const queryClient = new QueryClient()
 
@@ -70,6 +73,46 @@ const RouteAnnouncer = () => {
 
 function AppContent() {
   const location = useLocation()
+  const [showLoader, setShowLoader] = useState(true)
+
+  const assetsToPreload = useMemo(
+    () => [
+      { type: "video" as const, src: "/lovable-uploads/videonormale.mp4" },
+      { type: "video" as const, src: "/lovable-uploads/videouv.mp4" },
+      { type: "image" as const, src: "/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png" },
+      { type: "image" as const, src: "/lovable-uploads/paint-splatter-hi.png" },
+      { type: "image" as const, src: "/lovable-uploads/pngtree-ink-splash-black-splatter-brush-png-image_5837106.png" },
+      { type: "image" as const, src: "/lovable-uploads/yellow-watercolor-splatter-3.png" },
+      { type: "image" as const, src: "/lovable-uploads/yellow-watercolor-splatter-7-1024x639.png" },
+    ],
+    [],
+  )
+
+  const { progress, isLoaded } = useAssetPreloader(assetsToPreload, {
+    minimumDelay: 1400,
+  })
+
+  useEffect(() => {
+    if (isLoaded) {
+      const timeoutId = window.setTimeout(() => setShowLoader(false), 400)
+      return () => window.clearTimeout(timeoutId)
+    }
+  }, [isLoaded])
+
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    const previousOverflow = document.body.style.overflow
+
+    if (showLoader) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [showLoader])
 
   useEffect(() => {
     checkFeatureSupport('vr')
@@ -78,31 +121,41 @@ function AppContent() {
   }, [])
 
   return (
-    <div className="app-container">
-      <Navbar />
+    <>
+      <LoaderScrim isVisible={showLoader} />
+      <CyberpunkLoader progress={progress} isVisible={showLoader} />
 
-      <div className="content-container">
-        <VideoSplash />
-        <ParallaxScene />
+      <div
+        className={cn(
+          "app-container transition-all duration-700 ease-out",
+          showLoader ? "pointer-events-none opacity-0 blur-sm" : "opacity-100 blur-0",
+        )}
+      >
+        <Navbar />
 
-        <PageTransitionEffect />
-        <PageTransition keyId={location.pathname}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home />} />
-            <Route path="/what-we-do" element={<WhatWeDo />} />
-            <Route path="/artists" element={<Artists />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/book" element={<Book />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+        <div className="content-container">
+          <VideoSplash />
+          <ParallaxScene />
 
-          <div id="uv-page-secrets-container" className="relative">
-            <UVPageSecrets />
-          </div>
-        </PageTransition>
-        <UVCornerLabel />
+          <PageTransitionEffect />
+          <PageTransition keyId={location.pathname}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home />} />
+              <Route path="/what-we-do" element={<WhatWeDo />} />
+              <Route path="/artists" element={<Artists />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/book" element={<Book />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+
+            <div id="uv-page-secrets-container" className="relative">
+              <UVPageSecrets />
+            </div>
+          </PageTransition>
+          <UVCornerLabel />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
