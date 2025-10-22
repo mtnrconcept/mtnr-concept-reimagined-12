@@ -33,7 +33,7 @@ export function createLogoDisperseEffect(
   }
 
   const {
-    particleCount = 2500,
+    particleCount = 220,
     dispersionStrength = 2.2,
     duration = 1800,
     colorPalette = ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
@@ -107,7 +107,8 @@ export function createLogoDisperseEffect(
   particleContainer.appendChild(logoClone);
   
   // Échantillonner les pixels de l'image pour une meilleure couverture
-  const particleGap = Math.max(3, Math.floor(Math.sqrt(width * height) / Math.sqrt(particleCount)));
+  const targetParticleCount = Math.max(60, Math.min(Math.floor(particleCount), 300));
+  const particleGap = Math.max(3, Math.floor(Math.sqrt((width * height) / targetParticleCount)));
   const particleSize = Math.max(2.5, Math.min(Math.floor(Math.sqrt(width * height) / 30), 4));
   
   console.log(`🔍 Taille des particules: ${particleSize}px, espace entre particules: ${particleGap}px`);
@@ -116,14 +117,14 @@ export function createLogoDisperseEffect(
   const fragment = document.createDocumentFragment();
 
   let particleCount2D = 0;
-  const maxParticles = Math.min(options.particleCount || 2500, 3000);
+  const maxParticles = targetParticleCount;
 
   // Échantillonner l'image de manière plus complète
-  for (let y = 0; y < height; y += particleGap) {
+  outer: for (let y = 0; y < height; y += particleGap) {
     for (let x = 0; x < width; x += particleGap) {
       // Limiter le nombre total de particules
       if (particleCount2D >= maxParticles) {
-        break;
+        break outer;
       }
       
       try {
@@ -193,47 +194,55 @@ export function createLogoDisperseEffect(
   console.log(`✅ ${particleCount2D} particules créées à partir de l'image`);
   
   // Si pas assez de particules ont été créées, ajouter des particules supplémentaires
-  if (particleCount2D < maxParticles * 0.5) {
-    const additionalCount = Math.min(maxParticles - particleCount2D, maxParticles * 0.5);
-    console.log(`➕ Ajout de ${additionalCount} particules supplémentaires pour améliorer l'effet`);
-    
-    for (let i = 0; i < additionalCount; i++) {
-      const x = (Math.random() - 0.5) * width;
-      const y = (Math.random() - 0.5) * height;
-      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-      
-      const particle = document.createElement('div');
-      const finalSize = random(particleSize * 0.5, particleSize * 1.5);
-      const angle = Math.random() * Math.PI * 2;
-      const distance = random(100, 600) * dispersionStrength;
-      const delay = random(0, duration * 0.2);
-      
-      // Position centrée sur l'écran
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      
-      particle.className = 'logo-particle';
-      particle.style.cssText = `
-        position: absolute;
-        left: ${centerX + x}px;
-        top: ${centerY + y}px;
-        width: ${finalSize}px;
-        height: ${finalSize}px;
-        background-color: ${color};
-        border-radius: 50%;
-        opacity: ${random(0.7, 1)};
-        transform: translate(0, 0) scale(1);
-        will-change: transform, opacity;
-        box-shadow: 0 0 ${finalSize * 0.5}px rgba(255, 215, 0, 0.3);
-        --tx: ${Math.cos(angle) * distance}px;
-        --ty: ${Math.sin(angle) * distance}px;
-        --delay: ${delay}ms;
-        --duration: ${duration}ms;
-      `;
-      
-      fragment.appendChild(particle);
-      particles.push(particle);
-      particleCount2D++;
+  if (particleCount2D < maxParticles) {
+    const remaining = maxParticles - particleCount2D;
+    const additionalCount = Math.min(remaining, Math.max(0, Math.floor(maxParticles * 0.4)));
+
+    if (additionalCount > 0) {
+      console.log(`➕ Ajout de ${additionalCount} particules supplémentaires pour améliorer l'effet`);
+
+      for (let i = 0; i < additionalCount; i++) {
+        if (particleCount2D >= maxParticles) {
+          break;
+        }
+
+        const x = (Math.random() - 0.5) * width;
+        const y = (Math.random() - 0.5) * height;
+        const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+        const particle = document.createElement('div');
+        const finalSize = random(particleSize * 0.5, particleSize * 1.5);
+        const angle = Math.random() * Math.PI * 2;
+        const distance = random(100, 600) * dispersionStrength;
+        const delay = random(0, duration * 0.2);
+
+        // Position centrée sur l'écran
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        particle.className = 'logo-particle';
+        particle.style.cssText = `
+          position: absolute;
+          left: ${centerX + x}px;
+          top: ${centerY + y}px;
+          width: ${finalSize}px;
+          height: ${finalSize}px;
+          background-color: ${color};
+          border-radius: 50%;
+          opacity: ${random(0.7, 1)};
+          transform: translate(0, 0) scale(1);
+          will-change: transform, opacity;
+          box-shadow: 0 0 ${finalSize * 0.5}px rgba(255, 215, 0, 0.3);
+          --tx: ${Math.cos(angle) * distance}px;
+          --ty: ${Math.sin(angle) * distance}px;
+          --delay: ${delay}ms;
+          --duration: ${duration}ms;
+        `;
+
+        fragment.appendChild(particle);
+        particles.push(particle);
+        particleCount2D++;
+      }
     }
   }
   
