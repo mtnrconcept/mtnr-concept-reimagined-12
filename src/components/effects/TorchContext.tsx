@@ -16,6 +16,7 @@ interface TorchContextType {
   mousePosition: { x: number; y: number };
   updateMousePosition: (position: { x: number; y: number }) => void;
   containerRef: React.RefObject<HTMLDivElement>;
+  isMobile: boolean;
 }
 
 const TorchContext = createContext<TorchContextType>({
@@ -24,6 +25,7 @@ const TorchContext = createContext<TorchContextType>({
   mousePosition: { x: 0, y: 0 },
   updateMousePosition: () => {},
   containerRef: { current: null },
+  isMobile: false,
 });
 
 export const useTorch = () => useContext(TorchContext);
@@ -31,9 +33,20 @@ export const useTorch = () => useContext(TorchContext);
 export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isTorchActive, setIsTorchActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { uvMode, uvCircleRef, createUVCircle, removeUVCircle } = useUVMode();
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const updateMousePosition = (position: { x: number; y: number }) => {
     setMousePosition(position);
@@ -43,16 +56,42 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  // Mouse tracking
+  // Fixed mobile torch position (center-top of viewport)
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isTorchActive) {
-        updateMousePosition({ x: e.clientX, y: e.clientY });
-      }
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isTorchActive]);
+    if (isMobile && isTorchActive) {
+      const updateFixedPosition = () => {
+        const x = window.innerWidth / 2;
+        const y = window.innerHeight * 0.3; // 30% from top
+        setMousePosition({ x, y });
+        if (uvCircleRef.current && uvMode) {
+          uvCircleRef.current.style.left = `${x}px`;
+          uvCircleRef.current.style.top = `${y}px`;
+        }
+      };
+      
+      updateFixedPosition();
+      window.addEventListener('scroll', updateFixedPosition);
+      window.addEventListener('resize', updateFixedPosition);
+      
+      return () => {
+        window.removeEventListener('scroll', updateFixedPosition);
+        window.removeEventListener('resize', updateFixedPosition);
+      };
+    }
+  }, [isMobile, isTorchActive, uvMode, uvCircleRef]);
+
+  // Mouse tracking (desktop only)
+  useEffect(() => {
+    if (!isMobile) {
+      const handleMouseMove = (e: MouseEvent) => {
+        if (isTorchActive) {
+          updateMousePosition({ x: e.clientX, y: e.clientY });
+        }
+      };
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
+    }
+  }, [isTorchActive, isMobile]);
 
   // UV logic
   useEffect(() => {
@@ -72,6 +111,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     mousePosition,
     updateMousePosition,
     containerRef,
+    isMobile,
   };
 
   return (

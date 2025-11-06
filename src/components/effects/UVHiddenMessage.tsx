@@ -21,16 +21,16 @@ export default function UVHiddenMessage({
   offsetY = 0
 }: UVHiddenMessageProps) {
   const messageRef = useRef<HTMLDivElement>(null);
-  const { isTorchActive, mousePosition } = useTorch();
+  const { isTorchActive, mousePosition, isMobile } = useTorch();
   const { uvMode } = useUVMode();
 
   useEffect(() => {
     if (!messageRef.current || !isTorchActive || !uvMode) return;
 
-    const handleMouseMove = () => {
+    const handleReveal = () => {
       if (!messageRef.current) return;
 
-      // Calculate distance between mouse and element
+      // Calculate distance between torch position and element
       const rect = messageRef.current.getBoundingClientRect();
       const elementCenterX = rect.left + rect.width / 2;
       const elementCenterY = rect.top + rect.height / 2;
@@ -94,12 +94,21 @@ export default function UVHiddenMessage({
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY]);
+    if (isMobile) {
+      // On mobile, update on scroll and initial load
+      handleReveal();
+      window.addEventListener('scroll', handleReveal);
+      return () => {
+        window.removeEventListener('scroll', handleReveal);
+      };
+    } else {
+      // On desktop, update on mouse move
+      window.addEventListener('mousemove', handleReveal);
+      return () => {
+        window.removeEventListener('mousemove', handleReveal);
+      };
+    }
+  }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY, isMobile]);
 
   // Only render when torch is active and in UV mode
   if (!isTorchActive || !uvMode) return null;
