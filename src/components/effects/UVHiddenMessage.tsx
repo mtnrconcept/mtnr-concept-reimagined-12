@@ -94,20 +94,9 @@ export default function UVHiddenMessage({
       }
     };
 
-    if (isMobile) {
-      // On mobile, update on scroll and initial load
-      handleReveal();
-      window.addEventListener('scroll', handleReveal);
-      return () => {
-        window.removeEventListener('scroll', handleReveal);
-      };
-    } else {
-      // On desktop, update on mouse move
-      window.addEventListener('mousemove', handleReveal);
-      return () => {
-        window.removeEventListener('mousemove', handleReveal);
-      };
-    }
+    // Update on mouse/touch position changes
+    const interval = setInterval(handleReveal, 50);
+    return () => clearInterval(interval);
   }, [isTorchActive, mousePosition, message, color, uvMode, offsetX, offsetY, isMobile]);
 
   // Only render when torch is active and in UV mode

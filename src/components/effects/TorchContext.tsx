@@ -56,31 +56,7 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  // Fixed mobile torch position (center-top of viewport)
-  useEffect(() => {
-    if (isMobile && isTorchActive) {
-      const updateFixedPosition = () => {
-        const x = window.innerWidth / 2;
-        const y = window.innerHeight * 0.3; // 30% from top
-        setMousePosition({ x, y });
-        if (uvCircleRef.current && uvMode) {
-          uvCircleRef.current.style.left = `${x}px`;
-          uvCircleRef.current.style.top = `${y}px`;
-        }
-      };
-      
-      updateFixedPosition();
-      window.addEventListener('scroll', updateFixedPosition);
-      window.addEventListener('resize', updateFixedPosition);
-      
-      return () => {
-        window.removeEventListener('scroll', updateFixedPosition);
-        window.removeEventListener('resize', updateFixedPosition);
-      };
-    }
-  }, [isMobile, isTorchActive, uvMode, uvCircleRef]);
-
-  // Mouse tracking (desktop only)
+  // Mouse tracking (desktop)
   useEffect(() => {
     if (!isMobile) {
       const handleMouseMove = (e: MouseEvent) => {
@@ -90,6 +66,33 @@ export const TorchProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       };
       window.addEventListener("mousemove", handleMouseMove);
       return () => window.removeEventListener("mousemove", handleMouseMove);
+    }
+  }, [isTorchActive, isMobile]);
+
+  // Touch tracking (mobile)
+  useEffect(() => {
+    if (isMobile) {
+      const handleTouchMove = (e: TouchEvent) => {
+        if (isTorchActive && e.touches.length > 0) {
+          const touch = e.touches[0];
+          updateMousePosition({ x: touch.clientX, y: touch.clientY });
+        }
+      };
+
+      const handleTouchStart = (e: TouchEvent) => {
+        if (isTorchActive && e.touches.length > 0) {
+          const touch = e.touches[0];
+          updateMousePosition({ x: touch.clientX, y: touch.clientY });
+        }
+      };
+
+      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      window.addEventListener("touchstart", handleTouchStart, { passive: true });
+      
+      return () => {
+        window.removeEventListener("touchmove", handleTouchMove);
+        window.removeEventListener("touchstart", handleTouchStart);
+      };
     }
   }, [isTorchActive, isMobile]);
 
