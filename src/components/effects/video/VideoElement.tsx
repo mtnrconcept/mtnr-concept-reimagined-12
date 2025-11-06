@@ -26,9 +26,7 @@ const VideoElement: React.FC<VideoElementProps> = ({
         transform: 'translate3d(0, 0, 0)',
         backfaceVisibility: 'hidden',
         willChange: 'transform',
-        transformStyle: 'preserve-3d',
-        // Augmentation de l'échelle pour éviter les bords vides lors des mouvements
-        scale: '1.1'
+        transformStyle: 'preserve-3d'
       }}
     >
       <source src={uvMode ? videoUrlUV : videoUrl} type="video/mp4" />

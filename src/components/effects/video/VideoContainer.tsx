@@ -47,7 +47,7 @@ const VideoContainer: React.FC<VideoContainerProps> = ({
       const mouseX = lastKnownMouseX * 3; // Effet plus subtil
       const mouseY = lastKnownMouseY * 3;
       
-      videoRef.current.style.transform = `translate3d(${mouseX}px, ${translateY}px, 0) scale(1.1)`;
+      videoRef.current.style.transform = `translate3d(${mouseX}px, ${translateY}px, 0)`;
       
       ticking = false;
     };

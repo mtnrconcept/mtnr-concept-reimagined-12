@@ -63,9 +63,10 @@ const preloadVideo = (src: string) =>
 
     video.src = src
     // Force the browser to start fetching the resource immediately
-    const loadPromise = video.load()
-    if (loadPromise instanceof Promise) {
-      loadPromise.catch(() => undefined)
+    try {
+      video.load()
+    } catch (error) {
+      // Ignore load errors
     }
   })
 

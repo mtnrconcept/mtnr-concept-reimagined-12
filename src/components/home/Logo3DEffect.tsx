@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { createLogo3DDisperseEffect } from '@/lib/transitions';
+import { createLogoDisperseEffect } from '@/lib/transitions';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export const Logo3DEffect = () => {
@@ -26,7 +26,7 @@ export const Logo3DEffect = () => {
       // Indiquer que le logo est en cours d'animation
       setIsLogoVisible(false);
       
-      const cleanup = createLogo3DDisperseEffect(logoRef.current, {
+      const cleanup = createLogoDisperseEffect(logoRef.current, {
         duration: 4000,
         colorPalette: ['#FFD700', '#222222', '#FFFFFF'], // Jaune, noir, blanc
         onComplete: () => {
@@ -35,8 +35,7 @@ export const Logo3DEffect = () => {
             setIsLogoVisible(true);
             setShouldDisperse(false);
           }, 500);
-        },
-        logoSrc: '/lovable-uploads/5dff4cb1-c478-4ac7-814d-75617b46e725.png'
+        }
       });
       
       return () => {
