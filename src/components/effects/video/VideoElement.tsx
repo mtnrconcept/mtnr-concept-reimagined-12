@@ -17,7 +17,7 @@ const VideoElement: React.FC<VideoElementProps> = ({
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 w-full h-full object-cover"
+      className="absolute inset-0 w-full h-full object-contain"
       playsInline
       muted
       preload="auto"

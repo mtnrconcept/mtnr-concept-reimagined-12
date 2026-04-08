@@ -44,11 +44,40 @@
     box-shadow: 0 0 15px #00AAFF, inset 0 0 8px #00AAFF;
   }
   
-  /* Les conteneurs avec du contenu en mode UV */
+  /* Section containers in UV mode — no rectangular frame, just atmospheric accents */
   .uv-mode-active .container {
-    background-color: rgba(10, 0, 60, 0.4) !important;
-    border-radius: 12px;
-    border: 1px solid #0066FF !important;
-    box-shadow: 0 0 20px rgba(0, 102, 255, 0.2) !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: relative;
+  }
+
+  /* Decorative corner brackets (top-left & bottom-right) drawn with pseudo-elements.
+     Creates an asymmetric "editorial" frame instead of a closed rectangle. */
+  .uv-mode-active .container::before,
+  .uv-mode-active .container::after {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 0.6s ease-out;
+  }
+
+  .uv-mode-active .container::before {
+    top: 16px;
+    left: 16px;
+    border-top: 1px solid #4FA9FF;
+    border-left: 1px solid #4FA9FF;
+    filter: drop-shadow(0 0 6px rgba(79, 169, 255, 0.7));
+  }
+
+  .uv-mode-active .container::after {
+    bottom: 16px;
+    right: 16px;
+    border-bottom: 1px solid #4FA9FF;
+    border-right: 1px solid #4FA9FF;
+    filter: drop-shadow(0 0 6px rgba(79, 169, 255, 0.7));
   }
 }

@@ -125,16 +125,20 @@ function AppContent() {
       <LoaderScrim isVisible={showLoader} />
       <CyberpunkLoader progress={progress} isVisible={showLoader} />
 
+      {/* VideoSplash must live OUTSIDE any element with `filter` (blur) — a filtered
+          ancestor creates a new containing block and breaks `position: fixed`,
+          causing the background video to scroll with the page. */}
+      <VideoSplash />
+
       <div
         className={cn(
-          "app-container transition-all duration-700 ease-out",
-          showLoader ? "pointer-events-none opacity-0 blur-sm" : "opacity-100 blur-0",
+          "app-container transition-opacity duration-700 ease-out",
+          showLoader ? "pointer-events-none opacity-0" : "opacity-100",
         )}
       >
         <Navbar />
 
         <div className="content-container">
-          <VideoSplash />
           <ParallaxScene />
 
           <PageTransitionEffect />
@@ -164,8 +168,7 @@ function NavigationEventsBoundary({ children }: { children: ReactNode }) {
 
   const pickVideoSrc = useCallback(
     (pathname: string) => {
-      if (uvMode) return "/lovable-uploads/videouv.mp4"
-      return pathname.startsWith("/artists")
+      return uvMode
         ? "/lovable-uploads/videouv.mp4"
         : "/lovable-uploads/videonormale.mp4"
     },
