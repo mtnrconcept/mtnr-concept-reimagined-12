@@ -45,7 +45,7 @@ export default function Home() {
           <ServicesSection />
           <ArtistsSection />
 
-          <footer className="container mx-auto py-10 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative my-[16px]">
+          <footer className="container mx-auto py-16 sm:py-24 text-center text-sm text-yellow-400/80 uppercase tracking-widest relative mt-24 mb-8">
             © 2024 - MTNR Cave Studio. Fait maison, sert la vibe underground — Geneva/France.
             
             {/* UV-only text that appears when UV mode is active */}

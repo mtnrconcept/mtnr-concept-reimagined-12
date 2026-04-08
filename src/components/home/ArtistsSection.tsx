@@ -12,7 +12,7 @@ export default function ArtistsSection() {
   const yBg = useTransform(scrollYProgress, [0, 1], [60, -60]);
 
   return (
-    <section ref={ref} className="container mx-auto px-4 sm:px-6 py-[4px] relative">
+    <section ref={ref} className="container mx-auto px-4 sm:px-6 py-24 sm:py-40 my-16 sm:my-24 relative">
       <motion.div
         style={{
           y: yBg,

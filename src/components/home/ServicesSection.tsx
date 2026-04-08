@@ -35,7 +35,7 @@ export default function ServicesSection() {
   return (
     <section
       ref={ref}
-      className="container mx-auto px-4 sm:px-6 backdrop-blur-sm rounded-3xl max-w-6xl my-[66px] py-[26px] relative"
+      className="container mx-auto px-4 sm:px-6 backdrop-blur-sm rounded-3xl max-w-6xl my-28 sm:my-40 py-16 sm:py-28 relative"
     >
       <motion.div
         style={{

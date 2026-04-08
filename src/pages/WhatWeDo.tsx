@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Zap, Users, FlaskConical, Flag } from "lucide-react";
 import NeonText from "@/components/effects/NeonText";
 import ElectricParticles from "@/components/effects/ElectricParticles";
 import UVText from "@/components/effects/UVText";
@@ -11,7 +12,7 @@ import Footer from "@/components/Footer";
 /* ─── Data ─── */
 const services = [
   {
-    icon: "🎙",
+    icon: "/icons/recording.png",
     title: "Enregistrement",
     tag: "Recording",
     desc: "Notre cabine traitée acoustiquement capture chaque nuance de ta voix ou instrument. Micro Neumann TLM 103, préamp Neve, monitoring précis.",
@@ -25,7 +26,7 @@ const services = [
     uvColor: "#4FA9FF",
   },
   {
-    icon: "🎛",
+    icon: "/icons/mixing.png",
     title: "Mixage",
     tag: "Analog",
     desc: "Ton son prend vie entre nos mains. On sculpte l'équilibre parfait, on creuse la stéréo, on injecte la chaleur analogique.",
@@ -39,7 +40,7 @@ const services = [
     uvColor: "#D2FF3F",
   },
   {
-    icon: "💿",
+    icon: "/icons/mastering.png",
     title: "Mastering",
     tag: "Finition",
     desc: "L'étape finale qui transcende ton mix. On optimise, on équilibre, on donne le volume et l'énergie nécessaires.",
@@ -53,7 +54,7 @@ const services = [
     uvColor: "#00FFBB",
   },
   {
-    icon: "🎹",
+    icon: "/icons/production.png",
     title: "Production musicale",
     tag: "Beatmaking",
     desc: "On part de ton concept pour créer l'univers sonore qui t'appartient vraiment. Composition, arrangement, sound design.",
@@ -72,22 +73,22 @@ const values = [
   {
     title: "Authenticité",
     desc: "On défend l'honnêteté artistique avant tout. Pas de formules préfabriquées, chaque projet évolue selon sa propre nature.",
-    icon: "⚡",
+    icon: <Zap className="text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" size={32} strokeWidth={1.5} />,
   },
   {
     title: "Communauté",
     desc: "Le studio est un hub créatif où les artistes se rencontrent, échangent et évoluent ensemble. On crée des ponts, pas des murs.",
-    icon: "🤝",
+    icon: <Users className="text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" size={32} strokeWidth={1.5} />,
   },
   {
     title: "Expérimentation",
     desc: "Parfois faut casser les règles. On pousse les limites de la technique pour trouver des sonorités uniques.",
-    icon: "🔬",
+    icon: <FlaskConical className="text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" size={32} strokeWidth={1.5} />,
   },
   {
     title: "Indépendance",
     desc: "Auto-produit, auto-géré. On garde le contrôle total sur notre processus pour garantir l'intégrité artistique.",
-    icon: "🏴",
+    icon: <Flag className="text-yellow-400 drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" size={32} strokeWidth={1.5} />,
   },
 ];
 
@@ -326,8 +327,8 @@ export default function WhatWeDo() {
                 {/* Content */}
                 <div className="relative z-10 p-7 sm:p-9">
                   {/* Icon + Tag */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-3xl">{service.icon}</span>
+                  <div className="flex items-center gap-4 mb-6">
+                    <img src={service.icon} alt={service.title} className="w-12 h-12 object-contain" style={{ filter: 'drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.4))' }} />
                     <span className="text-[0.6rem] font-mono tracking-[0.3em] text-yellow-400/60 uppercase bg-yellow-400/10 px-3 py-1 rounded-full border border-yellow-400/20">
                       // {service.tag}
                     </span>
@@ -415,7 +416,7 @@ export default function WhatWeDo() {
                 <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-yellow-400/40 rounded-br pointer-events-none" />
 
                 {/* Icon */}
-                <div className="text-3xl mb-4">{value.icon}</div>
+                <div className="mb-5">{value.icon}</div>
 
                 {/* Title */}
                 <h3 className="text-yellow-400 text-lg font-display uppercase tracking-wide mb-2 group-hover:text-yellow-300 transition-colors drop-shadow-[0_0_5px_rgba(255,215,0,0.3)]">

@@ -12,7 +12,7 @@ export default function StudioSection() {
   const yBg = useTransform(scrollYProgress, [0, 1], [80, -80]);
 
   return (
-    <section ref={ref} className="container mx-auto px-4 sm:px-6 py-[67px] my-[34px] relative">
+    <section ref={ref} className="container mx-auto px-4 sm:px-6 py-24 sm:py-40 my-16 sm:my-24 relative">
       {/* Giant background number — outlined, glowing, highly visible */}
       <motion.div
         style={{
