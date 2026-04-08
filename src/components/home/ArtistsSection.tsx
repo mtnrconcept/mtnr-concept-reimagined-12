@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { artistImages } from "./data";
+import { ConcentricCircles, AudioWaveform, FrequencyMeter } from "./SectionTitleDecorations";
 
 export default function ArtistsSection() {
   const ref = useRef<HTMLElement>(null);
@@ -29,7 +30,16 @@ export default function ArtistsSection() {
         transition={{ duration: 0.7 }}
         className="relative mb-14 text-center"
       >
-        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase">
+        {/* Decorative concentric circles behind title */}
+        <ConcentricCircles className="w-[250px] h-[250px] sm:w-[340px] sm:h-[340px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-45" />
+
+        {/* Audio waveform — left side */}
+        <AudioWaveform className="hidden sm:flex left-0 sm:-left-6 top-1/2 -translate-y-1/2 z-0 opacity-40 scale-x-[-1]" barCount={45} />
+
+        {/* Frequency meter accents */}
+        <FrequencyMeter className="hidden md:flex -right-14 bottom-4 z-0" />
+
+        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase relative z-10">
           <span className="h-px w-12 bg-yellow-400/50" />
           <span>Chapitre 03</span>
           <span className="h-px w-12 bg-yellow-400/50" />
@@ -48,12 +58,12 @@ export default function ArtistsSection() {
               transform: "translate(-50%, -50%) rotate(-5deg)",
             }}
           />
-          <h2 className="section-title relative text-5xl sm:text-6xl md:text-7xl text-center font-extrabold py-[2px] my-[29px]">
+          <h2 className="section-title relative text-5xl sm:text-6xl md:text-7xl text-center font-extrabold py-[2px] my-[29px] z-10">
             Artistes de la cave
           </h2>
         </div>
 
-        <p className="neon-subtitle mt-2 max-w-xl mx-auto text-sm sm:text-base italic">
+        <p className="neon-subtitle mt-2 max-w-xl mx-auto text-sm sm:text-base italic relative z-10">
           Ceux qui ont laissé leur empreinte sur la console.
         </p>
       </motion.div>

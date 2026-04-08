@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { studioImages } from "./data";
+import { ConcentricCircles, AudioWaveform, FrequencyMeter } from "./SectionTitleDecorations";
 
 export default function StudioSection() {
   const ref = useRef<HTMLElement>(null);
@@ -30,7 +31,20 @@ export default function StudioSection() {
         transition={{ duration: 0.7 }}
         className="relative mb-14 text-center"
       >
-        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase">
+        {/* Decorative concentric circles behind title */}
+        <ConcentricCircles className="w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-60" />
+
+        {/* Audio waveform — right side */}
+        <AudioWaveform className="hidden sm:flex right-0 sm:-right-8 top-1/2 -translate-y-1/2 z-0 opacity-50" barCount={50} />
+
+        {/* Audio waveform — left side (reversed) */}
+        <AudioWaveform className="hidden sm:flex left-0 sm:-left-8 top-1/2 -translate-y-1/2 z-0 opacity-50 scale-x-[-1]" barCount={40} />
+
+        {/* Frequency meter accents */}
+        <FrequencyMeter className="hidden md:flex -right-16 top-4 z-0" />
+        <FrequencyMeter className="hidden md:flex -left-16 bottom-4 z-0" />
+
+        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase relative z-10">
           <span className="h-px w-12 bg-yellow-400/50" />
           <span>Chapitre 01</span>
           <span className="h-px w-12 bg-yellow-400/50" />
@@ -48,12 +62,12 @@ export default function StudioSection() {
                 "brightness(0.9) sepia(1) saturate(6) hue-rotate(-8deg) drop-shadow(0 0 25px rgba(255,215,0,0.3))",
             }}
           />
-          <h2 className="section-title relative text-center font-extrabold text-5xl sm:text-6xl md:text-7xl my-[17px] py-0">
+          <h2 className="section-title relative text-center font-extrabold text-5xl sm:text-6xl md:text-7xl my-[17px] py-0 z-10">
             Notre Studio
           </h2>
         </div>
 
-        <p className="neon-subtitle mt-4 max-w-xl mx-auto text-sm sm:text-base italic">
+        <p className="neon-subtitle mt-4 max-w-xl mx-auto text-sm sm:text-base italic relative z-10">
           Un terrain de jeu analogique où la matière sonore prend vie.
         </p>
       </motion.div>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { ConcentricCircles, AudioWaveform, FrequencyMeter } from "./SectionTitleDecorations";
 
 const services = [
   {
@@ -53,7 +54,16 @@ export default function ServicesSection() {
         transition={{ duration: 0.7 }}
         className="relative mb-14 text-center"
       >
-        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase">
+        {/* Decorative concentric circles behind title */}
+        <ConcentricCircles className="w-[260px] h-[260px] sm:w-[350px] sm:h-[350px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-50" />
+
+        {/* Audio waveform — right side */}
+        <AudioWaveform className="hidden sm:flex right-0 sm:-right-4 top-1/2 -translate-y-1/2 z-0 opacity-40" barCount={45} />
+
+        {/* Frequency meter accents */}
+        <FrequencyMeter className="hidden md:flex -left-12 top-6 z-0" />
+
+        <div className="flex items-center justify-center gap-4 mb-3 text-xs font-mono tracking-[0.3em] text-yellow-400/70 uppercase relative z-10">
           <span className="h-px w-12 bg-yellow-400/50" />
           <span>Chapitre 02</span>
           <span className="h-px w-12 bg-yellow-400/50" />
@@ -72,12 +82,12 @@ export default function ServicesSection() {
               transform: "translate(-50%, -50%) rotate(8deg)",
             }}
           />
-          <h2 className="section-title relative text-center text-5xl sm:text-6xl md:text-7xl font-extrabold my-[25px] py-[10px]">
+          <h2 className="section-title relative text-center text-5xl sm:text-6xl md:text-7xl font-extrabold my-[25px] py-[10px] z-10">
             Nos Services
           </h2>
         </div>
 
-        <p className="neon-subtitle mt-2 max-w-xl mx-auto text-sm sm:text-base italic">
+        <p className="neon-subtitle mt-2 max-w-xl mx-auto text-sm sm:text-base italic relative z-10">
           Trois portes d'entrée, un même culte du son brut.
         </p>
       </motion.div>
